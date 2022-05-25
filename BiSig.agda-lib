@@ -1,0 +1,8 @@
+name: BiSig
+include: 
+  src
+depend: 
+  cubical
+
+flags:
+  --auto-inline --no-import-sorts --without-K --cubical

@@ -1,6 +1,6 @@
 module Prelude where
 
--- open import Function   public
+open import Function   public
 
 open import Data.Empty public
 open import Data.Unit.Polymorphic  public

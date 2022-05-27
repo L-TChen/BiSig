@@ -1,0 +1,12 @@
+\contentsline {todo}{Define a binding signature as a sum of products for untyped language with weakening}{6}{section*.9}%
+\contentsline {todo}{Derive a strong functor along $U$ from a binding signature}{6}{section*.10}%
+\contentsline {todo}{An example of binding signature}{6}{section*.11}%
+\contentsline {todo}{Show that the strong functor associated with a signature gives rise to an initial algebra with substitution}{6}{section*.12}%
+\contentsline {todo}{Define morphism between signatures}{7}{section*.13}%
+\contentsline {todo}{Show that each signature morphism defines a morphism between strong functors}{7}{section*.14}%
+\contentsline {todo}{Representations for initial HSSs}{7}{section*.15}%
+\contentsline {todo}{Translation from named variable to locally nameless representations}{7}{section*.16}%
+\contentsline {todo}{Translation from locally nameless to finitely-scoped representations}{7}{section*.17}%
+\contentsline {todo}{Scope checking by initiality}{7}{section*.18}%
+\contentsline {todo}{Organise this section clearly}{7}{section*.19}%
+\contentsline {todo}{Define bidirectional type inference by initiality}{7}{section*.20}%

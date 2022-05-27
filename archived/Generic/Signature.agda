@@ -21,7 +21,7 @@ data ConDs : Type₁ where
 syntax σ A (λ a → D) = σ[ a ∶ A ] D
 syntax ρ R D         = ρ[     R ] D
 
-infixr 4 _∷_
+infixr 5 _∷_
 
 ⟦_⟧ʳ : RecD → (T : Type → Type) (Γ : Type) → Type
 ⟦ ι   ⟧ʳ T Γ = T Γ
@@ -86,3 +86,47 @@ module _
   str (D ∷ [])         x = strᶜ D x
   str (D ∷ Ds@(_ ∷ _)) (inl x) = inl (strᶜ D x)
   str (D ∷ Ds@(_ ∷ _)) (inr x) = inr (str Ds x)
+
+record Signature (O : Type) : Type₁ where
+  constructor sig
+  field arity : O → List ℕ
+open Signature
+
+expandᶜ : ConD → Type
+expandᶜ ι       = ⊤
+expandᶜ (σ A D) = Σ[ a ∈ A ] expandᶜ (D a)
+expandᶜ (ρ R D) = expandᶜ D
+
+expand : ConDs → Type
+expand []       = ⊥
+expand (D ∷ []) = expandᶜ D
+expand (D ∷ Ds) = expandᶜ D ⊎ expand Ds
+
+toSigʳ : (R : RecD) → ℕ
+toSigʳ ι     = 0
+toSigʳ (δ R) = suc (toSigʳ R)
+
+toSigᶜ : (D : ConD) → expandᶜ D → List ℕ
+toSigᶜ ι       _       = []
+toSigᶜ (σ A D) (a , o) = toSigᶜ (D a) o
+toSigᶜ (ρ R D) t       = toSigʳ R ∷ toSigᶜ D t 
+
+toSig′ : (Ds : ConDs) → expand Ds → List ℕ
+toSig′ []               o = []
+toSig′ (D ∷ [])         o = toSigᶜ D o
+toSig′ (D ∷ Ds@(_ ∷ _)) (inl o) = toSigᶜ D o
+toSig′ (D ∷ Ds@(_ ∷ _)) (inr o) = toSig′ Ds o
+
+toSig : (Ds : ConDs) → Signature (expand Ds)
+arity (toSig Ds) = toSig′ Ds
+
+LC : ConDs
+LC = ρ[ ι ] ρ[ ι ] ι ∷ ρ[ δ ι ] ι ∷ []
+
+data Λₒ : Type where
+  app lam : Λₒ
+
+Λ∶Sig : Signature Λₒ
+Λ∶Sig = sig λ where
+  app → 0 ∷ 0 ∷ []
+  lam → 1 ∷ []

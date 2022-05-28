@@ -29,8 +29,8 @@ rename ρ (` x)         = ` ρ x
 rename ρ (op (o , ts)) = op (o , renameMapᶜ (arity s o) ρ ts)
 renameMapᶜ []       ρ _       = _
 renameMapᶜ (a ∷ as) ρ (t , u) = renameMapᵇ a ρ t , renameMapᶜ as ρ u
-renameMapᵇ zero    ρ t = rename ρ t
-renameMapᵇ (suc a) ρ t = renameMapᵇ a (ext ρ) t
+renameMapᵇ zero     ρ t       = rename ρ t
+renameMapᵇ (suc a)  ρ t       = renameMapᵇ a (ext ρ) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren n m → Tm n → Tm m
@@ -53,30 +53,15 @@ substMapᶜ (a ∷ as) σ (t , u) = substMapᵇ a σ t , substMapᶜ as σ u
 substMapᵇ zero     σ t       = subst σ t
 substMapᵇ (suc a)  σ t       = substMapᵇ a (exts σ) t
 
-module _ {T : ℕ → Set ℓ} (α : s -Alg T) where
-  fold     : Tm ⇒ T
-  foldMapᶜ : (as : List ℕ) → ⟦ as ⟧ᶜ Tm ⇒ ⟦ as ⟧ᶜ T
-  foldMapᵇ : (a : ℕ)       → ⟦ a  ⟧ᵇ Tm ⇒ ⟦ a  ⟧ᵇ T
-
+module _ {T : ℕ → Set ℓ} (α : (s -Alg) T) where mutual
+  fold : Tm ⇒ T
   fold (` x)         = α .var x
   fold (op (o , as)) = α .alg (o , foldMapᶜ (arity s o) as)
 
+  foldMapᶜ : (as : List ℕ) → ⟦ as ⟧ᶜ Tm ⇒ ⟦ as ⟧ᶜ T
   foldMapᶜ []       _       = _
   foldMapᶜ (a ∷ as) (t , u) = foldMapᵇ a t , foldMapᶜ as u
 
+  foldMapᵇ : (a : ℕ)       → ⟦ a  ⟧ᵇ Tm ⇒ ⟦ a  ⟧ᵇ T
   foldMapᵇ zero    t = fold t
   foldMapᵇ (suc a) t = foldMapᵇ a t
-
-heightAlg : s -Alg (Cont ℕ)
-var heightAlg n        .runCont ρ = ρ n
-alg heightAlg (o , ts) .runCont   = suc ∘ algᶜ (arity s o) ts .runCont
-  where
-    algᶜ : ∀ as → as -Algᶜ Cont ℕ
-    algᵇ : ∀ a  → a  -Algᵇ Cont ℕ
-    algᵇ zero    t = t
-    algᵇ (suc a) t .runCont ρ = algᵇ a t .runCont λ where zero → 0; (suc x) → ρ x
-    algᶜ []       t       .runCont _ = 0
-    algᶜ (x ∷ as) (t , u) .runCont ρ = algᵇ x t .runCont ρ ⊔ algᶜ as u .runCont ρ
-
-height : Tm n → ℕ
-height t = fold heightAlg t .runCont (λ _ → 0)

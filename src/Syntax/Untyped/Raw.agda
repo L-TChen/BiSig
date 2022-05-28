@@ -1,50 +1,31 @@
 open import Prelude
+import Syntax.Untyped.Signature as S
 
--- Id is for the type of identitifers
-module Syntax.Untyped.Raw (Id : Set) (_≟_ : (x y : Id) → Dec (x ≡ y)) where
+module Syntax.Untyped.Raw (Id : Set) (_≟_ : Decidable {A = Id} _≡_) {O : Set} (s : S.Sig O) where
 
-open import Syntax.Untyped.Signature as S
-  using (Sig; sig; ∣_∣; arity)
+open import Syntax.Untyped.Term             s
+open import Syntax.Untyped.Raw.Term      Id s public
+open import Syntax.Untyped.Raw.Signature Id
 
 private
   variable
     n m : ℕ
-    O   : Set
-    X Y : Set ℓ
 
-⟦_⟧ᵇ_ : (a : ℕ) → (X : Set) → Set
-⟦ zero ⟧ᵇ  X = X
-⟦ suc a ⟧ᵇ X = Id × ⟦ a ⟧ᵇ X
+_∙_ : Id → (Id → Fin n) → Id → Fin (suc n)
+(x ∙ ρ) y with x ≟ y
+... | yes p = zero
+... | no ¬p = suc (ρ y)
 
-⟦_⟧ᶜ_ : (as : List ℕ) (X : Set) → Set
-⟦ []     ⟧ᶜ _ = ⊤
-⟦ a ∷ as ⟧ᶜ X = ⟦ a ⟧ᵇ X × ⟦ as ⟧ᶜ X
+mutual
+  fromRaw : (Id → Fin n)
+    → Raw → Tm n 
+  fromRaw ρ (` x)         = ` ρ x
+  fromRaw ρ (op (f , ts)) = op (f , (fromRawMapᶜ (S.arity s f) ρ ts))
 
-⟦_⟧_ : (s : Sig O) (X : Set) → Set
-⟦_⟧_ {O} (sig ar) X = Σ[ o ∈ O ] ⟦ ar o ⟧ᶜ X
+  fromRawMapᶜ : ∀ as → (Id → Fin n) → ⟦ as ⟧ᶜ Raw → (S.⟦ as ⟧ᶜ Tm) n
+  fromRawMapᶜ []       ρ _       = _
+  fromRawMapᶜ (a ∷ as) ρ (t , u) = fromRawMapᵇ a ρ t , (fromRawMapᶜ as ρ u)
 
-module _ {O} (s : Sig O) where
-  open import Syntax.Untyped.Term s as T
-
-  data Raw : Set where
-    `_ : Id        → Raw
-    op : ⟦ s ⟧ Raw → Raw
-
-  _∙_ : Id → (Id → Fin n) → Id → Fin (suc n)
-  (x ∙ ρ) y with x ≟ y
-  ... | yes p = zero
-  ... | no ¬p = suc (ρ y)
-  
-  mutual
-    alpha : (Id → Fin n)
-      → Raw → Tm n 
-    alpha ρ (` x)         = ` ρ x
-    alpha ρ (op (f , ts)) = op (f , (alphaMapᶜ (arity s f) ρ ts))
-
-    alphaMapᶜ : ∀ as → (Id → Fin n) → ⟦ as ⟧ᶜ Raw → (S.⟦ as ⟧ᶜ Tm) n
-    alphaMapᶜ []       ρ _       = _
-    alphaMapᶜ (a ∷ as) ρ (t , u) = alphaMapᵇ a ρ t , (alphaMapᶜ as ρ u)
-
-    alphaMapᵇ : ∀ a → (Id → Fin n) → ⟦ a ⟧ᵇ Raw → (S.⟦ a ⟧ᵇ Tm) n
-    alphaMapᵇ zero    ρ t        = alpha ρ t
-    alphaMapᵇ (suc a) ρ (id , t) = alphaMapᵇ a (id ∙ ρ) t
+  fromRawMapᵇ : ∀ a → (Id → Fin n) → ⟦ a ⟧ᵇ Raw → (S.⟦ a ⟧ᵇ Tm) n
+  fromRawMapᵇ zero    ρ t        = fromRaw ρ t
+  fromRawMapᵇ (suc a) ρ (id , t) = fromRawMapᵇ a (id ∙ ρ) t

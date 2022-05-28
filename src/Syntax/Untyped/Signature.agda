@@ -41,14 +41,14 @@ map : (s : Sig O) (f : X ⇒ Y)
   → ⟦ s ⟧ X ⇒ ⟦ s ⟧ Y
 map (sig ar) f (o , x) = (o , mapᶜ (ar o) f x)
 
-_-Algᵇ_ : (a : ℕ) (X : ℕ → Set ℓ) → Set ℓ
-a -Algᵇ X = ⟦ a ⟧ᵇ X ⇒ X
+_-Algᵇ : (a : ℕ) (X : ℕ → Set ℓ) → Set ℓ
+(a -Algᵇ) X = ⟦ a ⟧ᵇ X ⇒ X
 
-_-Algᶜ_ : (as : List ℕ) (X : ℕ → Set ℓ) → Set ℓ
-as -Algᶜ X = ⟦ as ⟧ᶜ X ⇒ X
+_-Algᶜ : (as : List ℕ) (X : ℕ → Set ℓ) → Set ℓ
+(as -Algᶜ) X = ⟦ as ⟧ᶜ X ⇒ X
 
-record _-Alg_ (s : Sig O) (X : ℕ → Set ℓ) : Set ℓ where
+record _-Alg (s : Sig O) (X : ℕ → Set ℓ) : Set ℓ where
   field
     var : Fin     ⇒ X
     alg : ⟦ s ⟧ X ⇒ X
-open _-Alg_ public
+open _-Alg public

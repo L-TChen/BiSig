@@ -8,7 +8,7 @@ open import Syntax.Untyped.Signature
 data Λₒ : Set where
   app abs : Λₒ
 
-Λ∶Sig : Signature Λₒ
+Λ∶Sig : Sig Λₒ
 ∣ Λ∶Sig ∣ = λ where
   app → 0 ∷ 0 ∷ []
   abs → 1 ∷ []

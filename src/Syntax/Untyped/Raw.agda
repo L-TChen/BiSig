@@ -16,16 +16,16 @@ _∙_ : Id → (Id → Fin n) → Id → Fin (suc n)
 ... | yes p = zero
 ... | no ¬p = suc (ρ y)
 
+_∙∙_ : ∀ {a} → Id ^ a → (Id → Fin n) → Id → Fin (a + n)
+_∙∙_ {a = zero}  _        ρ = ρ
+_∙∙_ {a = suc a} (xs , x) ρ = x ∙ (xs ∙∙ ρ)
+
 mutual
   fromRaw : (Id → Fin n)
     → Raw → Tm n 
   fromRaw ρ (` x)         = ` ρ x
   fromRaw ρ (op (f , ts)) = op (f , (fromRawMapᶜ (S.arity s f) ρ ts))
 
-  fromRawMapᶜ : ∀ as → (Id → Fin n) → ⟦ as ⟧ᶜ Raw → (S.⟦ as ⟧ᶜ Tm) n
-  fromRawMapᶜ []       ρ _       = _
-  fromRawMapᶜ (a ∷ as) ρ (t , u) = fromRawMapᵇ a ρ t , (fromRawMapᶜ as ρ u)
-
-  fromRawMapᵇ : ∀ a → (Id → Fin n) → ⟦ a ⟧ᵇ Raw → (S.⟦ a ⟧ᵇ Tm) n
-  fromRawMapᵇ zero    ρ t        = fromRaw ρ t
-  fromRawMapᵇ (suc a) ρ (id , t) = fromRawMapᵇ a (id ∙ ρ) t
+  fromRawMapᶜ : ∀ as → (Id → Fin n) → ⟦ as ⟧ᶜ Raw → (S.⟦ as ⟧ᵃ Tm) n
+  fromRawMapᶜ []       ρ _               = _
+  fromRawMapᶜ (a ∷ as) ρ ((ids , t) , u) = fromRaw (ids ∙∙ ρ) t , (fromRawMapᶜ as ρ u)

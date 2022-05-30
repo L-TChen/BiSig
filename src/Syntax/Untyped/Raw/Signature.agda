@@ -8,13 +8,13 @@ private
   variable
     O   : Set
 
-⟦_⟧ᵇ_ : (a : ℕ) → (X : Set) → Set
-⟦ zero ⟧ᵇ  X = X
-⟦ suc a ⟧ᵇ X = Id × ⟦ a ⟧ᵇ X
+_^_ : (X : Set ℓ) → ℕ → Set ℓ
+X ^ zero       = ⊤
+X ^ suc n      = (X ^ n) × X
 
 ⟦_⟧ᶜ_ : (as : List ℕ) (X : Set) → Set
 ⟦ []     ⟧ᶜ _ = ⊤
-⟦ a ∷ as ⟧ᶜ X = ⟦ a ⟧ᵇ X × ⟦ as ⟧ᶜ X
+⟦ a ∷ as ⟧ᶜ X = ((Id ^ a) × X)  × ⟦ as ⟧ᶜ X
 
 ⟦_⟧_ : (s : Sig O) (X : Set) → Set
 ⟦_⟧_ {O} (sig ar) X = Σ[ o ∈ O ] ⟦ ar o ⟧ᶜ X

@@ -4,7 +4,7 @@ import Syntax.Typed.Signature as S
 
 module Syntax.Typed.DecOp {T O : Set} (_≟o_ : Decidable {A = O} _≡_) (s : S.Sig T O) where
 
-open import Syntax.Context T
+open import Syntax.Typed.Context T
 open import Syntax.Typed.Term s
 open S T
 
@@ -35,8 +35,12 @@ mutual
 
   compareMap : ∀ as {Γ} → (t u : (⟦ as ⟧ᵃ Tm) Γ) → Dec (t ≡ u)
   compareMap ∅        _ _ = yes refl
-  compareMap (a ∙ as) (t , ts) (u , us) with t ≟ u 
+  compareMap (a ∙ as) (t , ts) (u , us) with compareMapᵇ a t u
   ... | no ¬p = no λ where refl → ¬p refl
-  ... | yes refl with compareMap as ts us 
-  ... | no ¬p = no λ where refl → ¬p refl
+  ... | yes refl with compareMap as ts us
+  ... | no ¬p    = no λ where refl → ¬p refl
   ... | yes refl = yes refl
+
+  compareMapᵇ : ∀ a {Γ} → (t u : (⟦ a ⟧ᵇ Tm) Γ) → Dec (t ≡ u)
+  compareMapᵇ (∅       , A) t u = t ≟ u
+  compareMapᵇ ((B ∙ Δ) , A) t u = compareMapᵇ (Δ , A) t u

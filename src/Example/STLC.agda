@@ -8,7 +8,7 @@ data Λₜ : Set where
   ι   : Λₜ
   _↣_ : (A B : Λₜ) → Λₜ
 
-open import Syntax.Context         Λₜ
+open import Syntax.Typed.Context   Λₜ
 open import Syntax.Typed.Signature Λₜ
 
 private variable
@@ -24,8 +24,11 @@ data Λₒ : Set where
   (app {A} {B}) → ([] , A ↣ B) ∷ ([] , A) ∷ [] , B
   (abs {A} {B}) → (A ∷ [] , B) ∷ [] , A ↣ B
 
-open import Syntax.Typed.Term Λ∶Sig
+open import Syntax.Typed.Term Λ∶Sig public
+  using (Tm; `_; op)
  
+Λ = Tm
+
 infixl 6 _·_
 infixr 5 ƛ_
 pattern ƛ_  t   = op (abs , refl , t , _)

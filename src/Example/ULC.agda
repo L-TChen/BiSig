@@ -13,19 +13,19 @@ data Λₒ : Set where
   app → 0 ∷ 0 ∷ []
   abs → 1 ∷ []
 
-open import Syntax.Untyped.Term Λ∶Sig renaming (Tm to Λ)
+open import Syntax.Untyped.Term Λ∶Sig -- renaming (Tm to Λ)
 open import Syntax.Untyped.Raw  String _≟s_ Λ∶Sig
 
 infixl 6 _·_
 infixr 5 ƛ_ ƛ_↦_
 pattern ƛ_  t    = op (abs , t , _)
-pattern ƛ_↦_ x t = op (abs , ((_ , x) , t) , _)
+pattern ƛ_↦_ x t = op (abs , (x , t) , _)
 pattern _·_ t u  = op (app , t , u , _)
 
-identity : Λ 0
+identity : Tm 0
 identity = ƛ ` (# 0)
 
-t₁ : Λ 0
+t₁ : Tm 0
 t₁ = ƛ ƛ ` (# 0) · ` (# 1)
 
 rt : Raw

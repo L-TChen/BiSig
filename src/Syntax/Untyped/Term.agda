@@ -17,10 +17,9 @@ Ren : (Γ Δ : Ctx) → Set
 Ren Γ Δ = Fin Γ → Fin Δ
 
 ext : Ren Γ Δ
-  → Ren (Ξ + Γ) (Ξ + Δ)
-ext {Ξ = zero}  ρ x = ρ x
-ext {Ξ = suc _} ρ zero    = zero
-ext {Ξ = suc _} ρ (suc x) = suc (ext ρ x)
+  → Ren (suc Γ) (suc Δ)
+ext ρ zero    = zero
+ext ρ (suc x) = suc (ρ x)
 
 mutual
   rename : Ren Γ Δ
@@ -31,7 +30,12 @@ mutual
   renameMap : ∀ as → Ren Γ Δ
     → (⟦ as ⟧ᵃ Tm) Γ → (⟦ as ⟧ᵃ Tm) Δ
   renameMap []       ρ _       = _
-  renameMap (a ∷ as) ρ (t , ts) = rename (ext ρ) t , renameMap as ρ ts
+  renameMap (a ∷ as) ρ (t , ts) = renameMapᵇ a ρ t , renameMap as ρ ts
+
+  renameMapᵇ : ∀ a → Ren Γ Δ
+    → (⟦ a ⟧ᵇ Tm) Γ → (⟦ a ⟧ᵇ Tm) Δ
+  renameMapᵇ zero    ρ t = rename ρ t
+  renameMapᵇ (suc a) ρ t = renameMapᵇ a (ext ρ) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ → Tm Γ → Tm Δ
@@ -41,10 +45,9 @@ Sub : (Γ Δ : ℕ) → Set
 Sub Γ Δ = Fin Γ → Tm Δ
 
 exts : Sub Γ Δ
-  → Sub (Ξ + Γ) (Ξ + Δ)
-exts {Ξ = zero}  σ x = σ x
-exts {Ξ = suc _} σ zero    = ` zero
-exts {Ξ = suc _} σ (suc x) = rename suc (exts σ x)
+  → Sub (suc Γ) (suc Δ)
+exts σ zero    = ` zero
+exts σ (suc x) = rename suc (σ x)
 
 mutual
   subst : Sub Γ Δ → Tm Γ → Tm Δ
@@ -53,7 +56,11 @@ mutual
 
   substMap : ∀ as → Sub Γ Δ → (⟦ as ⟧ᵃ Tm) Γ → (⟦ as ⟧ᵃ Tm) Δ
   substMap []       σ _       = _
-  substMap (a ∷ as) σ (t , u) = subst (exts σ) t , substMap as σ u
+  substMap (a ∷ as) σ (t , u) = substMapᵇ a σ t , substMap as σ u
+
+  substMapᵇ : ∀ a → Sub Γ Δ → (⟦ a ⟧ᵇ Tm) Γ → (⟦ a ⟧ᵇ Tm) Δ
+  substMapᵇ zero    σ t = subst σ t
+  substMapᵇ (suc a) σ t = substMapᵇ a (exts σ) t
 
 infixr 5 ⟪_⟫_
 ⟪_⟫_ : Sub Γ Δ
@@ -67,4 +74,8 @@ module _ {T : Fam ℓ} (α : (s -Alg) T) where mutual
 
   foldMap : ∀ as → ⟦ as ⟧ᵃ Tm ⇒₁ ⟦ as ⟧ᵃ T
   foldMap []       _       = _
-  foldMap (a ∷ as) (t , u) = fold t , foldMap as u
+  foldMap (a ∷ as) (t , u) = foldMapᵇ a t , foldMap as u
+
+  foldMapᵇ : ∀ a → ⟦ a ⟧ᵇ Tm ⇒₁ ⟦ a ⟧ᵇ T
+  foldMapᵇ zero    t = fold t
+  foldMapᵇ (suc a) t = foldMapᵇ a t

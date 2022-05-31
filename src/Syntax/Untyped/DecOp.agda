@@ -24,8 +24,12 @@ mutual
 
   compareMap : ∀ as {n} → Decidable {A = (⟦ as ⟧ᵃ Tm) n } _≡_
   compareMap []       _        _        = yes refl
-  compareMap (a ∷ as) (t , ts) (u , us) with t ≟ u
-  ... | no ¬p = no λ where refl → ¬p refl
+  compareMap (a ∷ as) (t , ts) (u , us) with compareMapᵇ a t u
+  ... | no ¬p    =  no λ where refl → ¬p refl 
   ... | yes refl with compareMap as ts us
-  ... | yes refl = yes refl
-  ... | no ¬p = no λ where refl → ¬p refl
+  ... | no ¬p    =  no λ where refl → ¬p refl
+  ... | yes refl =  yes refl
+
+  compareMapᵇ : ∀ a {n} → Decidable {A = (⟦ a ⟧ᵇ Tm) n} _≡_
+  compareMapᵇ zero    t u = t ≟ u
+  compareMapᵇ (suc a) t u = compareMapᵇ a t u

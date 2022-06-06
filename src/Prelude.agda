@@ -1,6 +1,7 @@
 module Prelude where
 
 open import Function                           public
+  hiding (_∋_)
 open import Data.Empty.Polymorphic             public
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)

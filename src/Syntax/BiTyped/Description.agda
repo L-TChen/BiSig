@@ -2,25 +2,29 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.Typed.Description (SD : S.Desc)  where
+module Syntax.BiTyped.Description (SD : S.Desc)  where
 
 open import Syntax.Simple.Term      SD as Ty
   renaming (Tm₀ to T)
 open import Syntax.Simple.Operation SD
 open import Syntax.Context    T
 
+data Mode : Set where
+  Check Infer : Mode
+
 Fam : (ℓ : Level) → Set (lsuc ℓ)
-Fam ℓ = T → Ctx → Set ℓ
+Fam ℓ = Mode → T → Ctx → Set ℓ
 
 Fam₀ = Fam lzero
 
 private variable
+  m     : Mode
   A B   : T
   Γ Δ Ξ : Ctx
   X Y   : Fam ℓ
 
 data ArgD  (Ξ : Ctx) : Set where
-  ⊢_  : (B : TExp Ξ)              → ArgD Ξ
+  ι   : (m : Mode)   (B : TExp Ξ) → ArgD Ξ
   _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
 
 data ArgsD (Ξ : Ctx) : Set where
@@ -28,13 +32,17 @@ data ArgsD (Ξ : Ctx) : Set where
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
 data ConD (Ξ : Ctx) : Set where
-  ι : (A : TExp Ξ)                 (D : ArgsD Ξ) → ConD Ξ
-  σ : (D : (A : T) → ConD (A ∙ Ξ))               → ConD Ξ
+  ι : (m : Mode)                   (A : TExp Ξ) (D : ArgsD Ξ) → ConD Ξ
+  σ : (D : (A : T) → ConD (A ∙ Ξ))                            → ConD Ξ
 
-infix  5 ⊢_
 infixr 6 σ
 infixr 7 ρ 
-syntax ι A D       = ▷ D ⦂ A
+▷_⇉_ : (D : ArgsD Ξ) (A : TExp Ξ) → ConD Ξ
+▷ D ⇉ A = ι Infer A D
+
+▷_⇇_ : (D : ArgsD Ξ) (A : TExp Ξ) → ConD Ξ
+▷ D ⇇ A = ι Check A D
+
 syntax σ (λ A → D) = σ[ A ] D
 syntax ρ D Ds      = ρ[ D ] Ds
 
@@ -42,26 +50,23 @@ Desc : Set
 Desc = List $ ConD ∅
 
 ⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Ctx → Set ℓ
-(⟦ ⊢    B ⟧ᵃ X) Γ = X (flatten B) Γ
-(⟦ A ∙ As ⟧ᵃ X) Γ = (⟦ As ⟧ᵃ X) (flatten A ∙ Γ)
+(⟦ ι m B ⟧ᵃ X) Γ = X m (flatten B) Γ
+(⟦ A ∙ D ⟧ᵃ X) Γ = (⟦ D ⟧ᵃ X) (flatten A ∙ Γ)
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Ctx → Set ℓ
 (⟦ ι      ⟧ᵃˢ _) _ = ⊤
 (⟦ ρ D Ds ⟧ᵃˢ X) Γ = (⟦ D ⟧ᵃ X) Γ × (⟦ Ds ⟧ᵃˢ X) Γ
 
 ⟦_⟧ᶜ_ : (D : ConD Ξ) (X : Fam ℓ) → Fam ℓ
-(⟦ ι B D ⟧ᶜ X) A Γ = flatten B ≡ A × (⟦ D ⟧ᵃˢ X) Γ
-(⟦ σ D   ⟧ᶜ X) A Γ = Σ[ B ∈ T ] (⟦ D B ⟧ᶜ X) A Γ
+(⟦ ι m B D ⟧ᶜ X) m′ A Γ = flatten B ≡ A × m ≡ m′ × (⟦ D ⟧ᵃˢ X) Γ
+(⟦ σ D     ⟧ᶜ X) m  A Γ = Σ[ B ∈ T ] (⟦ D B ⟧ᶜ X) m A Γ
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ []      ⟧ _) _ _ = ⊥
-(⟦ D ∷ Ds ⟧ X) A Γ = (⟦ D ⟧ᶜ X) A Γ ⊎ (⟦ Ds ⟧ X) A Γ
+(⟦ []      ⟧ _) m _ _ = ⊥
+(⟦ D ∷ Ds ⟧ X)  m A Γ = (⟦ D ⟧ᶜ X) m A Γ ⊎ (⟦ Ds ⟧ X) m A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where
   field
-    var : _∈_     ⇒ X
-    alg : ⟦ D ⟧ X ⇒ X
+    var : _∈_         ⇒ X Infer
+    alg : (⟦ D ⟧ X) m ⇒ X m
 open _-Alg public
-
--- Mode-Correct (BD : B.Desc) : Ctx → Ctx → Set
--- Complete (D : T.Desc) (BD : B.Desc) : Set

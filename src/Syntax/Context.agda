@@ -18,12 +18,6 @@ data _∈_ : T → Ctx → Set where
   suc  : {A B : T} {Γ : Ctx}
     → A ∈ Γ → A ∈ B ∙ Γ
 
-Fam : (ℓ : Level) → Set (lsuc ℓ)
-Fam ℓ = T → Ctx → Set ℓ
-
-Fam₀ = Fam lzero
-
-
 _≟_ : ∀ {Γ} → (x y : A ∈ Γ) → Dec (x ≡ y)
 zero  ≟ zero  = yes refl
 suc x ≟ suc y with x ≟ y

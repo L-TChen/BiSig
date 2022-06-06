@@ -8,7 +8,7 @@ open Typed SD
 open import Syntax.Simple.Term SD
   using ()
   renaming (Tm₀ to T)
-open import Syntax.Typed.Context T
+open import Syntax.Context T
 
 private
   variable
@@ -38,9 +38,8 @@ mutual
   renameMap : ∀ D
     → Ren Γ Δ 
     → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
-  renameMap ∅        _ ()
-  renameMap (D ∙ _)  f (inl t) = inl (renameMapᶜ D f t)
-  renameMap (_ ∙ Ds) f (inr t) = inr (renameMap Ds f t)
+  renameMap (D ∷ _)  f (inl t) = inl (renameMapᶜ D f t)
+  renameMap (_ ∷ Ds) f (inr t) = inr (renameMap Ds f t)
 
   renameMapᶜ : (D : ConD Ξ)
     → Ren Γ Δ
@@ -57,8 +56,8 @@ mutual
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃ Tm) Γ → (⟦ D ⟧ᵃ Tm) Δ
-  renameMapᵃ (∅     , B) f t = rename f t
-  renameMapᵃ (A ∙ Δ , B) f t = renameMapᵃ (Δ , B) (ext f) t
+  renameMapᵃ (⊢ B)   f t = rename f t
+  renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -81,8 +80,8 @@ mutual
   substMap : ∀ D
     → Sub Γ Δ 
     → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
-  substMap (D ∙ Ds) f (inl x) = inl (substMapᶜ D f x)
-  substMap (D ∙ Ds) f (inr y) = inr (substMap Ds f y)
+  substMap (D ∷ Ds) f (inl x) = inl (substMapᶜ D f x)
+  substMap (D ∷ Ds) f (inr y) = inr (substMap Ds f y)
 
   substMapᶜ : (D : ConD Ξ)
     → Sub Γ Δ
@@ -99,8 +98,8 @@ mutual
   substMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃ Tm) Γ → (⟦ D ⟧ᵃ Tm) Δ
-  substMapᵃ (∅     , B) f t = subst f t
-  substMapᵃ (A ∙ Δ , B) f t = substMapᵃ (Δ , B) (exts f) t
+  substMapᵃ (⊢ B)   f t = subst f t
+  substMapᵃ (A ∙ Δ) f t = substMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
 ⟪_⟫_ : Sub Γ Δ
@@ -129,5 +128,5 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → ⟦ D ⟧ᵃ Tm ⇒₁ ⟦ D ⟧ᵃ X
-  foldMapᵃ (∅     , B) t = fold t
-  foldMapᵃ (A ∙ Δ , B) t = foldMapᵃ (Δ , B) t
+  foldMapᵃ (⊢ B)   t = fold t
+  foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

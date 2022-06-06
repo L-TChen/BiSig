@@ -1,23 +1,28 @@
 open import Prelude
 
-module Syntax.Typed.Context (T : Set) where
+module Syntax.Context (T : Set) where
 
-open import Data.List
+infixr 5 _∙_
+data Ctx : Set where
+  ∅   :                     Ctx
+  _∙_ : (A : T) (Γ : Ctx) → Ctx
 
-Ctx = List T
+private variable
+  Γ   : Ctx
+  A B : T
+
+infix 4 _∈_
+data _∈_ : T → Ctx → Set where
+  zero : {A : T} {Γ : Ctx}
+    → A ∈ A ∙ Γ
+  suc  : {A B : T} {Γ : Ctx}
+    → A ∈ Γ → A ∈ B ∙ Γ
 
 Fam : (ℓ : Level) → Set (lsuc ℓ)
 Fam ℓ = T → Ctx → Set ℓ
 
 Fam₀ = Fam lzero
 
-private variable
-  Γ   : Ctx
-  A B : T
-
-infixr 5 _∙_
-pattern ∅       = []
-pattern _∙_ A Γ = A ∷ Γ
 
 _≟_ : ∀ {Γ} → (x y : A ∈ Γ) → Dec (x ≡ y)
 zero  ≟ zero  = yes refl

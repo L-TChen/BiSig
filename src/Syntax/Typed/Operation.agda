@@ -9,7 +9,7 @@ open import Syntax.Simple.Term SD
   renaming (Tm₀ to T)
 open import Syntax.Simple.Operation as S
 
-open import Syntax.Typed.Context T
+open import Syntax.Context T
   renaming (_≟_ to _≟ᵢ_)
 open import Syntax.Typed.Term D
 
@@ -34,14 +34,14 @@ mutual
   op _ ≟ ` _  = no λ ()
 
   compareMap : ∀ D → (t u : (⟦ D ⟧ Tm) A Γ) → Dec (t ≡ u)
-  compareMap (n ∙ ns) (inl t) (inl u) with compareMapᶜ n t u
+  compareMap (n ∷ ns) (inl t) (inl u) with compareMapᶜ n t u
   ... | yes p = yes (cong inl p)
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (_ ∙ ns) (inr t) (inr u) with compareMap ns t u 
+  compareMap (_ ∷ ns) (inr t) (inr u) with compareMap ns t u 
   ... | yes p = yes (cong inr p)
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (n ∙ ns) (inl _) (inr _) = no λ ()
-  compareMap (n ∙ ns) (inr _) (inl _) = no λ ()
+  compareMap (n ∷ ns) (inl _) (inr _) = no λ ()
+  compareMap (n ∷ ns) (inr _) (inl _) = no λ ()
 
   compareMapᶜ : (D : ConD Ξ) → (t u : (⟦ D ⟧ᶜ Tm) A Γ) → Dec (t ≡ u)
   compareMapᶜ (ι A D) (refl , t) (refl , u) with compareMapᵃˢ D t u
@@ -62,5 +62,5 @@ mutual
   ... | yes q = yes (cong₂ _,_ p q)
 
   compareMapᵃ : (D : ArgD Ξ) → (t u : (⟦ D ⟧ᵃ Tm) Γ) → Dec (t ≡ u)
-  compareMapᵃ (∅     , B) t u = t ≟ u
-  compareMapᵃ (A ∙ Δ , B) t u = compareMapᵃ (Δ , B) t u
+  compareMapᵃ (⊢ B)   t u = t ≟ u
+  compareMapᵃ (A ∙ Δ) t u = compareMapᵃ Δ t u

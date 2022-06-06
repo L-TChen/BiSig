@@ -42,13 +42,3 @@ X ⇒₁ Y = ∀ {i} → X i → Y i
 _⇒_ : {I : Set ℓ₁} {J : Set ℓ₂}
   → (X : I → J → Set ℓ) (Y : I → J → Set ℓ′) → Set _
 X ⇒ Y = ∀ {i j} → X i j → Y i j
-
-private variable
-  A   : Set ℓ
-  xs  : List A
-  x y : A
-
-infix 4 _∈_
-data _∈_ {A : Set ℓ} : A → List A → Set ℓ where
-  zero : x ∈ x ∷ xs
-  suc : x ∈ xs → x ∈ y ∷ xs

@@ -3,6 +3,7 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
+
 private variable
   A B : Set
 
@@ -66,3 +67,11 @@ module _ {X : Set → Set} (α : (D -Alg) X) where mutual
   foldMapⁿ : ∀ n → Tm A ^ n → X A ^ n
   foldMapⁿ zero    _        = _
   foldMapⁿ (suc n) (t , ts) = fold t , foldMapⁿ n ts
+
+open import Syntax.Context Tm₀
+
+TExp : Ctx → Set
+TExp Ξ = Tm (∃ (_∈ Ξ))
+
+flatten : {Ξ : Ctx} → TExp Ξ → Tm₀
+flatten = ⟪ id ⟫_ ∘ rename proj₁

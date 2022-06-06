@@ -1,7 +1,10 @@
 open import Prelude
 
-module Generic.Erasure.Type {T O : Set} where
+import Syntax.Simple.Description     as S
+open import Syntax.Typed.Description as T
 
+module Language.Erasure.Type {SD : S.Desc} {D : T.Desc SD} where
+{-
 open import Syntax.Typed.Signature   T as Typed
 open import Syntax.Untyped.Signature   as Untyped
   hiding (Ctx)
@@ -47,3 +50,4 @@ module _ {s : Typed.Sig O} where mutual
     → (Untyped.⟦ eraseArg a ⟧ᵇ Untyped.Tm (eraseₛ s)) (length Γ)
   eraseMapᵇ (∅       , A) t = erase t
   eraseMapᵇ ((_ ∙ Δ) , A) t = eraseMapᵇ (Δ , A) t
+  -}

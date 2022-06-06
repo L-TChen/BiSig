@@ -1,89 +1,133 @@
 open import Prelude
 
-import Syntax.Typed.Signature as S
+import Syntax.Simple.Description as S
+import Syntax.Typed.Description  as Typed
 
-module Syntax.Typed.Term {T : Set} {O : Set} (s : S.Sig T O) where
-
+module Syntax.Typed.Term {SD : S.Desc} (D : Typed.Desc SD) where
+open Typed SD
+open import Syntax.Simple.Term SD
+  using ()
+  renaming (Tm₀ to T)
 open import Syntax.Typed.Context T
-open S   T hiding (arity; sort)
-open Sig s
 
 private
   variable
-    A B   : T 
+    A B   : T
     Γ Δ Ξ : Ctx
 
 infix 40 `_
 
-data Tm : T → Ctx → Set where
-  `_ : _∈_      ⇒ Tm
-  op : ⟦ s ⟧ Tm ⇒ Tm 
+data Tm : Fam₀ where
+  `_ : _∈_       ⇒ Tm 
+  op : ⟦ D ⟧ Tm  ⇒ Tm 
 
 Ren : (Γ Δ : Ctx) → Set
 Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
 
 ext : Ren Γ Δ
   → Ren (A ∙ Γ) (A ∙ Δ)
-ext ρ zero    = zero
-ext ρ (suc x) = suc (ρ x)
+ext f zero    = zero
+ext f (suc x) = suc (f x)
 
 mutual
-  rename :  Ren Γ Δ → Tm A Γ     → Tm A Δ
-  rename ρ (` x)                = ` ρ x
-  rename ρ (op (o , refl , ts)) = op (o , refl , renameMap (arity o) ρ ts)
+  rename : Ren Γ Δ 
+    → Tm A Γ → Tm A Δ
+  rename f (`  x) = ` f x
+  rename f (op t) = op (renameMap _ f t)
 
-  renameMap : (as : Args)
-    → Ren Γ Δ
-    → (⟦ as ⟧ᵃ Tm) Γ → (⟦ as ⟧ᵃ Tm) Δ
-  renameMap ∅        ρ _        = _
-  renameMap (a ∙ as) ρ (t , ts) = renameMapᵇ a ρ t , renameMap as ρ ts
+  renameMap : ∀ D
+    → Ren Γ Δ 
+    → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
+  renameMap ∅        _ ()
+  renameMap (D ∙ _)  f (inl t) = inl (renameMapᶜ D f t)
+  renameMap (_ ∙ Ds) f (inr t) = inr (renameMap Ds f t)
 
-  renameMapᵇ : (a : Arg)
+  renameMapᶜ : (D : ConD Ξ)
     → Ren Γ Δ
-    → (⟦ a ⟧ᵇ Tm) Γ → (⟦ a ⟧ᵇ Tm) Δ
-  renameMapᵇ (∅       , A) ρ t = rename ρ t
-  renameMapᵇ ((B ∙ Δ) , A) ρ t = renameMapᵇ (Δ , A) (ext ρ) t
+    → (⟦ D ⟧ᶜ Tm) A Γ → (⟦ D ⟧ᶜ Tm) A Δ
+  renameMapᶜ (ι A D) f (eq , ts) = eq , renameMapᵃˢ D f ts
+  renameMapᶜ (σ D)   f (_ , t)   = _ , renameMapᶜ (D _) f t
+
+  renameMapᵃˢ : (D : ArgsD Ξ)
+    → Ren Γ Δ
+    → (⟦ D ⟧ᵃˢ Tm) Γ → (⟦ D ⟧ᵃˢ Tm) Δ
+  renameMapᵃˢ ι        f _        = _
+  renameMapᵃˢ (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMapᵃˢ Ds f ts
+
+  renameMapᵃ : (D : ArgD Ξ)
+    → Ren Γ Δ
+    → (⟦ D ⟧ᵃ Tm) Γ → (⟦ D ⟧ᵃ Tm) Δ
+  renameMapᵃ (∅     , B) f t = rename f t
+  renameMapᵃ (A ∙ Δ , B) f t = renameMapᵃ (Δ , B) (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
   → ∀ {A} → Tm A Γ → Tm A Δ
-⟨ ρ ⟩ t = rename ρ t
+⟨ f ⟩ t = rename f t
 
 Sub : (Γ Δ : Ctx) → Set
 Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm A Δ
 
 exts : Sub Γ Δ → Sub (A ∙ Γ) (A ∙ Δ)
-exts σ zero    = ` zero
-exts σ (suc x) = rename suc (σ x)
+exts f zero    = ` zero
+exts f (suc x) = rename suc (f x)
 
 mutual
   subst : Sub Γ Δ
     → ∀ {A} → Tm A Γ → Tm A Δ
-  subst σ (` x)  = σ x
-  subst σ (op (o , refl , ts)) = op (o , (refl , (substMap _ σ ts)))
+  subst f (` x)  = f x
+  subst f (op t) = op (substMap _ f t)
 
-  substMap : ∀ as → Sub Γ Δ → (⟦ as ⟧ᵃ Tm) Γ → (⟦ as ⟧ᵃ Tm) Δ
-  substMap ∅        σ _        = _
-  substMap (a ∙ as) σ (t , ts) = substMapᵇ a σ t , substMap as σ ts
+  substMap : ∀ D
+    → Sub Γ Δ 
+    → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
+  substMap (D ∙ Ds) f (inl x) = inl (substMapᶜ D f x)
+  substMap (D ∙ Ds) f (inr y) = inr (substMap Ds f y)
 
-  substMapᵇ : ∀ a → Sub Γ Δ → (⟦ a ⟧ᵇ Tm) Γ → (⟦ a ⟧ᵇ Tm) Δ
-  substMapᵇ (∅       , A) σ t = subst σ t
-  substMapᵇ ((B ∙ Δ) , A) σ t = substMapᵇ (Δ , A) (exts σ) t
+  substMapᶜ : (D : ConD Ξ)
+    → Sub Γ Δ
+    → (⟦ D ⟧ᶜ Tm) A Γ → (⟦ D ⟧ᶜ Tm) A Δ
+  substMapᶜ (ι A D) f (eq , ts) = eq , substMapᵃˢ D f ts
+  substMapᶜ (σ D)   f (_  , ts) = _  , substMapᶜ (D _) f ts
+
+  substMapᵃˢ : (D : ArgsD Ξ)
+    → Sub Γ Δ
+    → (⟦ D ⟧ᵃˢ Tm) Γ → (⟦ D ⟧ᵃˢ Tm) Δ
+  substMapᵃˢ ι        f _        = _
+  substMapᵃˢ (ρ D Ds) f (t , ts) = substMapᵃ D f t , substMapᵃˢ Ds f ts
+
+  substMapᵃ : (D : ArgD Ξ)
+    → Sub Γ Δ
+    → (⟦ D ⟧ᵃ Tm) Γ → (⟦ D ⟧ᵃ Tm) Δ
+  substMapᵃ (∅     , B) f t = subst f t
+  substMapᵃ (A ∙ Δ , B) f t = substMapᵃ (Δ , B) (exts f) t
 
 infixr 5 ⟪_⟫_
 ⟪_⟫_ : Sub Γ Δ
   → ∀ {A} → Tm A Γ → Tm A Δ
-⟪ σ ⟫ t = subst σ t
+⟪ f ⟫ t = subst f t
 
-module _ {X : Fam ℓ} (α : (s -Alg) X) where mutual
+module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold : Tm ⇒ X
-  fold (` x)              = α .var x
-  fold (op (o , eq , as)) = α .alg ((o , eq , foldMap _ as))
+  fold (` x)  = α .var x -- α .var x
+  fold (op t) = α .alg (foldMap _ t)
 
-  foldMap : ∀ as → ⟦ as ⟧ᵃ Tm ⇒₁ ⟦ as ⟧ᵃ X
-  foldMap ∅        _        = _
-  foldMap (a ∙ as) (t , ts) = foldMapᵇ a t , foldMap as ts
+  foldMap : ∀ D
+    → ⟦ D ⟧ Tm ⇒ ⟦ D ⟧ X
+  foldMap (D ∷ Ds) (inl t) = inl (foldMapᶜ D t)
+  foldMap (D ∷ Ds) (inr t) = inr (foldMap Ds t)
 
-  foldMapᵇ : ∀ a → ⟦ a ⟧ᵇ Tm ⇒₁ ⟦ a ⟧ᵇ X
-  foldMapᵇ (∅       , B) t = fold t
-  foldMapᵇ ((A ∙ Δ) , B) t = foldMapᵇ (Δ , B) t
+  foldMapᶜ : ∀ (D : ConD Ξ)
+    → ⟦ D ⟧ᶜ Tm ⇒ ⟦ D ⟧ᶜ X
+  foldMapᶜ (ι A D) (eq , t) = eq , foldMapᵃˢ D t
+  foldMapᶜ (σ D)   (A , t)  = A , foldMapᶜ (D A) t
+
+  foldMapᵃˢ : ∀ (D : ArgsD Ξ)
+    → ⟦ D ⟧ᵃˢ Tm ⇒₁ ⟦ D ⟧ᵃˢ X
+  foldMapᵃˢ ι        _        = _
+  foldMapᵃˢ (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMapᵃˢ Ds ts
+
+  foldMapᵃ : ∀ (D : ArgD Ξ)
+    → ⟦ D ⟧ᵃ Tm ⇒₁ ⟦ D ⟧ᵃ X
+  foldMapᵃ (∅     , B) t = fold t
+  foldMapᵃ (A ∙ Δ , B) t = foldMapᵃ (Δ , B) t

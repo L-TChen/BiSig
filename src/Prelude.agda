@@ -1,7 +1,7 @@
 module Prelude where
 
 open import Function                           public
-open import Data.Empty                         public
+open import Data.Empty.Polymorphic             public
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 open import Data.Nat                           public
@@ -34,12 +34,6 @@ open import Level                                 public
 variable
   ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ : Level
 
--- relative continuation monad
-record Cont (Val : Set) (n : ℕ) : Set where
-  constructor cont
-  field runCont : (Fin n → Val) → Val
-open Cont public
-
 infixr -10 _⇒₁_ _⇒_
 _⇒₁_ : {I : Set ℓ′}
   → (X : I → Set ℓ₁) (Y : I → Set ℓ₂) → Set _
@@ -48,3 +42,13 @@ X ⇒₁ Y = ∀ {i} → X i → Y i
 _⇒_ : {I : Set ℓ₁} {J : Set ℓ₂}
   → (X : I → J → Set ℓ) (Y : I → J → Set ℓ′) → Set _
 X ⇒ Y = ∀ {i j} → X i j → Y i j
+
+private variable
+  A   : Set ℓ
+  xs  : List A
+  x y : A
+
+infix 4 _∈_
+data _∈_ {A : Set ℓ} : A → List A → Set ℓ where
+  zero : x ∈ x ∷ xs
+  suc : x ∈ xs → x ∈ y ∷ xs

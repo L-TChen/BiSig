@@ -49,12 +49,12 @@ eraseᵃˢ ι        = ι
 eraseᵃˢ (ρ D Ds) = ρ (eraseᵃ D) (eraseᵃˢ Ds)
 
 -- T is non-empty
-eraseᶜ : T → B.ConD {SD} → B.ConD {⋆D}
-eraseᶜ A₀ (ι Ξ m A D) = ι Ξ m (eraseTExp A) (eraseᵃˢ D)
+eraseᶜ : B.ConD {SD} → B.ConD {⋆D}
+eraseᶜ (ι Ξ m A D) = ι Ξ m (eraseTExp A) (eraseᵃˢ D)
 
-erase : T → B.Desc → B.Desc
-erase _ []       = []
-erase ⋆ (D ∷ Ds) = eraseᶜ ⋆ D ∷ erase ⋆ Ds
+erase : B.Desc {SD} → B.Desc {⋆D}
+erase []       = []
+erase (D ∷ Ds) = eraseᶜ D ∷ erase Ds
 
 open import Syntax.BiTyped.Term  as B
 
@@ -62,7 +62,7 @@ open import Syntax.BiTyped.Term  as B
 module _ (A₀ : T) (D : B.Desc) where mutual
   forget
     : Tm D m       A Γ
-    → Tm (erase A₀ D) m ⋆ (eraseCtx Γ)
+    → Tm (erase D) m ⋆ (eraseCtx Γ)
   forget (` x)         = ` eraseIdx x
   forget (_ ∋ t)       = ⋆ ∋ forget t
   forget (⇉ t by _)    = ⇉ forget t by refl
@@ -70,24 +70,24 @@ module _ (A₀ : T) (D : B.Desc) where mutual
   
   forgetMap : (D′ : B.Desc)
     → (⟦ D′ ⟧          Tm D           ) m A Γ
-    → (⟦ erase A₀ D′ ⟧ Tm (erase A₀ D)) m ⋆ (eraseCtx Γ)
+    → (⟦ erase D′ ⟧ Tm (erase D)) m ⋆ (eraseCtx Γ)
   forgetMap (D ∷ Ds) (inl t) = inl (forgetMapᶜ D t)
   forgetMap (D ∷ Ds) (inr u) = inr (forgetMap Ds u)
 
   forgetMapᶜ : (D′ : B.ConD)
     → (⟦ D′           ⟧ᶜ Tm D           ) m A Γ
-    → (⟦ eraseᶜ A₀ D′ ⟧ᶜ Tm (erase A₀ D)) m ⋆ (eraseCtx Γ)
+    → (⟦ eraseᶜ D′ ⟧ᶜ Tm (erase D)) m ⋆ (eraseCtx Γ)
   forgetMapᶜ (ι Ξ m A D) (p , σ , q , ts) =
     p , eraseSub σ , refl , forgetMapᵃˢ D ts
 
   forgetMapᵃˢ : (D′ : B.ArgsD Ξ)
     → (⟦ D′ ⟧ᵃˢ Tm D) σ Γ
-    → (⟦ eraseᵃˢ D′ ⟧ᵃˢ Tm (erase A₀ D)) (eraseSub σ) (eraseCtx Γ)
+    → (⟦ eraseᵃˢ D′ ⟧ᵃˢ Tm (erase D)) (eraseSub σ) (eraseCtx Γ)
   forgetMapᵃˢ ι        _        = _
   forgetMapᵃˢ (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMapᵃˢ Ds ts
 
   forgetMapᵃ : (D′ : ArgD Ξ)
     → (⟦ D′ ⟧ᵃ Tm D) σ Γ
-    → (⟦ eraseᵃ D′ ⟧ᵃ Tm (erase A₀ D)) (eraseSub σ) (eraseCtx Γ)
+    → (⟦ eraseᵃ D′ ⟧ᵃ Tm (erase D)) (eraseSub σ) (eraseCtx Γ)
   forgetMapᵃ (ι m B) t = forget t
   forgetMapᵃ (A ∙ Δ) t = forgetMapᵃ Δ t

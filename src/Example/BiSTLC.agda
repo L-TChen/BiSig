@@ -25,7 +25,7 @@ private variable
   A B C : Λₜ
   Γ Δ   : Ctx
 
-open import Syntax.BiTyped.Description ΛₜD as T
+open import Syntax.BiTyped.Description  as T
 
 ΛₒD : T.Desc
 ΛₒD =

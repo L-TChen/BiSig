@@ -3,7 +3,6 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
-
 private variable
   A B : Set
 

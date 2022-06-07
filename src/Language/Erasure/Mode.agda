@@ -7,8 +7,8 @@ module Language.Erasure.Mode {SD : S.Desc} where
 open import Syntax.Simple.Term SD 
   renaming (Tm₀ to T)
 
-open import Syntax.Typed.Description   SD as T
-open import Syntax.BiTyped.Description SD as B
+open import Syntax.Typed.Description   as T
+open import Syntax.BiTyped.Description as B
  
 open import Syntax.Context T
 

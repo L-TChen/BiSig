@@ -1,13 +1,12 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as Typed
+open import Syntax.BiTyped.Description as T
 
-module Syntax.BiTyped.Term {SD : S.Desc} (D : Typed.Desc SD) where
-open Typed SD
+module Syntax.BiTyped.Term {SD : S.Desc} (D : Desc {SD}) where
+
 open import Syntax.Simple.Term SD
-  using ()
-  renaming (Tm₀ to T)
+  using () renaming (Tm₀ to T)
 open import Syntax.Context T
 
 private
@@ -29,14 +28,6 @@ data Tm : Fam₀ where
 
 Tm⇉ = Tm Infer
 Tm⇇ = Tm Check
-
-Ren : (Γ Δ : Ctx) → Set
-Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
-
-ext : Ren Γ Δ
-  → Ren (A ∙ Γ) (A ∙ Δ)
-ext f zero    = zero
-ext f (suc x) = suc (f x)
 
 mutual
   rename : Ren Γ Δ 

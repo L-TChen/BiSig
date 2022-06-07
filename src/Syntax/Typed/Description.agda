@@ -2,11 +2,11 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.Typed.Description (SD : S.Desc)  where
+module Syntax.Typed.Description {SD : S.Desc}  where
 
-open import Syntax.Simple.Term      SD as Ty
+open import Syntax.Simple.Term SD as Ty
   renaming (Tm₀ to T)
-open import Syntax.Simple.Operation SD
+open import Syntax.Simple.Operation {SD}
 open import Syntax.Context    T
 
 Fam : (ℓ : Level) → Set (lsuc ℓ)

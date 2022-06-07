@@ -1,7 +1,7 @@
 open import Prelude
 open import Syntax.Simple.Description
 
-module Syntax.Simple.Operation (D : Desc) where
+module Syntax.Simple.Operation {D : Desc} where
 
 open import Syntax.Simple.Term D
 

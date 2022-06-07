@@ -1,14 +1,14 @@
 open import Prelude
 
 import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as Typed
+import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Algebra {SD : S.Desc} (D : Typed.Desc SD) where
-open Typed SD
+module Syntax.Typed.Algebra {SD : S.Desc} (D : T.Desc {SD}) where
+open T {SD}
 open import Syntax.Simple.Term SD
   using ()
   renaming (Tm₀ to T)
-open import Syntax.Typed.Context T
+open import Syntax.Context T
 
 -- relative continuation monad
 record Cont (Val : Set) {A : Set} (Γ : A → Set) : Set where

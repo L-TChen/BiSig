@@ -10,7 +10,7 @@ import Syntax.Simple.Description as S
   ∷ 2   -- function type
   ∷ []
 
-open import Syntax.Simple.Term ΛₜD       as Type
+open import Syntax.Simple.Term ΛₜD   as Type
   using (`_; op)
   renaming (Tm₀ to Λₜ)
 open import Syntax.Context Λₜ
@@ -18,9 +18,9 @@ open import Syntax.Context Λₜ
 infixr 8 _↣_
 pattern _↣_ A B = op (inr (inl (A , B ,  _)))
 
-open import Syntax.Typed.Description ΛₜD as T
+open import Syntax.Typed.Description {ΛₜD} as T
 
-ΛₒD : Desc
+ΛₒD : Desc 
 ΛₒD =
   σ[ A ] σ[ B ] ▷ ρ[ ⊢ ` (A , suc zero) ↣ ` (B , zero) ] ρ[ ⊢ ` (A , suc zero) ] ι ⦂ ` (B , zero) ∷
   σ[ A ] σ[ B ] ▷ ρ[ ` (A , suc zero) ∙ ⊢ ` (B , zero) ] ι ⦂ (` (A , suc zero) ↣ ` (B , zero)) ∷
@@ -32,7 +32,7 @@ open import Syntax.Typed.Description ΛₜD as T
 
 -}
 
-open import Syntax.Typed.Term    ΛₒD
+open import Syntax.Typed.Term  ΛₒD
 private variable
   A B : Λₜ
   Γ Δ : Ctx

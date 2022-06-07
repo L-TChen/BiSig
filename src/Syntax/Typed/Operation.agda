@@ -1,12 +1,11 @@
 open import Prelude
 import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as Typed
+import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Operation {SD : S.Desc} (D : Typed.Desc SD) where
-open Typed SD
+module Syntax.Typed.Operation {SD : S.Desc} {D : T.Desc {SD}} where
+open T {SD}
 open import Syntax.Simple.Term SD
-  using ()
-  renaming (Tm₀ to T)
+  using () renaming (Tm₀ to T)
 open import Syntax.Simple.Operation as S
 
 open import Syntax.Context T
@@ -18,7 +17,7 @@ private
     A B   : T
     Γ Δ Ξ : Ctx
 
-open DecEq SD ⊥ (λ ()) 
+open DecEq {SD} ⊥ (λ ()) 
   using ()
   renaming (_≟_ to _≟T_)
 

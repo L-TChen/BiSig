@@ -1,13 +1,11 @@
 open import Prelude
 
-import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as Typed
+import Syntax.Simple.Description     as S
+open import Syntax.Typed.Description as T
 
-module Syntax.Typed.Term {SD : S.Desc} (D : Typed.Desc SD) where
-open Typed SD
+module Syntax.Typed.Term {SD : S.Desc} (D : Desc {SD}) where
 open import Syntax.Simple.Term SD
-  using ()
-  renaming (Tm₀ to T)
+  using () renaming (Tm₀ to T)
 open import Syntax.Context T
 
 private
@@ -20,14 +18,6 @@ infix 40 `_
 data Tm : Fam₀ where
   `_ : _∈_       ⇒ Tm 
   op : ⟦ D ⟧ Tm  ⇒ Tm 
-
-Ren : (Γ Δ : Ctx) → Set
-Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
-
-ext : Ren Γ Δ
-  → Ren (A ∙ Γ) (A ∙ Δ)
-ext f zero    = zero
-ext f (suc x) = suc (f x)
 
 mutual
   rename : Ren Γ Δ 

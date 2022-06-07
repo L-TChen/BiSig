@@ -33,7 +33,7 @@ infixr 5 ⇉_ ⇇_
 ⇇_ = ι Check
 
 data ArgsD (Ξ : Ctx) : Set where
-  ι :                              ArgsD Ξ
+  ι :                               ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
 data ConD (Ξ : Ctx) : Set where

@@ -24,7 +24,7 @@ data ArgD  (Ξ : Ctx) : Set where
   _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
 
 data ArgsD (Ξ : Ctx) : Set where
-  ι :                              ArgsD Ξ
+  ι :                               ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
 data ConD (Ξ : Ctx) : Set where

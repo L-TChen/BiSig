@@ -29,8 +29,12 @@ open import Syntax.BiTyped.Description ΛₜD as T
 
 ΛₒD : T.Desc
 ΛₒD =
-  σ[ A ] σ[ B ] ▷ ρ[ ⇉ ` (A , suc zero) ↣ ` (B , zero) ] ρ[ ⇇ ` (A , suc zero) ] ι ⇉ ` (B , zero) ∷
-  (σ[ A ] σ[ B ] ▷ ρ[ ` (A , suc zero) ∙ ⇇ ` (B , zero) ] ι ⇇ ` (A , suc zero) ↣ ` (B , zero)) ∷
+  σ[ A ] σ[ B ] ▷
+    ρ[ ⇉ ` (A , suc zero) ↣ ` (B , zero) ] ρ[ ⇇ ` (A , suc zero) ] ι
+      ⇉ ` (B , zero) ∷
+  σ[ A ] σ[ B ] ▷
+    ρ[ ` (A , suc zero) ∙ ⇇ ` (B , zero) ] ι
+      ⇇ ` (A , suc zero) ↣ ` (B , zero) ∷
   []
 
 open import Syntax.BiTyped.Term ΛₒD

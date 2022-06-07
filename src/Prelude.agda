@@ -12,9 +12,10 @@ open import Data.Fin                           public
 open import Data.Fin.Literals                  public
 open import Data.List                          public 
   using (List; []; _∷_; _++_; length)
+open import Data.Vec                           public
+  using (Vec; []; _∷_)
 open import Data.String                        public
   using (String)
-  renaming (_≟_ to _≟s_)
 open import Data.Product                       public
   using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; <_,_>)
 open import Data.Sum                           public

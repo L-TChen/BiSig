@@ -8,7 +8,7 @@ open T {SD}
 open import Syntax.Simple.Term SD
   using ()
   renaming (Tm₀ to T)
-open import Syntax.Context T
+open import Syntax.Context
 
 -- relative continuation monad
 record Cont (Val : Set) {A : Set} (Γ : A → Set) : Set where

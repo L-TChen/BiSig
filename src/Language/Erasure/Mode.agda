@@ -7,13 +7,15 @@ module Language.Erasure.Mode {SD : S.Desc} where
 open import Syntax.Simple.Term SD 
   renaming (Tm₀ to T)
 
-open import Syntax.Typed.Description   as T
+open import Syntax.Typed.Description  {SD} as T
 open import Syntax.BiTyped.Description as B
  
-open import Syntax.Context T
+open import Syntax.Context
 
 private variable
-  Γ Δ Ξ : Ctx
+  Ξ     : ℕ
+  σ     : Sub Ξ 0
+  Γ Δ   : Ctx T
 
 eraseᵃ : B.ArgD Ξ → T.ArgD Ξ
 eraseᵃ (ι m B)   = ⊢ B
@@ -23,9 +25,8 @@ eraseᵃˢ : B.ArgsD Ξ → T.ArgsD Ξ
 eraseᵃˢ ι        = ι
 eraseᵃˢ (ρ D Ds) = ρ (eraseᵃ D) (eraseᵃˢ Ds)
 
-eraseᶜ : B.ConD Ξ → T.ConD Ξ
-eraseᶜ (B.ι m A D) = T.ι A (eraseᵃˢ D)
-eraseᶜ (B.σ D)     = T.σ λ A → eraseᶜ (D A)
+eraseᶜ : B.ConD {SD} → T.ConD
+eraseᶜ (ι Ξ m A D) = ι Ξ A (eraseᵃˢ D)
 
 erase : B.Desc → T.Desc
 erase []       = []
@@ -51,22 +52,19 @@ module _ {D : B.Desc} where mutual
   forgetMap (D ∷ Ds) (inl t) = inl (forgetMapᶜ D t)
   forgetMap (D ∷ Ds) (inr u) = inr (forgetMap Ds u)
 
-  forgetMapᶜ : (D′ : B.ConD Ξ)
+  forgetMapᶜ : (D′ : B.ConD)
     → (B.⟦ D′ ⟧ᶜ B.Tm D) m A Γ
     → (T.⟦ eraseᶜ D′ ⟧ᶜ T.Tm (erase D)) A Γ
-  forgetMapᶜ (ι m A D) (A=B , m=m′ , t) = A=B , forgetMapᵃˢ D t
-  forgetMapᶜ (σ D)     (A , t)          = A , forgetMapᶜ (D A) t
+  forgetMapᶜ (ι Ξ m A D) (p , σ , q , ts) = σ , q , forgetMapᵃˢ D ts
 
   forgetMapᵃˢ : (D′ : B.ArgsD Ξ)
-    → (B.⟦ D′ ⟧ᵃˢ B.Tm D) Γ
-    → (T.⟦ eraseᵃˢ D′ ⟧ᵃˢ T.Tm (erase D)) Γ
+    → (B.⟦ D′ ⟧ᵃˢ B.Tm D) σ Γ
+    → (T.⟦ eraseᵃˢ D′ ⟧ᵃˢ T.Tm (erase D)) σ Γ
   forgetMapᵃˢ ι        _        = _
   forgetMapᵃˢ (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMapᵃˢ Ds ts
 
   forgetMapᵃ : (D′ : B.ArgD Ξ)
-    → (B.⟦ D′ ⟧ᵃ B.Tm D) Γ
-    → (T.⟦ eraseᵃ D′ ⟧ᵃ T.Tm (erase D)) Γ
+    → (B.⟦ D′ ⟧ᵃ B.Tm D) σ Γ
+    → (T.⟦ eraseᵃ D′ ⟧ᵃ T.Tm (erase D)) σ Γ
   forgetMapᵃ (ι m B) t = forget t
   forgetMapᵃ (A ∙ Δ) t = forgetMapᵃ Δ t
-
-

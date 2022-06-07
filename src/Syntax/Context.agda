@@ -1,24 +1,23 @@
 open import Prelude
 
-module Syntax.Context (T : Set) where
+module Syntax.Context where
 
 infixr 5 _∙_
-data Ctx : Set where
-  ∅   :                     Ctx
-  _∙_ : (A : T) (Γ : Ctx) → Ctx
+data Ctx (T : Set) : Set where
+  ∅   :                       Ctx T
+  _∙_ : (A : T) (Γ : Ctx T) → Ctx T
 
 private variable
-  Γ Δ : Ctx
+  T   : Set
+  Γ Δ : Ctx T
   A B : T
 
 infix 4 _∈_
-data _∈_ : T → Ctx → Set where
-  zero : {A : T} {Γ : Ctx}
-    → A ∈ A ∙ Γ
-  suc  : {A B : T} {Γ : Ctx}
-    → A ∈ Γ → A ∈ B ∙ Γ
+data _∈_ {T : Set} : T → Ctx T → Set where
+  zero : A ∈ A ∙ Γ
+  suc  : A ∈ Γ → A ∈ B ∙ Γ
 
-Ren : (Γ Δ : Ctx) → Set
+Ren : (Γ Δ : Ctx T) → Set
 Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
 
 ext : Ren Γ Δ

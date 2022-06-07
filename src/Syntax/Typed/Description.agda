@@ -5,56 +5,52 @@ import Syntax.Simple.Description as S
 module Syntax.Typed.Description {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
-  renaming (Tm₀ to T)
+  renaming (Tm₀ to T; Tm to TExp)
 open import Syntax.Simple.Operation {SD}
-open import Syntax.Context    T
+open import Syntax.Context
 
 Fam : (ℓ : Level) → Set (lsuc ℓ)
-Fam ℓ = T → Ctx → Set ℓ
+Fam ℓ = T → Ctx T → Set ℓ
 
 Fam₀ = Fam lzero
 
 private variable
   A B   : T
-  Γ Δ Ξ : Ctx
+  Γ Δ Ξ : ℕ
   X Y   : Fam ℓ
 
-data ArgD  (Ξ : Ctx) : Set where
+data ArgD  (Ξ : ℕ) : Set where
   ⊢_  : (B : TExp Ξ)              → ArgD Ξ
   _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
 
-data ArgsD (Ξ : Ctx) : Set where
+data ArgsD (Ξ : ℕ) : Set where
   ι :                               ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
-data ConD (Ξ : Ctx) : Set where
-  ι : (A : TExp Ξ)                 (D : ArgsD Ξ) → ConD Ξ
-  σ : (D : (A : T) → ConD (A ∙ Ξ))               → ConD Ξ
+data ConD : Set where
+  ι : (Ξ : ℕ) (A : TExp Ξ) (D : ArgsD Ξ) → ConD
 
 infix  5 ⊢_
-infixr 6 σ
 infixr 7 ρ 
-syntax ι A D       = ▷ D ⦂ A
-syntax σ (λ A → D) = σ[ A ] D
+syntax ι Ξ A D     = Ξ ▷ D ⦂ A
 syntax ρ D Ds      = ρ[ D ] Ds
 
 Desc : Set
-Desc = List $ ConD ∅
+Desc = List ConD
+ 
+⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Sub Ξ 0 → Ctx T → Set ℓ
+(⟦ ⊢    B ⟧ᵃ X) σ Γ = X (⟪ σ ⟫ B) Γ
+(⟦ A ∙ As ⟧ᵃ X) σ Γ = (⟦ As ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
 
-⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Ctx → Set ℓ
-(⟦ ⊢    B ⟧ᵃ X) Γ = X (flatten B) Γ
-(⟦ A ∙ As ⟧ᵃ X) Γ = (⟦ As ⟧ᵃ X) (flatten A ∙ Γ)
+⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Sub Ξ 0 → Ctx T → Set ℓ
+(⟦ ι      ⟧ᵃˢ _) σ _ = ⊤
+(⟦ ρ D Ds ⟧ᵃˢ X) σ Γ = (⟦ D ⟧ᵃ X) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
 
-⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Ctx → Set ℓ
-(⟦ ι      ⟧ᵃˢ _) _ = ⊤
-(⟦ ρ D Ds ⟧ᵃˢ X) Γ = (⟦ D ⟧ᵃ X) Γ × (⟦ Ds ⟧ᵃˢ X) Γ
-
-⟦_⟧ᶜ_ : (D : ConD Ξ) (X : Fam ℓ) → Fam ℓ
-(⟦ ι B D ⟧ᶜ X) A Γ = flatten B ≡ A × (⟦ D ⟧ᵃˢ X) Γ
-(⟦ σ D   ⟧ᶜ X) A Γ = Σ[ B ∈ T ] (⟦ D B ⟧ᶜ X) A Γ
+⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
+(⟦ ι Ξ B D ⟧ᶜ X) A Γ = Σ[ σ ∈ Sub Ξ 0 ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ []      ⟧ _) _ _ = ⊥
+(⟦ []           ⟧ _) _ _ = ⊥
 (⟦ D ∷ Ds ⟧ X) A Γ = (⟦ D ⟧ᶜ X) A Γ ⊎ (⟦ Ds ⟧ X) A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where

@@ -3,7 +3,7 @@ open import Prelude
 module Syntax.Simple.Description where
 
 private variable
-  X Y : Set → Set
+  X Y : ℕ → Set
 
 Desc = List ℕ
 
@@ -11,7 +11,7 @@ _^_ : Set → ℕ → Set
 X ^ zero  = ⊤
 X ^ suc n = X × X ^ n
 
-⟦_⟧_ : Desc → (Set → Set) → (Set → Set)
+⟦_⟧_ : Desc → (ℕ → Set) → (ℕ → Set)
 (⟦ []     ⟧ _) _ = ⊥
 (⟦ D ∷ Ds ⟧ X) n = (X n) ^ D ⊎ (⟦ Ds ⟧ X) n
 
@@ -25,9 +25,9 @@ map : (D : Desc) (f : X ⇒₁ Y)
 map (n ∷ ns) f (inl x) = inl (mapⁿ n f x)
 map (n ∷ ns) f (inr y) = inr (map ns f y)
 
-record _-Alg (D : Desc) (X : Set → Set) : Set₁ where
+record _-Alg (D : Desc) (X : ℕ → Set) : Set₁ where
   field
-    var : id      ⇒₁ X
+    var : Fin     ⇒₁ X
     alg : ⟦ D ⟧ X ⇒₁ X
 open _-Alg public
 

@@ -3,37 +3,43 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
+open import Data.Vec
+
 private variable
   A B : Set
 
-data Tm : Set → Set where
-  `_ : id       ⇒₁ Tm
+infix 9 `_
+data Tm : ℕ → Set where
+  `_ : Fin      ⇒₁ Tm
   op : ⟦ D ⟧ Tm ⇒₁ Tm
 
 Tm₀ : Set
-Tm₀ = Tm ⊥
+Tm₀ = Tm 0
 
-module _ (f : A → B) where mutual
-  rename : Tm A → Tm B
+Ren : (n m : ℕ) → Set
+Ren n m = Fin n → Fin m
+
+module _ {n m : ℕ} (f : Ren n m) where mutual
+  rename : Tm n → Tm m
   rename (` x)  = ` f x
   rename (op x) = op (renameMap _ x)
 
   renameMap : (D : Desc)
-    → (⟦ D ⟧ Tm) A → (⟦ D ⟧ Tm) B
+    → (⟦ D ⟧ Tm) n → (⟦ D ⟧ Tm) m
   renameMap (n ∷ ns) (inl x) = inl (renameMapⁿ n x)
   renameMap (h ∷ ns) (inr y) = inr (renameMap ns y)
 
-  renameMapⁿ : (n : ℕ)
-    → Tm A ^ n → Tm B ^ n
+  renameMapⁿ : (l : ℕ)
+    → Tm n ^ l → Tm m ^ l
   renameMapⁿ zero    _        = _
   renameMapⁿ (suc n) (t , ts) = rename t , renameMapⁿ n ts
     
-Sub : (A B : Set) → Set
-Sub A B = A → Tm B
+Sub : (A B : ℕ) → Set
+Sub A B = Vec (Tm B) A -- Fin A → Tm B
 
-module _ (f : Sub A B) where mutual
+module _ {A B : ℕ} (σ : Sub A B) where mutual
   subst : Tm A → Tm B
-  subst (` x)  = f x
+  subst (` x)  = lookup σ x
   subst (op x) = op (substMap _ x) 
 
   substMap : ∀ as
@@ -48,13 +54,13 @@ module _ (f : Sub A B) where mutual
 
 infixr 8 ⟨_⟩_ ⟪_⟫_
 
-⟨_⟩_ : (A → B) → Tm A → Tm B
+⟨_⟩_ : {A B : ℕ} → Ren A B → Tm A → Tm B
 ⟨ f ⟩ t = rename f t
 
-⟪_⟫_ : Sub A B → Tm A → Tm B
+⟪_⟫_ : {A B : ℕ} → Sub A B → Tm A → Tm B
 ⟪ f ⟫ t = subst f t
 
-module _ {X : Set → Set} (α : (D -Alg) X) where mutual
+module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
   fold (` x)  = α .var x
   fold (op t) = α .alg (foldMap _ t)
@@ -63,14 +69,13 @@ module _ {X : Set → Set} (α : (D -Alg) X) where mutual
   foldMap (D ∷ Ds) (inl x) = inl (foldMapⁿ D x)
   foldMap (D ∷ Ds) (inr y) = inr (foldMap Ds y)
 
-  foldMapⁿ : ∀ n → Tm A ^ n → X A ^ n
+  foldMapⁿ : ∀ {A : ℕ} n → Tm A ^ n → X A ^ n
   foldMapⁿ zero    _        = _
   foldMapⁿ (suc n) (t , ts) = fold t , foldMapⁿ n ts
 
-open import Syntax.Context Tm₀
-
-TExp : Ctx → Set
-TExp Ξ = Tm (∃ (_∈ Ξ))
-
-flatten : {Ξ : Ctx} → TExp Ξ → Tm₀
-flatten = ⟪ id ⟫_ ∘ rename proj₁
+-- 
+-- TExp : Ctx Tm₀ → Set
+-- TExp Ξ = Tm (∃ (_∈ Ξ))
+-- 
+-- flatten : {Ξ : Ctx Tm₀} → TExp Ξ → Tm₀
+-- flatten = ⟪ id ⟫_ ∘ rename proj₁

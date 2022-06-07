@@ -11,7 +11,7 @@ open import Syntax.Simple.Description as S
 open import Syntax.Simple.Term ΛₜD
   using (`_)
   renaming (Tm₀ to Λₜ ; op to top)
-open import Syntax.Context Λₜ
+open import Syntax.Context
 
 infixr 10 _↣_
 pattern _↣_ A B = top (inr (inl (A , B , _)))
@@ -23,26 +23,23 @@ data Λₜ : Set where
 
 private variable
   A B C : Λₜ
-  Γ Δ   : Ctx
-
+  Γ Δ   : Ctx Λₜ
+ 
 open import Syntax.BiTyped.Description  as T
 
-ΛₒD : T.Desc
+ΛₒD : T.Desc {ΛₜD}
 ΛₒD =
-  σ[ A ] σ[ B ] ▷
-    ρ[ ⇉ ` (A , suc zero) ↣ ` (B , zero) ] ρ[ ⇇ ` (A , suc zero) ] ι
-      ⇉ ` (B , zero) ∷
-  σ[ A ] σ[ B ] ▷
-    ρ[ ` (A , suc zero) ∙ ⇇ ` (B , zero) ] ι
-      ⇇ ` (A , suc zero) ↣ ` (B , zero) ∷
+  2 ▷ ρ[ ⇉ (` # 0) ↣ (` # 1) ] ρ[ ⇇ ` # 0 ] ι ⇉ ` # 1 ∷
+  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι ⇇ (` # 0) ↣ (` # 1) ∷
   []
-
+ 
 open import Syntax.BiTyped.Term ΛₒD
 
-pattern _∙′_ t u = op (inl (_ , _ , refl , refl , t , u , _))
-pattern ƛ′_  t   = op (inr (inl (_ , _ , refl , refl , t , _)))
+pattern _∙′_ t u = op (inl (refl , (_ ∷ _ ∷  []) , refl , t , u , _))
+pattern ƛ′_  t   = op (inr (inl (refl , (_ ∷ _ ∷ []) , refl , t , _)))
+
 mutual
-  data Λ⇉ : Λₜ → Ctx → Set where
+  data Λ⇉ : Λₜ → Ctx Λₜ → Set where
     `_ : _∈_ ⇒ Λ⇉
     _∙_
       : (t : Λ⇉ (A ↣ B) Γ) (u : Λ⇇ A Γ)
@@ -51,7 +48,7 @@ mutual
       : (A : Λₜ) (t : Λ⇇ A Γ)
       → Λ⇉ A Γ
 
-  data Λ⇇ : Λₜ → Ctx → Set where
+  data Λ⇇ : Λₜ → Ctx Λₜ → Set where
     ƛ_ 
       : (t : Λ⇇ B (A ∙ Γ))
       → Λ⇇ (A ↣ B) Γ

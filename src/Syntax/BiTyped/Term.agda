@@ -23,9 +23,12 @@ data Tm : Fam₀ where
   _∋_
     : (A : T) (t : Tm Check A Γ)
     → Tm Infer A Γ
-  ⇉ : (t : Tm Infer A Γ) (eq : A ≡ B)
+  ⇉_by_ : (t : Tm Infer A Γ) (eq : A ≡ B)
     → Tm Check B Γ
   op : (⟦ D ⟧ Tm) m ⇒ Tm m
+
+Tm⇉ = Tm Infer
+Tm⇇ = Tm Check
 
 Ren : (Γ Δ : Ctx) → Set
 Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
@@ -40,7 +43,7 @@ mutual
     → Tm m A Γ → Tm m A Δ
   rename f (`  x) = ` f x
   rename f (A ∋ t)  = A ∋ rename f t
-  rename f (⇉ t eq) = ⇉ (rename f t) eq
+  rename f (⇉ t by eq) = ⇉ (rename f t) by eq
   rename f (op t) = op (renameMap _ f t)
 
   renameMap : ∀ D
@@ -82,10 +85,10 @@ exts f (suc x) = rename suc (f x)
 mutual
   subst : Sub Γ Δ
     → ∀ {A} → Tm m A Γ → Tm m A Δ
-  subst f (` x)    = f x
-  subst f (A ∋ t)  = A ∋ subst f t
-  subst f (⇉ t eq) = ⇉ (subst f t) eq
-  subst f (op t)   = op (substMap _ f t)
+  subst f (` x)       = f x
+  subst f (A ∋ t)     = A ∋ subst f t
+  subst f (⇉ t by eq) = ⇉ (subst f t) by eq
+  subst f (op t)      = op (substMap _ f t)
 
   substMap : ∀ D
     → Sub Γ Δ 
@@ -116,21 +119,22 @@ infixr 5 ⟪_⟫_
   → ∀ {A} → Tm m A Γ → Tm m A Δ
 ⟪ f ⟫ t = subst f t
 
-{-
 module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
-  fold : Tm ⇒ X
-  fold (` x)  = α .var x -- α .var x
-  fold (op t) = α .alg (foldMap _ t)
+  fold : Tm m ⇒ X m
+  fold (` x)      = α .var x -- α .var x
+  fold (A ∋ t)    = α .toInfer (fold t)
+  fold (⇉ t by refl) = α .toCheck (fold t)
+  fold (op t)     = α .alg (foldMap _ t)
 
   foldMap : ∀ D
-    → ⟦ D ⟧ Tm ⇒ ⟦ D ⟧ X
+    → (⟦ D ⟧ Tm) m ⇒ (⟦ D ⟧ X) m
   foldMap (D ∷ Ds) (inl t) = inl (foldMapᶜ D t)
   foldMap (D ∷ Ds) (inr t) = inr (foldMap Ds t)
 
   foldMapᶜ : ∀ (D : ConD Ξ)
-    → ⟦ D ⟧ᶜ Tm ⇒ ⟦ D ⟧ᶜ X
-  foldMapᶜ (ι A D) (eq , t) = eq , foldMapᵃˢ D t
-  foldMapᶜ (σ D)   (A , t)  = A , foldMapᶜ (D A) t
+    → (⟦ D ⟧ᶜ Tm) m ⇒ (⟦ D ⟧ᶜ X) m
+  foldMapᶜ (ι m A D) (eq , eq′ , t) = eq , eq′ , foldMapᵃˢ D t
+  foldMapᶜ (σ D)   (A , t)          = A , foldMapᶜ (D A) t
 
   foldMapᵃˢ : ∀ (D : ArgsD Ξ)
     → ⟦ D ⟧ᵃˢ Tm ⇒₁ ⟦ D ⟧ᵃˢ X
@@ -139,6 +143,5 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → ⟦ D ⟧ᵃ Tm ⇒₁ ⟦ D ⟧ᵃ X
-  foldMapᵃ (⊢ B)   t = fold t
+  foldMapᵃ (ι m B) t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t
--}

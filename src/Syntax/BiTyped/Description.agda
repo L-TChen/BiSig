@@ -27,6 +27,11 @@ data ArgD  (Ξ : Ctx) : Set where
   ι   : (m : Mode)   (B : TExp Ξ) → ArgD Ξ
   _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
 
+infixr 5 ⇉_ ⇇_
+⇉_ ⇇_ : TExp Ξ → ArgD Ξ
+⇉_ = ι Infer
+⇇_ = ι Check
+
 data ArgsD (Ξ : Ctx) : Set where
   ι :                              ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
@@ -35,8 +40,9 @@ data ConD (Ξ : Ctx) : Set where
   ι : (m : Mode)                   (A : TExp Ξ) (D : ArgsD Ξ) → ConD Ξ
   σ : (D : (A : T) → ConD (A ∙ Ξ))                            → ConD Ξ
 
-infixr 6 σ
+infixr 6 σ ▷_⇉_ ▷_⇇_
 infixr 7 ρ 
+
 ▷_⇉_ : (D : ArgsD Ξ) (A : TExp Ξ) → ConD Ξ
 ▷ D ⇉ A = ι Infer A D
 
@@ -67,6 +73,8 @@ Desc = List $ ConD ∅
 
 record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where
   field
-    var : _∈_         ⇒ X Infer
-    alg : (⟦ D ⟧ X) m ⇒ X m
+    var     : _∈_         ⇒ X Infer
+    toInfer : X Check     ⇒ X Infer
+    toCheck : X Infer     ⇒ X Check
+    alg     : (⟦ D ⟧ X) m ⇒ X m
 open _-Alg public

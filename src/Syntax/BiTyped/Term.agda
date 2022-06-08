@@ -75,40 +75,40 @@ exts f zero    = ` zero
 exts f (suc x) = rename suc (f x)
 
 mutual
-  subst : Sub Γ Δ
+  sub : Sub Γ Δ
     → ∀ {A} → Tm m A Γ → Tm m A Δ
-  subst f (` x)       = f x
-  subst f (A ∋ t)     = A ∋ subst f t
-  subst f (⇉ t by eq) = ⇉ (subst f t) by eq
-  subst f (op t)      = op (substMap _ f t)
+  sub f (` x)       = f x
+  sub f (A ∋ t)     = A ∋ sub f t
+  sub f (⇉ t by eq) = ⇉ (sub f t) by eq
+  sub f (op t)      = op (subMap _ f t)
 
-  substMap : ∀ D
+  subMap : ∀ D
     → Sub Γ Δ 
     → (⟦ D ⟧ Tm) m A Γ → (⟦ D ⟧ Tm) m A Δ
-  substMap (D ∷ Ds) f (inl x) = inl (substMapᶜ D f x)
-  substMap (D ∷ Ds) f (inr y) = inr (substMap Ds f y)
+  subMap (D ∷ Ds) f (inl x) = inl (subMapᶜ D f x)
+  subMap (D ∷ Ds) f (inr y) = inr (subMap Ds f y)
 
-  substMapᶜ : (D : ConD)
+  subMapᶜ : (D : ConD)
     → Sub Γ Δ
     → (⟦ D ⟧ᶜ Tm) m A Γ → (⟦ D ⟧ᶜ Tm) m A Δ
-  substMapᶜ (ι Ξ m A D) f (p , σ , q , ts) = p , σ , q , substMapᵃˢ D f ts
+  subMapᶜ (ι Ξ m A D) f (p , σ , q , ts) = p , σ , q , subMapᵃˢ D f ts
 
-  substMapᵃˢ : (D : ArgsD Ξ)
+  subMapᵃˢ : (D : ArgsD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  substMapᵃˢ ι        f _        = _
-  substMapᵃˢ (ρ D Ds) f (t , ts) = substMapᵃ D f t , substMapᵃˢ Ds f ts
+  subMapᵃˢ ι        f _        = _
+  subMapᵃˢ (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMapᵃˢ Ds f ts
 
-  substMapᵃ : (D : ArgD Ξ)
+  subMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
-  substMapᵃ (ι m B) f t = subst f t
-  substMapᵃ (A ∙ Δ) f t = substMapᵃ Δ (exts f) t
+  subMapᵃ (ι m B) f t = sub f t
+  subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
 ⟪_⟫_ : Sub Γ Δ
   → ∀ {A} → Tm m A Γ → Tm m A Δ
-⟪ f ⟫ t = subst f t
+⟪ f ⟫ t = sub f t
 
 module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold : Tm m ⇒ X m

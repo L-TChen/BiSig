@@ -38,19 +38,19 @@ Sub : (A B : ℕ) → Set
 Sub A B = Vec (Tm B) A -- Fin A → Tm B
 
 module _ {A B : ℕ} (σ : Sub A B) where mutual
-  subst : Tm A → Tm B
-  subst (` x)  = lookup σ x
-  subst (op x) = op (substMap _ x) 
+  sub : Tm A → Tm B
+  sub (` x)  = lookup σ x
+  sub (op x) = op (subMap _ x) 
 
-  substMap : ∀ as
+  subMap : ∀ as
     → (⟦ as ⟧ Tm) A → (⟦ as ⟧ Tm) B
-  substMap (a ∷ as) (inl ts) = inl (substMapⁿ a ts)
-  substMap (a ∷ as) (inr y)  = inr (substMap as y)
+  subMap (a ∷ as) (inl ts) = inl (subMapⁿ a ts)
+  subMap (a ∷ as) (inr y)  = inr (subMap as y)
 
-  substMapⁿ : ∀ n
+  subMapⁿ : ∀ n
     → Tm A ^ n → Tm B ^ n
-  substMapⁿ zero    _        = _
-  substMapⁿ (suc n) (t , ts) = subst t , substMapⁿ n ts
+  subMapⁿ zero    _        = _
+  subMapⁿ (suc n) (t , ts) = sub t , subMapⁿ n ts
 
 infixr 8 ⟨_⟩_ ⟪_⟫_
 
@@ -58,7 +58,7 @@ infixr 8 ⟨_⟩_ ⟪_⟫_
 ⟨ f ⟩ t = rename f t
 
 ⟪_⟫_ : {A B : ℕ} → Sub A B → Tm A → Tm B
-⟪ f ⟫ t = subst f t
+⟪ f ⟫ t = sub f t
 
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X

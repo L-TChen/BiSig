@@ -51,7 +51,7 @@ erase : B.Desc {SD} → B.Desc {⋆D}
 erase []       = []
 erase (D ∷ Ds) = eraseᶜ D ∷ erase Ds
 
-module _ (A₀ : T) (D : B.Desc) where mutual
+module _ {D : B.Desc} where mutual
   open import Syntax.BiTyped.Term      D
   open import Syntax.BiTyped.Unityped  (erase D) as U
     renaming (Tm to UTm)

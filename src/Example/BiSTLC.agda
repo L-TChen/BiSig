@@ -12,6 +12,7 @@ open import Syntax.Simple.Term ΛₜD
   using (`_)
   renaming (Tm₀ to Λₜ ; op to top)
 open import Syntax.Context
+  renaming (_≟_ to _≟ctx_)
 
 infixr 10 _↣_
 pattern _↣_ A B = top (inr (inl (A , B , _)))
@@ -22,8 +23,9 @@ data Λₜ : Set where
 -}
 
 private variable
+  T     : Set
   A B C : Λₜ
-  Γ Δ   : Ctx Λₜ
+  Γ Δ   : Ctx T
  
 open import Syntax.BiTyped.Description {ΛₜD} as T
 
@@ -92,3 +94,69 @@ to-fromΛ Infer (t ∙ u)     = cong₂ _∙_ (to-fromΛ _ t) (to-fromΛ _ u)
 to-fromΛ Infer (_ ∋ t)     = cong (_ ∋_) (to-fromΛ _ t)
 to-fromΛ Check (ƛ t)       = cong ƛ_ (to-fromΛ _ t)
 to-fromΛ Check (⇉ t by eq) = cong (⇉_by eq) (to-fromΛ _ t)
+
+open import Syntax.Simple.Unit
+mutual
+  data UΛ⇉ : ⋆T → Ctx ⋆T → Set where
+    `_ : _∈_ ⇒ UΛ⇉
+    _∙_
+      : (t : UΛ⇉ ⋆ Γ) (u : UΛ⇇ ⋆ Γ)
+      → UΛ⇉ ⋆ Γ
+    _∋_
+      : (A : Λₜ) (t : UΛ⇇ ⋆ Γ)
+      → UΛ⇉ ⋆ Γ
+
+  data UΛ⇇ : ⋆T → Ctx ⋆T → Set where
+    ƛ_ 
+      : (t : UΛ⇇ ⋆ (⋆ ∙ Γ))
+      → UΛ⇇ ⋆ Γ
+    ↑_
+      : (t : UΛ⇉ ⋆ Γ)
+      → UΛ⇇ ⋆ Γ
+
+UΛ : Mode → ⋆T → Ctx ⋆T → Set
+UΛ Check = UΛ⇇
+UΛ Infer = UΛ⇉
+
+eraseCtx : Ctx Λₜ → Ctx ⋆T
+eraseCtx ∅       = ∅
+eraseCtx (A ∙ Γ) = ⋆ ∙ eraseCtx Γ
+
+eraseIdx : A ∈ Γ → ⋆ ∈ eraseCtx Γ
+eraseIdx zero    = zero
+eraseIdx (suc x) = suc (eraseIdx x)
+
+erase : {m : Mode} → Λ m A Γ → UΛ m ⋆ (eraseCtx Γ)
+erase {m = Check} (ƛ t)       = ƛ erase t
+erase {m = Check} (⇉ t by eq) = ↑ erase t
+erase {m = Infer} (` x)       = ` eraseIdx x
+erase {m = Infer} (t ∙ u)     = erase t
+erase {m = Infer} (A ∋ t)     = A ∋ erase t
+
+lookup : (Γ : Ctx Λₜ) (x : ⋆ ∈ eraseCtx Γ)
+  → Σ[ A ∈ Λₜ ] Σ[ x′ ∈ A ∈ Γ ] eraseIdx x′ ≡ x
+lookup (A ∙ Γ′) zero    = A , zero , refl
+lookup (A ∙ Γ′) (suc x) with lookup Γ′ x 
+... | (B , y , refl) = B , suc y , refl
+
+open import Syntax.Simple.Operation {ΛₜD}
+  renaming (_≟_ to _≟T_)
+
+mutual
+  infer : (Γ : Ctx Λₜ) (t : UΛ⇉ ⋆ (eraseCtx Γ)) 
+    → Dec (Σ[ A ∈ Λₜ ] Σ[ t′ ∈ Λ⇉ A Γ ] erase t′ ≡ t)
+  infer Γ (` x) with lookup Γ x 
+  ... | (A , x , refl) = yes (A , ` x , refl) 
+  infer Γ (t ∙ u) with infer Γ t
+  ... | no ¬p               = no λ where (A , t′ , p) → ¬p (A , t′ , {!   !})
+  ... | yes (top (inl      _)            , t′ , refl) = no λ where (A , t′ , p) → {!   !}
+  ... | yes (top (inr (inl (A , B , _))) , t′ , refl) = {!   !}
+  infer Γ (A ∋ t) with check A Γ t 
+  ... | yes (t′ , refl) = yes (A , A ∋ t′ , refl)
+  ... | no ¬p = no λ where (A , t′ , q) → {!   !}
+
+  check : (A : Λₜ) (Γ : Ctx Λₜ) (t : UΛ⇇ ⋆ (eraseCtx Γ)) 
+    → Dec (Σ[ t′ ∈ Λ⇇ A Γ ] erase t′ ≡ t)
+  check (top (inl _))                 Γ (ƛ t) = {!   !}
+  check (top (inl _))                 Γ (↑ t) = {!   !}
+  check (top (inr (inl (x , y , _)))) Γ t = {!   !}

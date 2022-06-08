@@ -67,11 +67,3 @@ _▷_⇇_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 (⟦ []      ⟧ _) m _ _ = ⊥
 (⟦ D ∷ Ds ⟧ X)  m A Γ = (⟦ D ⟧ᶜ X) m A Γ ⊎ (⟦ Ds ⟧ X) m A Γ
-
-record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where
-  field
-    var     : _∈_         ⇒ X Infer
-    toInfer : X Check     ⇒ X Infer
-    toCheck : X Infer     ⇒ X Check
-    alg     : (⟦ D ⟧ X) m ⇒ X m
-open _-Alg public

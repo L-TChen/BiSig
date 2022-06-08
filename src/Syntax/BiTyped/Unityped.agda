@@ -1,8 +1,8 @@
 open import Prelude
 
-import Syntax.Simple.Description  as S
+open import Syntax.Simple.Unit
 import Syntax.BiTyped.Description as B
 
-module Syntax.BiTyped.Unityped (D : B.Desc {S.⋆D}) where
+module Syntax.BiTyped.Unityped (D : B.Desc {⋆D}) where
 
-open import Syntax.BiTyped.Term {S.⋆D} D public
+open import Syntax.BiTyped.Term {⋆D} D public

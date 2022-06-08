@@ -72,10 +72,3 @@ module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   foldMapⁿ : ∀ {A : ℕ} n → Tm A ^ n → X A ^ n
   foldMapⁿ zero    _        = _
   foldMapⁿ (suc n) (t , ts) = fold t , foldMapⁿ n ts
-
--- 
--- TExp : Ctx Tm₀ → Set
--- TExp Ξ = Tm (∃ (_∈ Ξ))
--- 
--- flatten : {Ξ : Ctx Tm₀} → TExp Ξ → Tm₀
--- flatten = ⟪ id ⟫_ ∘ rename proj₁

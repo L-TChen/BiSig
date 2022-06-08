@@ -1,26 +1,26 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-open import Syntax.BiTyped.Description as T
+import Syntax.BiTyped.Description as T
 
-module Syntax.BiTyped.Term {SD : S.Desc} (D : Desc {SD}) where
-
+module Syntax.BiTyped.Term {SD : S.Desc} (D : T.Desc {SD}) where
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
 open import Syntax.Context
+open T {SD}
 
 private
   variable
     m     : Mode
     Ξ     : ℕ
-    σ     : TSub Ξ 0
+    σ     : Sub₀ Ξ
     A B   : T
     Γ Δ   : Ctx T
 
 infix 9 `_
 
 data Tm : Fam₀ where
-  `_ : _∈_          ⇒ Tm Infer
+  `_ : _∈_ ⇒ Tm Infer
   _∋_
     : (A : T) (t : Tm Check A Γ)
     → Tm Infer A Γ
@@ -112,10 +112,10 @@ infixr 5 ⟪_⟫_
 
 module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold : Tm m ⇒ X m
-  fold (` x)      = α .var x -- α .var x
-  fold (A ∋ t)    = α .toInfer (fold t)
+  fold (` x)         = α .var x -- α .var x
+  fold (A ∋ t)       = α .toInfer (fold t)
   fold (⇉ t by refl) = α .toCheck (fold t)
-  fold (op t)     = α .alg (foldMap _ t)
+  fold (op t)        = α .alg (foldMap _ t)
 
   foldMap : ∀ D
     → (⟦ D ⟧ Tm) m ⇒ (⟦ D ⟧ X) m

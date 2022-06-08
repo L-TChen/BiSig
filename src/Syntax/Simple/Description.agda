@@ -30,6 +30,3 @@ record _-Alg (D : Desc) (X : ℕ → Set) : Set₁ where
     var : Fin     ⇒₁ X
     alg : ⟦ D ⟧ X ⇒₁ X
 open _-Alg public
-
-⋆D : Desc
-⋆D = 0 ∷ []

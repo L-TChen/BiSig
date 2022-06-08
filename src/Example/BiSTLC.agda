@@ -25,12 +25,12 @@ private variable
   A B C : Λₜ
   Γ Δ   : Ctx Λₜ
  
-open import Syntax.BiTyped.Description  as T
+open import Syntax.BiTyped.Description {ΛₜD} as T
 
-ΛₒD : T.Desc {ΛₜD}
+ΛₒD : T.Desc
 ΛₒD =
   2 ▷ ρ[ ⇉ (` # 0) ↣ (` # 1) ] ρ[ ⇇ ` # 0 ] ι ⇉ ` # 1 ∷
-  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι ⇇ (` # 0) ↣ (` # 1) ∷
+  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι                  ⇇ (` # 0) ↣ (` # 1) ∷
   []
  
 open import Syntax.BiTyped.Term ΛₒD
@@ -56,7 +56,7 @@ mutual
       : (t : Λ⇉ A Γ) (eq : A ≡ B)
       → Λ⇇ B Γ
 
-Λ : Fam₀ -- Mode → Λₜ → Ctx → Set
+Λ : Fam₀
 Λ Check = Λ⇇
 Λ Infer = Λ⇉
 

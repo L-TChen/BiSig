@@ -32,3 +32,6 @@ suc x ≟ suc y with x ≟ y
 ... | yes p = yes (cong suc p)
 zero  ≟ suc _ = no λ ()
 suc _ ≟ zero  = no λ ()
+
+data Mode : Set where
+  Check Infer : Mode

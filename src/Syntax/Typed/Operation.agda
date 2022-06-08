@@ -5,10 +5,13 @@ open import Syntax.Typed.Description  as T
 module Syntax.Typed.Operation {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Sub to TSub)
-import Syntax.Simple.Operation as S
+open import Syntax.Simple.Operation as S
+  using (_≟s_) renaming (_≟_ to _≟T_)
 
 open import Syntax.Context
   renaming (_≟_ to _≟ᵢ_)
+
+open import Syntax.Typed.Functor
 open import Syntax.Typed.Term D
 
 private
@@ -40,7 +43,7 @@ mutual
   compareMap (n ∷ ns) (inr _) (inl _) = no λ ()
 
   compareMapᶜ : (D : ConD) → (t u : (⟦ D ⟧ᶜ Tm) A Γ) → Dec (t ≡ u)
-  compareMapᶜ (ι Ξ B D) (σ , _ , ts) (σ′ , _ , us) with σ S.≟s σ′
+  compareMapᶜ (ι Ξ B D) (σ , _ , ts) (σ′ , _ , us) with σ ≟s σ′
   ... | no ¬p = no λ where refl → ¬p refl
   compareMapᶜ (ι Ξ B D) (σ , refl , ts) (σ′ , refl , us) | yes refl with compareMapᵃˢ D ts us
   ... | no ¬q = no λ where refl → ¬q refl

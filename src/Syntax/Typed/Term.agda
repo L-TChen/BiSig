@@ -4,9 +4,12 @@ import Syntax.Simple.Description     as S
 open import Syntax.Typed.Description as T
 
 module Syntax.Typed.Term {SD : S.Desc} (D : Desc {SD}) where
+
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
+
 open import Syntax.Context
+open import Syntax.Typed.Functor {SD}
 
 private
   variable

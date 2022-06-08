@@ -27,7 +27,7 @@ open import Relation.Nullary                      public
 open import Relation.Binary                       public
   using (Decidable)
 open import Relation.Binary.PropositionalEquality public
-  using (_≡_; refl; cong; cong₂; subst)
+  using (_≡_; refl; cong; cong₂; subst; _≢_)
 
 open import Level                                 public
   using (Level; lift)
@@ -44,7 +44,6 @@ X ⇒₁ Y = ∀ {i} → X i → Y i
 _⇒_ : {I : Set ℓ₁} {J : Set ℓ₂}
   → (X : I → J → Set ℓ) (Y : I → J → Set ℓ′) → Set _
 X ⇒ Y = ∀ {i j} → X i j → Y i j
-
 
 data Mode : Set where
   Check Infer : Mode

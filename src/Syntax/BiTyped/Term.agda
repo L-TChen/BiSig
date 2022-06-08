@@ -4,10 +4,12 @@ import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as T
 
 module Syntax.BiTyped.Term {SD : S.Desc} (D : T.Desc {SD}) where
+
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
 open import Syntax.Context
 open T {SD}
+open import Syntax.BiTyped.Functor {SD}
 
 private
   variable

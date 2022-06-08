@@ -58,7 +58,7 @@ mutual
       : (t : Λ⇉ A Γ) (eq : A ≡ B)
       → Λ⇇ B Γ
 
-Λ : Fam₀
+Λ : Mode → Λₜ → Ctx Λₜ → Set
 Λ Check = Λ⇇
 Λ Infer = Λ⇉
 

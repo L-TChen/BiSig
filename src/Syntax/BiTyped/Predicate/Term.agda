@@ -18,12 +18,12 @@ private variable
   Ξ   : ℕ
   m   : Mode
   Γ   : Context T
-  x y : Id
+  x   : Id
   A B : T
-  t u : Raw m
+  t   : Raw m
 
 mutual
-  ⊢⇆ : Fam₀
+  ⊢⇆ : Pred₀ Raw
   ⊢⇆ A Γ Check t = Γ ⊢ t ⇇ A
   ⊢⇆ A Γ Infer t = Γ ⊢ t ⇉ A
 
@@ -34,7 +34,7 @@ mutual
     ⊢∈
       : Γ ⊢ t ⇇ A
       → Γ ⊢ t ∈ A ⇉ A  
-    op⇉
+    ⊢op
       : (t : (R.⟦ D ⟧ Raw) Infer)
       → (⟦ D ⟧ ⊢⇆) A Γ Infer t 
       → Γ ⊢ op t ⇉ A
@@ -43,7 +43,7 @@ mutual
       : Γ ⊢ t ⇉ A
       → A ≡ B
       → Γ ⊢ t ↑ ⇇ B
-    op⇇
+    ⊢op
       : (t : (R.⟦ D ⟧ Raw) Check)
       → (⟦ D ⟧ ⊢⇆) A Γ Check t
       → Γ ⊢ op t ⇇ A

@@ -23,8 +23,17 @@ data ArgsD (Ξ : ℕ) : Set where
   ι :                               ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
+{-
 data ConD : Set where
   ι :  (Ξ : ℕ) (m : Mode) (A : TExp Ξ) (D : ArgsD Ξ) → ConD
+-}
+record ConD : Set where
+  constructor ι
+  field
+    vars : ℕ
+    mode : Mode
+    type : TExp vars
+    args : ArgsD vars
 
 Desc : Set
 Desc = List ConD

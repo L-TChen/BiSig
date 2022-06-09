@@ -2,7 +2,7 @@ open import Prelude
 import Syntax.Simple.Description as S
 open import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Operation {SD : S.Desc} {D : T.Desc {SD}} where
+module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Sub to TSub)
 open import Syntax.Simple.Operation as S
@@ -11,8 +11,8 @@ open import Syntax.Simple.Operation as S
 open import Syntax.Context
   renaming (_≟_ to _≟ᵢ_)
 
-open import Syntax.Typed.Functor
-open import Syntax.Typed.Term D
+open import Syntax.Typed.Intrinsic.Functor
+open import Syntax.Typed.Intrinsic.Term D
 
 private
   variable

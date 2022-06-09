@@ -14,8 +14,11 @@ private variable
 
 infix 4 _∈_
 data _∈_ {T : Set} : T → Ctx T → Set where
-  zero : A ∈ A ∙ Γ
-  suc  : A ∈ Γ → A ∈ B ∙ Γ
+  zero
+    : A ∈ A ∙ Γ
+  suc
+    : A ∈ Γ
+    → A ∈ B ∙ Γ
 
 Ren : (Γ Δ : Ctx T) → Set
 Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ

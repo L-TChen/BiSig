@@ -2,7 +2,10 @@ module Prelude where
 
 open import Function                           public
   hiding (_∋_)
+open import Data.Empty                         public
+  using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
+  using (⊥; ⊥-elim)
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 open import Data.Nat                           public
@@ -23,7 +26,7 @@ open import Data.Sum                           public
   renaming (inj₁ to inl; inj₂ to inr)
 
 open import Relation.Nullary                      public
-  using (Dec; yes; no; _because_)
+  using (Dec; yes; no; _because_; ¬_)
 open import Relation.Binary                       public
   using (Decidable)
 open import Relation.Binary.PropositionalEquality public

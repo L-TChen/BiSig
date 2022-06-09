@@ -35,7 +35,10 @@ module _ {n m : ℕ} (f : Ren n m) where mutual
   renameMapⁿ (suc n) (t , ts) = rename t , renameMapⁿ n ts
     
 Sub : (A B : ℕ) → Set
-Sub A B = Vec (Tm B) A -- Fin A → Tm B
+Sub A B = Vec (Tm B) A
+
+Sub₀ : (Ξ : ℕ) → Set
+Sub₀ Ξ = Sub Ξ 0
 
 module _ {A B : ℕ} (σ : Sub A B) where mutual
   sub : Tm A → Tm B

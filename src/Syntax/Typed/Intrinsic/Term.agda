@@ -3,13 +3,13 @@ open import Prelude
 import Syntax.Simple.Description     as S
 open import Syntax.Typed.Description as T
 
-module Syntax.Typed.Term {SD : S.Desc} (D : Desc {SD}) where
+module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : Desc {SD}) where
 
 open import Syntax.Simple.Term SD
   using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
 
 open import Syntax.Context
-open import Syntax.Typed.Functor {SD}
+open import Syntax.Typed.Intrinsic.Functor {SD}
 
 private
   variable
@@ -20,7 +20,7 @@ private
 
 infix 9 `_
 data Tm : Fam₀ where
-  `_ : _∈_       ⇒ Tm 
+  `_ : _∈_       ⇒ Tm
   op : ⟦ D ⟧ Tm  ⇒ Tm 
 
 mutual

@@ -37,9 +37,11 @@ module _ {D : B.Desc} where mutual
   private variable
     m   : Mode
     A B : T
-  open import Syntax.BiTyped.Term  D
+  open import Syntax.BiTyped.Intrinsic.Functor         as B
+  open import Syntax.BiTyped.Intrinsic.Term  D
     renaming (Tm to BTm)
-  open import Syntax.Typed.Term    (erase D)
+  open import Syntax.Typed.Intrinsic.Functor           as T
+  open import Syntax.Typed.Intrinsic.Term    (erase D)
 
   forget
     : BTm m A Γ
@@ -52,14 +54,9 @@ module _ {D : B.Desc} where mutual
   forgetMap : ∀ D
     → (B.⟦ D       ⟧ BTm) m A Γ
     → (T.⟦ erase D ⟧ Tm)    A Γ
-  forgetMap (D ∷ Ds) (inl t) = inl (forgetMapᶜ D t)
+  forgetMap (ι Ξ m A D ∷ Ds) (inl (p , σ , q , ts)) = inl (σ , q , forgetMapᵃˢ D ts)
   forgetMap (D ∷ Ds) (inr u) = inr (forgetMap Ds u)
-
-  forgetMapᶜ : (D : B.ConD)
-    → (B.⟦ D        ⟧ᶜ BTm) m A Γ
-    → (T.⟦ eraseᶜ D ⟧ᶜ Tm)    A Γ
-  forgetMapᶜ (ι Ξ m A D) (p , σ , q , ts) = σ , q , forgetMapᵃˢ D ts
-
+  
   forgetMapᵃˢ : (D : B.ArgsD Ξ)
     → (B.⟦ D         ⟧ᵃˢ BTm) σ Γ
     → (T.⟦ eraseᵃˢ D ⟧ᵃˢ Tm)  σ Γ

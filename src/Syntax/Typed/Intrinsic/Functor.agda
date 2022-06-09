@@ -2,7 +2,7 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.Typed.Functor {SD : S.Desc}  where
+module Syntax.Typed.Intrinsic.Functor {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm₀ to T; Tm to TExp)

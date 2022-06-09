@@ -3,13 +3,13 @@ open import Prelude
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as T
 
-module Syntax.BiTyped.Term {SD : S.Desc} (D : T.Desc {SD}) where
+module Syntax.BiTyped.Intrinsic.Term {SD : S.Desc} (D : T.Desc {SD}) where
 
 open import Syntax.Simple.Term SD
-  using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
+  using (Sub₀) renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
 open import Syntax.Context
 open T {SD}
-open import Syntax.BiTyped.Functor {SD}
+open import Syntax.BiTyped.Intrinsic.Functor {SD}
 
 private
   variable
@@ -44,13 +44,8 @@ mutual
   renameMap : ∀ D
     → Ren Γ Δ 
     → (⟦ D ⟧ Tm) m A Γ → (⟦ D ⟧ Tm) m A Δ
-  renameMap (D ∷ _)  f (inl t) = inl (renameMapᶜ D f t)
-  renameMap (_ ∷ Ds) f (inr t) = inr (renameMap Ds f t)
-
-  renameMapᶜ : (D : ConD)
-    → Ren Γ Δ
-    → (⟦ D ⟧ᶜ Tm) m A Γ → (⟦ D ⟧ᶜ Tm) m A Δ
-  renameMapᶜ (ι Ξ m A D) f (p , σ , q , ts) = p , σ , q , renameMapᵃˢ D f ts
+  renameMap (ι Ξ m A D ∷ _)  f (inl (p , σ , q , ts)) = inl (p , σ , q , renameMapᵃˢ D f ts)
+  renameMap (_ ∷ Ds)         f (inr t)                = inr (renameMap Ds f t)
 
   renameMapᵃˢ : (D : ArgsD Ξ)
     → Ren Γ Δ
@@ -61,7 +56,7 @@ mutual
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
-  renameMapᵃ (ι m B)   f t = rename f t
+  renameMapᵃ (ι m B) f t = rename f t
   renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
 
 infixr 5 ⟨_⟩_
@@ -87,13 +82,8 @@ mutual
   subMap : ∀ D
     → Sub Γ Δ 
     → (⟦ D ⟧ Tm) m A Γ → (⟦ D ⟧ Tm) m A Δ
-  subMap (D ∷ Ds) f (inl x) = inl (subMapᶜ D f x)
-  subMap (D ∷ Ds) f (inr y) = inr (subMap Ds f y)
-
-  subMapᶜ : (D : ConD)
-    → Sub Γ Δ
-    → (⟦ D ⟧ᶜ Tm) m A Γ → (⟦ D ⟧ᶜ Tm) m A Δ
-  subMapᶜ (ι Ξ m A D) f (p , σ , q , ts) = p , σ , q , subMapᵃˢ D f ts
+  subMap (ι Ξ m₀ A D ∷ _)  f (inl (p , σ , q , ts)) = inl (p , σ , q , subMapᵃˢ D f ts)
+  subMap (D          ∷ Ds) f (inr y)                = inr (subMap Ds f y)
 
   subMapᵃˢ : (D : ArgsD Ξ)
     → Sub Γ Δ
@@ -121,12 +111,8 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
 
   foldMap : ∀ D
     → (⟦ D ⟧ Tm) m ⇒ (⟦ D ⟧ X) m
-  foldMap (D ∷ Ds) (inl t) = inl (foldMapᶜ D t)
-  foldMap (D ∷ Ds) (inr t) = inr (foldMap Ds t)
-
-  foldMapᶜ : ∀ (D : ConD)
-    → (⟦ D ⟧ᶜ Tm) m ⇒ (⟦ D ⟧ᶜ X) m
-  foldMapᶜ (ι Ξ m A D) (p , σ , q , ts)= p , σ , q , foldMapᵃˢ D ts
+  foldMap (ι Ξ m A D ∷ _)  (inl (p , σ , q , ts)) = inl (p , σ , q , foldMapᵃˢ D ts)
+  foldMap (_         ∷ Ds) (inr t)                = inr (foldMap Ds t)
 
   foldMapᵃˢ : ∀ (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ

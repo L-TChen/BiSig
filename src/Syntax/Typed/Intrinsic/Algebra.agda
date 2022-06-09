@@ -3,7 +3,7 @@ open import Prelude
 import Syntax.Simple.Description as S
 import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Algebra {SD : S.Desc} (D : T.Desc {SD}) where
+module Syntax.Typed.Intrinsic.Algebra {SD : S.Desc} (D : T.Desc {SD}) where
 open T {SD}
 open import Syntax.Simple.Term SD
   using ()

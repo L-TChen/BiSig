@@ -9,13 +9,12 @@ open import Syntax.Simple.Description as S
 ΛₜD = 0 ∙ 2 ∙ ∅
 
 open import Syntax.Simple.Term ΛₜD
-  using (`_)
-  renaming (Tm₀ to Λₜ ; op to top)
+  using (`_; op)
+  renaming (Tm₀ to Λₜ)
 open import Syntax.Context
---  renaming (_≟_ to _≟ctx_)
 
 infixr 10 _↣_
-pattern _↣_ A B = top (inr (inl (A , B , _)))
+pattern _↣_ A B = op (inr (inl (A , B , _)))
 {-
 data Λₜ : Set where
   ι   :              Λₜ
@@ -70,13 +69,12 @@ toΛ (_ ∋ t)     = _ ∋ toΛ t
 toΛ (t ∙′ u)    = toΛ t ∙ toΛ u
 toΛ (⇉ t by eq) = ⇉ (toΛ t) by eq
 toΛ (ƛ′ t)      = ƛ toΛ t
--- toΛ (Tm.op (inr (inr ())))
 
 fromΛ : ∀ m {A Γ} → Λ m A Γ → Tm m A Γ
 fromΛ Infer (` x)       = ` x
 fromΛ Infer (t ∙ u)     = fromΛ Infer t ∙′ fromΛ Check u
 fromΛ Infer (_ ∋ t)     = _ ∋ fromΛ Check t
-fromΛ Check (ƛ t)       = ƛ′ fromΛ Check t 
+fromΛ Check (ƛ t)       = ƛ′  fromΛ Check t 
 fromΛ Check (⇉ t by eq) = ⇉ fromΛ Infer t by eq
 
 from-toΛ : ∀ {m A Γ}
@@ -96,3 +94,5 @@ to-fromΛ Infer (t ∙ u)     = cong₂ _∙_ (to-fromΛ _ t) (to-fromΛ _ u)
 to-fromΛ Infer (_ ∋ t)     = cong (_ ∋_) (to-fromΛ _ t)
 to-fromΛ Check (ƛ t)       = cong ƛ_ (to-fromΛ _ t)
 to-fromΛ Check (⇉ t by eq) = cong (⇉_by eq) (to-fromΛ _ t)
+
+open import Example.STLC

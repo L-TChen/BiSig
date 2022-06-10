@@ -6,13 +6,13 @@ module Example.BiSTLC where
 open import Syntax.Simple.Description as S
 
 ΛₜD : S.Desc
-ΛₜD = 0 ∷ 2 ∷ []
+ΛₜD = 0 ∙ 2 ∙ ∅
 
 open import Syntax.Simple.Term ΛₜD
   using (`_)
   renaming (Tm₀ to Λₜ ; op to top)
 open import Syntax.Context
-  renaming (_≟_ to _≟ctx_)
+--  renaming (_≟_ to _≟ctx_)
 
 infixr 10 _↣_
 pattern _↣_ A B = top (inr (inl (A , B , _)))
@@ -31,14 +31,16 @@ open import Syntax.BiTyped.Description {ΛₜD} as T
 
 ΛₒD : T.Desc
 ΛₒD =
-  2 ▷ ρ[ ⇉ (` # 0) ↣ (` # 1) ] ρ[ ⇇ ` # 0 ] ι ⇉ ` # 1 ∷
-  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι                  ⇇ (` # 0) ↣ (` # 1) ∷
-  []
+  2 ▷ ρ[ ⇉ (` # 0) ↣ (` # 1) ] ρ[ ⇇ ` # 0 ] ι ⇉ ` # 1 ∙
+  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι                  ⇇ (` # 0) ↣ (` # 1) ∙
+  ∅
  
 open import Syntax.BiTyped.Intrinsic.Term ΛₒD
 
-pattern _∙′_ t u = op (inl (refl , (_ ∷ _ ∷  []) , refl , t , u , _))
-pattern ƛ′_  t   = op (inr (inl (refl , (_ ∷ _ ∷ []) , refl , t , _)))
+pattern _∙′_ t u = op (_ , here refl , refl , _ ∷ _ ∷ [] , refl , t , u , _)
+-- op (inl (refl , (_ ∷ _ ∷  []) , refl , t , u , _))
+pattern ƛ′_  t   = op (_ , there (here refl) , refl , _ ∷ _ ∷ [] , refl , t , _)
+-- op (inr (inl (refl , (_ ∷ _ ∷ []) , refl , t , _)))
 
 mutual
   data Λ⇉ : Λₜ → Ctx Λₜ → Set where

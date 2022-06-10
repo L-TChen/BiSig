@@ -2,9 +2,7 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Language.Soundness.Term {SD : S.Desc} where
-
-open import Data.List.Membership.Propositional
+module Language.Soundness {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tm₀ to T)
@@ -21,7 +19,6 @@ open import Syntax.BiTyped.Intrinsic.Term
   renaming (Tm to BTm)
 
 open import Language.Erasure.Description
-open import Language.Soundness.Description
 
 private variable
   m : Mode
@@ -30,6 +27,11 @@ private variable
   σ : Sub₀ Ξ
   Γ : Ctx T
 
+-- A bidirectional typing is sound with respect to a base typing
+-- if every bidirectional typing rule corresonds to a base typing rule.
+Soundness : B.Desc → T.Desc → Set
+Soundness BDs TDs = ∀ {D} → D ∈ BDs → eraseᶜ D ∈ TDs
+
 module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget
     : BTm BD m A Γ
@@ -37,14 +39,7 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
-  forget (op x)        = op (forgetMap _ _ s x)
-
-  forgetMap
-    : (Dᵇ : B.Desc) (Dᵗ : T.Desc)
-    → Soundness Dᵇ Dᵗ
-    → (B.⟦ Dᵇ ⟧ BTm BD) m A Γ
-    → (T.⟦ Dᵗ ⟧ Tm  TD)   A Γ
-  forgetMap Dᵇ Dᵗ s (D , i , p , σ , A=B , ts) = _ , s i , σ , A=B , forgetMapᵃˢ _ ts
+  forget (op (D , i , p , σ , A=B , ts)) = op (_ , s i , σ , A=B , forgetMapᵃˢ _ ts)
 
   forgetMapᵃˢ
     : (D : B.ArgsD Ξ)

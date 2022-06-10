@@ -26,8 +26,8 @@ module _ {n m : ℕ} (f : Ren n m) where mutual
 
   renameMap : (D : Desc)
     → (⟦ D ⟧ Tm) n → (⟦ D ⟧ Tm) m
-  renameMap (n ∷ ns) (inl x) = inl (renameMapⁿ n x)
-  renameMap (h ∷ ns) (inr y) = inr (renameMap ns y)
+  renameMap (n ∙ ns) (inl x) = inl (renameMapⁿ n x)
+  renameMap (h ∙ ns) (inr y) = inr (renameMap ns y)
 
   renameMapⁿ : (l : ℕ)
     → Tm n ^ l → Tm m ^ l
@@ -47,8 +47,8 @@ module _ {A B : ℕ} (σ : Sub A B) where mutual
 
   subMap : ∀ as
     → (⟦ as ⟧ Tm) A → (⟦ as ⟧ Tm) B
-  subMap (a ∷ as) (inl ts) = inl (subMapⁿ a ts)
-  subMap (a ∷ as) (inr y)  = inr (subMap as y)
+  subMap (a ∙ as) (inl ts) = inl (subMapⁿ a ts)
+  subMap (a ∙ as) (inr y)  = inr (subMap as y)
 
   subMapⁿ : ∀ n
     → Tm A ^ n → Tm B ^ n
@@ -69,8 +69,8 @@ module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold (op t) = α .alg (foldMap _ t)
 
   foldMap : ∀ D → ⟦ D ⟧ Tm ⇒₁ ⟦ D ⟧ X
-  foldMap (D ∷ Ds) (inl x) = inl (foldMapⁿ D x)
-  foldMap (D ∷ Ds) (inr y) = inr (foldMap Ds y)
+  foldMap (D ∙ Ds) (inl x) = inl (foldMapⁿ D x)
+  foldMap (D ∙ Ds) (inr y) = inr (foldMap Ds y)
 
   foldMapⁿ : ∀ {A : ℕ} n → Tm A ^ n → X A ^ n
   foldMapⁿ zero    _        = _

@@ -34,5 +34,4 @@ Fam₀ = Fam lzero
 (⟦ ι Ξ _     B D ⟧ᶜ X) _     = ⊥
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ []     ⟧ X) _ = ⊥
-(⟦ D ∷ Ds ⟧ X) m = (⟦ D ⟧ᶜ X) m ⊎ (⟦ Ds ⟧ X) m
+(⟦ Ds ⟧ X) m = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m

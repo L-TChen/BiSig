@@ -9,10 +9,12 @@ open import Syntax.Simple.Operation as S
   using (_≟s_) renaming (_≟_ to _≟T_)
 
 open import Syntax.Context
-  renaming (_≟_ to _≟ᵢ_)
 
 open import Syntax.Typed.Intrinsic.Functor
 open import Syntax.Typed.Intrinsic.Term D
+
+open import Data.List.Membership.Propositional
+open import Data.List.Relation.Unary.Any using (here; there)
 
 private
   variable
@@ -21,10 +23,11 @@ private
     A B   : T
     Γ Δ   : Ctx T
 
+
 mutual
   _≟_ : (t u : Tm A Γ) → Dec (t ≡ u)
-  (` x)  ≟ (` y)  with x ≟ᵢ y
-  ... | yes p = yes (cong `_ p)
+  (` x)  ≟ (` y)  with x ≟∈ y
+  ... | yes refl = yes refl
   ... | no ¬p = no λ where refl → ¬p refl
   op t ≟ op u with compareMap _ t u
   ... | yes p = yes (cong op p)
@@ -33,14 +36,11 @@ mutual
   op _ ≟ (` _)  = no λ ()
 
   compareMap : ∀ D → (t u : (⟦ D ⟧ Tm) A Γ) → Dec (t ≡ u)
-  compareMap (D ∷ ns) (inl t) (inl u) with compareMapᶜ D t u
-  ... | yes p = yes (cong inl p)
+  compareMap D (_ , i , t) (_ , j , u) with i ≟∈ j
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (_ ∷ ns) (inr t) (inr u) with compareMap ns t u 
-  ... | yes p = yes (cong inr p)
-  ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (n ∷ ns) (inl _) (inr _) = no λ ()
-  compareMap (n ∷ ns) (inr _) (inl _) = no λ ()
+  compareMap _ (D , i , t) (_ , _ , u) | yes refl with compareMapᶜ D t u
+  ... | no ¬q = no λ where refl → ¬q refl
+  ... | yes q = yes (cong (λ t → (D , i , t)) q)
 
   compareMapᶜ : (D : ConD) → (t u : (⟦ D ⟧ᶜ Tm) A Γ) → Dec (t ≡ u)
   compareMapᶜ (ι Ξ B D) (σ , _ , ts) (σ′ , _ , us) with σ ≟s σ′

@@ -33,7 +33,7 @@ mutual
       → Γ ⊢ ` x ⇉ A
     ⊢∈
       : Γ ⊢ t ⇇ A
-      → Γ ⊢ t ∈ A ⇉ A  
+      → Γ ⊢ t ⦂ A ⇉ A
     ⊢op
       : (t : (R.⟦ D ⟧ Raw) Infer)
       → (⟦ D ⟧ ⊢⇆) Infer A Γ t 

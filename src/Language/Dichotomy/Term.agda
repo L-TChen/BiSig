@@ -2,7 +2,7 @@ open import Prelude
 
 import Syntax.Simple.Description  as S
 open import Syntax.BiTyped.Description
-module Language.Conversion.Term {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
+module Language.Dichotomy.Term {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tm₀ to T)
@@ -11,7 +11,6 @@ open import Syntax.NamedContext Id
 
 open import Syntax.BiTyped.Raw.Functor {SD} Id as R
 open import Syntax.BiTyped.Raw.Term    D Id
-  hiding (_∈_)
 
 open import Syntax.BiTyped.Extrinsic.Functor {SD} D Id as E
 open import Syntax.BiTyped.Extrinsic.Term    D    Id
@@ -19,7 +18,7 @@ open import Syntax.BiTyped.Extrinsic.Term    D    Id
 open import Syntax.BiTyped.Intrinsic.Functor {SD}      as I
 open import Syntax.BiTyped.Intrinsic.Term    D
 
-open import Language.Conversion.Context Id
+open import Language.Dichotomy.Context Id
 
 private variable
   m     : Mode
@@ -40,13 +39,14 @@ mutual
   ∥ ⊢⇉ t  p ∥⇇ = ⇉ ∥ t ∥⇉ by p
   ∥ ⊢op t p ∥⇇ = op (∥-∥map _ t p)
 
-  ∥-∥map : ∀ D
+  ∥-∥map : (D : Desc)
     → (t : (R.⟦ D ⟧ Raw) m)
     → (E.⟦ D ⟧ ⊢⇆) m A Γ        t
     → (I.⟦ D ⟧ Tm) m A ∥ Γ ∥ctx
-  ∥-∥map {m = Check} (ι Ξ Check B D ∷ _) (inl _) (σ , p , t) = inl (refl , σ , p , ∥-∥mapᵃˢ D _ t)
-  ∥-∥map {m = Infer} (ι Ξ Infer B D ∷ _) (inl _) (σ , p , t) = inl (refl , σ , p , ∥-∥mapᵃˢ D _ t)
-  ∥-∥map             (_            ∷ Ds) (inr _) p           = inr (∥-∥map Ds _ p)
+  ∥-∥map {m = Check} Ds (ι Ξ Check B D , i , t) (σ , B=A , p) =
+    ι Ξ Check B D , i , refl , σ , B=A , ∥-∥mapᵃˢ D _ p
+  ∥-∥map {m = Infer} Ds (ι Ξ Infer B D , i , t) (σ , B=A , p) =
+    ι Ξ Infer B D , i , refl , σ , B=A , ∥-∥mapᵃˢ D _ p
 
   ∥-∥mapᵃˢ : (D : ArgsD Ξ)
     → (t : (R.⟦ D ⟧ᵃˢ Raw))

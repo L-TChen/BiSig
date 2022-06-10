@@ -27,18 +27,7 @@ mutual
   rename : Ren Γ Δ 
     → Tm A Γ → Tm A Δ
   rename f (`  x) = ` f x
-  rename f (op t) = op (renameMap _ f t)
-
-  renameMap : ∀ D
-    → Ren Γ Δ 
-    → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
-  renameMap (D ∷ _)  f (inl t) = inl (renameMapᶜ D f t)
-  renameMap (_ ∷ Ds)       f (inr t) = inr (renameMap Ds f t)
-
-  renameMapᶜ : (D : ConD)
-    → Ren Γ Δ
-    → (⟦ D ⟧ᶜ Tm) A Γ → (⟦ D ⟧ᶜ Tm) A Δ
-  renameMapᶜ (ι Ξ B D) f (σ , eq , ts) = σ , eq , renameMapᵃˢ D f ts
+  rename f (op (D , x , σ , p , ts)) = op (_ , x , σ , p , renameMapᵃˢ (ConD.args D) f ts)
 
   renameMapᵃˢ : (D : ArgsD Ξ)
     → Ren Γ Δ
@@ -61,25 +50,15 @@ Sub : (Γ Δ : Ctx T) → Set
 Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm A Δ
 
 exts : Sub Γ Δ → Sub (A ∙ Γ) (A ∙ Δ)
-exts f zero    = ` zero
-exts f (suc x) = rename suc (f x)
+exts f (here px) = ` here px
+exts f (there x) = rename there (f x)
 
 mutual
   sub : Sub Γ Δ
     → ∀ {A} → Tm A Γ → Tm A Δ
   sub f (` x)  = f x
-  sub f (op t) = op (subMap _ f t)
-
-  subMap : ∀ D
-    → Sub Γ Δ 
-    → (⟦ D ⟧ Tm) A Γ → (⟦ D ⟧ Tm) A Δ
-  subMap (D ∷ Ds) f (inl x) = inl (subMapᶜ D f x)
-  subMap (D ∷ Ds)       f (inr y) = inr (subMap Ds f y)
-
-  subMapᶜ : (D : ConD)
-    → Sub Γ Δ
-    → (⟦ D ⟧ᶜ Tm) A Γ → (⟦ D ⟧ᶜ Tm) A Δ
-  subMapᶜ (ι Ξ B D) f (σ , eq , ts) = σ , eq , subMapᵃˢ D f ts
+  sub f (op (D , x , σ , eq , ts)) =
+    op (_ , x , σ , eq , subMapᵃˢ (ConD.args D) f ts)
 
   subMapᵃˢ : (D : ArgsD Ξ)
     → Sub Γ Δ
@@ -101,18 +80,8 @@ infixr 5 ⟪_⟫_
 module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold : Tm ⇒ X
   fold (` x)  = α .var x -- α .var x
-  fold (op t) = α .alg (foldMap _ t)
-
-  foldMap : ∀ D
-    → ⟦ D ⟧ Tm ⇒ ⟦ D ⟧ X
-  foldMap (D ∷ Ds) (inl t) = inl (foldMapᶜ D t)
-  foldMap (D ∷ Ds) (inr t) = inr (foldMap Ds t)
-
-  foldMapᶜ : ∀ (D : ConD)
-    → ⟦ D ⟧ᶜ Tm ⇒ ⟦ D ⟧ᶜ X
-  foldMapᶜ (ι Ξ B D) (σ , eq , ts) = σ , eq , foldMapᵃˢ D ts
---  foldMapᶜ (ι A D) (eq , t) = eq , foldMapᵃˢ D t
- -- foldMapᶜ (σ D)   (A , t)  = A , foldMapᶜ (D A) t
+  fold (op (D , x , σ , eq , ts)) =
+    α . alg $ D , x , σ , eq , foldMapᵃˢ (ConD.args D) ts
 
   foldMapᵃˢ : ∀ (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ

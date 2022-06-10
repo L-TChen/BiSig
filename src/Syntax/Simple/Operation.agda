@@ -10,15 +10,15 @@ private variable
   Δ Ξ : ℕ
 
 freeAlg : (D -Alg) (List ∘ Fin)
-var freeAlg x = x ∷ []
+var freeAlg x = x ∙ ∅
 alg freeAlg = algᶜ _
   where
     algⁿ : ∀ n → List (Fin Ξ) ^ n → List (Fin Ξ)
-    algⁿ zero    _        = []
+    algⁿ zero    _        = ∅
     algⁿ (suc n) (t , ts) = t ++ algⁿ _ ts
     algᶜ : ∀ D → ⟦ D ⟧ (List ∘ Fin) ⇒₁ List ∘ Fin
-    algᶜ (n ∷ ns) (inl x) = algⁿ n x
-    algᶜ (n ∷ ns) (inr y) = algᶜ ns y
+    algᶜ (n ∙ ns) (inl x) = algⁿ n x
+    algᶜ (n ∙ ns) (inr y) = algᶜ ns y
 fv : Tm ⇒₁ List ∘ Fin
 fv = fold freeAlg
 
@@ -34,14 +34,14 @@ mutual
   op x  ≟ (` y) = no λ ()
 
   compareMap : ∀ D → (t u : (⟦ D ⟧ Tm) Ξ) → Dec (t ≡ u)
-  compareMap (n ∷ ns) (inl t) (inl u) with compareMapⁿ n t u
+  compareMap (n ∙ ns) (inl t) (inl u) with compareMapⁿ n t u
   ... | yes p = yes (cong inl p)
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (n ∷ ns) (inr t) (inr u) with compareMap ns t u 
+  compareMap (n ∙ ns) (inr t) (inr u) with compareMap ns t u 
   ... | yes p = yes (cong inr p)
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMap (n ∷ ns) (inl t) (inr u) = no λ ()
-  compareMap (n ∷ ns) (inr t) (inl u) = no λ ()
+  compareMap (n ∙ ns) (inl t) (inr u) = no λ ()
+  compareMap (n ∙ ns) (inr t) (inl u) = no λ ()
 
   compareMapⁿ : ∀ n → (ts us : Tm Ξ ^ n) → Dec (ts ≡ us)
   compareMapⁿ zero    _        _        = yes refl

@@ -30,10 +30,11 @@ private variable
 (⟦ ι      ⟧ᵃˢ _) σ _ = ⊤
 (⟦ ρ D Ds ⟧ᵃˢ X) σ Γ = (⟦ D ⟧ᵃ X) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
 
+⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
+(⟦ ι Ξ m₀ B D ⟧ᶜ X) m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
+
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ []              ⟧ _) _ _ _ = ⊥
-(⟦ ι Ξ m₀ B D ∷ Ds ⟧ X) m A Γ = (m₀ ≡ m × Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ))
-  ⊎ (⟦ Ds ⟧ X) m A Γ
+(⟦ Ds ⟧ X) m A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where
   field

@@ -6,7 +6,7 @@ open import Syntax.Simple.Description
 open import Syntax.Simple.Term
 
 ⋆D : Desc
-⋆D = 0 ∷ []
+⋆D = 0 ∙ ∅
 
 ⋆T = Tm₀ ⋆D
 

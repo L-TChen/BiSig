@@ -14,7 +14,10 @@ open import Data.Fin                           public
   using (Fin; #_; zero; suc)
 open import Data.Fin.Literals                  public
 open import Data.List                          public 
-  using (List; []; _∷_; _++_; length)
+  using (List; _++_; length; map)
+  renaming ([] to ∅; _∷_ to _∙_)
+open import Data.List.Membership.Propositional               public
+open import Data.List.Relation.Unary.Any using (here; there) public
 open import Data.Vec                           public
   using (Vec; []; _∷_)
 open import Data.String                        public
@@ -50,3 +53,12 @@ X ⇒ Y = ∀ {i j} → X i j → Y i j
 
 data Mode : Set where
   Check Infer : Mode
+
+_≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
+  → Dec ((x , i) ≡ (y , j))
+here refl ≟∈ here refl = yes refl
+there i   ≟∈ there j   with i ≟∈ j
+... | no ¬p    = no λ where refl → ¬p refl
+... | yes refl = yes refl
+here _    ≟∈ there _   = no λ ()
+there _   ≟∈ here  _   = no λ ()

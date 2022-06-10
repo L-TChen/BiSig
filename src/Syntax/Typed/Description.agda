@@ -17,8 +17,12 @@ data ArgsD (Ξ : ℕ) : Set where
   ι :                               ArgsD Ξ
   ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
 
-data ConD : Set where
-  ι : (Ξ : ℕ) (A : TExp Ξ) (D : ArgsD Ξ) → ConD
+record ConD : Set where
+  constructor ι
+  field
+    vars : ℕ
+    type : TExp  vars
+    args : ArgsD vars
 
 infix  5 ⊢_
 infixr 7 ρ 

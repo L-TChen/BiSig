@@ -14,8 +14,9 @@ private variable
   Ξ   : ℕ
   m   : Mode
 
+infix 4 _⦂_
 data Raw : Mode → Set where
   `_  : (x : Id)                → Raw Infer
-  _∈_ : (t : Raw Check) (A : T) → Raw Infer
+  _⦂_ : (t : Raw Check) (A : T) → Raw Infer
   _↑  : (t : Raw Infer)         → Raw Check
   op  : (⟦ D ⟧ Raw) m           → Raw m

@@ -37,6 +37,4 @@ Pred₀ X = Pred X lzero
 (⟦ ι Ξ Infer B D ⟧ᶜ X) Infer A Γ t = Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ t)
 
 ⟦_⟧_ : (D : Desc) (P : Pred X ℓ′) (m : Mode) (A : T) (Γ : Context T) (t : (R.⟦ D ⟧ X) m) → Set ℓ′
-(⟦ []     ⟧ X) _ _ _ _       = ⊥
-(⟦ D ∷ Ds ⟧ X) m A Γ (inl t) = (⟦ D ⟧ᶜ X) m A Γ t
-(⟦ D ∷ Ds ⟧ X) m A Γ (inr u) = (⟦ Ds ⟧ X) m A Γ u
+(⟦ Ds ⟧ X) m A Γ (D , i , t) = (⟦ D ⟧ᶜ X)  m A Γ t

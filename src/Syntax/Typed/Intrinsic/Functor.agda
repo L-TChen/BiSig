@@ -33,8 +33,7 @@ private variable
 (⟦ ι Ξ B D ⟧ᶜ X) A Γ = Σ[ σ ∈ Sub Ξ 0 ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ []           ⟧ _) _ _ = ⊥
-(⟦ D ∷ Ds ⟧ X) A Γ = (⟦ D ⟧ᶜ X) A Γ ⊎ (⟦ Ds ⟧ X) A Γ
+(⟦ Ds ⟧ X) A Γ = ∃[ D ] Σ[ _ ∈ D ∈ Ds ] (⟦ D ⟧ᶜ X) A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ) : Set ℓ where
   field

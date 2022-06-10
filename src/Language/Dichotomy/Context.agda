@@ -1,6 +1,6 @@
 open import Prelude
 
-module Language.Conversion.Context (Id : Set) where
+module Language.Dichotomy.Context (Id : Set) where
 
 open import Syntax.Context
 open import Syntax.NamedContext Id
@@ -16,5 +16,5 @@ private variable
 ∥ x ⦂ A , Γ ∥ctx = A ∙ ∥ Γ ∥ctx
 
 ∥_∥∈ : x ⦂ A ∈ Γ → A ∈ ∥ Γ ∥ctx
-∥ zero     ∥∈ = zero
-∥ suc ¬p x ∥∈ = suc ∥ x ∥∈
+∥ zero     ∥∈ = here refl
+∥ suc ¬p x ∥∈ = there ∥ x ∥∈

@@ -105,16 +105,12 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold (` x)         = α .var x -- α .var x
   fold (A ∋ t)       = α .toInfer (fold t)
   fold (⇉ t by refl) = α .toCheck (fold t)
-  fold (op t)        = α .alg (foldMap _ t)
+  fold (op (D , x , p , σ , q , ts)) = α .alg (D , x , p , σ , q , foldMap (ConD.args D) ts)
 
-  foldMap : ∀ D
-    → (⟦ D ⟧ Tm) m ⇒ (⟦ D ⟧ X) m
-  foldMap Ds (D , x , p , σ , q , ts) = D , x , p , σ , q , foldMapᵃˢ (ConD.args D) ts
-
-  foldMapᵃˢ : ∀ (D : ArgsD Ξ)
+  foldMap : ∀ (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
-  foldMapᵃˢ ι        _        = _
-  foldMapᵃˢ (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMapᵃˢ Ds ts
+  foldMap ι        _        = _
+  foldMap (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → (⟦ D ⟧ᵃ Tm) σ ⇒₁ (⟦ D ⟧ᵃ X) σ

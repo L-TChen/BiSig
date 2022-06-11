@@ -43,6 +43,3 @@ _▷_⇉_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 
 _▷_⇇_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 Ξ ▷ D ⇇ A = ι Ξ Check A D
-
--- Mode-Correct (BD : B.Desc) : Ctx → Ctx → Set
--- Complete (D : T.Desc) (BD : B.Desc) : Set

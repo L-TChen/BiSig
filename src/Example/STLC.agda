@@ -16,7 +16,7 @@ open import Syntax.Simple.Term ΛₜD   as Type
 open import Syntax.Context
 
 infixr 8 _↣_
-pattern _↣_ A B = op (inr (inl (A , B ,  _)))
+pattern _↣_ A B = op (_ , there (here refl) , A , B , _)
 
 open import Syntax.Typed.Description {ΛₜD} as T
 

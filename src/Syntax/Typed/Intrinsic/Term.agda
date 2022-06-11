@@ -27,13 +27,13 @@ mutual
   rename : Ren Γ Δ 
     → Tm A Γ → Tm A Δ
   rename f (`  x) = ` f x
-  rename f (op (D , x , σ , p , ts)) = op (_ , x , σ , p , renameMapᵃˢ (ConD.args D) f ts)
+  rename f (op (D , x , σ , p , ts)) = op (_ , x , σ , p , renameMap (ConD.args D) f ts)
 
-  renameMapᵃˢ : (D : ArgsD Ξ)
+  renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMapᵃˢ ι        f _        = _
-  renameMapᵃˢ (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMapᵃˢ Ds f ts
+  renameMap ι        f _        = _
+  renameMap (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
 
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
@@ -58,13 +58,13 @@ mutual
     → ∀ {A} → Tm A Γ → Tm A Δ
   sub f (` x)  = f x
   sub f (op (D , x , σ , eq , ts)) =
-    op (_ , x , σ , eq , subMapᵃˢ (ConD.args D) f ts)
+    op (_ , x , σ , eq , subMap (ConD.args D) f ts)
 
-  subMapᵃˢ : (D : ArgsD Ξ)
+  subMap : (D : ArgsD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  subMapᵃˢ ι        f _        = _
-  subMapᵃˢ (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMapᵃˢ Ds f ts
+  subMap ι        f _        = _
+  subMap (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
 
   subMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ
@@ -81,12 +81,12 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold : Tm ⇒ X
   fold (` x)  = α .var x -- α .var x
   fold (op (D , x , σ , eq , ts)) =
-    α . alg $ D , x , σ , eq , foldMapᵃˢ (ConD.args D) ts
+    α . alg $ D , x , σ , eq , foldMap (ConD.args D) ts
 
-  foldMapᵃˢ : ∀ (D : ArgsD Ξ)
+  foldMap : ∀ (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
-  foldMapᵃˢ ι        _        = _
-  foldMapᵃˢ (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMapᵃˢ Ds ts
+  foldMap ι        _        = _
+  foldMap (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → (⟦ D ⟧ᵃ Tm) σ  ⇒₁ (⟦ D ⟧ᵃ X) σ

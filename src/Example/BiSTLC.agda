@@ -14,7 +14,7 @@ open import Syntax.Simple.Term ΛₜD
 open import Syntax.Context
 
 infixr 10 _↣_
-pattern _↣_ A B = op (inr (inl (A , B , _)))
+pattern _↣_ A B = op (_ , there (here refl) , A , B , _)
 {-
 data Λₜ : Set where
   ι   :              Λₜ

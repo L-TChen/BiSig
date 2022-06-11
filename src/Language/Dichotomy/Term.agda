@@ -33,27 +33,20 @@ mutual
   ∥_∥⇉ : Γ ⊢ t ⇉ A → Tm⇉ A ∥ Γ ∥ctx
   ∥ ⊢` x    ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢∈ t    ∥⇉ = _ ∋ ∥ t ∥⇇
-  ∥ ⊢op t p ∥⇉ = op (∥-∥map _ t p)
+  ∥ ⊢op (ι Ξ Infer B D , i , t) (σ , B=A , p) ∥⇉ =
+    op (_ , i , refl , σ , B=A , ∥-∥map D _ p)
 
   ∥_∥⇇ : Γ ⊢ t ⇇ A → Tm⇇ A ∥ Γ ∥ctx
   ∥ ⊢⇉ t  p ∥⇇ = ⇉ ∥ t ∥⇉ by p
-  ∥ ⊢op t p ∥⇇ = op (∥-∥map _ t p)
+  ∥ ⊢op (ι Ξ Check B D , i , t) (σ , B=A , p) ∥⇇ =
+    op (_ , i , refl , σ , B=A , ∥-∥map D _ p)
 
-  ∥-∥map : (D : Desc)
-    → (t : (R.⟦ D ⟧ Raw) m)
-    → (E.⟦ D ⟧ ⊢⇆) m A Γ        t
-    → (I.⟦ D ⟧ Tm) m A ∥ Γ ∥ctx
-  ∥-∥map {m = Check} Ds (ι Ξ Check B D , i , t) (σ , B=A , p) =
-    ι Ξ Check B D , i , refl , σ , B=A , ∥-∥mapᵃˢ D _ p
-  ∥-∥map {m = Infer} Ds (ι Ξ Infer B D , i , t) (σ , B=A , p) =
-    ι Ξ Infer B D , i , refl , σ , B=A , ∥-∥mapᵃˢ D _ p
-
-  ∥-∥mapᵃˢ : (D : ArgsD Ξ)
+  ∥-∥map : (D : ArgsD Ξ)
     → (t : (R.⟦ D ⟧ᵃˢ Raw))
     → (E.⟦ D ⟧ᵃˢ ⊢⇆) σ Γ        t
     → (I.⟦ D ⟧ᵃˢ Tm) σ ∥ Γ ∥ctx 
-  ∥-∥mapᵃˢ ι        _        _        = tt
-  ∥-∥mapᵃˢ (ρ D Ds) (t , ts) (p , ps) = ∥-∥mapᵃ D _ p , ∥-∥mapᵃˢ Ds ts ps
+  ∥-∥map ι        _        _        = tt
+  ∥-∥map (ρ D Ds) (t , ts) (p , ps) = ∥-∥mapᵃ D _ p , ∥-∥map Ds ts ps
 
   ∥-∥mapᵃ : (D : ArgD Ξ)
     → (t : (R.⟦ D ⟧ᵃ Raw))

@@ -33,19 +33,14 @@ mutual
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
-  forget (op t)        = op (forgetMap _ t)
+  forget (op (_ , i , p , σ , q , ts)) =
+    op (_ , ∈-map⁺ eraseᶜ i , σ , q , forgetMap _ ts)
 
-  forgetMap : ∀ D
-    → (B.⟦ D       ⟧ BTm) m A Γ
-    → (T.⟦ erase D ⟧ Tm)    A Γ
-  forgetMap Ds (ι Ξ m A D , i , p , σ , q , ts) =
-    ι Ξ A (eraseᵃˢ D) , ∈-map⁺ eraseᶜ i , σ , q , forgetMapᵃˢ _ ts
-
-  forgetMapᵃˢ : (D : B.ArgsD Ξ)
+  forgetMap : (D : B.ArgsD Ξ)
     → (B.⟦ D         ⟧ᵃˢ BTm) σ Γ
     → (T.⟦ eraseᵃˢ D ⟧ᵃˢ Tm)  σ Γ
-  forgetMapᵃˢ ι        _        = _
-  forgetMapᵃˢ (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMapᵃˢ Ds ts
+  forgetMap ι        _        = _
+  forgetMap (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMap Ds ts
 
   forgetMapᵃ : (D : B.ArgD Ξ)
     → (B.⟦ D ⟧ᵃ        BTm) σ Γ

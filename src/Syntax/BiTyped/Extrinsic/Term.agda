@@ -22,28 +22,23 @@ private variable
   A B : T
   t   : Raw m
 
-mutual
-  ⊢⇆ : Pred₀ Raw
-  ⊢⇆ A Γ Check t = Γ ⊢ t ⇇ A
-  ⊢⇆ A Γ Infer t = Γ ⊢ t ⇉ A
+data ⊢⇄ : Pred₀ Raw where
+  ⊢`
+    : x ⦂ A ∈ Γ
+    → ⊢⇄ A Γ Infer (` x) -- Γ ⊢ ` x ⇉ A
+  ⊢⦂
+    : ⊢⇄ A Γ Check t
+    → ⊢⇄ A Γ Infer (t ⦂ A) -- Γ ⊢ t ⦂ A ⇉ A
+  ⊢⇉
+    : ⊢⇄ A Γ Infer t
+    → A ≡ B
+    → ⊢⇄ A Γ Check (t ↑)
+  ⊢op
+    : (t : (R.⟦ D ⟧ Raw) m)
+    → (⟦ D ⟧ ⊢⇄) m A Γ t 
+    → ⊢⇄ A Γ m (op t)
 
-  data _⊢_⇉_ : Context T → Raw Infer → T → Set where
-    ⊢`
-      : x ⦂ A ∈ Γ
-      → Γ ⊢ ` x ⇉ A
-    ⊢∈
-      : Γ ⊢ t ⇇ A
-      → Γ ⊢ t ⦂ A ⇉ A
-    ⊢op
-      : (t : (R.⟦ D ⟧ Raw) Infer)
-      → (⟦ D ⟧ ⊢⇆) Infer A Γ t 
-      → Γ ⊢ op t ⇉ A
-  data _⊢_⇇_ : Context T → Raw Check → T → Set where
-    ⊢⇉
-      : Γ ⊢ t ⇉ A
-      → A ≡ B
-      → Γ ⊢ t ↑ ⇇ B
-    ⊢op
-      : (t : (R.⟦ D ⟧ Raw) Check)
-      → (⟦ D ⟧ ⊢⇆) Check A Γ t
-      → Γ ⊢ op t ⇇ A
+_⊢_⇉_ : Context T → Raw Infer → T → Set
+Γ ⊢ t ⇉ A = ⊢⇄ A Γ Infer t
+_⊢_⇇_ : Context T → Raw Check → T → Set
+Γ ⊢ t ⇇ A = ⊢⇄ A Γ Check t

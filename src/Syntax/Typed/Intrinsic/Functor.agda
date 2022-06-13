@@ -6,7 +6,6 @@ module Syntax.Typed.Intrinsic.Functor {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm₀ to T; Tm to TExp)
-open import Syntax.Simple.Operation {SD}
 open import Syntax.Context
 
 open import Syntax.Typed.Description {SD}

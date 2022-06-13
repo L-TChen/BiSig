@@ -23,6 +23,7 @@ private variable
   A   : T
 
 ⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Sub₀ Ξ → Ctx T → Set ℓ
+-- (⟦ Δ ⊢ m ⦂ B ⟧ᵃ X) σ Γ = X m (⟪ σ ⟫ B) (map (sub σ) Δ ++ Γ)
 (⟦ ι m B ⟧ᵃ X) σ Γ = X m (⟪ σ ⟫ B) Γ
 (⟦ A ∙ D ⟧ᵃ X) σ Γ = (⟦ D ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
 

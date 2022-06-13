@@ -21,6 +21,7 @@ Fam₀ : Set₁
 Fam₀ = Fam lzero
 
 ⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Set ℓ
+-- ⟦ Δ ⊢ m ⦂ B ⟧ᵃ X = (Id ^ length Δ) × X m
 ⟦ ι m B ⟧ᵃ X = X m
 ⟦ A ∙ D ⟧ᵃ X = Id × ⟦ D ⟧ᵃ X
 

@@ -3,9 +3,13 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
-open import Data.Vec
+import      Data.Fin      as F
+open import Data.List using  (_++_)
+open import Data.Vec  hiding (_++_)
 
 private variable
+  Ξ Δ : ℕ
+  n m l : ℕ
   A B : Set
 
 infix 9 `_
@@ -61,3 +65,41 @@ module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   foldMap : ∀ {A : ℕ} n → Tm A ^ n → X A ^ n
   foldMap zero    _        = _
   foldMap (suc n) (t , ts) = fold t , foldMap n ts
+
+mutual
+  fv : Tm Ξ → List (Fin Ξ)
+  fv (` x)  = x ∙ ∅
+  fv (op (n , i , ts)) = fvMap ts
+
+  fvMap : Tm Ξ ^ n → List (Fin Ξ)
+  fvMap {n = zero}  _        = ∅
+  fvMap {n = suc n} (t , ts) = fv t ++ fvMap ts
+
+mutual
+  _≟_ : (t u : Tm Ξ) → Dec (t ≡ u)
+  (` x) ≟ (` y) with  x F.≟ y
+  ... | yes p = yes (cong `_ p)
+  ... | no ¬p = no λ where refl → ¬p refl
+  op (D , i , ts) ≟ op (_ , j , us) with i ≟∈ j
+  ... | no ¬p = no λ where refl → ¬p refl
+  ... | yes refl with compareMap ts us
+  ... | no ¬q = no λ where refl → ¬q refl
+  ... | yes q = yes (cong (λ ts → op (D , i , ts)) q)
+  (` x) ≟ op u  = no λ ()
+  op x  ≟ (` y) = no λ ()
+
+  compareMap : (ts us : Tm Ξ ^ n) → Dec (ts ≡ us)
+  compareMap {n = zero}  _        _        = yes refl
+  compareMap {n = suc n} (t , ts) (u , us) with t ≟ u
+  ... | no ¬p = no λ where refl → ¬p refl
+  ... | yes p with compareMap ts us 
+  ... | no ¬q = no λ where refl → ¬q refl
+  ... | yes q = yes (cong₂ _,_ p q)
+
+_≟s_ : (σ σ′ : Sub Ξ Δ) → Dec (σ ≡ σ′)
+[]      ≟s []      = yes refl
+(A ∷ Δ) ≟s (B ∷ Γ) with A ≟ B
+... | no ¬p =  no λ where refl → ¬p refl
+... | yes p with Δ ≟s Γ 
+... | no ¬q =  no λ where refl → ¬q refl
+... | yes q =  yes (cong₂ _∷_ p q)

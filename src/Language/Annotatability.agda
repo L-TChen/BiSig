@@ -38,7 +38,7 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
     → Tm⇇ BD A Γ
   annotate (` x)  = ⇉ ` x by refl
   annotate (op (D , i , σ , B=A , ts)) with s i
-  ... | ι Ξ Check B _ , j , refl = op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
+  ... | ι Ξ Check B _ , j , refl =   op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
   ... | ι Ξ Infer B _ , j , refl = ⇉ op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts) by refl
 
   annotateMap : (D  : T.ArgsD Ξ) (D′ : B.ArgsD Ξ) → eraseᵃˢ D′ ≡ D

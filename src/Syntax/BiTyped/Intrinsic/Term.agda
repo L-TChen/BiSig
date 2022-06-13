@@ -36,21 +36,17 @@ Tm⇇ = Tm Check
 mutual
   rename : Ren Γ Δ 
     → Tm m A Γ → Tm m A Δ
-  rename f (`  x) = ` f x
-  rename f (A ∋ t)  = A ∋ rename f t
-  rename f (⇉ t by eq) = ⇉ (rename f t) by eq
-  rename f (op t) = op (renameMap _ f t)
+  rename f (`  x)                        = ` f x
+  rename f (A ∋ t)                       = A ∋ rename f t
+  rename f (⇉ t by eq)                   = ⇉ (rename f t) by eq
+  rename f (op (D , x , p , σ , q , ts)) =
+    op (D , x , p , σ , q , renameMap _ f ts)
 
-  renameMap : ∀ D
-    → Ren Γ Δ 
-    → (⟦ D ⟧ Tm) m A Γ → (⟦ D ⟧ Tm) m A Δ
-  renameMap Ds f (D , x , p , σ , q , ts) = (D , x , p , σ , q , renameMapᵃˢ (ConD.args D) f ts)
-
-  renameMapᵃˢ : (D : ArgsD Ξ)
+  renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMapᵃˢ ι        f _        = _
-  renameMapᵃˢ (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMapᵃˢ Ds f ts
+  renameMap ι        f _        = _
+  renameMap (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
 
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
@@ -70,24 +66,26 @@ exts : Sub Γ Δ → Sub (A ∙ Γ) (A ∙ Δ)
 exts f (here px) = ` here px
 exts f (there x) = rename there (f x)
 
+extsⁿ : {Ξ : Ctx T}
+  → Sub Γ Δ → Sub (Ξ ++ Γ) (Ξ ++ Δ)
+extsⁿ {Ξ = ∅}     f x         = f x
+extsⁿ {Ξ = A ∙ Ξ} f (here px) = ` here px
+extsⁿ {Ξ = A ∙ Ξ} f (there x) = rename there (extsⁿ f x)
+
 mutual
   sub : Sub Γ Δ
     → ∀ {A} → Tm m A Γ → Tm m A Δ
-  sub f (` x)       = f x
-  sub f (A ∋ t)     = A ∋ sub f t
-  sub f (⇉ t by eq) = ⇉ (sub f t) by eq
-  sub f (op t)      = op (subMap _ f t)
+  sub f (` x)                         = f x
+  sub f (A ∋ t)                       = A ∋ sub f t
+  sub f (⇉ t by eq)                   = ⇉ (sub f t) by eq
+  sub f (op (D , x , p , σ , q , ts)) =
+    op (D , x , p , σ , q , subMap _ f ts)
 
-  subMap : ∀ D
-    → Sub Γ Δ 
-    → (⟦ D ⟧ Tm) m A Γ → (⟦ D ⟧ Tm) m A Δ
-  subMap Ds f (D , x , p , σ , q , ts) = (D , x , p , σ , q , subMapᵃˢ (ConD.args D) f ts)
-
-  subMapᵃˢ : (D : ArgsD Ξ)
+  subMap : (D : ArgsD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  subMapᵃˢ ι        f _        = _
-  subMapᵃˢ (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMapᵃˢ Ds f ts
+  subMap ι        f _        = _
+  subMap (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
 
   subMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ

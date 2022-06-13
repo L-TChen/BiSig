@@ -10,6 +10,7 @@ open import Syntax.Simple.Term SD as Ty
 
 private variable
   Ξ   : ℕ
+
 infixr 5 ⇉_ ⇇_
 infix  6 _▷_⇉_ _▷_⇇_
 infixr 7 ρ 

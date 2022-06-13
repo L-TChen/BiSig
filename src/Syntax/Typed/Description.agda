@@ -6,7 +6,6 @@ module Syntax.Typed.Description {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm₀ to T; Tm to TExp)
-open import Syntax.Simple.Operation {SD}
 open import Syntax.Context
 
 data ArgD  (Ξ : ℕ) : Set where
@@ -26,8 +25,8 @@ record ConD : Set where
 
 infix  5 ⊢_
 infixr 7 ρ 
-syntax ι Ξ A D     = Ξ ▷ D ⦂ A
-syntax ρ D Ds      = ρ[ D ] Ds
+syntax ι Ξ A D = Ξ ▷ D ⦂ A
+syntax ρ D Ds  = ρ[ D ] Ds
 
 Desc : Set
 Desc = List ConD

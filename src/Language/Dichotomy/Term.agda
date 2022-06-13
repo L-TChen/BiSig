@@ -9,16 +9,16 @@ open import Syntax.Simple.Term SD
 open import Syntax.Context 
 open import Syntax.NamedContext Id
 
-open import Syntax.BiTyped.Raw.Functor {SD} Id as R
-open import Syntax.BiTyped.Raw.Term    D Id
+open import Syntax.BiTyped.Raw.Functor {SD} Id   as R
+open import Syntax.BiTyped.Raw.Term         Id D
 
-open import Syntax.BiTyped.Extrinsic.Functor {SD} D Id as E
-open import Syntax.BiTyped.Extrinsic.Term    D    Id
+open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D as E
+open import Syntax.BiTyped.Extrinsic.Term         Id D
 
 open import Syntax.BiTyped.Intrinsic.Functor {SD}      as I
-open import Syntax.BiTyped.Intrinsic.Term    D
+open import Syntax.BiTyped.Intrinsic.Term            D
 
-open import Language.Dichotomy.Context Id
+open import Language.Dichotomy.Context            Id
 
 private variable
   m     : Mode
@@ -32,7 +32,7 @@ private variable
 mutual
   ∥_∥⇉ : Γ ⊢ t ⇉ A → Tm⇉ A ∥ Γ ∥ctx
   ∥ ⊢` x    ∥⇉ = ` ∥ x ∥∈
-  ∥ ⊢∈ t    ∥⇉ = _ ∋ ∥ t ∥⇇
+  ∥ ⊢⦂ t    ∥⇉ = _ ∋ ∥ t ∥⇇
   ∥ ⊢op (ι Ξ Infer B D , i , t) (σ , B=A , p) ∥⇉ =
     op (_ , i , refl , σ , B=A , ∥-∥map D _ p)
 
@@ -43,14 +43,14 @@ mutual
 
   ∥-∥map : (D : ArgsD Ξ)
     → (t : (R.⟦ D ⟧ᵃˢ Raw))
-    → (E.⟦ D ⟧ᵃˢ ⊢⇆) σ Γ        t
+    → (E.⟦ D ⟧ᵃˢ ⊢⇄) σ Γ        t
     → (I.⟦ D ⟧ᵃˢ Tm) σ ∥ Γ ∥ctx 
   ∥-∥map ι        _        _        = tt
   ∥-∥map (ρ D Ds) (t , ts) (p , ps) = ∥-∥mapᵃ D _ p , ∥-∥map Ds ts ps
 
   ∥-∥mapᵃ : (D : ArgD Ξ)
     → (t : (R.⟦ D ⟧ᵃ Raw))
-    → (E.⟦ D ⟧ᵃ ⊢⇆) σ Γ        t
+    → (E.⟦ D ⟧ᵃ ⊢⇄) σ Γ        t
     → (I.⟦ D ⟧ᵃ Tm) σ ∥ Γ ∥ctx 
   ∥-∥mapᵃ (ι Check B) _ p = ∥ p ∥⇇
   ∥-∥mapᵃ (ι Infer B) _ p = ∥ p ∥⇉

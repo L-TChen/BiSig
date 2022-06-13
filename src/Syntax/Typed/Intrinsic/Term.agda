@@ -6,7 +6,7 @@ open import Syntax.Typed.Description as T
 module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : Desc {SD}) where
 
 open import Syntax.Simple.Term SD
-  using () renaming (Tm₀ to T; Tm to TExp; Sub to TSub)
+  using (Sub₀) renaming (Tm₀ to T; Tm to TExp)
 
 open import Syntax.Context
 open import Syntax.Typed.Intrinsic.Functor {SD}
@@ -16,7 +16,7 @@ private
     A B   : T
     Ξ     : ℕ
     Γ Δ   : Ctx T
-    σ     : TSub Ξ 0
+    σ     : Sub₀ Ξ
 
 infix 9 `_
 data Tm : Fam₀ where
@@ -38,8 +38,9 @@ mutual
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
-  renameMapᵃ (⊢ B)   f t = rename f t
-  renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
+  -- renamemapᵃ (δ ⊢ b) f t = rename (extⁿ f) t
+  renameMapᵃ (⊢ b)   f t = rename f t
+  renameMapᵃ (a ∙ δ) f t = renameMapᵃ δ (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -47,16 +48,22 @@ infixr 5 ⟨_⟩_
 ⟨ f ⟩ t = rename f t
 
 Sub : (Γ Δ : Ctx T) → Set
-Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm A Δ
+Sub Γ Δ = {A : T} (x : A ∈ Γ) → Tm A Δ
 
 exts : Sub Γ Δ → Sub (A ∙ Γ) (A ∙ Δ)
 exts f (here px) = ` here px
 exts f (there x) = rename there (f x)
 
+extsⁿ : {Ξ : Ctx T}
+  → Sub Γ Δ → Sub (Ξ ++ Γ) (Ξ ++ Δ)
+extsⁿ {Ξ = ∅}     f i = f i
+extsⁿ {Ξ = A ∙ Ξ} f (here px) = ` here px
+extsⁿ {Ξ = A ∙ Ξ} f (there i) = ⟨ there ⟩ extsⁿ f i
+
 mutual
   sub : Sub Γ Δ
     → ∀ {A} → Tm A Γ → Tm A Δ
-  sub f (` x)  = f x
+  sub f (` x)                      = f x
   sub f (op (D , x , σ , eq , ts)) =
     op (_ , x , σ , eq , subMap (ConD.args D) f ts)
 
@@ -69,6 +76,7 @@ mutual
   subMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
+  -- subMapᵃ (Ξ ⊢ B) f t = sub (extsⁿ f) t
   subMapᵃ (⊢ B)   f t = sub f t
   subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
@@ -90,5 +98,6 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → (⟦ D ⟧ᵃ Tm) σ  ⇒₁ (⟦ D ⟧ᵃ X) σ
+  -- foldMapᵃ (Δ ⊢ B) t = fold t
   foldMapᵃ (⊢ B)   t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

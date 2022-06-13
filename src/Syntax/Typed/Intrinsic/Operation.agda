@@ -4,9 +4,7 @@ open import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term SD
-  using () renaming (Tm₀ to T; Sub to TSub)
-open import Syntax.Simple.Operation as S
-  using (_≟s_) renaming (_≟_ to _≟T_)
+  using (_≟s_) renaming (Tm₀ to T; Sub to TSub; _≟_ to _≟T_)
 
 open import Syntax.Context
 
@@ -58,5 +56,6 @@ mutual
   ... | yes q = yes (cong₂ _,_ p q)
 
   compareMapᵃ : (D : ArgD Ξ) → (t u : (⟦ D ⟧ᵃ Tm) σ Γ) → Dec (t ≡ u)
+  -- compareMapᵃ D t u = t ≟ u
   compareMapᵃ (⊢ B)   t u = t ≟ u
   compareMapᵃ (A ∙ Δ) t u = compareMapᵃ Δ t u

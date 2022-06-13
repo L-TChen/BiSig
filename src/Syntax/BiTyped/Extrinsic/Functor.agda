@@ -3,7 +3,7 @@ open import Prelude
 import Syntax.Simple.Description  as S
 open import Syntax.BiTyped.Description
 
-module Syntax.BiTyped.Extrinsic.Functor {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
+module Syntax.BiTyped.Extrinsic.Functor {SD : S.Desc} (Id : Set) (D : Desc {SD}) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tm₀ to T)

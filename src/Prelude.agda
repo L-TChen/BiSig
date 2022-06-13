@@ -1,5 +1,6 @@
 module Prelude where
 
+open import Axiom.UniquenessOfIdentityProofs   public
 open import Function                           public
   hiding (_∋_)
 open import Data.Empty                         public
@@ -14,7 +15,7 @@ open import Data.Fin                           public
   using (Fin; #_; zero; suc)
 open import Data.Fin.Literals                  public
 open import Data.List                          public 
-  using (List; _++_; length; map)
+  using (List; length; map; _++_; zip)
   renaming ([] to ∅; _∷_ to _∙_)
 open import Data.List.Membership.Propositional               public
 open import Data.List.Relation.Unary.Any using (here; there) public
@@ -62,3 +63,7 @@ there i   ≟∈ there j   with i ≟∈ j
 ... | yes refl = yes refl
 here _    ≟∈ there _   = no λ ()
 there _   ≟∈ here  _   = no λ ()
+
+_^_ : Set ℓ → ℕ → Set ℓ
+X ^ zero  = ⊤
+X ^ suc n = X × X ^ n

@@ -7,10 +7,6 @@ private variable
 
 Desc = List ℕ
 
-_^_ : Set → ℕ → Set
-X ^ zero  = ⊤
-X ^ suc n = X × X ^ n
-
 ⟦_⟧_ : Desc → (ℕ → Set) → (ℕ → Set)
 (⟦ Ds ⟧ X) n = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (X n) ^ D
 

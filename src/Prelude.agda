@@ -18,7 +18,9 @@ open import Data.List                          public
   using (List; length; map; _++_; zip)
   renaming ([] to ∅; _∷_ to _∙_)
 open import Data.List.Membership.Propositional               public
-open import Data.List.Relation.Unary.Any using (here; there) public
+open import Data.List.Relation.Unary.Any using (Any; here; there) public
+open import Data.List.Relation.Unary.All public
+  using (All)
 open import Data.Vec                           public
   using (Vec; []; _∷_)
 open import Data.String                        public
@@ -34,10 +36,10 @@ open import Relation.Nullary                      public
 open import Relation.Binary                       public
   using (Decidable)
 open import Relation.Binary.PropositionalEquality public
-  using (_≡_; refl; cong; cong₂; subst; _≢_)
+  using (_≡_; refl; sym; cong; cong₂; subst; _≢_; module ≡-Reasoning)
 
 open import Level                                 public
-  using (Level; lift)
+  using (Level; Lift; lift)
   renaming (zero to lzero; suc to lsuc; _⊔_ to lmax)
 
 variable
@@ -67,3 +69,8 @@ there _   ≟∈ here  _   = no λ ()
 _^_ : Set ℓ → ℕ → Set ℓ
 X ^ zero  = ⊤
 X ^ suc n = X × X ^ n
+
+Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
+Lift₀ {ℓ} = Lift {ℓ} lzero -- Lift {ℓ} lzero
+
+{-# DISPLAY Lift lzero A = Lift₀ A #-}

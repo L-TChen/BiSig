@@ -26,8 +26,8 @@ Fam₀ = Fam lzero
 ⟦ A ∙ D ⟧ᵃ X = Id × ⟦ D ⟧ᵃ X
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Set ℓ
-⟦ ι      ⟧ᵃˢ _ = ⊤
-⟦ ρ D Ds ⟧ᵃˢ X = ⟦ D ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
+⟦ ∅      ⟧ᵃˢ _ = ⊤
+⟦ D ∙ Ds ⟧ᵃˢ X = ⟦ D ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
 (⟦ ι Ξ Check B D ⟧ᶜ X) Check = ⟦ D ⟧ᵃˢ X

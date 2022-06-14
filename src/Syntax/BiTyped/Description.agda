@@ -13,16 +13,14 @@ private variable
 
 infixr 5 ⇉_ ⇇_
 infix  6 _▷_⇉_ _▷_⇇_
-infixr 7 ρ 
-syntax ρ D Ds      = ρ[ D ] Ds
+infixr 7 ρ-syntax 
 
 data ArgD  (Ξ : ℕ) : Set where
   ι   : (m : Mode)   (B : TExp Ξ) → ArgD Ξ
   _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
 
-data ArgsD (Ξ : ℕ) : Set where
-  ι :                               ArgsD Ξ
-  ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
+ArgsD : ℕ → Set
+ArgsD Ξ = List (ArgD Ξ)
 
 record ConD : Set where
   constructor ι
@@ -35,6 +33,11 @@ record ConD : Set where
 Desc : Set
 Desc = List ConD
 
+ρ-syntax : ArgD Ξ → ArgsD Ξ → ArgsD Ξ
+ρ-syntax D Ds = D ∙ Ds
+
+syntax ρ-syntax D Ds = ρ[ D ] Ds
+
 ⇉_ ⇇_ : TExp Ξ → ArgD Ξ
 ⇉_ = ι Infer
 ⇇_ = ι Check
@@ -44,3 +47,7 @@ _▷_⇉_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 
 _▷_⇇_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 Ξ ▷ D ⇇ A = ι Ξ Check A D
+
+fvArgD : ArgD Ξ → List (Fin Ξ)
+fvArgD (ι m B) = fv B
+fvArgD (A ∙ D) = fvArgD D

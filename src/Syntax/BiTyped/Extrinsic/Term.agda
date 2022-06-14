@@ -25,10 +25,10 @@ private variable
 data ⊢⇄ : Pred₀ Raw where
   ⊢`
     : x ⦂ A ∈ Γ
-    → ⊢⇄ A Γ Infer (` x) -- Γ ⊢ ` x ⇉ A
+    → ⊢⇄ A Γ Infer (` x)
   ⊢⦂
     : ⊢⇄ A Γ Check t
-    → ⊢⇄ A Γ Infer (t ⦂ A) -- Γ ⊢ t ⦂ A ⇉ A
+    → ⊢⇄ A Γ Infer (t ⦂ A)
   ⊢⇉
     : ⊢⇄ A Γ Infer t
     → A ≡ B

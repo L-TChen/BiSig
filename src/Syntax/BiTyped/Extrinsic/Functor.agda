@@ -29,8 +29,8 @@ Pred₀ X = Pred X lzero
 (⟦ A ∙ D ⟧ᵃ X) σ Γ (x , t) = (⟦ D ⟧ᵃ X) σ (x ⦂ ⟪ σ ⟫ A , Γ) t
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (P : Pred X ℓ′) (σ : Sub₀ Ξ) (Γ : Context T) (ts : R.⟦ D ⟧ᵃˢ X) → Set ℓ′
-(⟦ ι      ⟧ᵃˢ _) _ _ _        = ⊤
-(⟦ ρ D Ds ⟧ᵃˢ X) σ Γ (t , ts) = (⟦ D ⟧ᵃ X) σ Γ t × (⟦ Ds ⟧ᵃˢ X) σ Γ ts
+(⟦ ∅      ⟧ᵃˢ _) _ _ _        = ⊤
+(⟦ D ∙ Ds ⟧ᵃˢ X) σ Γ (t , ts) = (⟦ D ⟧ᵃ X) σ Γ t × (⟦ Ds ⟧ᵃˢ X) σ Γ ts
 
 ⟦_⟧ᶜ_ : (D : ConD) (P : Pred X ℓ′) (m : Mode) (A : T) (Γ : Context T) (t : (R.⟦ D ⟧ᶜ X) m) → Set ℓ′
 (⟦ ι Ξ Check B D ⟧ᶜ X) Check A Γ t = Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ t)

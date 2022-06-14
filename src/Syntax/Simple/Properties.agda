@@ -7,11 +7,13 @@ open import Syntax.Simple.Term D
 import      Data.Fin      as F
 open import Data.Vec as V using (lookup)
 open import Data.Product.Properties
+open import Data.List.Properties
 open import Data.List.Relation.Unary.Any.Properties
 
 private variable
   Γ Δ Ξ n : ℕ
   ts us : Tm Ξ ^ n
+  σ₁ σ₂ : Sub Γ Δ
   x y   : Fin Ξ
 
 op-inj
@@ -49,3 +51,19 @@ module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
   ≡-fvMap zero    _        _ = refl
   ≡-fvMap (suc n) (A , As) p = cong₂ _,_
     (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvMap n As λ k → p (++⁺ʳ (fv A) k))
+
+mutual
+  closed-subst-invariant
+    : (A : Tm Γ)
+    → fv A ≡ ∅
+    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+  closed-subst-invariant (op (n , i , ts)) p =
+    cong (λ ts → op (n , i , ts)) (closed-subst-invariantMap ts p)
+
+  closed-subst-invariantMap : {n : ℕ}
+    → (As : Tm Γ ^ n)
+    → fvMap As ≡ ∅
+    → subMap σ₁ n As ≡ subMap σ₂ n As
+  closed-subst-invariantMap {n = zero}  _        _ = refl
+  closed-subst-invariantMap {n = suc n} (t , ts) p =
+    cong₂ _,_ (closed-subst-invariant t (++-conicalˡ (fv t) (fvMap ts) p)) (closed-subst-invariantMap ts (++-conicalʳ (fv t) (fvMap ts) p))

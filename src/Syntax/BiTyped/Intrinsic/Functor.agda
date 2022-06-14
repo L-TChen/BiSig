@@ -28,8 +28,8 @@ private variable
 (⟦ A ∙ D ⟧ᵃ X) σ Γ = (⟦ D ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Sub₀ Ξ → Ctx T → Set ℓ
-(⟦ ι      ⟧ᵃˢ _) σ _ = ⊤
-(⟦ ρ D Ds ⟧ᵃˢ X) σ Γ = (⟦ D ⟧ᵃ X) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
+(⟦ ∅      ⟧ᵃˢ _) σ _ = ⊤
+(⟦ D ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ D ⟧ᵃ X) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
 (⟦ ι Ξ m₀ B D ⟧ᶜ X) m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)

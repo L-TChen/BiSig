@@ -45,8 +45,8 @@ mutual
   renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMap ι        f _        = _
-  renameMap (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
+  renameMap ∅        f _        = _
+  renameMap (D ∙ Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
 
   renameMapᵃ : (D : ArgD Ξ)
     → Ren Γ Δ
@@ -84,8 +84,8 @@ mutual
   subMap : (D : ArgsD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  subMap ι        f _        = _
-  subMap (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
+  subMap ∅        f _        = _
+  subMap (D ∙ Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
 
   subMapᵃ : (D : ArgD Ξ)
     → Sub Γ Δ
@@ -107,8 +107,8 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
 
   foldMap : ∀ (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
-  foldMap ι        _        = _
-  foldMap (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
+  foldMap ∅        _        = _
+  foldMap (D ∙ Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
 
   foldMapᵃ : ∀ (D : ArgD Ξ)
     → (⟦ D ⟧ᵃ Tm) σ ⇒₁ (⟦ D ⟧ᵃ X) σ

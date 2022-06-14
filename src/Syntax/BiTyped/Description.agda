@@ -51,3 +51,7 @@ _▷_⇇_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 fvArgD : ArgD Ξ → List (Fin Ξ)
 fvArgD (ι m B) = fv B
 fvArgD (A ∙ D) = fvArgD D
+
+modeArgD : ArgD Ξ → Mode
+modeArgD (ι m _) = m
+modeArgD (_ ∙ D) = modeArgD D

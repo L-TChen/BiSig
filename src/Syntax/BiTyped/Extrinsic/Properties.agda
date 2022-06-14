@@ -36,11 +36,11 @@ Inferᵃ xs (A ∙ Ds)    = fv A ⊆ xs × Inferᵃ xs Ds
 data Inferᵃˢ (Ξ : ℕ) : List (Fin Ξ) → ArgsD Ξ → Set where
   ∅ 
     : Inferᵃˢ Ξ ∅ ∅
-  snoc⇉
-    : (ID : Inferᵃˢ Ξ xs Ds) (IDs : Inferᵃ xs D)
+  cons⇉
+    :  (ID : Inferᵃ xs D) (IDs : Inferᵃˢ Ξ xs Ds) (m=Infer : modeArgD D ≡ Infer)
     → Inferᵃˢ Ξ (fvArgD D ++ xs) (D ∙ Ds)
-  snoc⇇
-    : (ID : Inferᵃ xs D) (IDs : Inferᵃˢ Ξ xs Ds) (fvD⊆xs : fvArgD D ⊆ xs)
+  cons⇇
+    : (ID : Inferᵃ xs D) (IDs : Inferᵃˢ Ξ xs Ds) (m=Check : modeArgD D ≡ Check) (fvD⊆xs : fvArgD D ⊆ xs)
     → Inferᵃˢ Ξ xs (D ∙ Ds)
 
 Inference : (Ξ : ℕ) (C : TExp Ξ) (Ds : ArgsD Ξ) → Set
@@ -53,10 +53,11 @@ Inferᶜ (ι Ξ Check C Ds) = ⊤
 x∉∅ : {A : Set ℓ} {x : A}
   → x ∈ ∅ → ⊥ {lzero}
 x∉∅ ()
-module _ {D : Desc} (inf : All Inferᶜ D) where mutual
+
+module _ {D : Desc} {inf : All Inferᶜ D}  where mutual
   open import Syntax.BiTyped.Raw.Term          {SD} Id D
   open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D
-  open import Syntax.BiTyped.Extrinsic.Term  {SD}   Id D
+  open import Syntax.BiTyped.Extrinsic.Term    {SD} Id D
 
   uniq-⇉ : {t : Raw⇉}
     → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
@@ -64,39 +65,39 @@ module _ {D : Desc} (inf : All Inferᶜ D) where mutual
   uniq-⇉ (⊢` x)   (⊢` y)   = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u)  = refl
   uniq-⇉ (⊢op D@(ι Ξ Infer C Ds , i , ts) (σ₁ , refl , ⊢ts)) (⊢op _ (σ₂ , refl , ⊢us)) =
-    ≡-fv σ₁ σ₂ C (uniq-⇉Map C (A.lookup inf i) ⊢ts ⊢us)
+    let (xs , fvC⊆xs , IDs) = A.lookup inf i in 
+    ≡-fv σ₁ σ₂ C λ x → uniq-⇉Map xs IDs ⊢ts ⊢us (fvC⊆xs x)
 
-  uniq-⇉Map : (C : TExp Ξ)
-    → Inference Ξ C Ds
+  uniq-⇉Map : (xs : List (Fin Ξ))
+    → Inferᵃˢ Ξ xs Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
     → (⊢ts : (⟦ Ds ⟧ᵃˢ ⊢⇄) σ₁ Γ ts)
     → (⊢us : (⟦ Ds ⟧ᵃˢ ⊢⇄) σ₂ Γ ts)
-    → ∀ {x} → x ∈ fv C
-    → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Map C (.∅ , C⊆xs , ∅) ⊢ts ⊢us i = ⊥-elim (x∉∅ (C⊆xs i))
-  uniq-⇉Map C (.(fvArgD D ++ xs) , fvC⊆xs , snoc⇉ {xs} {_} {D} infDs IDs) (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fvArgD D) (fvC⊆xs i)
-  ... | inl x∈fvD = {!   !}
-  ... | inr x∈xs  = {!   !}
-  uniq-⇉Map C (xs , C⊆xs , snoc⇇ ID infDs fvD⊆xs) ⊢ts ⊢us = {!   !}
-
-  σ₁=σ₂ : ∀ AD → Inferᵃ xs AD
     → ∀ {x} → x ∈ xs
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  σ₁=σ₂ (ι Infer B) _   i = {!   !}
-  σ₁=σ₂ (ι Check B) inf i = {!   !}
-  σ₁=σ₂ (A ∙ AD) inf i = {!   !}
+  uniq-⇉Map .∅               ∅                                    ⊢ts ⊢us i = ⊥-elim $ x∉∅ i
+  uniq-⇉Map .(fvArgD D ++ _) (cons⇉ {xs} {D} {Ds} ID IDs m=Infer) (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fvArgD D) i
+  ... | inl j = uniq-⇉Mapᵃ xs D ID (uniq-⇉Map xs IDs ⊢ts ⊢us) ⊢t ⊢u m=Infer i
+  ... | inr j = uniq-⇉Map xs IDs ⊢ts ⊢us j
+  uniq-⇉Map xs (cons⇇ ID IDs m=Check fvD⊆xs) (_ , ⊢ts) (_ , ⊢us) i  = uniq-⇉Map xs IDs ⊢ts ⊢us i
 
-  uniq-⇉Mapᵃ : ∀ AD 
+  uniq-⇉Mapᵃ : (xs : List (Fin Ξ)) (AD : ArgD Ξ) 
     → Inferᵃ xs AD
+    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → {t : R.⟦ AD ⟧ᵃ Raw}
     → (⊢t : (⟦ AD ⟧ᵃ ⊢⇄) σ₁ Γ t)
     → (⊢u : (⟦ AD ⟧ᵃ ⊢⇄) σ₂ Γ t)
-    → ∀ {x} → x ∈ fvArgD AD
+    → modeArgD AD ≡ Infer → ∀ {x} → x ∈ fvArgD AD ++ xs
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Mapᵃ (ι Infer B) _                ⊢t ⊢u   = ≡-fv-inv _ _ B (uniq-⇉ ⊢t ⊢u)
-  uniq-⇉Mapᵃ (ι Check B) fvB⊆xs           ⊢t ⊢u x = {!   !}
-  uniq-⇉Mapᵃ (A ∙ Ds)    (fvA⊆xs , infDs) ⊢t ⊢u x = {!   !}
+  uniq-⇉Mapᵃ xs (ι Infer B) _              f ⊢t ⊢u refl i with ++⁻ (fv B) i
+  ... | inl j = ≡-fv-inv _ _ B (uniq-⇉ ⊢t ⊢u) j
+  ... | inr j = f j
+  uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂} {Γ} xs (A ∙ AD)    (fvA⊆xs , ID) f ⊢t ⊢u p    i with ++⁻ (fvArgD AD) i
+  ... | inr j = f j
+  ... | inl j = uniq-⇉Mapᵃ xs AD ID f (subst (λ A → (⟦ AD ⟧ᵃ ⊢⇄) σ₁ (_ ⦂ A , Γ) _) A₁=A₂ ⊢t) ⊢u p i -- {! uniq-⇉Mapᵃ xs AD ID f   !}
     where
-      helper : ∀ {x} → x ∈ fv A
-        → V.lookup σ₁ x ≡ V.lookup σ₂ x
-      helper x∈fvA = {! fvA⊆xs x∈fvA  !}
+      helper : ∀ {x} → x ∈ fv A → V.lookup σ₁ x ≡ V.lookup σ₂ x
+      helper x∈fvA = f (fvA⊆xs  x∈fvA)
+
+      A₁=A₂ : sub σ₁ A ≡ sub σ₂ A
+      A₁=A₂ = ≡-fv σ₁ σ₂ A helper

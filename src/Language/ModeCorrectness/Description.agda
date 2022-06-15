@@ -22,24 +22,26 @@ ModeCorrectᵃ : List (Fin Ξ) → TExps Ξ → Set
 ModeCorrectᵃ xs ∅       = ⊤
 ModeCorrectᵃ xs (A ∙ Θ) = fv A ⊆ xs × ModeCorrectᵃ xs Θ
 
-data Synthesisᵃˢ {Ξ : ℕ} : List (Fin Ξ) → ArgsD Ξ → Set where
-  nil
-    : Synthesisᵃˢ ∅ ∅
-  cons⇉
-    : (Θ : TExps Ξ) (C : TExp Ξ) (Ds : ArgsD Ξ)
-    → (SD : ModeCorrectᵃ xs Θ) (SDs : Synthesisᵃˢ xs Ds) 
-    → Synthesisᵃˢ (fv C ++ xs) (Θ ⊢[ Infer ] C ∙ Ds)
-  cons⇇
-    : (Θ : TExps Ξ) (C : TExp Ξ) (fvD⊆xs : fv C ⊆ xs) (Ds : ArgsD Ξ)
-    → (SD : ModeCorrectᵃ xs Θ) (SDs : Synthesisᵃˢ xs Ds) 
-    → Synthesisᵃˢ xs (Θ ⊢[ Check ] C ∙ Ds)
+module _ (xs₀ : List (Fin Ξ)) where
+  data ModeCorrectᵃˢ : List (Fin Ξ) → ArgsD Ξ → Set where
+    nil
+      : ModeCorrectᵃˢ xs₀ ∅
+    cons⇉
+      : (Θ : TExps Ξ) (C : TExp Ξ) (Ds : ArgsD Ξ)
+      → (SD : ModeCorrectᵃ xs Θ) (SDs : ModeCorrectᵃˢ xs Ds) 
+      → ModeCorrectᵃˢ (fv C ++ xs) (Θ ⊢[ Infer ] C ∙ Ds)
+    cons⇇
+      : (Θ : TExps Ξ) (C : TExp Ξ) (fvD⊆xs : fv C ⊆ xs) (Ds : ArgsD Ξ)
+      → (SD : ModeCorrectᵃ xs Θ) (SDs : ModeCorrectᵃˢ xs Ds) 
+      → ModeCorrectᵃˢ xs (Θ ⊢[ Check ] C ∙ Ds)
 
-Synthesis : (C : TExp Ξ) (Ds : ArgsD Ξ) → Set
-Synthesis C Ds = ∃[ xs ] (fv C ⊆ xs × Synthesisᵃˢ xs Ds)
+Synthesis : TExp Ξ → ArgsD Ξ → Set
+Synthesis C Ds = ∃[ xs ] (fv C ⊆ xs × ModeCorrectᵃˢ ∅ xs Ds)
 
-ModeCorrect : ConD → Set
-ModeCorrect (ι Infer C Ds) = Synthesis C Ds
-ModeCorrect (ι Check C Ds) = ⊤
+Checking : TExp Ξ → ArgsD Ξ → Set
+Checking C Ds = ∃[ xs ] ModeCorrectᵃˢ (fv C) xs Ds
 
-AllModeCorrect : Desc → Set
-AllModeCorrect = All ModeCorrect
+ModeCorrect : Desc → Set
+ModeCorrect = All λ
+  where (ι Check C Ds) → Checking  C Ds
+        (ι Infer C Ds) → Synthesis C Ds

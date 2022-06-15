@@ -7,7 +7,7 @@ import Language.ModeCorrectness.Description as B
 
 module Language.ModeCorrectness.Term {SD : S.Desc}
   (Id : Set) (_≟Id_ : (x y : Id) → Dec (x ≡ y))
-  (D : Desc {SD}) (modeCorrect : B.AllModeCorrect Id D) where
+  (D : Desc {SD}) (modeCorrect : B.ModeCorrect Id D) where
 
 open B {SD} Id
 
@@ -39,6 +39,9 @@ private variable
   t     : Raw m
   ts    : R.⟦ ADs ⟧ᵃˢ Raw
 
+Correctness : {CD : ConD} → (CD ∈ D) → _
+Correctness i = A.lookup modeCorrect i
+
 mutual
   uniq-⇉
     : (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
@@ -46,11 +49,11 @@ mutual
   uniq-⇉ (⊢` x)   (⊢` y)   = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u)  = refl
   uniq-⇉ (⊢op (ι Infer C Ds , i , ts) (σ₁ , refl , ⊢ts)) (⊢op _ (σ₂ , refl , ⊢us)) =
-    let (xs , fvC⊆xs , IDs) = A.lookup modeCorrect i in
+    let (xs , fvC⊆xs , IDs) = Correctness i in
     ≡-fv C (λ x → uniq-⇉Map IDs ⊢ts ⊢us (fvC⊆xs x))
 
   uniq-⇉Map : {xs : List (Fin Ξ)}
-    → Synthesisᵃˢ xs ADs
+    → ModeCorrectᵃˢ ∅ xs ADs
     → (⊢ts : (⟦ ADs ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts)
     → (⊢us : (⟦ ADs ⟧ᵃˢ Raw , ⊢⇄) σ₂ Γ ts)
     → ∀ {x} → x ∈ xs
@@ -76,6 +79,12 @@ mutual
      let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
      uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
+¬switch
+  : Γ ⊢ t ⇉ A
+  → A ≢ B
+  → ¬ (Γ ⊢ (t ↑) ⇇ B)
+¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
+
 mutual
   synthesize
     : (Γ : Context T) (t : Raw⇉)
@@ -86,7 +95,8 @@ mutual
   synthesize Γ (t ⦂ A) with inherit Γ t A
   ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
   ... | yes p = yes (A , ⊢⦂ p)
-  synthesize Γ (op (_ , i , ts))  = {!   !}
+  synthesize Γ (op (ι Infer C Ds , i , ts)) =
+    let (xs , fvC⊆xs , IDs) = Correctness i in {!   !}
 
   inherit
     : (Γ : Context T) (t : Raw⇇) (A : T)
@@ -94,6 +104,7 @@ mutual
   inherit Γ (t ↑)  A with synthesize  Γ t
   ... | no ¬p = no λ where (⊢⇉ ⊢t refl) → ¬p (A , ⊢t)
   ... | yes (B , ⊢t) with B ≟T A
-  ... | no ¬q = no λ where (⊢⇉ ⊢u refl) → ¬q (uniq-⇉ ⊢t ⊢u)
+  ... | no ¬q = no (¬switch ⊢t ¬q)
   ... | yes A=B = yes (⊢⇉ ⊢t A=B)
-  inherit Γ (op (_ , i , ts)) A = {!   !}
+  inherit Γ (op (ι Check B Ds , i , ts)) A =
+    let (xs , IDs) = Correctness i in {!   !}

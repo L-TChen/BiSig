@@ -20,6 +20,9 @@ data Tm : ℕ → Set where
 Tm₀ : Set
 Tm₀ = Tm 0
 
+Tms : ℕ → Set
+Tms Ξ = List (Tm Ξ)
+
 Ren : (n m : ℕ) → Set
 Ren n m = Fin n → Fin m
 

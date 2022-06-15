@@ -10,14 +10,19 @@ open import Syntax.Simple.Term SD as Ty
 
 private variable
   Ξ   : ℕ
+  m   : Mode
+  B   : TExp Ξ
 
-infixr 5 ⇉_ ⇇_
+infixr 5 _⇉_ _⇇_
 infix  6 _▷_⇉_ _▷_⇇_
 infixr 7 ρ-syntax 
 
-data ArgD  (Ξ : ℕ) : Set where
-  ι   : (m : Mode)   (B : TExp Ξ) → ArgD Ξ
-  _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
+record ArgD (Ξ : ℕ) : Set where
+  constructor _⊢[_]_
+  field
+    cxt  : List (TExp Ξ)
+    mode : Mode
+    type : TExp Ξ
 
 ArgsD : ℕ → Set
 ArgsD Ξ = List (ArgD Ξ)
@@ -25,7 +30,7 @@ ArgsD Ξ = List (ArgD Ξ)
 record ConD : Set where
   constructor ι
   field
-    vars : ℕ
+    {vars} : ℕ
     mode : Mode
     type : TExp vars
     args : ArgsD vars
@@ -38,20 +43,18 @@ Desc = List ConD
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
 
-⇉_ ⇇_ : TExp Ξ → ArgD Ξ
-⇉_ = ι Infer
-⇇_ = ι Check
+_⇉_ _⇇_ : List (TExp Ξ) → (B : TExp Ξ) → ArgD Ξ
+Δ ⇉ B = record { cxt = Δ ; mode = Infer ; type = B }
+Δ ⇇ B = record { cxt = Δ ; mode = Check ; type = B }
 
 _▷_⇉_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
-Ξ ▷ D ⇉ A = ι Ξ Infer A D
+Ξ ▷ D ⇉ A = ι Infer A D
 
 _▷_⇇_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
-Ξ ▷ D ⇇ A = ι Ξ Check A D
+Ξ ▷ D ⇇ A = ι Check A D
 
-fvArgD : ArgD Ξ → List (Fin Ξ)
-fvArgD (ι m B) = fv B
-fvArgD (A ∙ D) = fvArgD D
+fvArgD : (D : ArgD Ξ) → List (Fin Ξ)
+fvArgD D = fv $ ArgD.type D
 
 modeArgD : ArgD Ξ → Mode
-modeArgD (ι m _) = m
-modeArgD (_ ∙ D) = modeArgD D
+modeArgD D = ArgD.mode D

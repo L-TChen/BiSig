@@ -17,6 +17,7 @@ private
     Ξ     : ℕ
     σ     : Sub₀ Ξ
     A B   : T
+    C     : TExp Ξ
     Γ Δ   : Ctx T
 
 infix 9 `_
@@ -45,13 +46,13 @@ mutual
   renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMap ∅        f _        = _
-  renameMap (D ∙ Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
+  renameMap ∅                 f _        = _
+  renameMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
-  renameMapᵃ : (D : ArgD Ξ)
+  renameMapᵃ : (Θ : List (TExp Ξ))
     → Ren Γ Δ
-    → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
-  renameMapᵃ (ι m B) f t = rename f t
+    → (⟦ Θ ⟧ᵃ Tm m A) σ Γ → (⟦ Θ ⟧ᵃ Tm m A) σ Δ
+  renameMapᵃ ∅       f t = rename f t
   renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
 
 infixr 5 ⟨_⟩_
@@ -85,12 +86,12 @@ mutual
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
   subMap ∅        f _        = _
-  subMap (D ∙ Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
+  subMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
-  subMapᵃ : (D : ArgD Ξ)
+  subMapᵃ : (Θ : List (TExp Ξ))
     → Sub Γ Δ
-    → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
-  subMapᵃ (ι m B) f t = sub f t
+    → (⟦ Θ ⟧ᵃ Tm m A) σ Γ → (⟦ Θ ⟧ᵃ Tm m A) σ Δ
+  subMapᵃ ∅       f t = sub f t
   subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
@@ -105,12 +106,12 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold (⇉ t by refl) = α .toCheck (fold t)
   fold (op (D , x , p , σ , q , ts)) = α .alg (D , x , p , σ , q , foldMap (ConD.args D) ts)
 
-  foldMap : ∀ (D : ArgsD Ξ)
+  foldMap : (D : ArgsD Ξ)
     → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
   foldMap ∅        _        = _
-  foldMap (D ∙ Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
+  foldMap (Θ ⊢[ _ ] _ ∙ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
-  foldMapᵃ : ∀ (D : ArgD Ξ)
-    → (⟦ D ⟧ᵃ Tm) σ ⇒₁ (⟦ D ⟧ᵃ X) σ
-  foldMapᵃ (ι m B) t = fold t
+  foldMapᵃ : (Θ : List (TExp Ξ))
+    → (⟦ Θ ⟧ᵃ Tm m A) σ ⇒₁ (⟦ Θ ⟧ᵃ X m A) σ
+  foldMapᵃ ∅       t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

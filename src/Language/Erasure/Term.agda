@@ -7,7 +7,7 @@ module Language.Erasure.Term {SD : S.Desc} {D : B.Desc {SD}} where
 
 open import Syntax.Context
 open import Syntax.Simple.Term SD 
-  hiding (Tm) renaming (Tm₀ to T)
+  hiding (Tm) renaming (Tm₀ to T; Tms to TExps)
 open import Syntax.Typed.Description   {SD} as T
 open import Language.Erasure.Description {SD}
 
@@ -39,11 +39,11 @@ mutual
   forgetMap : (D : B.ArgsD Ξ)
     → (B.⟦ D         ⟧ᵃˢ BTm) σ Γ
     → (T.⟦ eraseᵃˢ D ⟧ᵃˢ Tm)  σ Γ
-  forgetMap ι        _        = _
-  forgetMap (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMap Ds ts
+  forgetMap ∅        _        = _
+  forgetMap (Θ ⊢[ m ] C ∙ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
 
-  forgetMapᵃ : (D : B.ArgD Ξ)
-    → (B.⟦ D ⟧ᵃ        BTm) σ Γ
-    → (T.⟦ eraseᵃ D ⟧ᵃ Tm)  σ Γ
-  forgetMapᵃ (ι m B) t = forget t
-  forgetMapᵃ (A ∙ Δ) t = forgetMapᵃ Δ t
+  forgetMapᵃ : (Θ : TExps Ξ)
+    → (B.⟦ Θ ⟧ᵃ BTm m A) σ Γ
+    → (T.⟦ Θ ⟧ᵃ Tm A)    σ Γ
+  forgetMapᵃ ∅       t = forget t
+  forgetMapᵃ (A ∙ Θ) t = forgetMapᵃ Θ t

@@ -21,18 +21,18 @@ private variable
   X Y : Fam ℓ
   Γ   : Ctx T
   A   : T
+  B   : TExp Ξ
 
-⟦_⟧ᵃ_ : (D : ArgD Ξ) (X : Fam ℓ) → Sub₀ Ξ → Ctx T → Set ℓ
--- (⟦ Δ ⊢ m ⦂ B ⟧ᵃ X) σ Γ = X m (⟪ σ ⟫ B) (map (sub σ) Δ ++ Γ)
-(⟦ ι m B ⟧ᵃ X) σ Γ = X m (⟪ σ ⟫ B) Γ
+⟦_⟧ᵃ_ : List (TExp Ξ) → (Ctx T → Set ℓ) → Sub₀ Ξ → Ctx T → Set ℓ
+(⟦ ∅     ⟧ᵃ X) _ Γ = X Γ
 (⟦ A ∙ D ⟧ᵃ X) σ Γ = (⟦ D ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Sub₀ Ξ → Ctx T → Set ℓ
-(⟦ ∅      ⟧ᵃˢ _) σ _ = ⊤
-(⟦ D ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ D ⟧ᵃ X) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
+(⟦ ∅               ⟧ᵃˢ _) σ _ = ⊤
+(⟦ Δ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ Δ ⟧ᵃ X m (⟪ σ ⟫ B)) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
-(⟦ ι Ξ m₀ B D ⟧ᶜ X) m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub₀ Ξ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
+(⟦ ι m₀ B D ⟧ᶜ X) m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub₀ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 (⟦ Ds ⟧ X) m A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m A Γ

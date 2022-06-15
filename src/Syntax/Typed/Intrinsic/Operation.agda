@@ -4,7 +4,7 @@ open import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term SD
-  using (_≟s_) renaming (Tm₀ to T; Sub to TSub; _≟_ to _≟T_)
+  using (_≟s_) renaming (Tm₀ to T; Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
 
 open import Syntax.Context
 
@@ -40,22 +40,24 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong (λ t → (D , i , t)) q)
 
-  compareMapᶜ : (D : ConD) → (t u : (⟦ D ⟧ᶜ Tm) A Γ) → Dec (t ≡ u)
-  compareMapᶜ (ι Ξ B D) (σ , _ , ts) (σ′ , _ , us) with σ ≟s σ′
+  compareMapᶜ : (D : ConD)
+    → (t u : (⟦ D ⟧ᶜ Tm) A Γ) → Dec (t ≡ u)
+  compareMapᶜ (ι B D) (σ , _ , ts) (σ′ , _ , us) with σ ≟s σ′
   ... | no ¬p = no λ where refl → ¬p refl
-  compareMapᶜ (ι Ξ B D) (σ , refl , ts) (σ′ , refl , us) | yes refl with compareMapᵃˢ D ts us
+  compareMapᶜ (ι B D) (σ , refl , ts) (σ′ , refl , us) | yes refl with compareMapᵃˢ D ts us
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong (λ ts → σ , refl , ts) q)
 
-  compareMapᵃˢ : (D : ArgsD Ξ) → (t u : (⟦ D ⟧ᵃˢ Tm) σ Γ) → Dec (t ≡ u)
-  compareMapᵃˢ ι        _        _        = yes refl
-  compareMapᵃˢ (ρ D Ds) (t , ts) (u , us) with compareMapᵃ D t u
+  compareMapᵃˢ : (D : ArgsD Ξ)
+    → (t u : (⟦ D ⟧ᵃˢ Tm) σ Γ) → Dec (t ≡ u)
+  compareMapᵃˢ ∅            _        _        = yes refl
+  compareMapᵃˢ (Θ ⊢ C ∙ Ds) (t , ts) (u , us) with compareMapᵃ Θ t u
   ... | no ¬p = no λ where refl → ¬p refl
   ... | yes p with compareMapᵃˢ Ds ts us
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _,_ p q)
 
-  compareMapᵃ : (D : ArgD Ξ) → (t u : (⟦ D ⟧ᵃ Tm) σ Γ) → Dec (t ≡ u)
-  -- compareMapᵃ D t u = t ≟ u
-  compareMapᵃ (⊢ B)   t u = t ≟ u
+  compareMapᵃ : (Θ : TExps Ξ) 
+    → (t u : (⟦ Θ ⟧ᵃ Tm A) σ Γ) → Dec (t ≡ u)
+  compareMapᵃ ∅       t u = t ≟ u
   compareMapᵃ (A ∙ Δ) t u = compareMapᵃ Δ t u

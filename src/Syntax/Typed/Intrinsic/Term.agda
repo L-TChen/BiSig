@@ -6,7 +6,7 @@ open import Syntax.Typed.Description as T
 module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : Desc {SD}) where
 
 open import Syntax.Simple.Term SD
-  using (Sub₀) renaming (Tm₀ to T; Tm to TExp)
+  using (Sub₀) renaming (Tm₀ to T; Tm to TExp; Tms to TExps)
 
 open import Syntax.Context
 open import Syntax.Typed.Intrinsic.Functor {SD}
@@ -27,20 +27,20 @@ mutual
   rename : Ren Γ Δ 
     → Tm A Γ → Tm A Δ
   rename f (`  x) = ` f x
-  rename f (op (D , x , σ , p , ts)) = op (_ , x , σ , p , renameMap (ConD.args D) f ts)
+  rename f (op (ι A D , x , σ , p , ts)) = op (_ , x , σ , p , renameMap D f ts)
 
   renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMap ι        f _        = _
-  renameMap (ρ D Ds) f (t , ts) = renameMapᵃ D f t , renameMap Ds f ts
+  renameMap ∅            f _        = _
+  renameMap (Θ ⊢ C ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
-  renameMapᵃ : (D : ArgD Ξ)
+  renameMapᵃ : (Θ : TExps Ξ)
     → Ren Γ Δ
-    → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
+    → (⟦ Θ ⟧ᵃ Tm A) σ Γ → (⟦ Θ ⟧ᵃ Tm A) σ Δ
+  renameMapᵃ ∅       f t = rename f t
+  renameMapᵃ (A ∙ Θ) f t = renameMapᵃ Θ (ext f) t
   -- renamemapᵃ (δ ⊢ b) f t = rename (extⁿ f) t
-  renameMapᵃ (⊢ b)   f t = rename f t
-  renameMapᵃ (a ∙ δ) f t = renameMapᵃ δ (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -70,14 +70,14 @@ mutual
   subMap : (D : ArgsD Ξ)
     → Sub Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  subMap ι        f _        = _
-  subMap (ρ D Ds) f (t , ts) = subMapᵃ D f t , subMap Ds f ts
+  subMap ∅            f _        = _
+  subMap (Θ ⊢ C ∙ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
-  subMapᵃ : (D : ArgD Ξ)
+  subMapᵃ : (Θ : TExps Ξ)
     → Sub Γ Δ
-    → (⟦ D ⟧ᵃ Tm) σ Γ → (⟦ D ⟧ᵃ Tm) σ Δ
+    → (⟦ Θ ⟧ᵃ Tm A) σ Γ → (⟦ Θ ⟧ᵃ Tm A) σ Δ
   -- subMapᵃ (Ξ ⊢ B) f t = sub (extsⁿ f) t
-  subMapᵃ (⊢ B)   f t = sub f t
+  subMapᵃ ∅       f t = sub f t
   subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
@@ -91,13 +91,13 @@ module _ {X : Fam ℓ} (α : (D -Alg) X) where mutual
   fold (op (D , x , σ , eq , ts)) =
     α . alg $ D , x , σ , eq , foldMap (ConD.args D) ts
 
-  foldMap : ∀ (D : ArgsD Ξ)
-    → (⟦ D ⟧ᵃˢ Tm) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
-  foldMap ι        _        = _
-  foldMap (ρ D Ds) (t , ts) = foldMapᵃ D t , foldMap Ds ts
+  foldMap : (D : ArgsD Ξ)
+    → ⟦ D ⟧ᵃˢ Tm ⇒ ⟦ D ⟧ᵃˢ X
+  foldMap ∅            _        = _
+  foldMap (Θ ⊢ C ∙ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
-  foldMapᵃ : ∀ (D : ArgD Ξ)
-    → (⟦ D ⟧ᵃ Tm) σ  ⇒₁ (⟦ D ⟧ᵃ X) σ
+  foldMapᵃ : (Θ : TExps Ξ)
+    → ⟦ Θ ⟧ᵃ Tm A ⇒ ⟦ Θ ⟧ᵃ X A
   -- foldMapᵃ (Δ ⊢ B) t = fold t
-  foldMapᵃ (⊢ B)   t = fold t
+  foldMapᵃ ∅       t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

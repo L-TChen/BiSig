@@ -5,7 +5,7 @@ import Syntax.Simple.Description as S
 module Language.Soundness {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+  renaming (Tm to TExp; Tms to TExps; Tm₀ to T)
 open import Syntax.Context
 
 open import Syntax.Typed.Description    {SD} as T
@@ -45,12 +45,12 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
     : (D : B.ArgsD Ξ)
     → (B.⟦ D ⟧ᵃˢ BTm BD)        σ Γ
     → (T.⟦ eraseᵃˢ D ⟧ᵃˢ Tm TD) σ Γ
-  forgetMap ι        _        = _
-  forgetMap (ρ D Ds) (t , ts) = forgetMapᵃ D t , forgetMap Ds ts
+  forgetMap ∅                 _        = _
+  forgetMap (Θ ⊢[ m ] B ∙ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
 
   forgetMapᵃ
-    : (D : B.ArgD Ξ)
-    → (B.⟦ D ⟧ᵃ BTm BD)       σ Γ
-    → (T.⟦ eraseᵃ D ⟧ᵃ Tm TD) σ Γ
-  forgetMapᵃ (ι m B) t = forget t
-  forgetMapᵃ (A ∙ D) t = forgetMapᵃ D t
+    : (Θ : TExps Ξ)
+    → (B.⟦ Θ ⟧ᵃ BTm BD m A) σ Γ
+    → (T.⟦ Θ ⟧ᵃ Tm  TD   A) σ Γ
+  forgetMapᵃ ∅       t = forget t
+  forgetMapᵃ (_ ∙ Θ) t = forgetMapᵃ Θ t

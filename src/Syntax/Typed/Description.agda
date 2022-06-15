@@ -8,25 +8,29 @@ open import Syntax.Simple.Term SD as Ty
   renaming (Tm₀ to T; Tm to TExp)
 open import Syntax.Context
 
-data ArgD  (Ξ : ℕ) : Set where
-  ⊢_  : (B : TExp Ξ)              → ArgD Ξ
-  _∙_ : (A : TExp Ξ) (Δ : ArgD Ξ) → ArgD Ξ
+record ArgD (Ξ : ℕ) : Set where
+  constructor _⊢_
+  field
+    cxt  : List (TExp Ξ)
+    type : TExp Ξ
 
-data ArgsD (Ξ : ℕ) : Set where
-  ι :                               ArgsD Ξ
-  ρ : (D : ArgD Ξ) (Ds : ArgsD Ξ) → ArgsD Ξ
+ArgsD : ℕ → Set
+ArgsD Ξ = List (ArgD Ξ)
 
 record ConD : Set where
   constructor ι
   field
-    vars : ℕ
-    type : TExp  vars
-    args : ArgsD vars
-
-infix  5 ⊢_
-infixr 7 ρ 
-syntax ι Ξ A D = Ξ ▷ D ⦂ A
-syntax ρ D Ds  = ρ[ D ] Ds
+    {vars} : ℕ
+    type   : TExp  vars
+    args   : ArgsD vars
 
 Desc : Set
 Desc = List ConD
+
+ρ-syntax : ∀ {Ξ} → ArgD Ξ → ArgsD Ξ → ArgsD Ξ
+ρ-syntax D Ds = D ∙ Ds
+
+syntax ρ-syntax D Ds = ρ[ D ] Ds
+
+infixr 7 ρ-syntax
+syntax ι Ξ A D = Ξ ▷ D ⦂ A

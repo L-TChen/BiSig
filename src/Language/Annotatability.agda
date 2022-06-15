@@ -5,7 +5,7 @@ import Syntax.Simple.Description as S
 module Language.Annotatability {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+  renaming (Tm to TExp; Tms to TExps; Tm₀ to T)
 open import Syntax.Context
 
 open import Syntax.Typed.Description    {SD} as T
@@ -38,18 +38,20 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
     → Tm⇇ BD A Γ
   annotate (` x)  = ⇉ ` x by refl
   annotate (op (D , i , σ , B=A , ts)) with s i
-  ... | ι Ξ Check B _ , j , refl =   op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
-  ... | ι Ξ Infer B _ , j , refl = ⇉ op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts) by refl
+  ... | ι Check B _ , j , refl =   op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
+  ... | ι Infer B _ , j , refl = ⇉ op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts) by refl
 
   annotateMap : (D  : T.ArgsD Ξ) (D′ : B.ArgsD Ξ) → eraseᵃˢ D′ ≡ D
     → (T.⟦ D  ⟧ᵃˢ Tm TD)  σ Γ
     → (B.⟦ D′ ⟧ᵃˢ BTm BD) σ Γ
-  annotateMap ι        ι          refl _        = _
-  annotateMap (ρ D Ds) (ρ D′ Ds′) refl (t , ts) = annotateMapᵃ D D′ refl t , annotateMap Ds Ds′ refl ts
+  annotateMap ∅        ∅                refl _        = _
+  annotateMap (_ ∙ _) (Θ ⊢[ m ] C ∙ Ds) refl (t , ts) =
+    annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
 
-  annotateMapᵃ : (D  : T.ArgD Ξ) (D′ : B.ArgD Ξ) → eraseᵃ D′ ≡ D
-    → (T.⟦ D  ⟧ᵃ Tm TD)  σ Γ
-    → (B.⟦ D′ ⟧ᵃ BTm BD) σ Γ
-  annotateMapᵃ (⊢ B)   (ι Check B) refl t = annotate t
-  annotateMapᵃ (⊢ B)   (ι Infer B) refl t = _ ∋ annotate t
-  annotateMapᵃ (A ∙ Γ) (A ∙ _)     refl t = annotateMapᵃ Γ _ refl t
+  annotateMapᵃ : (Θ : TExps Ξ)
+    → (m : Mode)
+    → (T.⟦ Θ ⟧ᵃ Tm TD A)  σ Γ
+    → (B.⟦ Θ ⟧ᵃ BTm BD m A) σ Γ
+  annotateMapᵃ ∅       Check t = annotate t
+  annotateMapᵃ ∅       Infer t = _ ∋ annotate t
+  annotateMapᵃ (A ∙ Θ) m     t = annotateMapᵃ Θ m t

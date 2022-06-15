@@ -22,7 +22,7 @@ op-inj
   → ts ≡ us
 op-inj refl = refl
 
-module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
+module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
     → x ∈ fv A
@@ -38,7 +38,7 @@ module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
   ... | inl j = ≡-fv-inv      A  (,-injectiveˡ p) j
   ... | inr j = ≡-fv-invMap n As (,-injectiveʳ p) j
 
-module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
+module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv : (A : Tm Γ)
     → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A

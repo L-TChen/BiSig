@@ -20,84 +20,85 @@ open import Data.Vec                     as V
 
 private variable
   Ξ     : ℕ
-  A B   : T
   xs    : List (Fin Ξ)
-  Γ Δ   : Context T
   D     : ArgD Ξ
   Ds    : ArgsD Ξ
-  σ σ₁ σ₂ : Sub₀ Ξ
-  m   : Mode
 
-Inferᵃ : List (Fin Ξ) → ArgD Ξ → Set
-Inferᵃ xs (ι Check B) = fv B ⊆ xs
-Inferᵃ xs (ι Infer B) = ⊤
-Inferᵃ xs (A ∙ Ds)    = fv A ⊆ xs × Inferᵃ xs Ds
+module _ (Ξ : ℕ) where
+  data Synthesisᵃ (xs : List (Fin Ξ)) : ArgD Ξ → Set where
+    nil⇉
+      : (B : TExp Ξ)
+      → Synthesisᵃ xs (ι Infer B)
+    nil⇇
+      : (B : TExp Ξ)
+      → (B⊆xs : fv B ⊆ xs)
+      → Synthesisᵃ xs (ι Check B)
+    cons
+      : (A : TExp Ξ) (D : ArgD Ξ)
+      → (A⊆xs : fv A ⊆ xs) (SynD : Synthesisᵃ xs D)
+      → Synthesisᵃ xs (A ∙ D)
 
-data Inferᵃˢ (Ξ : ℕ) : List (Fin Ξ) → ArgsD Ξ → Set where
-  ∅ 
-    : Inferᵃˢ Ξ ∅ ∅
-  cons⇉
-    :  (ID : Inferᵃ xs D) (IDs : Inferᵃˢ Ξ xs Ds) (m=Infer : modeArgD D ≡ Infer)
-    → Inferᵃˢ Ξ (fvArgD D ++ xs) (D ∙ Ds)
-  cons⇇
-    : (ID : Inferᵃ xs D) (IDs : Inferᵃˢ Ξ xs Ds) (m=Check : modeArgD D ≡ Check) (fvD⊆xs : fvArgD D ⊆ xs)
-    → Inferᵃˢ Ξ xs (D ∙ Ds)
+  data Synthesisᵃˢ : List (Fin Ξ) → ArgsD Ξ → Set where
+    nil
+      : Synthesisᵃˢ ∅ ∅
+    cons⇉
+      : (D : ArgD Ξ) (Ds : ArgsD Ξ)
+      → (ID : Synthesisᵃ xs D) (eq : modeArgD D ≡ Infer) (IDs : Synthesisᵃˢ xs Ds) 
+      → Synthesisᵃˢ (fvArgD D ++ xs) (D ∙ Ds)
+    cons⇇
+      : (D : ArgD Ξ) (Ds : ArgsD Ξ)
+      → (ID : Synthesisᵃ xs D) (eq : modeArgD D ≡ Check) (fvD⊆xs : fvArgD D ⊆ xs) (IDs : Synthesisᵃˢ xs Ds) 
+      → Synthesisᵃˢ xs (D ∙ Ds)
 
-Inference : (Ξ : ℕ) (C : TExp Ξ) (Ds : ArgsD Ξ) → Set
-Inference Ξ C Ds = ∃[ xs ] (fv C ⊆ xs × Inferᵃˢ Ξ xs Ds)
+Synthesis : (Ξ : ℕ) (C : TExp Ξ) (Ds : ArgsD Ξ) → Set
+Synthesis Ξ C Ds = ∃[ xs ] (fv C ⊆ xs × Synthesisᵃˢ Ξ xs Ds)
 
-Inferᶜ : ConD → Set
-Inferᶜ (ι Ξ Infer C Ds) = Inference Ξ C Ds
-Inferᶜ (ι Ξ Check C Ds) = ⊤
+ModeCorrect : ConD → Set
+ModeCorrect (ι Ξ Infer C Ds) = Synthesis Ξ C Ds
+ModeCorrect (ι Ξ Check C Ds) = ⊤
 
-x∉∅ : {A : Set ℓ} {x : A}
-  → x ∈ ∅ → ⊥ {lzero}
-x∉∅ ()
-
-module _ {D : Desc} {inf : All Inferᶜ D}  where mutual
+module _ {D : Desc} {inf : All ModeCorrect D}  where mutual
   open import Syntax.BiTyped.Raw.Term          {SD} Id D
   open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D
   open import Syntax.BiTyped.Extrinsic.Term    {SD} Id D
 
-  uniq-⇉ : {t : Raw⇉}
-    → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
+  private variable
+    A B   : T
+    Γ Δ   : Context T
+    σ₁ σ₂ : Sub₀ Ξ
+    t     : Raw⇉
+    ts    : R.⟦ Ds ⟧ᵃˢ Raw
+
+  uniq-⇉
+    : (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
     → A ≡ B
   uniq-⇉ (⊢` x)   (⊢` y)   = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u)  = refl
   uniq-⇉ (⊢op D@(ι Ξ Infer C Ds , i , ts) (σ₁ , refl , ⊢ts)) (⊢op _ (σ₂ , refl , ⊢us)) =
-    let (xs , fvC⊆xs , IDs) = A.lookup inf i in 
-    ≡-fv σ₁ σ₂ C λ x → uniq-⇉Map xs IDs ⊢ts ⊢us (fvC⊆xs x)
+    let (xs , fvC⊆xs , IDs) = A.lookup inf i in
+    ≡-fv C λ x → uniq-⇉Map IDs ⊢ts ⊢us (fvC⊆xs x)
 
-  uniq-⇉Map : (xs : List (Fin Ξ))
-    → Inferᵃˢ Ξ xs Ds
-    → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+  uniq-⇉Map : Synthesisᵃˢ Ξ xs Ds
     → (⊢ts : (⟦ Ds ⟧ᵃˢ ⊢⇄) σ₁ Γ ts)
     → (⊢us : (⟦ Ds ⟧ᵃˢ ⊢⇄) σ₂ Γ ts)
     → ∀ {x} → x ∈ xs
-    → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Map .∅               ∅                                    ⊢ts ⊢us i = ⊥-elim $ x∉∅ i
-  uniq-⇉Map .(fvArgD D ++ _) (cons⇉ {xs} {D} {Ds} ID IDs m=Infer) (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fvArgD D) i
-  ... | inl j = uniq-⇉Mapᵃ xs D ID (uniq-⇉Map xs IDs ⊢ts ⊢us) ⊢t ⊢u m=Infer i
-  ... | inr j = uniq-⇉Map xs IDs ⊢ts ⊢us j
-  uniq-⇉Map xs (cons⇇ ID IDs m=Check fvD⊆xs) (_ , ⊢ts) (_ , ⊢us) i  = uniq-⇉Map xs IDs ⊢ts ⊢us i
+    → lookup σ₁ x ≡ lookup σ₂ x
+  uniq-⇉Map  nil                    _          _          ()
+  uniq-⇉Map  (cons⇉ D Ds ID eq IDs) (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fvArgD D) i
+  ... | inl j = uniq-⇉Mapᵃ ID eq (uniq-⇉Map IDs ⊢ts ⊢us) ⊢t ⊢u j
+  ... | inr j = uniq-⇉Map  IDs ⊢ts ⊢us j
+  uniq-⇉Map (cons⇇ D Ds ID _ fvD⊆xs IDs) (_ , ⊢ts) (_ , ⊢us) = uniq-⇉Map IDs ⊢ts ⊢us
 
-  uniq-⇉Mapᵃ : (xs : List (Fin Ξ)) (AD : ArgD Ξ) 
-    → Inferᵃ xs AD
-    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
-    → {t : R.⟦ AD ⟧ᵃ Raw}
-    → (⊢t : (⟦ AD ⟧ᵃ ⊢⇄) σ₁ Γ t)
-    → (⊢u : (⟦ AD ⟧ᵃ ⊢⇄) σ₂ Γ t)
-    → modeArgD AD ≡ Infer → ∀ {x} → x ∈ fvArgD AD ++ xs
+  uniq-⇉Mapᵃ : {D : ArgD Ξ}
+    → Synthesisᵃ Ξ xs D
+    → modeArgD D ≡ Infer 
+    → ({x : Fin Ξ} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
+    → {t : R.⟦ D ⟧ᵃ Raw}
+    → (⊢t : (⟦ D ⟧ᵃ ⊢⇄) σ₁ Γ t)
+    → (⊢u : (⟦ D ⟧ᵃ ⊢⇄) σ₂ Γ t)
+    → ∀ {x} → x ∈ fvArgD D
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Mapᵃ xs (ι Infer B) _              f ⊢t ⊢u refl i with ++⁻ (fv B) i
-  ... | inl j = ≡-fv-inv _ _ B (uniq-⇉ ⊢t ⊢u) j
-  ... | inr j = f j
-  uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂} {Γ} xs (A ∙ AD)    (fvA⊆xs , ID) f ⊢t ⊢u p    i with ++⁻ (fvArgD AD) i
-  ... | inr j = f j
-  ... | inl j = uniq-⇉Mapᵃ xs AD ID f (subst (λ A → (⟦ AD ⟧ᵃ ⊢⇄) σ₁ (_ ⦂ A , Γ) _) A₁=A₂ ⊢t) ⊢u p i -- {! uniq-⇉Mapᵃ xs AD ID f   !}
-    where
-      helper : ∀ {x} → x ∈ fv A → V.lookup σ₁ x ≡ V.lookup σ₂ x
-      helper x∈fvA = f (fvA⊆xs  x∈fvA)
-
-      A₁=A₂ : sub σ₁ A ≡ sub σ₂ A
-      A₁=A₂ = ≡-fv σ₁ σ₂ A helper
+  uniq-⇉Mapᵃ (nil⇉ B)             _ _ ⊢t ⊢u = ≡-fv-inv B (uniq-⇉ ⊢t ⊢u)
+  uniq-⇉Mapᵃ (cons A D A⊆xs synD) p f ⊢t ⊢u =
+    let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
+    uniq-⇉Mapᵃ synD p f (subst (λ A → (⟦ D ⟧ᵃ ⊢⇄) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u

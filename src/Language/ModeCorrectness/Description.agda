@@ -13,35 +13,25 @@ open import Data.List.Relation.Binary.Subset.Propositional
 
 private variable
   Ξ     : ℕ
-  m     : Mode
-  xs    : List (Fin Ξ)
-  D     : ArgD Ξ
-  Ds    : ArgsD Ξ
 
 ModeCorrectᵃ : List (Fin Ξ) → TExps Ξ → Set
 ModeCorrectᵃ xs ∅       = ⊤
 ModeCorrectᵃ xs (A ∙ Θ) = fv A ⊆ xs × ModeCorrectᵃ xs Θ
 
 module _ (xs₀ : List (Fin Ξ)) where
-  data ModeCorrectᵃˢ : List (Fin Ξ) → ArgsD Ξ → Set where
-    nil
-      : ModeCorrectᵃˢ xs₀ ∅
-    cons⇉
-      : (Θ : TExps Ξ) (C : TExp Ξ) (Ds : ArgsD Ξ)
-      → (SD : ModeCorrectᵃ xs Θ) (SDs : ModeCorrectᵃˢ xs Ds) 
-      → ModeCorrectᵃˢ (fv C ++ xs) (Θ ⊢[ Infer ] C ∙ Ds)
-    cons⇇
-      : (Θ : TExps Ξ) (C : TExp Ξ) (fvD⊆xs : fv C ⊆ xs) (Ds : ArgsD Ξ)
-      → (SD : ModeCorrectᵃ xs Θ) (SDs : ModeCorrectᵃˢ xs Ds) 
-      → ModeCorrectᵃˢ xs (Θ ⊢[ Check ] C ∙ Ds)
+  Known : ArgsD Ξ →  List (Fin Ξ)
+  Known ∅                     = xs₀
+  Known (Θ ⊢[ Check ] C ∙ Ds) =         Known Ds
+  Known (Θ ⊢[ Infer ] C ∙ Ds) = fv C ++ Known Ds
 
-Synthesis : TExp Ξ → ArgsD Ξ → Set
-Synthesis C Ds = ∃[ xs ] (fv C ⊆ xs × ModeCorrectᵃˢ ∅ xs Ds)
-
-Checking : TExp Ξ → ArgsD Ξ → Set
-Checking C Ds = ∃[ xs ] ModeCorrectᵃˢ (fv C) xs Ds
+  MC : ArgsD Ξ → Set
+  MC ∅                     = ⊤
+  MC (Θ ⊢[ Check ] C ∙ Ds) = let xs = Known Ds in
+    fv C ⊆ xs × ModeCorrectᵃ xs Θ × MC Ds
+  MC (Θ ⊢[ Infer ] C ∙ Ds) = let xs = Known Ds in
+    ModeCorrectᵃ xs Θ × MC Ds
 
 ModeCorrect : Desc → Set
 ModeCorrect = All λ
-  where (ι Check C Ds) → Checking  C Ds
-        (ι Infer C Ds) → Synthesis C Ds
+  where (ι Check C Ds) → MC (fv C) Ds
+        (ι Infer C Ds) → MC ∅      (∅ ⊢[ Check ] C ∙ Ds)

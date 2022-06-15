@@ -52,18 +52,18 @@ module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fvMap (suc n) (A , As) p = cong₂ _,_
     (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvMap n As λ k → p (++⁺ʳ (fv A) k))
 
-mutual
-  closed-subst-invariant
-    : (A : Tm Γ)
-    → fv A ≡ ∅
-    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
-  closed-subst-invariant (op (n , i , ts)) p =
-    cong (λ ts → op (n , i , ts)) (closed-subst-invariantMap ts p)
+-- mutual
+--   closed-subst-invariant
+--     : (A : Tm Γ)
+--     → fv A ≡ ∅
+--     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+--   closed-subst-invariant (op (n , i , ts)) p =
+--     cong (λ ts → op (n , i , ts)) (closed-subst-invariantMap ts p)
 
-  closed-subst-invariantMap : {n : ℕ}
-    → (As : Tm Γ ^ n)
-    → fvMap As ≡ ∅
-    → subMap σ₁ n As ≡ subMap σ₂ n As
-  closed-subst-invariantMap {n = zero}  _        _ = refl
-  closed-subst-invariantMap {n = suc n} (t , ts) p =
-    cong₂ _,_ (closed-subst-invariant t (++-conicalˡ (fv t) (fvMap ts) p)) (closed-subst-invariantMap ts (++-conicalʳ (fv t) (fvMap ts) p))
+--   closed-subst-invariantMap : {n : ℕ}
+--     → (As : Tm Γ ^ n)
+--     → fvMap As ≡ ∅
+--     → subMap σ₁ n As ≡ subMap σ₂ n As
+--   closed-subst-invariantMap {n = zero}  _        _ = refl
+--   closed-subst-invariantMap {n = suc n} (t , ts) p =
+--     cong₂ _,_ (closed-subst-invariant t (++-conicalˡ (fv t) (fvMap ts) p)) (closed-subst-invariantMap ts (++-conicalʳ (fv t) (fvMap ts) p))

@@ -7,7 +7,7 @@ import Language.ModeCorrectness.Description as B
 
 module Language.ModeCorrectness.Term {SD : S.Desc}
   (Id : Set) (_≟Id_ : (x y : Id) → Dec (x ≡ y))
-  (D : Desc {SD}) (modeCorrect : B.ModeCorrect Id D) where
+  (D : Desc {SD}) (mc : B.ModeCorrect Id D) where
 
 open B {SD} Id
 
@@ -34,11 +34,11 @@ private variable
   Γ     : Context T
   Ds    : ArgsD Ξ
   AD    : ArgD Ξ
-  σ₁ σ₂ : Sub₀ Ξ
+  σ σ₁ σ₂ : Sub₀ Ξ
   m     : Mode
 
-Correctness : {CD : ConD} → (CD ∈ D) → _
-Correctness i = A.lookup modeCorrect i
+MC : {CD : ConD} → (CD ∈ D) → _
+MC i = A.lookup mc i
 
 mutual
   uniq-⇉
@@ -48,27 +48,26 @@ mutual
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
   uniq-⇉ (⊢op (ι Infer C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
-    let (C⊆xs , _ , SDs) = Correctness i in
+    let (_ , C⊆xs , _ , SDs) = MC i in
     ≡-fv C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-⇉Map
     : (Ds : ArgsD Ξ)
-    → MC ∅ Ds
+    → ModeCorrectᵃˢ ∅ Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
     → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts)
     → (⊢us : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₂ Γ ts)
     → ∀ {x} → x ∈ Known ∅ Ds
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Map ∅                 _ _ _ ()
-  uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (B⊆xs , SD , SDs) (_ , ⊢ts) (_ , ⊢us) = 
+  uniq-⇉Map ∅                     _             _          _          ()
+  uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) = 
     uniq-⇉Map Ds SDs ⊢ts ⊢us
-  uniq-⇉Map (Θ ⊢[ Infer ] C ∙ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fv C) i
+  uniq-⇉Map (Θ ⊢[ Infer ] C ∙ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fv C) i
   ... | inl j = uniq-⇉Mapᵃ C Θ SD ⊢t ⊢u (uniq-⇉Map Ds SDs ⊢ts ⊢us) j
   ... | inr j = uniq-⇉Map Ds SDs ⊢ts ⊢us j
 
   uniq-⇉Mapᵃ
-    : (C : TExp Ξ)
-    → (Θ : TExps Ξ)
+    : (C : TExp Ξ) (Θ : TExps Ξ)
     → ModeCorrectᵃ xs Θ
     → {t : R.⟦ Θ ⟧ᵃ Raw Infer}
     → (⊢t : (⟦ Θ ⟧ᵃ Raw , ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
@@ -77,9 +76,8 @@ mutual
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
   uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
-  uniq-⇉Mapᵃ C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f =
-     let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
-     uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+  uniq-⇉Mapᵃ C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f = let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
+    uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
 ¬switch
   : {t : Raw⇉}
@@ -89,30 +87,53 @@ mutual
 ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
 mutual
-  synthesize
+  synthesise
     : (Γ : Context T) (t : Raw⇉)
     → Dec (∃[ A ] Γ ⊢ t ⇉ A)
-  synthesize Γ (` x)   with lookup Γ x
+  synthesise Γ (` x)   with lookup Γ x
   ... | no ¬p       = no λ where (A , ⊢` x∈) → ¬p (A , x∈)
   ... | yes (A , x) = yes (A , ⊢` x)
-  synthesize Γ (t ⦂ A) with inherit Γ t A
+  synthesise Γ (t ⦂ A) with check Γ t A
   ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
   ... | yes p = yes (A , ⊢⦂ p)
-  synthesize Γ (op (ι Infer C Ds , i , ts)) =
-    let (xs , fvC⊆xs , IDs) = Correctness i in {!   !}
+  synthesise Γ (op (ι Infer C Ds , i , ts)) with MC i
+  ... | (_ , C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
+  ... | no ¬p = no λ where (A , ⊢op _ (σ , refl , ⊢ts)) → ¬p (σ , ⊢ts)
+  ... | yes (σ , ⊢ts) = yes (⟪ σ ⟫ C , ⊢op (_ , i , ts) (σ , refl , ⊢ts))
 
-  synthesizeMap
-    : (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
-    → {!   !} -- Dec (∃[ A ] Γ ⊢ t ⇉ A)
-  synthesizeMap = {!   !}
-
-  inherit
+  check
     : (Γ : Context T) (t : Raw⇇) (A : T)
     → Dec (Γ ⊢ t ⇇ A)
-  inherit Γ (t ↑)  A with synthesize  Γ t
+  check Γ (t ↑)  A with synthesise  Γ t
   ... | no ¬p = no λ where (⊢⇉ ⊢t refl) → ¬p (A , ⊢t)
   ... | yes (B , ⊢t) with B ≟T A
   ... | no ¬q   = no (¬switch ⊢t ¬q)
   ... | yes A=B = yes (⊢⇉ ⊢t A=B)
-  inherit Γ (op (ι Check B Ds , i , ts)) A =
-    let IDs = Correctness i in {!   !}
+  check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i .proj₂) Γ ts
+  ... | no ¬p = no λ where (⊢op _ p) → ¬p p
+  ... | yes (σ , eq , ⊢ts) = yes (⊢op (_ , i , ts) (σ , eq , ⊢ts))
+
+  synthesiseᵃˢ
+    : (Ds : ArgsD Ξ)
+    → ModeCorrectᵃˢ ∅ Ds
+    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+    → Dec (∃[ σ ] (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts)
+  synthesiseᵃˢ DS SDs Γ ts = {!   !}
+
+  synthesiseSubᵃˢ
+    : (Ds : ArgsD Ξ)
+    → ModeCorrectᵃˢ ∅ Ds
+    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+    → ∀ {x} → (i : x ∈ Known ∅ Ds) → {!   !}
+  synthesiseSubᵃˢ ∅ _ _ _ ()
+  synthesiseSubᵃˢ (Θ ⊢[ Infer ] C ∙ Ds) Mc Γ ts i = {!   !}
+  synthesiseSubᵃˢ (Θ ⊢[ Check ] C ∙ Ds) Mc Γ ts i = {!   !}
+
+  checkᵃˢ
+    : (C : TExp Ξ)
+    → (A : T)
+    → (Ds : ArgsD Ξ)
+    → ModeCorrectᵃˢ (fv C) Ds
+    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+    → Dec (∃[ σ ] (⟪ σ ⟫ C ≡ A × (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts))
+  checkᵃˢ C A DS SDs Γ ts = {!   !}

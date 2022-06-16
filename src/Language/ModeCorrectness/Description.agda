@@ -24,14 +24,14 @@ module _ (xs₀ : List (Fin Ξ)) where
   Known (Θ ⊢[ Check ] C ∙ Ds) =         Known Ds
   Known (Θ ⊢[ Infer ] C ∙ Ds) = fv C ++ Known Ds
 
-  MC : ArgsD Ξ → Set
-  MC ∅                     = ⊤
-  MC (Θ ⊢[ Check ] C ∙ Ds) = let xs = Known Ds in
-    fv C ⊆ xs × ModeCorrectᵃ xs Θ × MC Ds
-  MC (Θ ⊢[ Infer ] C ∙ Ds) = let xs = Known Ds in
-    ModeCorrectᵃ xs Θ × MC Ds
+  ModeCorrectᵃˢ : ArgsD Ξ → Set
+  ModeCorrectᵃˢ ∅                     = ⊤
+  ModeCorrectᵃˢ (Θ ⊢[ Check ] C ∙ Ds) = let xs = Known Ds in
+    fv C ⊆ xs × ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
+  ModeCorrectᵃˢ (Θ ⊢[ Infer ] C ∙ Ds) = let xs = Known Ds in
+    ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
 
 ModeCorrect : Desc → Set
 ModeCorrect = All λ
-  where (ι Check C Ds) → MC (fv C) Ds
-        (ι Infer C Ds) → MC ∅      (∅ ⊢[ Check ] C ∙ Ds)
+  where (ι Check C Ds) → (∀ x → x ∈ Known (fv C) Ds) × ModeCorrectᵃˢ (fv C) Ds
+        (ι Infer C Ds) → (∀ x → x ∈ Known ∅      Ds) × ModeCorrectᵃˢ ∅      (∅ ⊢[ Check ] C ∙ Ds)

@@ -17,6 +17,8 @@ open import Data.Fin.Literals                  public
 open import Data.List                          public 
   using (List; length; map; _++_; zip)
   renaming ([] to ∅; _∷_ to _∙_)
+open import Data.Maybe                         public
+  using (Maybe; nothing; just)
 open import Data.List.Membership.Propositional               public
 open import Data.List.Relation.Unary.Any using (Any; here; there) public
 open import Data.List.Relation.Unary.All public
@@ -74,3 +76,33 @@ Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
 Lift₀ {ℓ} = Lift {ℓ} lzero -- Lift {ℓ} lzero
 
 {-# DISPLAY Lift lzero A = Lift₀ A #-}
+
+private variable
+  n : ℕ
+  A : Set ℓ
+
+strengthL : List (Fin (suc n)) → List (Fin n)
+strengthL ∅            = ∅
+strengthL (zero ∙ xs)  = strengthL xs
+strengthL (suc x ∙ xs) = x ∙ strengthL xs
+
+pred∈ : {y : Fin n} {xs : List (Fin (suc n))}
+  → suc y ∈ xs → y ∈ strengthL xs
+pred∈ {xs = _           } (here refl) = here refl
+pred∈ {xs = (zero ∙ xs) } (there i)   = pred∈ i
+pred∈ {xs = (suc x ∙ xs)} (there i)   = there (pred∈ i)
+
+succ∈ : {y : Fin n} {xs : List (Fin (suc n))}
+  → y ∈ strengthL xs → (suc y) ∈ xs
+succ∈ {xs = zero  ∙ xs} i           = there (succ∈ i)
+succ∈ {xs = suc x ∙ xs} (here refl) = here refl
+succ∈ {xs = suc x ∙ xs} (there i)   = there (succ∈ i)
+
+∈-length : {x : A} {xs : List A}
+  → x ∈ xs → Fin (length xs)
+∈-length (here _)  = zero
+∈-length (there x) = suc (∈-length x)
+
+update : (i : Fin n) (x : A) → Vec A n → Vec A n
+update zero    y (x ∷ xs) = y ∷ xs
+update (suc i) y (x ∷ xs) = x ∷ update i y xs

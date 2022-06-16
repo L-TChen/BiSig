@@ -4,11 +4,14 @@ open import Syntax.Simple.Description
 module Syntax.Simple.Term (D : Desc) where
 
 import      Data.Fin      as F
-open import Data.List using  (_++_)
-open import Data.Vec  hiding (_++_)
+open import Data.List as L using  (_++_)
+open import Data.Vec  as V hiding (_++_)
+
+import      Data.Fin.Substitution as F
+open import Data.List.Membership.Propositional.Properties
 
 private variable
-  Ξ Δ : ℕ
+  Γ Ξ Δ : ℕ
   n m l : ℕ
   A B : Set
 
@@ -36,8 +39,9 @@ module _ {n m : ℕ} (f : Ren n m) where mutual
   renameMap zero    _        = _
   renameMap (suc n) (t , ts) = rename t , renameMap n ts
     
-Sub : (A B : ℕ) → Set
-Sub A B = Vec (Tm B) A
+
+Sub : (Γ Δ : ℕ) → Set
+Sub Γ Δ = F.Sub Tm Γ Δ
 
 Sub₀ : (Ξ : ℕ) → Set
 Sub₀ Ξ = Sub Ξ 0
@@ -56,6 +60,9 @@ infixr 8 ⟨_⟩_ ⟪_⟫_
 
 ⟨_⟩_ : {A B : ℕ} → Ren A B → Tm A → Tm B
 ⟨ f ⟩ t = rename f t
+
+weaken : Tm Ξ → Tm (suc Ξ)
+weaken = ⟨ suc ⟩_
 
 ⟪_⟫_ : {A B : ℕ} → Sub A B → Tm A → Tm B
 ⟪ f ⟫ t = sub f t
@@ -106,3 +113,33 @@ _≟s_ : (σ σ′ : Sub Ξ Δ) → Dec (σ ≡ σ′)
 ... | yes p with Δ ≟s Γ 
 ... | no ¬q =  no λ where refl → ¬q refl
 ... | yes q =  yes (cong₂ _∷_ p q)
+
+-- Some attempts to build aux functions for unification
+mutual
+  check : (x : Fin (suc Ξ)) (t : Tm (suc Ξ))
+    → ¬ x ∈ fv t → Tm Ξ
+  check x (` y)  x∉t with x F.≟ y
+  ... | yes x=y = ⊥-elim₀ (x∉t (here x=y))
+  ... | no ¬x=y = ` F.punchOut ¬x=y
+  check x (op (_ , i , ts)) x∉t =
+    op (_ , i , checkⁿ x ts x∉t)
+
+  checkⁿ : (x : Fin (suc Ξ)) (ts : Tm (suc Ξ) ^ n)
+    → ¬ x ∈ fvMap ts → Tm Ξ ^ n
+  checkⁿ {n = zero}  _ _        _    = _ 
+  checkⁿ {n = suc l} x (t , ts) x∉ts =
+    check x t (x∉ts ∘ ∈-++⁺ˡ) , checkⁿ x ts (x∉ts ∘ ∈-++⁺ʳ (fv t))
+
+TmSimple : F.Simple Tm
+TmSimple = record
+  { var    = `_
+  ; weaken = weaken
+  }
+
+open F.Simple TmSimple
+  using (_↑) renaming (id to idS; wk⋆ to wk⋆S) public
+
+_for_ : Tm Ξ → Fin (suc Ξ) → Sub (suc Ξ) Ξ
+_for_ {Ξ = zero}  t zero    = t ∷ []
+_for_ {Ξ = suc Ξ} t zero    = t ∷ idS
+_for_ {Ξ = suc Ξ} t (suc x) = ` zero ∷ update x t idS

@@ -28,29 +28,87 @@ module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
     → x ∈ fv A
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-inv (` x)             p (here refl) = p
-  ≡-fv-inv (op (Ξ , i , ts)) p j = ≡-fv-invMap Ξ ts (op-inj p) j
+  ≡-fv-inv (op (Ξ , i , ts)) p j = ≡-fv-invⁿ Ξ ts (op-inj p) j
 
-  ≡-fv-invMap : (n : ℕ) (As : Tm Γ ^ n)
-    → subMap σ₁ _ As ≡ subMap σ₂ _ As
-    → x ∈ fvMap As
+  ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
+    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+    → x ∈ fvⁿ As
     → lookup σ₁ x ≡ lookup σ₂ x
-  ≡-fv-invMap (suc n) (A , As) p i with ++⁻ (fv A) i
+  ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
   ... | inl j = ≡-fv-inv      A  (,-injectiveˡ p) j
-  ... | inr j = ≡-fv-invMap n As (,-injectiveʳ p) j
+  ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv : (A : Tm Γ)
     → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
   ≡-fv (` x)             p = p (here refl)
-  ≡-fv (op (n , _ , ts)) p = cong (λ ts → op (n , _ , ts)) (≡-fvMap n ts p)
+  ≡-fv (op (n , _ , ts)) p = cong (λ ts → op (n , _ , ts)) (≡-fvⁿ n ts p)
 
-  ≡-fvMap : (n : ℕ) (As : Tm Γ ^ n)
-    → (∀ {x} → x ∈ fvMap As → lookup σ₁ x ≡ lookup σ₂ x)
-    → subMap σ₁ _ As ≡ subMap σ₂ _ As
-  ≡-fvMap zero    _        _ = refl
-  ≡-fvMap (suc n) (A , As) p = cong₂ _,_
-    (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvMap n As λ k → p (++⁺ʳ (fv A) k))
+  ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
+    → (∀ {x} → x ∈ fvⁿ  As → lookup σ₁ x ≡ lookup σ₂ x)
+    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+  ≡-fvⁿ zero    _        _ = refl
+  ≡-fvⁿ (suc n) (A , As) p = cong₂ _,_
+    (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvⁿ n As λ k → p (++⁺ʳ (fv A) k))
+
+
+-- sub-inv₂
+--   : ∀ {n} {i : n ∈ _}
+--   → (ts : Tm Γ ^ n) (σ : SubFv (fvⁿ ts) Δ)
+--   → ∀ {x} → (j k : x ∈ fvⁿ ts) 
+--   → sub-inv₁ {i = i} ts σ j ≡ sub-inv₁ {i = i} ts σ k
+-- sub-inv₂ {n = zero}  _        σ       () 
+-- sub-inv₂ {n = suc n} (t , ts) (σ , p) j k with ++⁻ (fv t) j | ++⁻ (fv t) k
+-- ... | inl ∈t  | inl ∈t′  = p (++⁺ˡ ∈t) (++⁺ˡ ∈t′)
+-- ... | inl ∈t  | inr ∈ts  = p (++⁺ˡ ∈t) (++⁺ʳ (fv t) ∈ts)
+-- ... | inr ∈ts | inl ∈t   = p (++⁺ʳ (fv t) ∈ts) (++⁺ˡ ∈t)
+-- ... | inr ∈ts | inr ∈ts′ = p (++⁺ʳ (fv t) ∈ts) (++⁺ʳ (fv t) ∈ts′)
+
+
+SubFv : List (Fin Ξ) → ℕ → Set
+SubFv xs Δ = Vec (Tm Δ) (length xs) -- Σ[ ys ∈ List (Fin _ × Tm Δ) ] map proj₁ ys ≡ xs
+
+Covered : {Ξ : ℕ} → List (Fin Ξ) → Set
+Covered xs = (x : Fin _) → x ∈ xs
+
+-- sub-inv₁
+--   : ∀ {n} {i : n ∈ _} → (ts : Tm Γ ^ n)
+--   → SubFv (fvⁿ ts) Δ
+--   → SubFv (fv (op (n , i , ts))) Δ
+-- sub-inv₁ {n = zero}  _        σ ()
+-- sub-inv₁ {n = suc n} (t , ts) σ j with ++⁻ (fv t) j
+-- ... | inl ∈t  = σ (++⁺ˡ ∈t)
+-- ... | inr ∈ts = σ (++⁺ʳ (fv t) ∈ts)
+
+-- fromSub : {xs : List (Fin Ξ)}
+--   → (∀ x → x ∈ xs)
+--   → Sub Ξ Δ
+--   → SubFv xs Δ
+-- fromSub ∀x σ {x} _ = V.lookup σ x
+
+-- lem : {xs : List (Fin Ξ)}
+--   → (p : ∀ x → x ∈ xs)
+--   → (σ : SubFv xs Δ)
+--   → ∀ {x} (i : x ∈ xs)
+--   → fromSub p (toSub p σ) i ≡ σ i
+-- lem {suc Ξ} {xs = zero ∙ xs} p σ {zero}  i = {!   !}
+-- lem {suc Ξ} {xs = zero ∙ xs} p σ {suc y} i = {!   !}
+-- lem {suc Ξ} {xs = suc x ∙ xs} p σ {y}    i = {!   !}
+
+-- mutual
+--   subByFv : (A : Tm Γ)
+--     → SubFv (fv A) Δ
+--     → Tm Δ
+--   subByFv (` x)             σ = σ {x} (here refl)
+--   subByFv (op (n , i , ts)) σ = op (n , i , subByFvⁿ ts σ)
+
+--   subByFvⁿ : (A : Tm Ξ ^ n)
+--     → SubFv (fvⁿ A) Δ
+--     → Tm Δ ^ n
+--   subByFvⁿ {n = zero}  _        _ = _
+--   subByFvⁿ {n = suc n} (t , ts) σ =
+--     subByFv t (σ ∘ ++⁺ˡ) , subByFvⁿ ts (σ ∘ ++⁺ʳ (fv t))
 
 -- mutual
 --   closed-subst-invariant

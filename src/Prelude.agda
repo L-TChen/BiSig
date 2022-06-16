@@ -7,6 +7,8 @@ open import Data.Empty                         public
   using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
   using (⊥; ⊥-elim)
+open import Data.Unit                          public
+  using () renaming (⊤ to ⊤₀; tt to tt₀)
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 open import Data.Nat                           public
@@ -68,8 +70,8 @@ there i   ≟∈ there j   with i ≟∈ j
 here _    ≟∈ there _   = no λ ()
 there _   ≟∈ here  _   = no λ ()
 
-_^_ : Set ℓ → ℕ → Set ℓ
-X ^ zero  = ⊤
+_^_ : Set → ℕ → Set
+X ^ zero  = ⊤₀
 X ^ suc n = X × X ^ n
 
 Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
@@ -106,3 +108,4 @@ succ∈ {xs = suc x ∙ xs} (there i)   = there (succ∈ i)
 update : (i : Fin n) (x : A) → Vec A n → Vec A n
 update zero    y (x ∷ xs) = y ∷ xs
 update (suc i) y (x ∷ xs) = x ∷ update i y xs
+

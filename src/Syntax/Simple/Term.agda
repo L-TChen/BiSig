@@ -3,12 +3,12 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
-import      Data.Fin      as F
-open import Data.List as L using  (_++_)
-open import Data.Vec  as V hiding (_++_)
-
-import      Data.Fin.Substitution as F
-open import Data.List.Membership.Propositional.Properties
+import      Data.Fin  as F
+open import Data.List as L
+  using  (_++_)
+open import Data.Vec  as V
+  using (lookup)
+open import Data.Vec.Properties as V
 
 private variable
   Γ Ξ Δ : ℕ
@@ -26,64 +26,102 @@ Tm₀ = Tm 0
 Tms : ℕ → Set
 Tms Ξ = List (Tm Ξ)
 
-Ren : (n m : ℕ) → Set
-Ren n m = Fin n → Fin m
+Ren : ℕ → ℕ → Set
+Ren m n = Fin m → Fin n -- Vec (Fin n) m
 
-module _ {n m : ℕ} (f : Ren n m) where mutual
-  rename : Tm n → Tm m
-  rename (` x)  = ` f x
-  rename (op (_ , i , ts)) = op (_ , i , renameMap _ ts)
+module _ (f : Ren m n) where mutual
+  rename : Tm m → Tm n
+  rename (` x)             = ` f x
+  rename (op (_ , i , ts)) = op (_ , i , renameⁿ ts)
 
-  renameMap : (l : ℕ)
-    → Tm n ^ l → Tm m ^ l
-  renameMap zero    _        = _
-  renameMap (suc n) (t , ts) = rename t , renameMap n ts
-    
+  renameⁿ : {l : ℕ}
+    → Tm m ^ l → Tm n ^ l
+  renameⁿ {l = zero}  _        = _
+  renameⁿ {l = suc n} (t , ts) = rename t , renameⁿ ts
 
-Sub : (Γ Δ : ℕ) → Set
-Sub Γ Δ = F.Sub Tm Γ Δ
+Sub : (m n : ℕ) → Set
+Sub m n = Vec (Tm n) m
 
 Sub₀ : (Ξ : ℕ) → Set
 Sub₀ Ξ = Sub Ξ 0
 
-module _ {A B : ℕ} (σ : Sub A B) where mutual
-  sub : Tm A → Tm B
+module _ (σ : Sub m n) where mutual
+  sub : Tm m → Tm n
   sub (` x)  = lookup σ x
-  sub (op (_ , i , ts)) = op (_ , i , subMap _ ts)
+  sub (op (_ , i , ts)) = op (_ , i , subⁿ _ ts)
 
-  subMap : ∀ n
-    → Tm A ^ n → Tm B ^ n
-  subMap zero    _        = _
-  subMap (suc n) (t , ts) = sub t , subMap n ts
+  subⁿ : ∀ l
+    → Tm m ^ l → Tm n ^ l
+  subⁿ zero    _        = _
+  subⁿ (suc n) (t , ts) = sub t , subⁿ n ts
 
 infixr 8 ⟨_⟩_ ⟪_⟫_
 
-⟨_⟩_ : {A B : ℕ} → Ren A B → Tm A → Tm B
+⟨_⟩_ : Ren m n → Tm m → Tm n
 ⟨ f ⟩ t = rename f t
 
-weaken : Tm Ξ → Tm (suc Ξ)
-weaken = ⟨ suc ⟩_
+idr : Ren m m
+idr = id
 
-⟪_⟫_ : {A B : ℕ} → Sub A B → Tm A → Tm B
+weaken : Tm m → Tm (suc m)
+weaken = rename suc
+
+⟪_⟫_ : Sub m n → Tm m → Tm n
 ⟪ f ⟫ t = sub f t
+
+ids : Sub m m
+ids {m = zero}  = []
+ids {m = suc m} = ` zero ∷ V.map weaken ids
+
+ids-at-x=x : (x : Fin n)
+  → V.lookup ids x ≡ ` x
+ids-at-x=x {n = suc n} zero    = refl
+ids-at-x=x {n = suc n} (suc x) = begin
+  lookup (V.map weaken ids) x
+    ≡⟨ lookup-map x weaken ids ⟩
+  weaken (lookup ids x)
+    ≡⟨ cong weaken (ids-at-x=x x) ⟩
+  weaken (` x)
+    ≡⟨⟩
+  ` suc x
+    ∎
+  where open ≡-Reasoning
+
+mutual
+  sub-id : (t : Tm m)
+    → ⟪ ids ⟫ t ≡ t
+  sub-id {m = zero} (op (_ , i , ts)) =
+    cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
+  sub-id {m = suc m} (` x)  = ids-at-x=x x
+  sub-id {m = suc m} (op (_ , i , ts)) =
+    cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
+
+  sub-idⁿ : (t : Tm m ^ l)
+    → subⁿ ids l t ≡ t
+  sub-idⁿ {l = zero}  t        = refl
+  sub-idⁿ {l = suc l} (t , ts) =
+    cong₂ _,_ (sub-id t) (sub-idⁿ ts)
+
+_◇_ : Sub m n → Sub n l → Sub m l
+σ₁ ◇ σ₂ = V.map (sub σ₂) σ₁
 
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
   fold (` x)  = α .var x
-  fold (op (_ , i , ts)) = α .alg (_ , i , foldMap _ ts)
+  fold (op (_ , i , ts)) = α .alg (_ , i , foldⁿ ts)
 
-  foldMap : ∀ {A : ℕ} n → Tm A ^ n → X A ^ n
-  foldMap zero    _        = _
-  foldMap (suc n) (t , ts) = fold t , foldMap n ts
+  foldⁿ : {l : ℕ} → Tm m ^ l → X m ^ l
+  foldⁿ {l = zero  }  _        = _
+  foldⁿ {l = suc n } (t , ts) = fold t , foldⁿ ts
 
 mutual
   fv : Tm Ξ → List (Fin Ξ)
   fv (` x)  = x ∙ ∅
-  fv (op (n , i , ts)) = fvMap ts
+  fv (op (n , i , ts)) = fvⁿ ts
 
-  fvMap : Tm Ξ ^ n → List (Fin Ξ)
-  fvMap {n = zero}  _        = ∅
-  fvMap {n = suc n} (t , ts) = fv t ++ fvMap ts
+  fvⁿ : Tm Ξ ^ n → List (Fin Ξ)
+  fvⁿ {n = zero}  _        = ∅
+  fvⁿ {n = suc n} (t , ts) = fv t ++ fvⁿ ts
 
 mutual
   _≟_ : (t u : Tm Ξ) → Dec (t ≡ u)
@@ -113,33 +151,3 @@ _≟s_ : (σ σ′ : Sub Ξ Δ) → Dec (σ ≡ σ′)
 ... | yes p with Δ ≟s Γ 
 ... | no ¬q =  no λ where refl → ¬q refl
 ... | yes q =  yes (cong₂ _∷_ p q)
-
--- Some attempts to build aux functions for unification
-mutual
-  check : (x : Fin (suc Ξ)) (t : Tm (suc Ξ))
-    → ¬ x ∈ fv t → Tm Ξ
-  check x (` y)  x∉t with x F.≟ y
-  ... | yes x=y = ⊥-elim₀ (x∉t (here x=y))
-  ... | no ¬x=y = ` F.punchOut ¬x=y
-  check x (op (_ , i , ts)) x∉t =
-    op (_ , i , checkⁿ x ts x∉t)
-
-  checkⁿ : (x : Fin (suc Ξ)) (ts : Tm (suc Ξ) ^ n)
-    → ¬ x ∈ fvMap ts → Tm Ξ ^ n
-  checkⁿ {n = zero}  _ _        _    = _ 
-  checkⁿ {n = suc l} x (t , ts) x∉ts =
-    check x t (x∉ts ∘ ∈-++⁺ˡ) , checkⁿ x ts (x∉ts ∘ ∈-++⁺ʳ (fv t))
-
-TmSimple : F.Simple Tm
-TmSimple = record
-  { var    = `_
-  ; weaken = weaken
-  }
-
-open F.Simple TmSimple
-  using (_↑) renaming (id to idS; wk⋆ to wk⋆S) public
-
-_for_ : Tm Ξ → Fin (suc Ξ) → Sub (suc Ξ) Ξ
-_for_ {Ξ = zero}  t zero    = t ∷ []
-_for_ {Ξ = suc Ξ} t zero    = t ∷ idS
-_for_ {Ξ = suc Ξ} t (suc x) = ` zero ∷ update x t idS

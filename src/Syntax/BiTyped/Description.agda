@@ -13,9 +13,9 @@ private variable
   m   : Mode
   B   : TExp Ξ
 
-infixr 5 _⇉_ _⇇_
+infixr 4 _⇉_ _⇇_
 infix  6 _▷_⇉_ _▷_⇇_
-infixr 7 ρ-syntax 
+infixr 7 ρ-syntax _⊢[_]_
 
 record ArgD (Ξ : ℕ) : Set where
   constructor _⊢[_]_
@@ -43,9 +43,10 @@ Desc = List ConD
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
 
+infix  6 ι
 _⇉_ _⇇_ : List (TExp Ξ) → (B : TExp Ξ) → ArgD Ξ
-Δ ⇉ B = record { cxt = Δ ; mode = Infer ; type = B }
-Δ ⇇ B = record { cxt = Δ ; mode = Check ; type = B }
+Θ ⇉ B = record { cxt = Θ ; mode = Infer ; type = B }
+Θ ⇇ B = record { cxt = Θ ; mode = Check ; type = B }
 
 _▷_⇉_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 Ξ ▷ D ⇉ A = ι Infer A D

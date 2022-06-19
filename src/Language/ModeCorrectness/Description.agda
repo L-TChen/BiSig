@@ -33,5 +33,5 @@ module _ (xs₀ : List (Fin Ξ)) where
 
 ModeCorrect : Desc → Set
 ModeCorrect = All λ
-  where (ι Check C Ds) → (∀ x → x ∈ Known (fv C) Ds) × ModeCorrectᵃˢ (fv C) Ds
-        (ι Infer C Ds) → (∀ x → x ∈ Known ∅      Ds) × ModeCorrectᵃˢ ∅      (∅ ⊢[ Check ] C ∙ Ds)
+  where (ι Check C Ds) → ModeCorrectᵃˢ (fv C) Ds
+        (ι Infer C Ds) → ModeCorrectᵃˢ ∅      (∅ ⊢[ Check ] C ∙ Ds)

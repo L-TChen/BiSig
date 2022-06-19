@@ -40,4 +40,4 @@ private variable
 (⟦ ι Infer B D ⟧ᶜ P) Infer A Γ t = Σ[ σ ∈ Sub₀ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t)
 
 ⟦_⟧_ : (D : Desc) (P : Pred ℓ′ X) (m : Mode) (A : T) (Γ : Context T) (t : (R.⟦ D ⟧ X) m) → Set ℓ′
-(⟦ Ds ⟧ P) m A Γ (D , i , t) = (⟦ D ⟧ᶜ P)  m A Γ t
+(⟦ Ds ⟧ P) m A Γ (D , _ , t) = (⟦ D ⟧ᶜ P)  m A Γ t

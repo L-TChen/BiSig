@@ -49,7 +49,6 @@ mutual
   checkⁿ {n = suc l} x (t , ts) x∉ts =
     check x t (x∉ts ∘ ∈-++⁺ˡ) , checkⁿ x ts (x∉ts ∘ ∈-++⁺ʳ (fv t))
 
-
 _for_ : Tm Ξ → Fin (suc Ξ) → Sub (suc Ξ) Ξ
 _for_ {Ξ = zero}  t zero    = t ∷ []
 _for_ {Ξ = suc Ξ} t zero    = t ∷ ids

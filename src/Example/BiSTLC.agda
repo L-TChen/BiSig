@@ -25,15 +25,15 @@ private variable
   T     : Set
   A B C : Λₜ
   Γ Δ   : Ctx T
- 
+
 open import Syntax.BiTyped.Description {ΛₜD} as T
 
 ΛₒD : T.Desc
 ΛₒD =
-  2 ▷ ρ[ ⇉ (` # 0) ↣ (` # 1) ] ρ[ ⇇ ` # 0 ] ι ⇉ ` # 1 ∙
-  2 ▷ ρ[ ` # 0 ∙ ⇇ ` # 1 ] ι                  ⇇ (` # 0) ↣ (` # 1) ∙
+  2 ▷ ρ[ ∅ ⇉ (` # 1) ↣ (` # 0) ] ρ[ ∅ ⇇ ` # 1 ] ∅ ⇉ ` # 0 ∙
+  2 ▷ ρ[ ` # 1 ∙ ∅ ⇇ ` # 0 ]                    ∅ ⇇ (` # 1) ↣ (` # 0) ∙
   ∅
- 
+
 open import Syntax.BiTyped.Intrinsic.Term ΛₒD
 
 pattern _∙′_ t u = op (_ , here refl , refl , _ ∷ _ ∷ [] , refl , t , u , _)

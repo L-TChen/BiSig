@@ -19,11 +19,12 @@ infixr 8 _↣_
 pattern _↣_ A B = op (_ , there (here refl) , A , B , _)
 
 open import Syntax.Typed.Description {ΛₜD} as T
+  renaming (_⊢_ to infix 4 _⊢_)
 
 ΛₒD : Desc 
 ΛₒD =
-  2 ▷ ρ[ ⊢ ` # 0 ↣ ` # 1 ] ρ[ ⊢ ` # 0 ] ι ⦂ (` # 1) ∙
-  2 ▷ ρ[ ` # 0 ∙ ⊢ ` # 1 ] ι ⦂ (` # 0 ↣ ` # 1)      ∙
+  2 ▷ ρ[ ∅ ⊢ ` # 1 ↣ ` # 0 ]  ρ[ ∅ ⊢ ` # 1 ] ∅ ⦂ ` # 0 ∙
+  2 ▷ ρ[ ` # 1 ∙ ∅ ⊢ ` # 0 ]                 ∅ ⦂ ` # 1 ↣ ` # 0 ∙
   ∅
 {-
     σ[ A ] σ[ B ] ▷ ρ[ ⊢ A ↣ B ] ρ[ ⊢ A ] ι ⦂ B      -- application
@@ -37,9 +38,8 @@ private variable
   Γ Δ : Ctx Λₜ
 
 pattern ƛ_ t     = op (_ , there (here refl) , _ ∷ _ ∷ [] , refl , t , _)
-                -- op (inr (inl ((_ ∷ _ ∷ []) , refl , t , _)))
 pattern _·_ t u  = op (_ , here refl , _ ∷ _ ∷ [] , refl , t , u , _)
-                -- op inl ((_ ∷ _ ∷ []) , refl , t , u , _)) 
+
 infixl 8 _·_
 infixr 7 ƛ_ 
 

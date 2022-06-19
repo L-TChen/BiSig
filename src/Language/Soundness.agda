@@ -40,6 +40,7 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
   forget (op (D , i , p , σ , A=B , ts)) = op (_ , s i , σ , A=B , forgetMap _ ts)
+  -- p is ignored.
 
   forgetMap
     : (D : B.ArgsD Ξ)

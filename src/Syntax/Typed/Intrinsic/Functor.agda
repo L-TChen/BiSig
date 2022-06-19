@@ -25,7 +25,7 @@ private variable
 (⟦ A ∙ As ⟧ᵃ X) σ Γ = (⟦ As ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
 
 ⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Sub Ξ 0 → Ctx T → Set ℓ
-(⟦ ∅            ⟧ᵃˢ _) σ _ = ⊤
+(⟦ ∅            ⟧ᵃˢ _) _ _ = ⊤
 (⟦ (θ ⊢ B) ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ θ ⟧ᵃ X (⟪ σ ⟫ B)) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ

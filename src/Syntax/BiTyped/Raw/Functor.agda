@@ -29,9 +29,9 @@ Fam₀ = Fam lzero
 ⟦ Θ ⊢[ m ] _ ∙ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ X m × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
-(⟦ ι Check B D ⟧ᶜ X) Check = ⟦ D ⟧ᵃˢ X
-(⟦ ι Infer B D ⟧ᶜ X) Infer = ⟦ D ⟧ᵃˢ X
-(⟦ ι _     B D ⟧ᶜ X) _     = ⊥
+(⟦ ι Check _ D ⟧ᶜ X) Check = ⟦ D ⟧ᵃˢ X
+(⟦ ι Infer _ D ⟧ᶜ X) Infer = ⟦ D ⟧ᵃˢ X
+(⟦ ι _     _ D ⟧ᶜ X) _     = ⊥
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 (⟦ Ds ⟧ X) m = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m

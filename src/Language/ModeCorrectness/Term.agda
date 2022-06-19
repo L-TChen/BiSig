@@ -48,7 +48,7 @@ mutual
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
   uniq-⇉ (⊢op (ι Infer C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
-    let (_ , C⊆xs , _ , SDs) = MC i in
+    let (C⊆xs , _ , SDs) = MC i in
     ≡-fv C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-⇉Map
@@ -60,7 +60,7 @@ mutual
     → ∀ {x} → x ∈ Known ∅ Ds
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
   uniq-⇉Map ∅                     _             _          _          ()
-  uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) = 
+  uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
   uniq-⇉Map (Θ ⊢[ Infer ] C ∙ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fv C) i
   ... | inl j = uniq-⇉Mapᵃ C Θ SD ⊢t ⊢u (uniq-⇉Map Ds SDs ⊢ts ⊢us) j
@@ -97,7 +97,7 @@ mutual
   ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
   ... | yes p = yes (A , ⊢⦂ p)
   synthesise Γ (op (ι Infer C Ds , i , ts)) with MC i
-  ... | (_ , C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
+  ... | (C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
   ... | no ¬p = no λ where (A , ⊢op _ (σ , refl , ⊢ts)) → ¬p (σ , ⊢ts)
   ... | yes (σ , ⊢ts) = yes (⟪ σ ⟫ C , ⊢op (_ , i , ts) (σ , refl , ⊢ts))
 
@@ -109,7 +109,7 @@ mutual
   ... | yes (B , ⊢t) with B ≟T A
   ... | no ¬q   = no (¬switch ⊢t ¬q)
   ... | yes A=B = yes (⊢⇉ ⊢t A=B)
-  check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i .proj₂) Γ ts
+  check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i) Γ ts
   ... | no ¬p = no λ where (⊢op _ p) → ¬p p
   ... | yes (σ , eq , ⊢ts) = yes (⊢op (_ , i , ts) (σ , eq , ⊢ts))
 

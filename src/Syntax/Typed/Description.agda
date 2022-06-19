@@ -31,6 +31,9 @@ Desc = List ConD
 ρ-syntax D Ds = D ∙ Ds
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
-
 infixr 7 ρ-syntax
-syntax ι Ξ A D = Ξ ▷ D ⦂ A
+infix  6 _⊢_
+
+syntax ι {Ξ} A D = Ξ ▷ D ⦂ A
+
+infix  6 ι

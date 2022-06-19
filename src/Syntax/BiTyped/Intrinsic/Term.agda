@@ -39,7 +39,7 @@ mutual
     → Tm m A Γ → Tm m A Δ
   rename f (`  x)                        = ` f x
   rename f (A ∋ t)                       = A ∋ rename f t
-  rename f (⇉ t by eq)                   = ⇉ (rename f t) by eq
+  rename f (⇉ t by eq)                   = ⇉ rename f t by eq
   rename f (op (D , x , p , σ , q , ts)) =
     op (D , x , p , σ , q , renameMap _ f ts)
 

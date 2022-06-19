@@ -19,20 +19,20 @@ private
     σ     : Sub₀ Ξ
 
 infix 9 `_
-data Tm : Fam₀ where
+data Tm : T → Ctx T → Set where
   `_ : _∈_       ⇒ Tm
   op : ⟦ D ⟧ Tm  ⇒ Tm 
 
 mutual
   rename : Ren Γ Δ 
     → Tm A Γ → Tm A Δ
-  rename f (`  x) = ` f x
-  rename f (op (ι A D , x , σ , p , ts)) = op (_ , x , σ , p , renameMap D f ts)
+  rename f (`  x)                        = ` f x
+  rename f (op (ι B Ds , x , σ , p , ts)) = op (_ , x , σ , p , renameMap Ds f ts)
 
   renameMap : (D : ArgsD Ξ)
     → Ren Γ Δ
     → (⟦ D ⟧ᵃˢ Tm) σ Γ → (⟦ D ⟧ᵃˢ Tm) σ Δ
-  renameMap ∅            f _        = _
+  renameMap ∅            f _        = tt
   renameMap (Θ ⊢ C ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
   renameMapᵃ : (Θ : TExps Ξ)
@@ -40,7 +40,6 @@ mutual
     → (⟦ Θ ⟧ᵃ Tm A) σ Γ → (⟦ Θ ⟧ᵃ Tm A) σ Δ
   renameMapᵃ ∅       f t = rename f t
   renameMapᵃ (A ∙ Θ) f t = renameMapᵃ Θ (ext f) t
-  -- renamemapᵃ (δ ⊢ b) f t = rename (extⁿ f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -64,8 +63,8 @@ mutual
   sub : Sub Γ Δ
     → ∀ {A} → Tm A Γ → Tm A Δ
   sub f (` x)                      = f x
-  sub f (op (D , x , σ , eq , ts)) =
-    op (_ , x , σ , eq , subMap (ConD.args D) f ts)
+  sub f (op (ι B Ds , x , σ , eq , ts)) =
+    op (_ , x , σ , eq , subMap Ds f ts)
 
   subMap : (D : ArgsD Ξ)
     → Sub Γ Δ

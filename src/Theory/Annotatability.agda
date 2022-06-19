@@ -14,9 +14,6 @@ open import Syntax.BiTyped.Description  {SD} as B
 open import Syntax.Typed.Intrinsic.Functor    as T
 open import Syntax.BiTyped.Intrinsic.Functor  as B
 
-open import Syntax.Typed.Intrinsic.Term
-open import Syntax.BiTyped.Intrinsic.Term
-  renaming (Tm to BTm)
 
 open import Theory.Erasure.Description
 
@@ -33,25 +30,31 @@ Annotatability : (BD : B.Desc) (TD : T.Desc) → Set
 Annotatability BD TD = {D : T.ConD} → D ∈ TD → ∃[ D′ ] (D′ ∈ BD × eraseᶜ D′ ≡ D)
 
 module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
+  open import Syntax.Typed.Intrinsic.Term   TD
+  open import Syntax.BiTyped.Intrinsic.Term BD
+    renaming (Tm to BTm)
+
   annotate
-    : Tm  TD A Γ
-    → Tm⇇ BD A Γ
-  annotate (` x)  = ⇉ ` x by refl
+    : Tm  A Γ
+    → ∃[ m ] BTm m A Γ
+  annotate (` x)  = Infer , ` x
   annotate (op (D , i , σ , B=A , ts)) with s i
-  ... | ι Check B _ , j , refl =   op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
-  ... | ι Infer B _ , j , refl = ⇉ op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts) by refl
+  ... | ι m B _ , j , refl = m , op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
 
   annotateMap : (D  : T.ArgsD Ξ) (D′ : B.ArgsD Ξ) → eraseᵃˢ D′ ≡ D
-    → (T.⟦ D  ⟧ᵃˢ Tm TD)  σ Γ
-    → (B.⟦ D′ ⟧ᵃˢ BTm BD) σ Γ
+    → (T.⟦ D  ⟧ᵃˢ Tm)  σ Γ
+    → (B.⟦ D′ ⟧ᵃˢ BTm) σ Γ
   annotateMap ∅        ∅                refl _        = _
   annotateMap (_ ∙ _) (Θ ⊢[ m ] C ∙ Ds) refl (t , ts) =
     annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
 
   annotateMapᵃ : (Θ : TExps Ξ)
     → (m : Mode)
-    → (T.⟦ Θ ⟧ᵃ Tm TD A)  σ Γ
-    → (B.⟦ Θ ⟧ᵃ BTm BD m A) σ Γ
-  annotateMapᵃ ∅       Check t = annotate t
-  annotateMapᵃ ∅       Infer t = _ ∋ annotate t
-  annotateMapᵃ (A ∙ Θ) m     t = annotateMapᵃ Θ m t
+    → (T.⟦ Θ ⟧ᵃ Tm A)  σ Γ
+    → (B.⟦ Θ ⟧ᵃ BTm m A) σ Γ
+  annotateMapᵃ ∅       m t with annotate t
+  annotateMapᵃ ∅ Check t | Check , t′ = t′
+  annotateMapᵃ ∅ Infer t | Check , t′ = _ ∋ t′
+  annotateMapᵃ ∅ Check t | Infer , t′ = ⇉ t′ by refl
+  annotateMapᵃ ∅ Infer t | Infer , t′ = t′
+  annotateMapᵃ (x ∙ Θ) m t = annotateMapᵃ Θ m t

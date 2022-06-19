@@ -32,7 +32,7 @@ Desc = List ConD
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
 infixr 7 ρ-syntax
-infix  6 _⊢_
+infix  7 _⊢_
 
 syntax ι {Ξ} A D = Ξ ▷ D ⦂ A
 

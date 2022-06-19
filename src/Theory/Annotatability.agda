@@ -2,7 +2,7 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Language.Annotatability {SD : S.Desc} where
+module Theory.Annotatability {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Tm₀ to T)
@@ -18,7 +18,7 @@ open import Syntax.Typed.Intrinsic.Term
 open import Syntax.BiTyped.Intrinsic.Term
   renaming (Tm to BTm)
 
-open import Language.Erasure.Description
+open import Theory.Erasure.Description
 
 private variable
   m : Mode

@@ -3,9 +3,9 @@ open import Prelude
 import Syntax.Simple.Description as S
 open import Syntax.BiTyped.Description
 
-import Language.ModeCorrectness.Description as B
+import Theory.ModeCorrectness.Description as B
 
-module Language.ModeCorrectness.Term {SD : S.Desc}
+module Theory.ModeCorrectness.Term {SD : S.Desc}
   (Id : Set) (_≟Id_ : (x y : Id) → Dec (x ≡ y))
   (D : Desc {SD}) (mc : B.ModeCorrect Id D) where
 

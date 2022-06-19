@@ -2,11 +2,12 @@ open import Prelude
 
 import Syntax.Simple.Description  as S
 open import Syntax.BiTyped.Description
-module Language.Dichotomy.Term {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
+
+module Theory.Dichotomy.Term {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Tm₀ to T)
-open import Syntax.Context 
+open import Syntax.Context
 open import Syntax.NamedContext Id
 
 open import Syntax.BiTyped.Raw.Functor {SD} Id   as R
@@ -18,7 +19,7 @@ open import Syntax.BiTyped.Extrinsic.Term         Id D
 open import Syntax.BiTyped.Intrinsic.Functor {SD}      as I
 open import Syntax.BiTyped.Intrinsic.Term            D
 
-open import Language.Dichotomy.Context            Id
+open import Theory.Dichotomy.Context            Id
 
 private variable
   m     : Mode

@@ -1,6 +1,6 @@
 open import Prelude
 
-module Language.Dichotomy.Context (Id : Set) where
+module Theory.Dichotomy.Context (Id : Set) where
 
 open import Syntax.Context
 open import Syntax.NamedContext Id

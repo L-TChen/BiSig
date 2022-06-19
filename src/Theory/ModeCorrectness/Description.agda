@@ -2,7 +2,7 @@ open import Prelude
 
 import Syntax.Simple.Description  as S
 
-module Language.ModeCorrectness.Description {SD : S.Desc} (Id : Set)  where
+module Theory.ModeCorrectness.Description {SD : S.Desc} (Id : Set)  where
 
 open import Syntax.NamedContext Id
 open import Syntax.Simple.Term  SD

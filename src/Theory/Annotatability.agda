@@ -57,4 +57,4 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
   annotateMapᵃ ∅ Infer t | Check , t′ = _ ∋ t′
   annotateMapᵃ ∅ Check t | Infer , t′ = ⇉ t′ by refl
   annotateMapᵃ ∅ Infer t | Infer , t′ = t′
-  annotateMapᵃ (x ∙ Θ) m t = annotateMapᵃ Θ m t
+  annotateMapᵃ (_ ∙ Θ) m t = annotateMapᵃ Θ m t

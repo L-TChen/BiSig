@@ -14,7 +14,7 @@ open import Syntax.Simple.Term ΛₜD
 open import Syntax.Context
 
 infixr 10 _↣_
-pattern _↣_ A B = op (_ , there (here refl) , A , B , _)
+pattern _↣_ A B = op (2 , there (here refl) , A , B , _)
 {-
 data Λₜ : Set where
   ι   :              Λₜ
@@ -31,7 +31,13 @@ open import Syntax.BiTyped.Description {ΛₜD} as T
 ΛₒD : T.Desc
 ΛₒD =
   2 ▷ ρ[ ∅ ⇉ (` # 1) ↣ (` # 0) ] ρ[ ∅ ⇇ ` # 1 ] ∅ ⇉ ` # 0 ∙
+  -- Γ ⊢ t ⇉ (A → B)             Γ ⊢ u ⇇ A
+  -- --------------------------------------
+  --   Γ ⊢ t u ⇉ B
   2 ▷ ρ[ ` # 1 ∙ ∅ ⇇ ` # 0 ]                    ∅ ⇇ (` # 1) ↣ (` # 0) ∙
+  -- Γ , x : A ⊢ t ⇇ B
+  -----------------------
+  -- Γ ⊢ λ x . t ⇇ A → B
   ∅
 
 open import Syntax.BiTyped.Intrinsic.Term ΛₒD
@@ -66,16 +72,16 @@ mutual
 toΛ : ∀ {m} {A Γ} → Tm m A Γ → Λ m A Γ
 toΛ (` x)       = ` x
 toΛ (_ ∋ t)     = _ ∋ toΛ t
-toΛ (t ∙′ u)    = toΛ t ∙ toΛ u
 toΛ (⇉ t by eq) = ⇉ (toΛ t) by eq
+toΛ (t ∙′ u)    = toΛ t ∙ toΛ u
 toΛ (ƛ′ t)      = ƛ toΛ t
 
 fromΛ : ∀ m {A Γ} → Λ m A Γ → Tm m A Γ
 fromΛ Infer (` x)       = ` x
-fromΛ Infer (t ∙ u)     = fromΛ Infer t ∙′ fromΛ Check u
 fromΛ Infer (_ ∋ t)     = _ ∋ fromΛ Check t
-fromΛ Check (ƛ t)       = ƛ′  fromΛ Check t 
 fromΛ Check (⇉ t by eq) = ⇉ fromΛ Infer t by eq
+fromΛ Infer (t ∙ u)     = fromΛ Infer t ∙′ fromΛ Check u
+fromΛ Check (ƛ t)       = ƛ′  fromΛ Check t 
 
 from-toΛ : ∀ {m A Γ}
   → (t : Tm m A Γ)

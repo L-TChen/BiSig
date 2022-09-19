@@ -4,11 +4,6 @@ open import Syntax.Simple.Description
 module Syntax.Simple.Term (D : Desc) where
 
 import      Data.Fin  as F
-open import Data.List as L
-  using  (_++_)
-open import Data.Vec  as V
-  using (lookup)
-open import Data.Vec.Properties as V
 
 private variable
   Γ Ξ Δ : ℕ
@@ -27,7 +22,7 @@ Tms : ℕ → Set
 Tms Ξ = List (Tm Ξ)
 
 Ren : ℕ → ℕ → Set
-Ren m n = Fin m → Fin n -- Vec (Fin n) m
+Ren m n = Fin m → Fin n
 
 module _ (f : Ren m n) where mutual
   rename : Tm m → Tm n
@@ -39,15 +34,30 @@ module _ (f : Ren m n) where mutual
   renameⁿ {l = zero}  _        = _
   renameⁿ {l = suc n} (t , ts) = rename t , renameⁿ ts
 
-Sub : (m n : ℕ) → Set
-Sub m n = Vec (Tm n) m
+wkʳ : Tm m → Tm (n + m)
+wkʳ = rename (F._↑ʳ_ _) 
 
-Sub₀ : (Ξ : ℕ) → Set
-Sub₀ Ξ = Sub Ξ 0
+wkˡ : Tm m → Tm (m + n)
+wkˡ = rename λ i → F._↑ˡ_ i _
+
+wk : m ≤ n → Tm m → Tm n
+wk (less-than-or-equal refl) = wkˡ
+
+weaken : Tm m → Tm (suc m)
+weaken = rename suc
+
+⟨_⟩_ : Ren m n → Tm m → Tm n
+⟨ f ⟩ t = rename f t
+
+idr : Ren m m
+idr = id
+
+Sub : (m n : ℕ) → Set
+Sub m n = Fin m → Tm n
 
 module _ (σ : Sub m n) where mutual
   sub : Tm m → Tm n
-  sub (` x)  = lookup σ x
+  sub (` x)  = σ x
   sub (op (_ , i , ts)) = op (_ , i , subⁿ _ ts)
 
   subⁿ : ∀ l
@@ -57,42 +67,21 @@ module _ (σ : Sub m n) where mutual
 
 infixr 8 ⟨_⟩_ ⟪_⟫_
 
-⟨_⟩_ : Ren m n → Tm m → Tm n
-⟨ f ⟩ t = rename f t
-
-idr : Ren m m
-idr = id
-
-weaken : Tm m → Tm (suc m)
-weaken = rename suc
-
 ⟪_⟫_ : Sub m n → Tm m → Tm n
 ⟪ f ⟫ t = sub f t
 
 ids : Sub m m
-ids {m = zero}  = []
-ids {m = suc m} = ` zero ∷ V.map weaken ids
+ids = `_
 
-ids-at-x=x : (x : Fin n)
-  → V.lookup ids x ≡ ` x
-ids-at-x=x {n = suc n} zero    = refl
-ids-at-x=x {n = suc n} (suc x) = begin
-  lookup (V.map weaken ids) x
-    ≡⟨ lookup-map x weaken ids ⟩
-  weaken (lookup ids x)
-    ≡⟨ cong weaken (ids-at-x=x x) ⟩
-  weaken (` x)
-    ≡⟨⟩
-  ` suc x
-    ∎
-  where open ≡-Reasoning
+_⨟_ : Sub m n → Sub n l → Sub m l
+(σ₁ ⨟ σ₂) i = ⟪ σ₂ ⟫ σ₁ i
 
 mutual
   sub-id : (t : Tm m)
     → ⟪ ids ⟫ t ≡ t
   sub-id {m = zero} (op (_ , i , ts)) =
     cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
-  sub-id {m = suc m} (` x)  = ids-at-x=x x
+  sub-id {m = suc m} (` x)  = refl -- ids-at-x=x x
   sub-id {m = suc m} (op (_ , i , ts)) =
     cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
 
@@ -101,9 +90,6 @@ mutual
   sub-idⁿ {l = zero}  t        = refl
   sub-idⁿ {l = suc l} (t , ts) =
     cong₂ _,_ (sub-id t) (sub-idⁿ ts)
-
-_◇_ : Sub m n → Sub n l → Sub m l
-σ₁ ◇ σ₂ = V.map (sub σ₂) σ₁
 
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
@@ -121,7 +107,7 @@ mutual
 
   fvⁿ : Tm Ξ ^ n → List (Fin Ξ)
   fvⁿ {n = zero}  _        = ∅
-  fvⁿ {n = suc n} (t , ts) = fv t ++ fvⁿ ts
+  fvⁿ {n = suc n} (t , ts) = fv t ++ fvⁿ ts -- fv t ++ fvⁿ ts
 
 mutual
   _≟_ : (t u : Tm Ξ) → Dec (t ≡ u)
@@ -144,10 +130,18 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _,_ p q)
 
-_≟s_ : (σ σ′ : Sub Ξ Δ) → Dec (σ ≡ σ′)
-[]      ≟s []      = yes refl
-(A ∷ Δ) ≟s (B ∷ Γ) with A ≟ B
-... | no ¬p =  no λ where refl → ¬p refl
-... | yes p with Δ ≟s Γ 
-... | no ¬q =  no λ where refl → ¬q refl
-... | yes q =  yes (cong₂ _∷_ p q)
+thick : (x y : Fin (suc m)) → Maybe (Fin m)
+thick {m = zero}  zero zero       = nothing
+thick {m = suc m} zero zero       = nothing
+thick {m = suc m} zero (suc y)    = just y
+thick {m = suc m} (suc x) zero    = just zero
+thick {m = suc m} (suc x) (suc y) with thick x y
+... | just y′ = just (suc y′)
+... | nothing = nothing
+
+_for_
+  : Tm Ξ → Fin (suc Ξ)
+  → Sub (suc Ξ) Ξ
+(t for x) y with thick x y
+... | just y′ = ` y′
+... | nothing = t

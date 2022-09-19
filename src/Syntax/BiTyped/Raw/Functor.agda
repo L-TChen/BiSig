@@ -10,8 +10,8 @@ open import Syntax.Simple.Term SD
 open B {SD}
 
 private variable
-  Ξ   : ℕ
-  m   : Mode
+  n m : ℕ
+  mod : Mode
   A B : Set
 
 Fam : (ℓ : Level) → Set (lsuc ℓ)
@@ -20,18 +20,17 @@ Fam ℓ = Mode → Set ℓ
 Fam₀ : Set₁
 Fam₀ = Fam lzero
 
-⟦_⟧ᵃ_ : (D : List (TExp Ξ)) → Set ℓ → Set ℓ
+⟦_⟧ᵃ_ : (D : List (TExp n)) → Set ℓ → Set ℓ
 ⟦ ∅     ⟧ᵃ X = X
 ⟦ A ∙ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
 
-⟦_⟧ᵃˢ_ : (D : ArgsD Ξ) (X : Fam ℓ) → Set ℓ
+⟦_⟧ᵃˢ_ : (D : ArgsD n) (X : Fam ℓ) → Set ℓ
 ⟦ ∅      ⟧ᵃˢ _ = ⊤
 ⟦ Θ ⊢[ m ] _ ∙ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ X m × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
-(⟦ ι Check _ D ⟧ᶜ X) Check = ⟦ D ⟧ᵃˢ X
-(⟦ ι Infer _ D ⟧ᶜ X) Infer = ⟦ D ⟧ᵃˢ X
-(⟦ ι _     _ D ⟧ᶜ X) _     = ⊥
+(⟦ ι mod₁  _ D ⟧ᶜ X) mod₂ = mod₁ ≡ mod₂ × ⟦ D ⟧ᵃˢ X
+-- (⟦ ι _     _ D ⟧ᶜ X) _    = ⊥
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 (⟦ Ds ⟧ X) m = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m

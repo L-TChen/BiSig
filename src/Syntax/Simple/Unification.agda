@@ -6,12 +6,9 @@ module Syntax.Simple.Unification {D : Desc} where
 
 open import Syntax.Simple.Term D
   hiding (_≟_)
+open import Syntax.Simple.Association D
 
-open import Data.Vec
-  hiding (_++_)
 open import Data.Fin
-open import Data.Fin.Substitution
-  hiding (Sub)
 open import Data.List.Membership.Propositional.Properties
 
 private variable
@@ -48,35 +45,6 @@ mutual
   checkⁿ {n = zero}  _ _        _    = _ 
   checkⁿ {n = suc l} x (t , ts) x∉ts =
     check x t (x∉ts ∘ ∈-++⁺ˡ) , checkⁿ x ts (x∉ts ∘ ∈-++⁺ʳ (fv t))
-
-_for_ : Tm Ξ → Fin (suc Ξ) → Sub (suc Ξ) Ξ
-_for_ {Ξ = zero}  t zero    = t ∷ []
-_for_ {Ξ = suc Ξ} t zero    = t ∷ ids
-_for_ {Ξ = suc Ξ} t (suc x) = ` zero ∷ update x t ids
-
-data AList : (m n : ℕ) → Set where
-  []   : AList n n
-  _/_∷_ : (t : Tm m) (x : Fin (suc m)) (σ : AList m n) → AList (suc m) n
-
-toSub : AList m n → Sub m n
-toSub []          = ids
-toSub (t / x ∷ p) = (t for x) ◇ toSub p
-
-_++_ : AList m n → AList n l → AList m l
-[]           ++ σ₂ = σ₂
-(t / x ∷ σ₁) ++ σ₂ = t / x ∷ (σ₁ ++ σ₂)
-
-_/_∷′_ : Tm m → Fin (suc m) → ∃ (AList m) → ∃ (AList (suc m))
-t / x ∷′ (n , σ) = n , (t / x ∷ σ)
-
-thick : (x y : Fin (suc m)) → Maybe (Fin m)
-thick {m = zero}  zero zero       = nothing
-thick {m = suc m} zero zero       = nothing
-thick {m = suc m} zero (suc y)    = just y
-thick {m = suc m} (suc x) zero    = just zero
-thick {m = suc m} (suc x) (suc y) with thick x y
-... | just y′ = just (suc y′)
-... | nothing = nothing
 
 flexFlex : (x y : Fin m) → ∃ (AList m)
 flexFlex {m = suc m} x y with thick x y

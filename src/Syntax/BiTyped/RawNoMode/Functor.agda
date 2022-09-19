@@ -6,7 +6,7 @@ import Syntax.BiTyped.Description as B
 module Syntax.BiTyped.RawNoMode.Functor {SD : S.Desc} (Id : Set) where
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+  renaming (Tm to TExp)
 open B {SD}
 
 private variable

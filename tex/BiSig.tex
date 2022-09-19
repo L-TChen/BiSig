@@ -59,12 +59,11 @@ The initial semantics~\cite{Fiore1999} initiates from the observation that the f
 \todo{Modules over monads \cite{Hirschowitz2010}}
 \todo{\cite{Hirschowitz2022}}
 
-The idea of including the presentation as well as the language itself appeared earlier~\cite{Hamana2011a,Fiore2013a,Arkor2020} and is essential for our development, since we need to recognise type variables in the binding signature for defining mode-correctness.
+The idea of including the presentation of types as well as the language itself appeared earlier~\cite{Hamana2011a,Fiore2013a,Arkor2020} and is essential for our development, since we need to recognise type variables in the binding signature for defining mode-correctness.
 
 
-\paragraph{Language-formalisation frameworks} have been implemented in proof assistants and vary in design choices including the binding representation paradigm, the language presentation, how the formal syntax is instantiated, and more.
-Due to the limited space we will only discuss frameworks that are somewhat of different characteristics.
-Nevertheless, the interested reader is referred to the discussion by Gheri and Popescu~\cite[Section 8]{Gheri2020} for a more comprehensive list of frameworks.
+\paragraph{Language-formalisation frameworks} have been implemented in proof assistants and vary in design choices including binding representation paradigms, language presentations, the instantiation of formal syntax, and more.
+Due to the limited space the interested reader is referred to the discussion by Gheri and Popescu~\cite[Section 8]{Gheri2020} for a more comprehensive list of frameworks.
 
 Among the plethora of choices, the formalisation of the category-theoretic approach based on (coalgebraic) $\Sigma$-monoids with metavariable~\cite{Fiore2008} by Fiore and Szamozvancev~\cite{Fiore2022} provides a metatheory independent of the aforementioned design choices whereas, instead of having the formal metatheory bolted on to a set of chosen paradigms, they only presume the property of a language to satisfy, i.e.\ the \emph{initiality}, offering a greater flexibility.
 Another frameworks based on the category-theoretic notion of heterogeneous substitution systems are implemented by Ahrens et al.~\cite{Ahrens2018,Ahrens2022}

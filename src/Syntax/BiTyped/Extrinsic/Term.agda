@@ -15,14 +15,14 @@ import Syntax.BiTyped.Raw.Functor {SD} Id as R
 open import Syntax.BiTyped.Raw.Term    Id D
 
 private variable
-  Ξ   : ℕ
-  m   : Mode
-  Γ   : Context T
+  n m : ℕ
+  mod  : Mode
+  Γ   : Cxt m
   x   : Id
-  A B : T
-  t   : Raw m
+  A B : TExp m
+  t   : Raw m mod
 
-data ⊢⇄ : Pred₀ Raw where
+data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
   ⊢`
     : x ⦂ A ∈ Γ
     → ⊢⇄ Infer A Γ (` x)
@@ -34,11 +34,12 @@ data ⊢⇄ : Pred₀ Raw where
     → A ≡ B
     → ⊢⇄ Check B Γ (t ↑)
   ⊢op
-    : (t : (R.⟦ D ⟧ Raw) m)
-    → (⊢t : (⟦ D ⟧ ⊢⇄) m A Γ t)
-    → ⊢⇄ m A Γ (op t)
+    : (t : (R.⟦ D ⟧ Raw m) mod)
+    → (⊢t : (⟦ D ⟧ ⊢⇄) mod A Γ t)
+    → ⊢⇄ mod A Γ (op t)
 
-_⊢_⇉_ : Context T → Raw Infer → T → Set
+_⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set
 Γ ⊢ t ⇉ A = ⊢⇄ Infer A Γ t
-_⊢_⇇_ : Context T → Raw Check → T → Set
+
+_⊢_⇇_ : Cxt m → Raw m Check → TExp m → Set
 Γ ⊢ t ⇇ A = ⊢⇄ Check A Γ t

@@ -41,6 +41,28 @@ MC : {CD : ConD} → (CD ∈ D) → _
 MC i = A.lookup mc i
 
 mutual
+  -- a result of syntax directedness
+  uniq-⊢
+    : {t : Raw m}
+    → (⊢t : ⊢⇄ m A Γ t) (⊢u : ⊢⇄ m B Γ t)
+    → A ≡ B
+  uniq-⊢ (⊢` x)       (⊢` y)       = uniq-∈ x y
+  uniq-⊢ (⊢⦂ ⊢t)      (⊢⦂ ⊢u)      = refl
+  uniq-⊢ (⊢⇉ ⊢t refl) (⊢⇉ ⊢u refl) = uniq-⊢ ⊢t ⊢u
+  uniq-⊢ {Check} (⊢op (ι Check C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) = {!   !}
+  uniq-⊢ {Infer} (⊢op (ι Infer C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) = {!   !}
+
+  uniq-⊢ⁿ
+    : (Ds : ArgsD Ξ) (xs₀ : List {!   !})
+    → ModeCorrectᵃˢ xs₀ Ds
+    → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+    → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts)
+    → (⊢us : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts) 
+    → ∀ {x} → x ∈ Known xs₀ Ds
+    → V.lookup σ₁ x ≡ V.lookup σ₂ x
+  uniq-⊢ⁿ ∅ xs₀ SDs ⊢ts ⊢us i = {!   !}
+  uniq-⊢ⁿ (Θ ⊢[ m ] _  ∙ Ds) xs₀ SDs ⊢ts ⊢us i = {!   !}
+  -- decompose this lemma into some more conceptual results
   uniq-⇉
     : {t : Raw⇉}
     → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
@@ -79,61 +101,61 @@ mutual
   uniq-⇉Mapᵃ C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f = let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
     uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
-¬switch
-  : {t : Raw⇉}
-  → Γ ⊢ t ⇉ A
-  → A ≢ B
-  → ¬ (Γ ⊢ (t ↑) ⇇ B)
-¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
+-- ¬switch
+--   : {t : Raw⇉}
+--   → Γ ⊢ t ⇉ A
+--   → A ≢ B
+--   → ¬ (Γ ⊢ (t ↑) ⇇ B)
+-- ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
-mutual
-  synthesise
-    : (Γ : Context T) (t : Raw⇉)
-    → Dec (∃[ A ] Γ ⊢ t ⇉ A)
-  synthesise Γ (` x)   with lookup Γ x
-  ... | no ¬p       = no λ where (A , ⊢` x∈) → ¬p (A , x∈)
-  ... | yes (A , x) = yes (A , ⊢` x)
-  synthesise Γ (t ⦂ A) with check Γ t A
-  ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
-  ... | yes p = yes (A , ⊢⦂ p)
-  synthesise Γ (op (ι Infer C Ds , i , ts)) with MC i
-  ... | (C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
-  ... | no ¬p = no λ where (A , ⊢op _ (σ , refl , ⊢ts)) → ¬p (σ , ⊢ts)
-  ... | yes (σ , ⊢ts) = yes (⟪ σ ⟫ C , ⊢op (_ , i , ts) (σ , refl , ⊢ts))
+-- mutual
+--   synthesise
+--     : (Γ : Context T) (t : Raw⇉)
+--     → Dec (∃[ A ] Γ ⊢ t ⇉ A)
+--   synthesise Γ (` x)   with lookup Γ x
+--   ... | no ¬p       = no λ where (A , ⊢` x∈) → ¬p (A , x∈)
+--   ... | yes (A , x) = yes (A , ⊢` x)
+--   synthesise Γ (t ⦂ A) with check Γ t A
+--   ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
+--   ... | yes p = yes (A , ⊢⦂ p)
+--   synthesise Γ (op (ι Infer C Ds , i , ts)) with MC i
+--   ... | (C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
+--   ... | no ¬p = no λ where (A , ⊢op _ (σ , refl , ⊢ts)) → ¬p (σ , ⊢ts)
+--   ... | yes (σ , ⊢ts) = yes (⟪ σ ⟫ C , ⊢op (_ , i , ts) (σ , refl , ⊢ts))
 
-  check
-    : (Γ : Context T) (t : Raw⇇) (A : T)
-    → Dec (Γ ⊢ t ⇇ A)
-  check Γ (t ↑)  A with synthesise  Γ t
-  ... | no ¬p = no λ where (⊢⇉ ⊢t refl) → ¬p (A , ⊢t)
-  ... | yes (B , ⊢t) with B ≟T A
-  ... | no ¬q   = no (¬switch ⊢t ¬q)
-  ... | yes A=B = yes (⊢⇉ ⊢t A=B)
-  check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i) Γ ts
-  ... | no ¬p = no λ where (⊢op _ p) → ¬p p
-  ... | yes (σ , eq , ⊢ts) = yes (⊢op (_ , i , ts) (σ , eq , ⊢ts))
+--   check
+--     : (Γ : Context T) (t : Raw⇇) (A : T)
+--     → Dec (Γ ⊢ t ⇇ A)
+--   check Γ (t ↑)  A with synthesise  Γ t
+--   ... | no ¬p = no λ where (⊢⇉ ⊢t refl) → ¬p (A , ⊢t)
+--   ... | yes (B , ⊢t) with B ≟T A
+--   ... | no ¬q   = no (¬switch ⊢t ¬q)
+--   ... | yes A=B = yes (⊢⇉ ⊢t A=B)
+--   check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i) Γ ts
+--   ... | no ¬p = no λ where (⊢op _ p) → ¬p p
+--   ... | yes (σ , eq , ⊢ts) = yes (⊢op (_ , i , ts) (σ , eq , ⊢ts))
 
-  synthesiseᵃˢ
-    : (Ds : ArgsD Ξ)
-    → ModeCorrectᵃˢ ∅ Ds
-    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
-    → Dec (∃[ σ ] (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts)
-  synthesiseᵃˢ DS SDs Γ ts = {!   !}
+--   synthesiseᵃˢ
+--     : (Ds : ArgsD Ξ)
+--     → ModeCorrectᵃˢ ∅ Ds
+--     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+--     → Dec (∃[ σ ] (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts)
+--   synthesiseᵃˢ DS SDs Γ ts = {!   !}
 
-  synthesiseSubᵃˢ
-    : (Ds : ArgsD Ξ)
-    → ModeCorrectᵃˢ ∅ Ds
-    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
-    → ∀ {x} → (i : x ∈ Known ∅ Ds) → {!   !}
-  synthesiseSubᵃˢ ∅ _ _ _ ()
-  synthesiseSubᵃˢ (Θ ⊢[ Infer ] C ∙ Ds) Mc Γ ts i = {!   !}
-  synthesiseSubᵃˢ (Θ ⊢[ Check ] C ∙ Ds) Mc Γ ts i = {!   !}
+--   synthesiseSubᵃˢ
+--     : (Ds : ArgsD Ξ)
+--     → ModeCorrectᵃˢ ∅ Ds
+--     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+--     → ∀ {x} → (i : x ∈ Known ∅ Ds) → {!   !}
+--   synthesiseSubᵃˢ ∅ _ _ _ ()
+--   synthesiseSubᵃˢ (Θ ⊢[ Infer ] C ∙ Ds) Mc Γ ts i = {!   !}
+--   synthesiseSubᵃˢ (Θ ⊢[ Check ] C ∙ Ds) Mc Γ ts i = {!   !}
 
-  checkᵃˢ
-    : (C : TExp Ξ)
-    → (A : T)
-    → (Ds : ArgsD Ξ)
-    → ModeCorrectᵃˢ (fv C) Ds
-    → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
-    → Dec (∃[ σ ] (⟪ σ ⟫ C ≡ A × (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts))
-  checkᵃˢ C A DS SDs Γ ts = {!   !}
+--   checkᵃˢ
+--     : (C : TExp Ξ)
+--     → (A : T)
+--     → (Ds : ArgsD Ξ)
+--     → ModeCorrectᵃˢ (fv C) Ds
+--     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
+--     → Dec (∃[ σ ] (⟪ σ ⟫ C ≡ A × (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts))
+--   checkᵃˢ C A DS SDs Γ ts = {!   !}

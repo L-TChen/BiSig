@@ -6,38 +6,42 @@ open import Syntax.BiTyped.Description
 module Syntax.BiTyped.Extrinsic.Functor {SD : S.Desc} (Id : Set) (D : Desc {SD}) where
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+  renaming (Tm to TExp)
 
 open import Syntax.NamedContext   Id
 import Syntax.BiTyped.Raw.Functor {SD} Id as R
 
+Cxt : ℕ → Set
+Cxt m = Context (TExp m)
 
-Pred :  (ℓ′ : Level) → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
-Pred ℓ′ X = (m : Mode) → T → Context T → X m → Set ℓ′
+Pred :  (ℓ′ : Level) → (n : ℕ) → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
+Pred ℓ′ n X = (mod : Mode) → TExp n → Cxt n → X mod → Set ℓ′
 
-Pred₀ : (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc lzero))
-Pred₀ X = Pred lzero X
+Pred₀ : ℕ → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc lzero))
+Pred₀ n X = Pred lzero n X
 
 private variable
-  Ξ   : ℕ
-  m   : Mode
-  A B : T
-  X   : Mode → Set ℓ
-  σ   : Sub₀ Ξ
+  n m l : ℕ
+  σ     : Sub n m
+  mod   : Mode
+  A B   : TExp n
+  X     : Mode → Set ℓ
 
-⟦_⟧ᵃ_,_ : (Θ : List (TExp Ξ)) (X : Mode → Set ℓ) (P : Context T → X m → Set ℓ′)
-  → Sub₀ Ξ → Context T → R.⟦ Θ ⟧ᵃ X m → Set ℓ′
+⟦_⟧ᵃ_,_ : (Θ : List (TExp n)) (X : Mode → Set ℓ) (P : Cxt m → X mod → Set ℓ′)
+  → Sub n m → Cxt m → R.⟦ Θ ⟧ᵃ X mod → Set ℓ′
 (⟦ ∅     ⟧ᵃ X , P) σ Γ t       = P Γ t
 (⟦ A ∙ D ⟧ᵃ X , P) σ Γ (x , t) = (⟦ D ⟧ᵃ X , P) σ (x ⦂ ⟪ σ ⟫ A , Γ) t
 
-⟦_⟧ᵃˢ_,_ : (D : ArgsD Ξ) (X : Mode → Set ℓ) (P : Pred ℓ′ X)
-  → Sub₀ Ξ → Context T → R.⟦ D ⟧ᵃˢ X → Set ℓ′
+⟦_⟧ᵃˢ_,_ : (D : ArgsD n) (X : Mode → Set ℓ) (P : Pred ℓ′ m X)
+  → Sub n m → Cxt m → R.⟦ D ⟧ᵃˢ X → Set ℓ′
 (⟦ ∅               ⟧ᵃˢ X , _) _ _ _        = ⊤
-(⟦ Θ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X , P) σ Γ (t , ts) = (⟦ Θ ⟧ᵃ X , P m (⟪ σ ⟫ B)) σ Γ t × (⟦ Ds ⟧ᵃˢ X , P) σ Γ ts
+(⟦ Θ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X , P) σ Γ (t , ts) =
+  (⟦ Θ ⟧ᵃ X , P m (⟪ σ ⟫ B)) σ Γ t × (⟦ Ds ⟧ᵃˢ X , P) σ Γ ts
 
-⟦_⟧ᶜ_ : (D : ConD) (P : Pred ℓ′ X) (m : Mode) (A : T) (Γ : Context T) (t : (R.⟦ D ⟧ᶜ X) m) → Set ℓ′
-(⟦ ι Check B D ⟧ᶜ P) Check A Γ t = Σ[ σ ∈ Sub₀ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t)
-(⟦ ι Infer B D ⟧ᶜ P) Infer A Γ t = Σ[ σ ∈ Sub₀ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t)
+⟦_⟧ᶜ_ : (D : ConD) (P : Pred ℓ′ m X) (mod : Mode) (A : TExp m) (Γ : Cxt m)
+  (t : (R.⟦ D ⟧ᶜ X) mod) → Set ℓ′
+(⟦ ι mod B D ⟧ᶜ P) mod′ A Γ (refl , t) = Σ[ σ ∈ Sub _ _ ] ⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t
 
-⟦_⟧_ : (D : Desc) (P : Pred ℓ′ X) (m : Mode) (A : T) (Γ : Context T) (t : (R.⟦ D ⟧ X) m) → Set ℓ′
+⟦_⟧_ : (D : Desc) (P : Pred ℓ′ m X) (mod : Mode) (A : TExp m) (Γ : Cxt m)
+  (t : (R.⟦ D ⟧ X) mod) → Set ℓ′
 (⟦ Ds ⟧ P) m A Γ (D , _ , t) = (⟦ D ⟧ᶜ P)  m A Γ t

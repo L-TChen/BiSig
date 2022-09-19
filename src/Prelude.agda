@@ -12,9 +12,14 @@ open import Data.Unit                          public
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 open import Data.Nat                           public
-  using (ℕ; zero; suc; _+_; _⊔_)
+  using (ℕ; zero; suc; _+_; _⊔_; less-than-or-equal)
+  renaming (_≤″_ to _≤_)
+import Data.Nat.Properties 
+--  renaming (_≤′_ to _≤_; ≤′-refl to ≤-refl; ≤′-step to ≤-step)
+module ℕₚ = Data.Nat.Properties
+
 open import Data.Fin                           public
-  using (Fin; #_; zero; suc)
+  using (Fin; #_; zero; suc; fromℕ)
 open import Data.Fin.Literals                  public
 open import Data.List                          public 
   using (List; length; map; _++_; zip)
@@ -109,3 +114,27 @@ update : (i : Fin n) (x : A) → Vec A n → Vec A n
 update zero    y (x ∷ xs) = y ∷ xs
 update (suc i) y (x ∷ xs) = x ∷ update i y xs
 
+------------------------------------------------------------------------------
+-- Properties of ≤
+------------------------------------------------------------------------------
+
+≤-step : {m n : ℕ} → m ≤ n → m ≤ suc n
+≤-step {m} {n} (less-than-or-equal eq) = less-than-or-equal (begin
+  m + (suc _)
+    ≡⟨ ℕₚ.+-suc m _ ⟩
+  suc (m + _)
+    ≡⟨ cong suc eq ⟩
+  suc n
+    ∎)
+  where open ≡-Reasoning
+    
+≤-refl : ∀ {m} → m ≤ m
+≤-refl = less-than-or-equal (ℕₚ.+-identityʳ _)
+
+m≤m+a+b : {m a b : ℕ}
+  → m ≤ m + a + b
+m≤m+a+b {m} {a} {b} = less-than-or-equal {m} {m + a + b} {a + b} $ begin
+  m + (a + b)
+    ≡⟨ sym (ℕₚ.+-assoc m a b) ⟩
+  m + a + b
+  ∎ where open ≡-Reasoning

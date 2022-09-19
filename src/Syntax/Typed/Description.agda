@@ -5,7 +5,7 @@ import Syntax.Simple.Description as S
 module Syntax.Typed.Description {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
-  renaming (Tm₀ to T; Tm to TExp)
+  renaming (Tm to TExp)
 open import Syntax.Context
 
 record ArgD (Ξ : ℕ) : Set where

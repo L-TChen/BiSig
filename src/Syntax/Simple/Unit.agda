@@ -11,4 +11,4 @@ open import Syntax.Simple.Term
 ⋆T = Tm₀ ⋆D
 
 ⋆ : {Ξ : ℕ} → Tm ⋆D Ξ
-⋆ = op (inl tt)
+⋆ = op (_ , here refl , tt₀)

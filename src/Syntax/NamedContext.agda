@@ -20,10 +20,6 @@ private variable
   x y : Id
   A B : T
 
--- _++_ : Context T → Context T → Context T
--- ∅           ++ Δ =              Δ
--- (x ⦂ A , Γ) ++ Δ = x ⦂ A , Γ ++ Δ
-
 data _⦂_∈_ {T : Set} (x : Id) (A : T) : Context T → Set where
   zero
     :  x ⦂ A ∈ x ⦂ A , Γ

@@ -2,14 +2,14 @@ open import Prelude
 
 module Syntax.Context where
 
-Ctx = List
+Context = List
 
 private variable
-  T   : Set
-  Γ Δ Ξ : Ctx T
-  A B : T
+  T     : Set
+  Γ Δ Ξ : Context T
+  A B   : T
 
-Ren : (Γ Δ : Ctx T) → Set
+Ren : (Γ Δ : Context T) → Set
 Ren Γ Δ = ∀ {A} → A ∈ Γ → A ∈ Δ
 
 ext : Ren Γ Δ

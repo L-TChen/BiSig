@@ -33,4 +33,4 @@ Fam₀ = Fam lzero
 -- (⟦ ι _     _ D ⟧ᶜ X) _    = ⊥
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-(⟦ Ds ⟧ X) m = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m
+(⟦ Ds ⟧ X) mod = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) mod

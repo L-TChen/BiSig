@@ -17,7 +17,7 @@ eraseᵃˢ : B.ArgsD Ξ → T.ArgsD Ξ
 eraseᵃˢ = map eraseᵃ
 
 eraseᶜ : B.ConD → T.ConD
-eraseᶜ (ι m A D) = ι A (eraseᵃˢ D)
+eraseᶜ (ι {n} mod A D) = ι A (eraseᵃˢ D)
 
 erase : B.Desc → T.Desc
 erase Ds = map eraseᶜ Ds

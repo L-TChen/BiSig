@@ -22,18 +22,18 @@ data Raw (m : ℕ) : Fam₀ where
   _⦂_ : (t : Raw m) (A : TExp m) → Raw m
   op  : ⟦ D ⟧ Raw m              → Raw m
 
--- mutual
---   twkʳ : Raw m → Raw (n + m)
---   twkʳ (` x)   = ` x
---   twkʳ (t ⦂ A) = twkʳ t ⦂ wkʳ A 
---   twkʳ (op (D , i , ts)) = op (D , i , twkʳⁿ ts)
--- 
---   twkʳⁿ : {D : B.ArgsD Ξ}
---     → (⟦ D ⟧ᵃˢ Raw m) → (⟦ D ⟧ᵃˢ Raw (n + m))
---   twkʳⁿ {D = ∅}     (lift _) = _
---   twkʳⁿ {D = A ∙ D} (t , ts) = twkʳᵃ t , twkʳⁿ ts
--- 
---   twkʳᵃ : {D : List (TExp Ξ)}
---     → (⟦ D ⟧ᵃ Raw m) → (⟦ D ⟧ᵃ Raw (n + m))
---   twkʳᵃ {D = ∅}     t       = twkʳ t
---   twkʳᵃ {D = A ∙ D} (x , t) = x , twkʳᵃ t
+--mutual
+--  twkˡ : Raw m → Raw (m + n)
+--  twkˡ (` x)   = ` x
+--  twkˡ (t ⦂ A) = twkˡ t ⦂ wkˡ A 
+--  twkˡ (op (D , i , ts)) = op (D , i , twkˡⁿ ts)
+--
+--  twkˡⁿ : {D : B.ArgsD Ξ}
+--    → (⟦ D ⟧ᵃˢ Raw m) → (⟦ D ⟧ᵃˢ Raw (m + n))
+--  twkˡⁿ {D = ∅}     (lift _) = _
+--  twkˡⁿ {D = A ∙ D} (t , ts) = twkˡᵃ t , twkˡⁿ ts
+--
+--  twkˡᵃ : {D : List (TExp Ξ)}
+--    → (⟦ D ⟧ᵃ Raw m) → (⟦ D ⟧ᵃ Raw (m + n))
+--  twkˡᵃ {D = ∅}     t       = twkˡ t
+--  twkˡᵃ {D = A ∙ D} (x , t) = x , twkˡᵃ t

@@ -40,8 +40,16 @@ wkʳ = rename (F._↑ʳ_ _)
 wkˡ : Tm m → Tm (m + n)
 wkˡ = rename λ i → F._↑ˡ_ i _
 
-wk : m ≤ n → Tm m → Tm n
-wk (less-than-or-equal refl) = wkˡ
+insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
+insert-mid m n i with F.splitAt m i
+... | inl j = (j F.↑ˡ _) F.↑ˡ _ 
+... | inr k = (m + n) F.↑ʳ k
+
+wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
+wkᵐ m n = rename (insert-mid m n)
+
+wk≤ˡ : m ≤ n → Tm m → Tm n
+wk≤ˡ (less-than-or-equal refl) = wkˡ 
 
 weaken : Tm m → Tm (suc m)
 weaken = rename suc

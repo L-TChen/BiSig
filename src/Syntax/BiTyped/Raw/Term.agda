@@ -27,18 +27,38 @@ Raw⇇ m = Raw m Check
 Raw⇉ m = Raw m Infer
 
 mutual
-  twk : m ≤ n → Raw m mod → Raw n mod
-  twk le (` x)   = ` x
-  twk le (t ⦂ A) = twk le t ⦂ wk le A
-  twk le (t ↑)   = twk le t ↑
-  twk le (op (D , i , refl , ts)) = op (D , i , refl , twkⁿ le ts)
+  twkˡ : m ≤ n → Raw m mod → Raw n mod
+  twkˡ le (` x)   = ` x
+  twkˡ le (t ⦂ A) = twkˡ le t ⦂ wk≤ˡ le A 
+  twkˡ le (t ↑)   = twkˡ le t ↑
+  twkˡ le (op (D , i , refl , ts)) = op (D , i , refl , twkˡⁿ le ts)
 
-  twkⁿ : {D : B.ArgsD k}
+  twkˡⁿ : {D : B.ArgsD k}
     → m ≤ n → ⟦ D ⟧ᵃˢ Raw m → ⟦ D ⟧ᵃˢ Raw n
-  twkⁿ {D = ∅}     le (lift _) = _
-  twkⁿ {D = A ∙ D} le (t , ts) = twkᵃ le t , twkⁿ le ts
+  twkˡⁿ {D = ∅}     le (lift _) = _
+  twkˡⁿ {D = A ∙ D} le (t , ts) = twkˡᵃ le t , twkˡⁿ le ts
 
-  twkᵃ : {D : List (TExp k)}
+  twkˡᵃ : {D : List (TExp k)}
     → m ≤ n → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
-  twkᵃ {D = ∅}     le t       = twk le t
-  twkᵃ {D = A ∙ D} le (x , t) = x , twkᵃ le t
+  twkˡᵃ {D = ∅}     le t       = twkˡ le t
+  twkˡᵃ {D = A ∙ D} le (x , t) = x , twkˡᵃ le t
+
+mutual
+  twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
+  twkᵐ m n (` x)   = ` x
+  twkᵐ m n (t ⦂ A) = twkᵐ m n t ⦂ wkᵐ m n A
+  twkᵐ m n (t ↑)   = twkᵐ m n t ↑
+  twkᵐ m n (op (D , i , refl , ts)) =
+    op (D , i , refl , twkᵐⁿ m n ts)
+
+  twkᵐⁿ : {D : B.ArgsD k}
+    → (m n {l} : ℕ) 
+    → ⟦ D ⟧ᵃˢ Raw (m + l) → ⟦ D ⟧ᵃˢ Raw (m + n + l)
+  twkᵐⁿ {D = ∅}     m n (lift _) = _
+  twkᵐⁿ {D = A ∙ D} m n (t , ts) = twkᵐᵃ m n t , twkᵐⁿ m n ts
+
+  twkᵐᵃ : {D : List (TExp k)}
+    → (m n {l} : ℕ)
+    → ⟦ D ⟧ᵃ Raw (m + l) mod → ⟦ D ⟧ᵃ Raw (m + n + l) mod
+  twkᵐᵃ {D = ∅}     m n t       = twkᵐ m n t
+  twkᵐᵃ {D = A ∙ D} m n (x , t) = x , twkᵐᵃ m n t

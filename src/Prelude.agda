@@ -131,10 +131,10 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
 ≤-refl : ∀ {m} → m ≤ m
 ≤-refl = less-than-or-equal (ℕₚ.+-identityʳ _)
 
-m≤m+a+b : {m a b : ℕ}
-  → m ≤ m + a + b
-m≤m+a+b {m} {a} {b} = less-than-or-equal {m} {m + a + b} {a + b} $ begin
-  m + (a + b)
-    ≡⟨ sym (ℕₚ.+-assoc m a b) ⟩
-  m + a + b
-  ∎ where open ≡-Reasoning
+-- m≤m+a+b : {m a b : ℕ}
+--   → m ≤ m + a + b
+-- m≤m+a+b {m} {a} {b} = less-than-or-equal {m} {m + a + b} {a + b} $ begin
+--   m + (a + b)
+--     ≡⟨ sym (ℕₚ.+-assoc m a b) ⟩
+--   m + a + b
+--   ∎ where open ≡-Reasoning

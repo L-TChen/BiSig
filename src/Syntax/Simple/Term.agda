@@ -5,6 +5,9 @@ module Syntax.Simple.Term (D : Desc) where
 
 import      Data.Fin  as F
 
+open import Syntax.Context
+  using (Context)
+
 private variable
   Γ Ξ Δ : ℕ
   n m l : ℕ
@@ -14,6 +17,9 @@ infix 9 `_
 data Tm : ℕ → Set where
   `_ : Fin      ⇒₁ Tm
   op : ⟦ D ⟧ Tm ⇒₁ Tm
+
+Cxt : ℕ → Set
+Cxt m = Context (Tm m)
 
 Tm₀ : Set
 Tm₀ = Tm 0

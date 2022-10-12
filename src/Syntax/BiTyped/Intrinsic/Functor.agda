@@ -10,10 +10,6 @@ open import Syntax.Simple.Term SD as Ty
   
 open import Syntax.BiTyped.Description {SD}
 
-
-Cxt : ℕ → Set
-Cxt m = Context (TExp m)
-
 Fam : (m : ℕ) (ℓ : Level) → Set (lsuc ℓ)
 Fam m ℓ = Mode → TExp m → Cxt m → Set ℓ
 

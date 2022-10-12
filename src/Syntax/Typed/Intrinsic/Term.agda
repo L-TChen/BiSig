@@ -6,9 +6,8 @@ open import Syntax.Typed.Description as T
 module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : Desc {SD}) where
 
 open import Syntax.Simple.Term        SD
-  using () renaming (Tm to TExp; Tms to TExps; Sub to TSub)
+  using (Cxt) renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Simple.Association SD
-
 
 open import Syntax.Context
 open import Syntax.Typed.Intrinsic.Functor {SD}

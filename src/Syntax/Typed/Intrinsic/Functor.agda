@@ -12,9 +12,6 @@ open import Syntax.Simple.Association SD
 
 open import Syntax.Typed.Description {SD}
 
-Cxt : ℕ → Set
-Cxt m = Context (TExp m)
-
 Fam : (ℓ : Level) (m : ℕ) → Set (lsuc ℓ)
 Fam ℓ m = TExp m → Cxt m → Set ℓ
 

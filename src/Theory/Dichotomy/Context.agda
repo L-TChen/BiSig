@@ -2,16 +2,16 @@ open import Prelude
 
 module Theory.Dichotomy.Context (Id : Set) where
 
-open import Syntax.Context
-open import Syntax.NamedContext Id
+open import Syntax.Context.Base         as Nameless
+open import Syntax.NamedContext.Base Id as Named
 
 private variable
   T     : Set
   A B C : T
   x y   : Id
-  Γ     : Context T
+  Γ     : Named.Context T
 
-∥_∥ctx : Context T → Ctx T
+∥_∥ctx : Named.Context T → Nameless.Context T
 ∥ ∅         ∥ctx = ∅
 ∥ x ⦂ A , Γ ∥ctx = A ∙ ∥ Γ ∥ctx
 

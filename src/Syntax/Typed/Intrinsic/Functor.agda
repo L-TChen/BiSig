@@ -4,7 +4,7 @@ import Syntax.Simple.Description as S
 
 module Syntax.Typed.Intrinsic.Functor {SD : S.Desc}  where
 
-open import Syntax.Context
+open import Syntax.Context            SD
 
 open import Syntax.Simple.Term        SD as Ty
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)

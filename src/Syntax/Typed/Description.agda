@@ -6,7 +6,6 @@ module Syntax.Typed.Description {SD : S.Desc}  where
 
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm to TExp)
-open import Syntax.Context
 
 record ArgD (Ξ : ℕ) : Set where
   constructor _⊢_

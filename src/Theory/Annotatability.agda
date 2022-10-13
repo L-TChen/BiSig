@@ -6,7 +6,7 @@ module Theory.Annotatability {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
-open import Syntax.Context
+open import Syntax.Context SD
 
 open import Syntax.Typed.Description    {SD} as T
 open import Syntax.BiTyped.Description  {SD} as B

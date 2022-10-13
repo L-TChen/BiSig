@@ -7,7 +7,7 @@ open import Syntax.Simple.Term        SD
   using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps; _≟_ to _≟T_)
 open import Syntax.Simple.Association SD
 
-open import Syntax.Context
+open import Syntax.Context            SD
 
 open import Syntax.Typed.Intrinsic.Functor
 open import Syntax.Typed.Intrinsic.Term D

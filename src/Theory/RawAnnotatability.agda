@@ -7,7 +7,7 @@ module Theory.RawAnnotatability {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
 
 open B {SD}
 
-open import Syntax.Context
+open import Syntax.Context     SD
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps)
 

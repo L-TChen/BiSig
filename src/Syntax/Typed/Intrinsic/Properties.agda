@@ -4,9 +4,9 @@ open import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Intrinsic.Properties {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term SD
-  using (_≟s_) renaming (Tm₀ to T; Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
+  using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
 
-open import Syntax.Context
+open import Syntax.Context SD
 
 open import Syntax.Typed.Intrinsic.Functor
 open import Syntax.Typed.Intrinsic.Term D

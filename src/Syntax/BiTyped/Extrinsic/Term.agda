@@ -8,7 +8,7 @@ module Syntax.BiTyped.Extrinsic.Term {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tm₀ to T)
 
-open import Syntax.NamedContext Id
+open import Syntax.NamedContext SD Id
 
 open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D
 import Syntax.BiTyped.Raw.Functor {SD} Id as R

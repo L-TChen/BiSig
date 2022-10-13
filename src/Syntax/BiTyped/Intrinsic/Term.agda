@@ -6,8 +6,8 @@ import Syntax.BiTyped.Description as T
 module Syntax.BiTyped.Intrinsic.Term {SD : S.Desc} (D : T.Desc {SD}) where
 
 open import Syntax.Simple.Term SD
-  using (Cxt) renaming (Tm to TExp; Sub to TSub)
-open import Syntax.Context
+  using () renaming (Tm to TExp; Sub to TSub)
+open import Syntax.Context SD
 open T {SD}
 open import Syntax.BiTyped.Intrinsic.Functor {SD}
 

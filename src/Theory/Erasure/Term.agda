@@ -5,7 +5,7 @@ open import Syntax.BiTyped.Description as B
 
 module Theory.Erasure.Term {SD : S.Desc} {D : B.Desc {SD}} where
 
-open import Syntax.Context
+open import Syntax.Context     SD
 open import Syntax.Simple.Term SD 
   hiding () renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 

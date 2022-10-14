@@ -4,27 +4,27 @@ import Syntax.Simple.Description  as S
 
 module Theory.ModeCorrectness.Description {SD : S.Desc} (Id : Set)  where
 
-open import Syntax.NamedContext Id
+open import Syntax.NamedContext SD Id
 open import Syntax.Simple.Term  SD
-  renaming (Tm to TExp; Tms to TExps; Tm₀ to T)
+  renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Simple.Properties         {SD}
 open import Syntax.BiTyped.Description       {SD}
 open import Data.List.Relation.Binary.Subset.Propositional
 
 private variable
-  Ξ     : ℕ
+  n : ℕ
 
-ModeCorrectᵃ : List (Fin Ξ) → TExps Ξ → Set
+ModeCorrectᵃ : List (Fin n) → TExps n → Set
 ModeCorrectᵃ xs ∅       = ⊤
 ModeCorrectᵃ xs (A ∙ Θ) = fv A ⊆ xs × ModeCorrectᵃ xs Θ
 
-module _ (xs₀ : List (Fin Ξ)) where
-  Known : ArgsD Ξ →  List (Fin Ξ)
+module _ (xs₀ : List (Fin n)) where
+  Known : ArgsD n →  List (Fin n)
   Known ∅                     = xs₀
   Known (Θ ⊢[ Check ] C ∙ Ds) =         Known Ds
   Known (Θ ⊢[ Infer ] C ∙ Ds) = fv C ++ Known Ds
 
-  ModeCorrectᵃˢ : ArgsD Ξ → Set
+  ModeCorrectᵃˢ : ArgsD n → Set
   ModeCorrectᵃˢ ∅                     = ⊤
   ModeCorrectᵃˢ (Θ ⊢[ Check ] C ∙ Ds) = let xs = Known Ds in
     fv C ⊆ xs × ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds

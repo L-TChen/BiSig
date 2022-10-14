@@ -15,11 +15,11 @@ import      Data.Vec                     as V
 import      Data.List.Relation.Unary.All as A
 open import Data.List.Relation.Unary.Any.Properties
 
-open import Syntax.NamedContext Id
+open import Syntax.NamedContext           SD Id
 open import Syntax.NamedContext.Decidable _≟Id_
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tms to TExps; Tm₀ to T; _≟_ to _≟T_)
+  renaming (Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
 open import Syntax.Simple.Properties         {SD}
 
 import      Syntax.BiTyped.Raw.Functor       {SD} Id as R
@@ -28,59 +28,39 @@ open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D
 open import Syntax.BiTyped.Extrinsic.Term    {SD} Id D
 
 private variable
-  Ξ     : ℕ
-  A B   : T
-  xs    : List (Fin Ξ)
-  Γ     : Context T
-  Ds    : ArgsD Ξ
-  AD    : ArgD Ξ
-  σ σ₁ σ₂ : Sub₀ Ξ
-  m     : Mode
+  n m l : ℕ
+  A B   : TExp n
+  xs    : List (Fin n)
+  Γ     : Cxt n
+  Ds    : ArgsD n
+  AD    : ArgD n
+  σ σ₁ σ₂ : TSub n m
+  mod     : Mode
 
 MC : {CD : ConD} → (CD ∈ D) → _
 MC i = A.lookup mc i
 
 mutual
-  -- a result of syntax directedness
-  uniq-⊢
-    : {t : Raw m}
-    → (⊢t : ⊢⇄ m A Γ t) (⊢u : ⊢⇄ m B Γ t)
-    → A ≡ B
-  uniq-⊢ (⊢` x)       (⊢` y)       = uniq-∈ x y
-  uniq-⊢ (⊢⦂ ⊢t)      (⊢⦂ ⊢u)      = refl
-  uniq-⊢ (⊢⇉ ⊢t refl) (⊢⇉ ⊢u refl) = uniq-⊢ ⊢t ⊢u
-  uniq-⊢ {Check} (⊢op (ι Check C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) = {!   !}
-  uniq-⊢ {Infer} (⊢op (ι Infer C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) = {!   !}
-
-  uniq-⊢ⁿ
-    : (Ds : ArgsD Ξ) (xs₀ : List {!   !})
-    → ModeCorrectᵃˢ xs₀ Ds
-    → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
-    → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts)
-    → (⊢us : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts) 
-    → ∀ {x} → x ∈ Known xs₀ Ds
-    → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⊢ⁿ ∅ xs₀ SDs ⊢ts ⊢us i = {!   !}
-  uniq-⊢ⁿ (Θ ⊢[ m ] _  ∙ Ds) xs₀ SDs ⊢ts ⊢us i = {!   !}
-  -- decompose this lemma into some more conceptual results
+-- It should follow from syntax directedness: 
+-- decompose this lemma into some more conceptual results
   uniq-⇉
-    : {t : Raw⇉}
+    : {t : Raw⇉ m}
     → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
     → A ≡ B
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
-  uniq-⇉ (⊢op (ι Infer C Ds , i , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
+  uniq-⇉ (⊢op (ι Infer C Ds , i , refl , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
     let (C⊆xs , _ , SDs) = MC i in
     ≡-fv C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-⇉Map
-    : (Ds : ArgsD Ξ)
+    : (Ds : ArgsD n)
     → ModeCorrectᵃˢ ∅ Ds
-    → {ts : R.⟦ Ds ⟧ᵃˢ Raw}
-    → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₁ Γ ts)
-    → (⊢us : (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ₂ Γ ts)
+    → {ts : R.⟦ Ds ⟧ᵃˢ Raw m}
+    → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw m , ⊢⇄) σ₁ Γ ts)
+    → (⊢us : (⟦ Ds ⟧ᵃˢ Raw m , ⊢⇄) σ₂ Γ ts)
     → ∀ {x} → x ∈ Known ∅ Ds
-    → V.lookup σ₁ x ≡ V.lookup σ₂ x
+    → σ₁ x ≡ σ₂ x
   uniq-⇉Map ∅                     _             _          _          ()
   uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
@@ -89,24 +69,24 @@ mutual
   ... | inr j = uniq-⇉Map Ds SDs ⊢ts ⊢us j
 
   uniq-⇉Mapᵃ
-    : (C : TExp Ξ) (Θ : TExps Ξ)
+    : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
-    → {t : R.⟦ Θ ⟧ᵃ Raw Infer}
-    → (⊢t : (⟦ Θ ⟧ᵃ Raw , ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
-    → (⊢u : (⟦ Θ ⟧ᵃ Raw , ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
-    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
+    → {t : R.⟦ Θ ⟧ᵃ Raw m Infer}
+    → (⊢t : (⟦ Θ ⟧ᵃ Raw m , ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
+    → (⊢u : (⟦ Θ ⟧ᵃ Raw m , ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
+    → (∀ {x} → x ∈ xs → σ₁ x ≡ σ₂ x)
     → ∀ {x} → x ∈ fv C
-    → V.lookup σ₁ x ≡ V.lookup σ₂ x
+    → σ₁ x ≡ σ₂ x
   uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
   uniq-⇉Mapᵃ C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f = let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
     uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
--- ¬switch
---   : {t : Raw⇉}
---   → Γ ⊢ t ⇉ A
---   → A ≢ B
---   → ¬ (Γ ⊢ (t ↑) ⇇ B)
--- ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
+¬switch
+  : {t : Raw⇉ m}
+  → Γ ⊢ t ⇉ A
+  → A ≢ B
+  → ¬ (Γ ⊢ (t ↑) ⇇ B)
+¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
 -- mutual
 --   synthesise

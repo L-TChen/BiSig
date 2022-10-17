@@ -35,10 +35,9 @@ private variable
 (⟦ Θ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X , P) σ Γ (t , ts) =
   (⟦ Θ ⟧ᵃ X , P m (⟪ σ ⟫ B)) σ Γ t × (⟦ Ds ⟧ᵃˢ X , P) σ Γ ts
 
-⟦_⟧ᶜ_ : (D : ConD) (P : Pred ℓ′ m X) (mod : Mode) (A : TExp m) (Γ : Cxt m)
-  (t : (R.⟦ D ⟧ᶜ X) mod) → Set ℓ′
-(⟦ ι mod B D ⟧ᶜ P) mod′ A Γ (refl , t) = Σ[ σ ∈ TSub _ _ ] ⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t
+⟦_⟧ᶜ_ : (D : ConD) → Pred ℓ′ m X → Pred ℓ′ m (R.⟦ D ⟧ᶜ X)
+(⟦ ι {n} mod B D ⟧ᶜ P) mod′ A Γ (mod≡mod′ , t) =
+  Σ[ σ ∈ TSub n _ ] ⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ _ , P) σ Γ t
 
-⟦_⟧_ : (D : Desc) (P : Pred ℓ′ m X) (mod : Mode) (A : TExp m) (Γ : Cxt m)
-  (t : (R.⟦ D ⟧ X) mod) → Set ℓ′
+⟦_⟧_ : (D : Desc) → Pred ℓ′ n X → Pred ℓ′ n (R.⟦ D ⟧ X)
 (⟦ Ds ⟧ P) m A Γ (D , _ , t) = (⟦ D ⟧ᶜ P)  m A Γ t

@@ -22,6 +22,9 @@ private variable
   A B : TExp m
   t   : Raw m mod
 
+-- ⊢⇄ Infer == _⊢_⇉_
+-- ⊢⇄ Check == _⊢_⇇_
+
 data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
   ⊢`
     : x ⦂ A ∈ Γ
@@ -43,3 +46,4 @@ _⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set
 
 _⊢_⇇_ : Cxt m → Raw m Check → TExp m → Set
 Γ ⊢ t ⇇ A = ⊢⇄ Check A Γ t
+

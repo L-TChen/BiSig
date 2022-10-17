@@ -34,16 +34,19 @@ module _ (f : Ren m n) where mutual
   renameⁿ {l = zero}  _        = _
   renameⁿ {l = suc n} (t , ts) = rename t , renameⁿ ts
 
-wkʳ : Tm m → Tm (n + m)
-wkʳ = rename (F._↑ʳ_ _) 
-
-wkˡ : Tm m → Tm (m + n)
-wkˡ = rename λ i → F._↑ˡ_ i _
+injectˡ : Ren m (m + n)
+injectˡ i = F._↑ˡ_ i _
 
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
 insert-mid m n i with F.splitAt m i
 ... | inl j = (j F.↑ˡ _) F.↑ˡ _ 
 ... | inr k = (m + n) F.↑ʳ k
+
+wkʳ : Tm m → Tm (n + m)
+wkʳ = rename (F._↑ʳ_ _) 
+
+wkˡ : Tm m → Tm (m + n)
+wkˡ = rename injectˡ
 
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
 wkᵐ m n = rename (insert-mid m n)

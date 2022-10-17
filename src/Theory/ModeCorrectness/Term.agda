@@ -21,11 +21,12 @@ open import Syntax.NamedContext.Decidable _≟Id_
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
 open import Syntax.Simple.Properties         {SD}
+open import Syntax.Simple.Unification        {SD}
 
 import      Syntax.BiTyped.Raw.Functor       {SD} Id as R
-open import Syntax.BiTyped.Raw.Term          {SD} Id D
-open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D
-open import Syntax.BiTyped.Extrinsic.Term    {SD} Id D
+open import Syntax.BiTyped.Raw.Term               Id D
+open import Syntax.BiTyped.Extrinsic.Functor      Id D
+open import Syntax.BiTyped.Extrinsic.Term         Id D
 
 private variable
   n m l : ℕ
@@ -41,15 +42,15 @@ MC : {CD : ConD} → (CD ∈ D) → _
 MC i = A.lookup mc i
 
 mutual
--- It should follow from syntax directedness: 
--- decompose this lemma into some more conceptual results
+  -- It should follow from syntax directedness: 
+  -- decompose this lemma into some more conceptual results
   uniq-⇉
     : {t : Raw⇉ m}
     → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
     → A ≡ B
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
-  uniq-⇉ (⊢op (ι Infer C Ds , i , refl , _) (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
+  uniq-⇉ {t = op (ι Infer C Ds , i , refl , _)} (⊢op _ (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
     let (C⊆xs , _ , SDs) = MC i in
     ≡-fv C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
 
@@ -88,6 +89,29 @@ mutual
   → ¬ (Γ ⊢ (t ↑) ⇇ B)
 ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
+mutual
+  synthetise
+    : (Γ : Cxt m) (t : Raw⇉ m)
+    → Dec (∃[ n ] n ≤ m × Σ[ σ ∈ TSub m n ] ∃[ A ] (cxtSub σ Γ ⊢ tsub σ t ⇉ A))
+     -- [TODO] Replace TSub by AList
+  inherit
+    : (Γ : Cxt m) (A : TExp m) (t : Raw⇇ m)
+    → Dec (∃[ n ] (n ≤ m × Σ[ σ ∈ TSub m n ] (cxtSub σ Γ ⊢ tsub σ t ⇇ sub σ A)))
+     -- [TODO] Replace TSub by AList
+
+  synthetise Γ (` x)   with lookup Γ x
+  ... | no ¬p = no λ where
+    (n , less-than-or-equal refl , σ , A , ⊢` x∈) → ¬p ({!!} , {!!})
+  ... | yes (A , x) = yes (_ , ≤-refl , `_ , A , ⊢` {!x!})
+  synthetise Γ (t ⦂ A) with inherit Γ A t
+  ... | no ¬p = no λ where (n , n≤m , σ , A , ⊢⦂ ⊢t) → ¬p (n , n≤m , σ , ⊢t)
+  ... | yes (n , n≤m , σ , ⊢t) = yes (n , n≤m , σ , sub σ A  , ⊢⦂ ⊢t)
+  synthetise Γ (op (D , i , refl , ts))  = {!!}
+
+  inherit Γ A (t ↑) with synthetise Γ t
+  ... | no ¬p = no λ where (n , n≤m , σ , ⊢⇉ ⊢t refl) → ¬p (n , n≤m , σ , sub σ A , ⊢t)
+  ... | yes (n , n≤m , σ , B , ⊢t) = {!amgu B (sub σ A)!} -- we should check if A and B are unifiable.
+  inherit Γ A (op (D , i , refl , ts)) = {!!}
 -- mutual
 --   synthesise
 --     : (Γ : Context T) (t : Raw⇉)

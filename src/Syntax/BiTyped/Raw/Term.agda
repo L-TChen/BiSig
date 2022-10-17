@@ -5,6 +5,8 @@ import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
 
+import      Data.Fin  as F
+
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp)
 
@@ -26,39 +28,56 @@ Raw⇇ Raw⇉ : ℕ → Set
 Raw⇇ m = Raw m Check
 Raw⇉ m = Raw m Infer
 
-mutual
-  twkˡ : m ≤ n → Raw m mod → Raw n mod
-  twkˡ le (` x)   = ` x
-  twkˡ le (t ⦂ A) = twkˡ le t ⦂ wk≤ˡ le A 
-  twkˡ le (t ↑)   = twkˡ le t ↑
-  twkˡ le (op (D , i , refl , ts)) = op (D , i , refl , twkˡⁿ le ts)
+module _ (ρ : Ren m n) where mutual
+  trename : Raw m mod → Raw n mod
+  trename (` x)   = ` x
+  trename (t ⦂ A) = trename t ⦂ rename ρ A
+  trename (t ↑)   = trename t ↑
+  trename (op (_ , i , refl , ts))  = op (_ , i , refl , trenameⁿ ts)
 
-  twkˡⁿ : {D : B.ArgsD k}
-    → m ≤ n → ⟦ D ⟧ᵃˢ Raw m → ⟦ D ⟧ᵃˢ Raw n
-  twkˡⁿ {D = ∅}     le (lift _) = _
-  twkˡⁿ {D = A ∙ D} le (t , ts) = twkˡᵃ le t , twkˡⁿ le ts
+  trenameⁿ : {D : B.ArgsD k}
+    → ⟦ D ⟧ᵃˢ Raw m  → ⟦ D ⟧ᵃˢ Raw n
+  trenameⁿ {D = ∅}     _        = _
+  trenameⁿ {D = A ∙ D} (t , ts) = trenameᵃ t , trenameⁿ ts
 
-  twkˡᵃ : {D : List (TExp k)}
-    → m ≤ n → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
-  twkˡᵃ {D = ∅}     le t       = twkˡ le t
-  twkˡᵃ {D = A ∙ D} le (x , t) = x , twkˡᵃ le t
+  trenameᵃ : {D : List (TExp k)}
+    → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
+  trenameᵃ {D = ∅}     t       = trename t
+  trenameᵃ {D = A ∙ D} (x , t) = x , trenameᵃ t
 
-mutual
-  twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
-  twkᵐ m n (` x)   = ` x
-  twkᵐ m n (t ⦂ A) = twkᵐ m n t ⦂ wkᵐ m n A
-  twkᵐ m n (t ↑)   = twkᵐ m n t ↑
-  twkᵐ m n (op (D , i , refl , ts)) =
-    op (D , i , refl , twkᵐⁿ m n ts)
+twkˡ : m ≤ n → Raw m mod → Raw n mod
+twkˡⁿ : {D : B.ArgsD k} → m ≤ n
+  → ⟦ D ⟧ᵃˢ Raw m → ⟦ D ⟧ᵃˢ Raw n
+twkˡᵃ : {D : List (TExp k)} → m ≤ n
+  → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
 
-  twkᵐⁿ : {D : B.ArgsD k}
-    → (m n {l} : ℕ) 
-    → ⟦ D ⟧ᵃˢ Raw (m + l) → ⟦ D ⟧ᵃˢ Raw (m + n + l)
-  twkᵐⁿ {D = ∅}     m n (lift _) = _
-  twkᵐⁿ {D = A ∙ D} m n (t , ts) = twkᵐᵃ m n t , twkᵐⁿ m n ts
+twkˡ  (less-than-or-equal refl) = trename  injectˡ
+twkˡⁿ (less-than-or-equal refl) = trenameⁿ injectˡ
+twkˡᵃ (less-than-or-equal refl) = trenameᵃ injectˡ
 
-  twkᵐᵃ : {D : List (TExp k)}
-    → (m n {l} : ℕ)
-    → ⟦ D ⟧ᵃ Raw (m + l) mod → ⟦ D ⟧ᵃ Raw (m + n + l) mod
-  twkᵐᵃ {D = ∅}     m n t       = twkᵐ m n t
-  twkᵐᵃ {D = A ∙ D} m n (x , t) = x , twkᵐᵃ m n t
+twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
+twkᵐⁿ : {D : B.ArgsD k} (m n {l} : ℕ) 
+  → ⟦ D ⟧ᵃˢ Raw (m + l) → ⟦ D ⟧ᵃˢ Raw (m + n + l)
+twkᵐᵃ : {D : List (TExp k)} (m n {l} : ℕ)
+  → ⟦ D ⟧ᵃ Raw (m + l) mod → ⟦ D ⟧ᵃ Raw (m + n + l) mod
+
+twkᵐ  m n = trename  (insert-mid m n)
+twkᵐⁿ m n = trenameⁿ (insert-mid m n)
+twkᵐᵃ m n = trenameᵃ (insert-mid m n)
+
+module _ (σ : Sub m n) where mutual
+  tsub : Raw m mod → Raw n mod
+  tsub (` x)   = ` x
+  tsub (t ⦂ A) = tsub t ⦂ sub σ A
+  tsub (t ↑)   = tsub t ↑
+  tsub (op (D , i , refl , ts)) = op (D , i , refl , tsubⁿ ts)
+
+  tsubⁿ : {D : B.ArgsD k}
+    → ⟦ D ⟧ᵃˢ Raw m  → ⟦ D ⟧ᵃˢ Raw n
+  tsubⁿ {D = ∅}     _        = _
+  tsubⁿ {D = A ∙ D} (t , ts) = tsubᵃ t , tsubⁿ ts
+
+  tsubᵃ : {D : List (TExp k)}
+    → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
+  tsubᵃ {D = ∅}     t       = tsub t
+  tsubᵃ {D = A ∙ D} (x , t) = x , tsubᵃ t

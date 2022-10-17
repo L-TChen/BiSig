@@ -8,3 +8,8 @@ open import Syntax.Simple.Term       D
 
 Cxt : ℕ → Set
 Cxt m = Context (Tm m)
+
+cxtSub : {m n : ℕ} → Sub m n
+  → Cxt m → Cxt n
+cxtSub σ ∅       = ∅
+cxtSub σ ((x , A) ∙ Γ) = (x , sub σ A) ∙ cxtSub σ Γ

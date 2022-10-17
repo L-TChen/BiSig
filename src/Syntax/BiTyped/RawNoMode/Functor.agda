@@ -29,7 +29,7 @@ Fam₀ = Fam lzero
 ⟦ Θ ⊢[ _ ] _ ∙ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ) → Fam ℓ
-(⟦ ι _ _ D ⟧ᶜ X) = ⟦ D ⟧ᵃˢ X
+(⟦ ι _ _ Ds ⟧ᶜ X) = ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧_ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 ⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X)

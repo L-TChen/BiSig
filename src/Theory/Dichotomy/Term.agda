@@ -35,15 +35,15 @@ mutual
     → Tm⇉ m A ∥ Γ ∥ctx
   ∥ ⊢` x     ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢⦂ t     ∥⇉ = _ ∋ ∥ t ∥⇇
-  ∥ ⊢op (ι Infer B D , i , refl , t) (σ , B=A , p) ∥⇉ =
-    op (_ , i , refl , σ , B=A , ∥-∥map D p)
+  ∥ ⊢op (ι Infer B D , i , q , t) (σ , B=A , p) ∥⇉ =
+    op (_ , i , q , σ , B=A , ∥-∥map D p)
 
   ∥_∥⇇
     : Γ ⊢ t ⇇ A
     → Tm⇇ m A ∥ Γ ∥ctx
   ∥ ⊢⇉ t  p ∥⇇ = ⇉ ∥ t ∥⇉ by p
-  ∥ ⊢op (ι Check B D , i , refl , t) (σ , B=A , p) ∥⇇ =
-    op (_ , i , refl , σ , B=A , ∥-∥map D p)
+  ∥ ⊢op (ι Check B D , i , q , t) (σ , B=A , p) ∥⇇ =
+    op (_ , i , q , σ , B=A , ∥-∥map D p)
 
   ∥-∥map : (D : ArgsD n)
     → {t : R.⟦ D ⟧ᵃˢ Raw m}

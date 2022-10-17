@@ -18,6 +18,8 @@ private variable
     Γ Δ   : Cxt m
     σ     : TSub n m
 
+-- Tm m A Γ = Γ ⊢ A
+
 infix 9 `_
 data Tm (m : ℕ) : TExp m → Cxt m → Set where
   `_ : _∈_          ⇒ Tm m
@@ -79,7 +81,7 @@ infixr 5 ⟪_⟫_
 
 module _ {X : Fam ℓ m} (α : (D -Alg) X) where mutual
   fold : Tm m ⇒ X
-  fold (` x)  = α .var x -- α .var x
+  fold (` x)  = α .var x
   fold (op (D , x , σ , eq , ts)) =
     α . alg $ D , x , σ , eq , foldMap (ConD.args D) ts
 

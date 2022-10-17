@@ -10,8 +10,8 @@ open import Syntax.Simple.Term SD as Ty
 record ArgD (Ξ : ℕ) : Set where
   constructor _⊢_
   field
-    cxt  : List (TExp Ξ)
-    type : TExp Ξ
+    cxt  : List (TExp Ξ) -- context extension
+    type : TExp Ξ        -- the type of an argument
 
 ArgsD : ℕ → Set
 ArgsD Ξ = List (ArgD Ξ)
@@ -19,12 +19,12 @@ ArgsD Ξ = List (ArgD Ξ)
 record ConD : Set where
   constructor ι
   field
-    {vars} : ℕ
-    type   : TExp  vars
-    args   : ArgsD vars
+    {vars} : ℕ           -- the number of type variables
+    type   : TExp  vars  -- the target type
+    args   : ArgsD vars  -- the arguments of a typing rule
 
 Desc : Set
-Desc = List ConD
+Desc = List ConD -- a list of typing rules
 
 ρ-syntax : ∀ {Ξ} → ArgD Ξ → ArgsD Ξ → ArgsD Ξ
 ρ-syntax D Ds = D ∙ Ds

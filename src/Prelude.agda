@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K --safe #-}
+
 module Prelude where
 
 open import Axiom.UniquenessOfIdentityProofs   public
@@ -21,14 +23,16 @@ module ℕₚ = Data.Nat.Properties
 open import Data.Fin                           public
   using (Fin; #_; zero; suc; fromℕ)
 open import Data.Fin.Literals                  public
+
 open import Data.List                          public 
   using (List; length; map; _++_; zip)
   renaming ([] to ∅; _∷_ to _∙_)
 open import Data.Maybe                         public
   using (Maybe; nothing; just)
-open import Data.List.Membership.Propositional               public
-open import Data.List.Relation.Unary.Any using (Any; here; there) public
-open import Data.List.Relation.Unary.All public
+open import Data.List.Membership.Propositional public
+open import Data.List.Relation.Unary.Any       public
+  using (Any; here; there) 
+open import Data.List.Relation.Unary.All       public
   using (All)
 open import Data.Vec                           public
   using (Vec; []; _∷_)

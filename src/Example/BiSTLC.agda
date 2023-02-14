@@ -1,3 +1,5 @@
+{-# OPTIONS --with-K #-}
+
 module Example.BiSTLC where
 
 open import Prelude
@@ -28,14 +30,8 @@ open import Syntax.BiTyped.Description {ΛₜD}
 
 open import Syntax.BiTyped.Intrinsic.Term ΛₒD
 
-pattern _·′_ t u = op (_ , here refl , refl , _ , refl , t , u , _)
-pattern ƛ′_  t   = op (_ , there (here refl) , refl , _ , refl , t , _)
-
-_·′′_ : Tm _ Infer (A ↣ B) Γ → Tm _ Check A Γ → Tm _ Infer B Γ
-t ·′′ u = op (_ , here refl , refl , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , u , _)
-
-ƛ′′_ : Tm _ Check B (A ∙ Γ) → Tm _ Check (A ↣ B) Γ
-ƛ′′ t = op (_ , there (here refl) , refl , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , _)
+pattern _·′_ t u = op (_ , here refl , refl , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern ƛ′_  t   = op (_ , there (here refl) , refl , _ ∷ _ ∷ [] , refl , t , _)
 
 mutual
   data Λ⇉ {m : ℕ} : Λₜ m → Cxt m → Set where
@@ -70,16 +66,15 @@ fromΛ : ∀ mod → Λ mod A Γ → Tm _ mod A Γ
 fromΛ Infer (` x)       = ` x
 fromΛ Infer (_ ∋ t)     = _ ∋ fromΛ Check t
 fromΛ Check (⇉ t by eq) = ⇉ fromΛ Infer t by eq
-fromΛ Infer (t · u)     = fromΛ Infer t ·′′ fromΛ Check u
-fromΛ Check (ƛ t)       = ƛ′′ (fromΛ Check t)
+fromΛ Infer (t · u)     = fromΛ Infer t ·′ fromΛ Check u
+fromΛ Check (ƛ t)       = ƛ′ (fromΛ Check t)
 
--- [FAIL] needs function extensionality
--- from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
--- from-toΛ (` x)       = refl
--- from-toΛ (_ ∋ t)     = cong (_ ∋_) (from-toΛ t)
--- from-toΛ (⇉ t by eq) = cong (⇉_by eq)  (from-toΛ t)
--- from-toΛ (t ·′ u)    = {! cong₂ _·′′_ (from-toΛ t) !}
--- from-toΛ (ƛ′ t)      = {! cong ƛ′′_ (from-toΛ t)   !}
+from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
+from-toΛ (` x)       = refl
+from-toΛ (_ ∋ t)     = cong (_ ∋_) (from-toΛ t)
+from-toΛ (⇉ t by eq) = cong (⇉_by eq)  (from-toΛ t)
+from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
+from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)    
 
 to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
 to-fromΛ Infer (` x)       = refl

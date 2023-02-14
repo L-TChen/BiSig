@@ -1,9 +1,13 @@
+{-# OPTIONS --with-K --safe #-}
+
 open import Prelude
 open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
-import      Data.Fin  as F
+import Data.Fin            as F
+import Data.Vec            as V
+import Data.Vec.Properties as V
 
 private variable
   Γ Ξ Δ : ℕ
@@ -11,9 +15,9 @@ private variable
   A B : Set
 
 infix 9 `_
-data Tm : ℕ → Set where
-  `_ : Fin        ⇒₁ Tm
-  op : ⟦ D ⟧ ∘ Tm ⇒₁ Tm
+data Tm (n : ℕ) : Set where
+  `_ :       Fin n  → Tm n -- Fin        ⇒₁ Tm
+  op : ⟦ D ⟧ (Tm n) → Tm n -- ⟦ D ⟧ ∘ Tm ⇒₁ Tm
 
 Tm₀ : Set
 Tm₀ = Tm 0
@@ -22,11 +26,11 @@ Tms : ℕ → Set
 Tms Ξ = List (Tm Ξ)
 
 Ren : ℕ → ℕ → Set
-Ren m n = Fin m → Fin n
+Ren m n = Vec (Fin n) m -- Fin m → Fin n
 
-module _ (f : Ren m n) where mutual
+module _ (ρ : Ren m n) where mutual
   rename : Tm m → Tm n
-  rename (` x)             = ` f x
+  rename (` x)             = ` V.lookup ρ x
   rename (op (_ , i , ts)) = op (_ , i , renameⁿ ts)
 
   renameⁿ : {l : ℕ}
@@ -35,7 +39,7 @@ module _ (f : Ren m n) where mutual
   renameⁿ {l = suc n} (t , ts) = rename t , renameⁿ ts
 
 injectˡ : Ren m (m + n)
-injectˡ i = F._↑ˡ_ i _
+injectˡ = V.tabulate λ i → F._↑ˡ_ i _ -- λ i → F._↑ˡ_ i _
 
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
 insert-mid m n i with F.splitAt m i
@@ -43,32 +47,32 @@ insert-mid m n i with F.splitAt m i
 ... | inr k = (m + n) F.↑ʳ k
 
 wkʳ : Tm m → Tm (n + m)
-wkʳ = rename (F._↑ʳ_ _)
+wkʳ = rename (V.tabulate (F._↑ʳ_ _)) -- (F._↑ʳ_ _)
 
 wkˡ : Tm m → Tm (m + n)
 wkˡ = rename injectˡ
 
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
-wkᵐ m n = rename (insert-mid m n)
+wkᵐ m n = rename (V.tabulate (insert-mid m n)) -- (insert-mid m n)
 
 wk≤ˡ : m ≤ n → Tm m → Tm n
 wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
-weaken = rename suc
+weaken = rename (V.tabulate suc)
 
 ⟨_⟩ : Ren m n → Tm m → Tm n
 ⟨ f ⟩ t = rename f t
 
 idr : Ren m m
-idr = id
+idr = V.allFin _
 
 Sub : (m n : ℕ) → Set
-Sub m n = Fin m → Tm n
+Sub m n = Vec (Tm n) m -- Fin m → Tm n
 
 module _ (σ : Sub m n) where mutual
   sub : Tm m → Tm n
-  sub (` x)  = σ x
+  sub (` x)  = V.lookup σ x -- σ x
   sub (op (_ , i , ts)) = op (_ , i , subⁿ _ ts)
 
   subⁿ : ∀ l
@@ -82,17 +86,18 @@ infixr 8 ⟨_⟩ ⟪_⟫
 ⟪ f ⟫ t = sub f t
 
 ids : Sub m m
-ids = `_
+ids = V.tabulate `_ -- `_
 
 _⨟_ : Sub m n → Sub n l → Sub m l
-(σ₁ ⨟ σ₂) i = ⟪ σ₂ ⟫ (σ₁ i)
+(σ₁ ⨟ σ₂) = V.tabulate λ i → ⟪ σ₂ ⟫ (V.lookup σ₁ i) -- ⟪ σ₂ ⟫ (σ₁ i)
 
 ∅ₛ : Sub 0 n
-∅ₛ ()
+∅ₛ = []
 
 _∙ₛ_ : Tm n → Sub m n → Sub (suc m) n
-(t ∙ₛ σ)  zero   = t
-(t ∙ₛ σ) (suc i) = σ i
+(t ∙ₛ σ) = t ∷ σ
+-- (t ∙ₛ σ)  zero   = t
+-- (t ∙ₛ σ) (suc i) = σ i
 
 infixr 5 _∙ₛ_
 
@@ -101,7 +106,7 @@ mutual
     → ⟪ ids ⟫ t ≡ t
   sub-id {m = zero} (op (_ , i , ts)) =
     cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
-  sub-id {m = suc m} (` x)  = refl -- ids-at-x=x x
+  sub-id {m = suc m} (` x)  = V.lookup∘tabulate `_ x
   sub-id {m = suc m} (op (_ , i , ts)) =
     cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
 
@@ -159,9 +164,10 @@ thick {m = suc m} (suc x) (suc y) with thick x y
 ... | just y′ = just (suc y′)
 ... | nothing = nothing
 
-_for_
-  : Tm Ξ → Fin (suc Ξ)
-  → Sub (suc Ξ) Ξ
-(t for x) y with thick x y
-... | just y′ = ` y′
-... | nothing = t
+-- _for_
+--   : Tm Ξ → Fin (suc Ξ)
+--   → Sub (suc Ξ) Ξ
+-- (t for x) y with thick x y
+-- ... | just y′ = ` y′
+-- ... | nothing = t
+

@@ -7,7 +7,7 @@ module Syntax.BiTyped.Intrinsic.Functor {SD : S.Desc} where
 open import Syntax.Context     SD
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm to TExp)
-  
+
 open import Syntax.BiTyped.Description {SD}
 
 Fam : (m : ℕ) (ℓ : Level) → Set (lsuc ℓ)
@@ -23,19 +23,19 @@ private variable
   Γ   : Cxt m
   A B : TExp m
 
-⟦_⟧ᵃ_ : List (TExp n) → (Cxt m → Set ℓ) → Sub n m → Cxt m → Set ℓ
-(⟦ ∅     ⟧ᵃ X) _ Γ = X Γ
-(⟦ A ∙ D ⟧ᵃ X) σ Γ = (⟦ D ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ)
+⟦_⟧ᵃ : List (TExp n) → (Cxt m → Set ℓ) → Sub n m → Cxt m → Set ℓ
+⟦ ∅     ⟧ᵃ X _ Γ = X Γ
+⟦ A ∙ D ⟧ᵃ X σ Γ = ⟦ D ⟧ᵃ X σ (⟪ σ ⟫ A ∙ Γ)
 
-⟦_⟧ᵃˢ_ : (D : ArgsD n) (X : Fam m ℓ) → Sub n m → Cxt m → Set ℓ
-(⟦ ∅               ⟧ᵃˢ _) σ _ = ⊤
-(⟦ Δ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ Δ ⟧ᵃ X m (⟪ σ ⟫ B)) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
+⟦_⟧ᵃˢ : (D : ArgsD n) (X : Fam m ℓ) → Sub n m → Cxt m → Set ℓ
+⟦ ∅               ⟧ᵃˢ _ σ _ = ⊤
+⟦ Δ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X σ Γ = ⟦ Δ ⟧ᵃ (X m (⟪ σ ⟫ B)) σ Γ × ⟦ Ds ⟧ᵃˢ X σ Γ
 
-⟦_⟧ᶜ_ : (D : ConD) (X : Fam m ℓ) → Fam m ℓ
-(⟦ ι m₀ B D ⟧ᶜ X) m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
+⟦_⟧ᶜ : (D : ConD) (X : Fam m ℓ) → Fam m ℓ
+⟦ ι m₀ B D ⟧ᶜ X m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
 
-⟦_⟧_ : (D : Desc) (X : Fam m ℓ) → Fam m ℓ
-(⟦ Ds ⟧ X) m A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) m A Γ
+⟦_⟧ : (D : Desc) (X : Fam m ℓ) → Fam m ℓ
+⟦ Ds ⟧ X m A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X m A Γ
 
 record _-Alg (D : Desc) (X : Fam m ℓ) : Set ℓ where
   field

@@ -22,21 +22,21 @@ private variable
   A B  : TExp m
   Γ Δ  : ℕ
   X Y  : Fam ℓ m
- 
-⟦_⟧ᵃ_ : (D : TExps n) (X : Cxt m → Set ℓ) → TSub n m → Cxt m → Set ℓ
-(⟦ ∅      ⟧ᵃ X) σ Γ = X Γ
-(⟦ A ∙ As ⟧ᵃ X) σ Γ = (⟦ As ⟧ᵃ X) σ (⟪ σ ⟫ A ∙ Γ) -- (⟪ σ ⟫ A ∙ Γ)
 
-⟦_⟧ᵃˢ_ : (D : ArgsD n) (X : Fam ℓ m) → TSub n m → Cxt m → Set ℓ
-(⟦ ∅            ⟧ᵃˢ _) _ _ = ⊤
-(⟦ (θ ⊢ B) ∙ Ds ⟧ᵃˢ X) σ Γ = (⟦ θ ⟧ᵃ X (⟪ σ ⟫ B)) σ Γ × (⟦ Ds ⟧ᵃˢ X) σ Γ
+⟦_⟧ᵃ : (D : TExps n) (X : Cxt m → Set ℓ) → TSub n m → Cxt m → Set ℓ
+⟦ ∅      ⟧ᵃ X σ Γ = X Γ
+⟦ A ∙ As ⟧ᵃ X σ Γ = ⟦ As ⟧ᵃ X σ (⟪ σ ⟫ A ∙ Γ) -- (⟪ σ ⟫ A ∙ Γ)
+
+⟦_⟧ᵃˢ : (D : ArgsD n) (X : Fam ℓ m) → TSub n m → Cxt m → Set ℓ
+⟦ ∅            ⟧ᵃˢ _ _ _ = ⊤
+⟦ (θ ⊢ B) ∙ Ds ⟧ᵃˢ X σ Γ = ⟦ θ ⟧ᵃ (X (⟪ σ ⟫ B)) σ Γ × ⟦ Ds ⟧ᵃˢ X σ Γ
 
 -- the interpretation of the conclusion of a typing rule
-⟦_⟧ᶜ_ : (D : ConD) (X : Fam ℓ m) → Fam ℓ m
-(⟦ ι {n} B D ⟧ᶜ X) A Γ = Σ[ σ ∈ TSub n _ ] (⟪ σ ⟫ B ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
+⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ m) → Fam ℓ m
+⟦ ι {n} B D ⟧ᶜ X A Γ = Σ[ σ ∈ TSub n _ ] (⟪ σ ⟫ B ≡ A × ⟦ D ⟧ᵃˢ X σ Γ)
 
-⟦_⟧_ : (D : Desc) (X : Fam ℓ m) → Fam ℓ m
-(⟦ Ds ⟧ X) A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] (⟦ D ⟧ᶜ X) A Γ
+⟦_⟧ : (D : Desc) (X : Fam ℓ m) → Fam ℓ m
+⟦ Ds ⟧ X A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ m) : Set ℓ where
   field

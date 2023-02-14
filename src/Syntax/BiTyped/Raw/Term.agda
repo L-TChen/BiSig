@@ -22,7 +22,7 @@ data Raw (m : ℕ) : Mode → Set where
   `_  : (x : Id)                       → Raw m Infer
   _⦂_ : (t : Raw m Check) (A : TExp m) → Raw m Infer
   _↑  : (t : Raw m Infer)              → Raw m Check
-  op  : (⟦ D ⟧ Raw m) mod              → Raw m mod
+  op  : ⟦ D ⟧ (Raw m) mod              → Raw m mod
 
 Raw⇇ Raw⇉ : ℕ → Set
 Raw⇇ m = Raw m Check
@@ -36,30 +36,30 @@ module _ (ρ : Ren m n) where mutual
   trename (op (_ , i , refl , ts))  = op (_ , i , refl , trenameⁿ ts)
 
   trenameⁿ : {D : B.ArgsD k}
-    → ⟦ D ⟧ᵃˢ Raw m  → ⟦ D ⟧ᵃˢ Raw n
+    → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
   trenameⁿ {D = ∅}     _        = _
   trenameⁿ {D = A ∙ D} (t , ts) = trenameᵃ t , trenameⁿ ts
 
   trenameᵃ : {D : List (TExp k)}
-    → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
+    → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
   trenameᵃ {D = ∅}     t       = trename t
   trenameᵃ {D = A ∙ D} (x , t) = x , trenameᵃ t
 
 twkˡ : m ≤ n → Raw m mod → Raw n mod
 twkˡⁿ : {D : B.ArgsD k} → m ≤ n
-  → ⟦ D ⟧ᵃˢ Raw m → ⟦ D ⟧ᵃˢ Raw n
+  → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
 twkˡᵃ : {D : List (TExp k)} → m ≤ n
-  → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
+  → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
 
 twkˡ  (less-than-or-equal refl) = trename  injectˡ
 twkˡⁿ (less-than-or-equal refl) = trenameⁿ injectˡ
 twkˡᵃ (less-than-or-equal refl) = trenameᵃ injectˡ
 
 twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
-twkᵐⁿ : {D : B.ArgsD k} (m n {l} : ℕ) 
-  → ⟦ D ⟧ᵃˢ Raw (m + l) → ⟦ D ⟧ᵃˢ Raw (m + n + l)
+twkᵐⁿ : {D : B.ArgsD k} (m n {l} : ℕ)
+  → ⟦ D ⟧ᵃˢ (Raw (m + l)) → ⟦ D ⟧ᵃˢ (Raw (m + n + l))
 twkᵐᵃ : {D : List (TExp k)} (m n {l} : ℕ)
-  → ⟦ D ⟧ᵃ Raw (m + l) mod → ⟦ D ⟧ᵃ Raw (m + n + l) mod
+  → ⟦ D ⟧ᵃ (Raw (m + l) mod) → ⟦ D ⟧ᵃ (Raw (m + n + l) mod)
 
 twkᵐ  m n = trename  (insert-mid m n)
 twkᵐⁿ m n = trenameⁿ (insert-mid m n)
@@ -73,11 +73,11 @@ module _ (σ : Sub m n) where mutual
   tsub (op (D , i , refl , ts)) = op (D , i , refl , tsubⁿ ts)
 
   tsubⁿ : {D : B.ArgsD k}
-    → ⟦ D ⟧ᵃˢ Raw m  → ⟦ D ⟧ᵃˢ Raw n
+    → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
   tsubⁿ {D = ∅}     _        = _
   tsubⁿ {D = A ∙ D} (t , ts) = tsubᵃ t , tsubⁿ ts
 
   tsubᵃ : {D : List (TExp k)}
-    → ⟦ D ⟧ᵃ Raw m mod → ⟦ D ⟧ᵃ Raw n mod
+    → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
   tsubᵃ {D = ∅}     t       = tsub t
   tsubᵃ {D = A ∙ D} (x , t) = x , tsubᵃ t

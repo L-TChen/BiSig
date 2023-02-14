@@ -28,14 +28,14 @@ data Tm (m : ℕ) : Fam₀ m where
     → Tm m Infer A Γ
   ⇉_by_ : (t : Tm m Infer A Γ) (eq : A ≡ B)
     → Tm m Check B Γ
-  op : (⟦ D ⟧ Tm m) mod ⇒ Tm m mod
+  op : ⟦ D ⟧ (Tm m) mod ⇒ Tm m mod
 
 Tm⇉ Tm⇇ : (m : ℕ) → _
 Tm⇉ m = Tm m Infer
 Tm⇇ m = Tm m Check
 
 mutual
-  rename : Ren Γ Δ 
+  rename : Ren Γ Δ
     → Tm m mod A Γ → Tm m mod A Δ
   rename f (`  x)                        = ` f x
   rename f (A ∋ t)                       = A ∋ rename f t
@@ -45,13 +45,13 @@ mutual
 
   renameMap : (D : ArgsD n)
     → Ren Γ Δ
-    → (⟦ D ⟧ᵃˢ Tm m) σ Γ → (⟦ D ⟧ᵃˢ Tm m) σ Δ
+    → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
   renameMap ∅                 f _        = _
   renameMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
   renameMapᵃ : (Θ : List (TExp n))
     → Ren Γ Δ
-    → (⟦ Θ ⟧ᵃ Tm m mod A) σ Γ → (⟦ Θ ⟧ᵃ Tm m mod A) σ Δ
+    → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
   renameMapᵃ ∅       f t = rename f t
   renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
 
@@ -84,13 +84,13 @@ mutual
 
   subMap : (D : ArgsD n)
     → Sub Γ Δ
-    → (⟦ D ⟧ᵃˢ Tm m) σ Γ → (⟦ D ⟧ᵃˢ Tm m) σ Δ
+    → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
   subMap ∅        f _        = _
   subMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
   subMapᵃ : (Θ : List (TExp n))
     → Sub Γ Δ
-    → (⟦ Θ ⟧ᵃ Tm m mod A) σ Γ → (⟦ Θ ⟧ᵃ Tm m mod A) σ Δ
+    → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
   subMapᵃ ∅       f t = sub f t
   subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
@@ -107,11 +107,11 @@ module _ {X : Fam m ℓ} (α : (D -Alg) X) where mutual
   fold (op (D , x , p , σ , q , ts)) = α .alg (D , x , p , σ , q , foldMap (ConD.args D) ts)
 
   foldMap : (D : ArgsD n)
-    → (⟦ D ⟧ᵃˢ Tm m) σ ⇒₁ (⟦ D ⟧ᵃˢ X) σ
+    → ⟦ D ⟧ᵃˢ (Tm m) σ ⇒₁ ⟦ D ⟧ᵃˢ X σ
   foldMap ∅        _        = _
   foldMap (Θ ⊢[ _ ] _ ∙ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
   foldMapᵃ : (Θ : List (TExp n))
-    → (⟦ Θ ⟧ᵃ Tm m mod A) σ ⇒₁ (⟦ Θ ⟧ᵃ X mod A) σ
+    → ⟦ Θ ⟧ᵃ (Tm m mod A) σ ⇒₁ ⟦ Θ ⟧ᵃ (X mod A) σ
   foldMapᵃ ∅       t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

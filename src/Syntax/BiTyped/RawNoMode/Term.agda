@@ -20,12 +20,12 @@ infix 4 _⦂_
 data Raw (m : ℕ) : Fam₀ where
   `_  : (x : Id)                 → Raw m
   _⦂_ : (t : Raw m) (A : TExp m) → Raw m
-  op  : ⟦ D ⟧ Raw m              → Raw m
+  op  : ⟦ D ⟧ (Raw m)            → Raw m
 
 --mutual
 --  twkˡ : Raw m → Raw (m + n)
 --  twkˡ (` x)   = ` x
---  twkˡ (t ⦂ A) = twkˡ t ⦂ wkˡ A 
+--  twkˡ (t ⦂ A) = twkˡ t ⦂ wkˡ A
 --  twkˡ (op (D , i , ts)) = op (D , i , twkˡⁿ ts)
 --
 --  twkˡⁿ : {D : B.ArgsD Ξ}

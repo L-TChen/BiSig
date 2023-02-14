@@ -12,8 +12,8 @@ private variable
 
 infix 9 `_
 data Tm : ℕ → Set where
-  `_ : Fin      ⇒₁ Tm
-  op : ⟦ D ⟧ Tm ⇒₁ Tm
+  `_ : Fin        ⇒₁ Tm
+  op : ⟦ D ⟧ ∘ Tm ⇒₁ Tm
 
 Tm₀ : Set
 Tm₀ = Tm 0
@@ -39,11 +39,11 @@ injectˡ i = F._↑ˡ_ i _
 
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
 insert-mid m n i with F.splitAt m i
-... | inl j = (j F.↑ˡ _) F.↑ˡ _ 
+... | inl j = (j F.↑ˡ _) F.↑ˡ _
 ... | inr k = (m + n) F.↑ʳ k
 
 wkʳ : Tm m → Tm (n + m)
-wkʳ = rename (F._↑ʳ_ _) 
+wkʳ = rename (F._↑ʳ_ _)
 
 wkˡ : Tm m → Tm (m + n)
 wkˡ = rename injectˡ
@@ -52,12 +52,12 @@ wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
 wkᵐ m n = rename (insert-mid m n)
 
 wk≤ˡ : m ≤ n → Tm m → Tm n
-wk≤ˡ (less-than-or-equal refl) = wkˡ 
+wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
 weaken = rename suc
 
-⟨_⟩_ : Ren m n → Tm m → Tm n
+⟨_⟩ : Ren m n → Tm m → Tm n
 ⟨ f ⟩ t = rename f t
 
 idr : Ren m m
@@ -76,16 +76,25 @@ module _ (σ : Sub m n) where mutual
   subⁿ zero    _        = _
   subⁿ (suc n) (t , ts) = sub t , subⁿ n ts
 
-infixr 8 ⟨_⟩_ ⟪_⟫_
+infixr 8 ⟨_⟩ ⟪_⟫
 
-⟪_⟫_ : Sub m n → Tm m → Tm n
+⟪_⟫ : Sub m n → Tm m → Tm n
 ⟪ f ⟫ t = sub f t
 
 ids : Sub m m
 ids = `_
 
 _⨟_ : Sub m n → Sub n l → Sub m l
-(σ₁ ⨟ σ₂) i = ⟪ σ₂ ⟫ σ₁ i
+(σ₁ ⨟ σ₂) i = ⟪ σ₂ ⟫ (σ₁ i)
+
+∅ₛ : Sub 0 n
+∅ₛ ()
+
+_∙ₛ_ : Tm n → Sub m n → Sub (suc m) n
+(t ∙ₛ σ)  zero   = t
+(t ∙ₛ σ) (suc i) = σ i
+
+infixr 5 _∙ₛ_
 
 mutual
   sub-id : (t : Tm m)
@@ -137,7 +146,7 @@ mutual
   compareMap {n = zero}  _        _        = yes refl
   compareMap {n = suc n} (t , ts) (u , us) with t ≟ u
   ... | no ¬p = no λ where refl → ¬p refl
-  ... | yes p with compareMap ts us 
+  ... | yes p with compareMap ts us
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _,_ p q)
 

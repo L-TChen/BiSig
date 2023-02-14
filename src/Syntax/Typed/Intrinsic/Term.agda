@@ -26,20 +26,20 @@ data Tm (m : ℕ) : TExp m → Cxt m → Set where
   op : ⟦ D ⟧ (Tm m) ⇒ Tm m
 
 mutual
-  rename : Ren Γ Δ 
+  rename : Ren Γ Δ
     → Tm m A Γ → Tm m A Δ
   rename f (`  x)                         = ` f x
   rename f (op (ι B Ds , x , σ , p , ts)) = op (_ , x , σ , p , renameMap Ds f ts)
 
   renameMap : (D : ArgsD n)
     → Ren Γ Δ
-    → (⟦ D ⟧ᵃˢ Tm m) σ Γ → (⟦ D ⟧ᵃˢ Tm m) σ Δ
+    → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
   renameMap ∅            f _        = tt
   renameMap (Θ ⊢ C ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
   renameMapᵃ : (Θ : TExps n)
     → Ren Γ Δ
-    → (⟦ Θ ⟧ᵃ Tm m A) σ Γ → (⟦ Θ ⟧ᵃ Tm m A) σ Δ
+    → ⟦ Θ ⟧ᵃ (Tm m A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m A) σ Δ
   renameMapᵃ ∅       f t = rename f t
   renameMapᵃ (A ∙ Θ) f t = renameMapᵃ Θ (ext f) t
 
@@ -64,13 +64,13 @@ mutual
 
   subMap : (D : ArgsD n)
     → Sub Γ Δ
-    → (⟦ D ⟧ᵃˢ Tm m) σ Γ → (⟦ D ⟧ᵃˢ Tm m) σ Δ
+    → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
   subMap ∅            f _        = _
   subMap (Θ ⊢ C ∙ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
   subMapᵃ : (Θ : TExps n)
     → Sub Γ Δ
-    → (⟦ Θ ⟧ᵃ Tm m A) σ Γ → (⟦ Θ ⟧ᵃ Tm m A) σ Δ
+    → ⟦ Θ ⟧ᵃ (Tm m A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m A) σ Δ
   subMapᵃ ∅       f t = sub f t
   subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
 
@@ -86,11 +86,11 @@ module _ {X : Fam ℓ m} (α : (D -Alg) X) where mutual
     α . alg $ D , x , σ , eq , foldMap (ConD.args D) ts
 
   foldMap : (D : ArgsD n)
-    → ⟦ D ⟧ᵃˢ Tm m ⇒ ⟦ D ⟧ᵃˢ X
+    → ⟦ D ⟧ᵃˢ (Tm m) ⇒ ⟦ D ⟧ᵃˢ X
   foldMap ∅            _        = _
   foldMap (Θ ⊢ C ∙ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
   foldMapᵃ : (Θ : TExps n)
-    → ⟦ Θ ⟧ᵃ Tm m A ⇒ ⟦ Θ ⟧ᵃ X A
+    → ⟦ Θ ⟧ᵃ (Tm m A) ⇒ ⟦ Θ ⟧ᵃ (X A)
   foldMapᵃ ∅       t = fold t
   foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t

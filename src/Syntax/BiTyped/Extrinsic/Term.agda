@@ -46,4 +46,3 @@ _⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set
 
 _⊢_⇇_ : Cxt m → Raw m Check → TExp m → Set
 Γ ⊢ t ⇇ A = ⊢⇄ Check A Γ t
-

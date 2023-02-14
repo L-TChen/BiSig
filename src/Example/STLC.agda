@@ -1,27 +1,14 @@
+module Example.STLC where
+
 open import Prelude
   hiding (_↣_)
 
-module Example.STLC where
+open import Example.Implicational
 
-import Syntax.Simple.Description as S
-
-ΛₜD : S.Desc
-ΛₜD = 0 -- base type
-  ∙ 2   -- function type
-  ∙ ∅
-
-open import Syntax.Simple.Term ΛₜD   as Type
-  using (`_; op)
-  renaming (Tm₀ to Λₜ)
-open import Syntax.Context
-
-infixr 8 _↣_
-pattern _↣_ A B = op (_ , there (here refl) , A , B , _)
-
-open import Syntax.Typed.Description {ΛₜD} as T
+open import Syntax.Typed.Description {ΛₜD}
   renaming (_⊢_ to infix 4 _⊢_)
 
-ΛₒD : Desc 
+ΛₒD : Desc
 ΛₒD =
   2 ▷ ρ[ ∅ ⊢ ` # 1 ↣ ` # 0 ]  ρ[ ∅ ⊢ ` # 1 ] ∅ ⦂ ` # 0 ∙
   2 ▷ ρ[ ` # 1 ∙ ∅ ⊢ ` # 0 ]                 ∅ ⦂ ` # 1 ↣ ` # 0 ∙
@@ -32,27 +19,35 @@ open import Syntax.Typed.Description {ΛₜD} as T
   ∷ []
 -}
 
-open import Syntax.Typed.Intrinsic.Term  ΛₒD
+open import Syntax.Typed.Intrinsic.Term ΛₒD
+
 private variable
-  A B : Λₜ
-  Γ Δ : Ctx Λₜ
+  m n : ℕ
+  A B : Λₜ  m
+  Γ Δ : Cxt m
 
-pattern ƛ_ t     = op (_ , there (here refl) , _ ∷ _ ∷ [] , refl , t , _)
-pattern _·_ t u  = op (_ , here refl , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern ƛ_ t     = op (_ , there (here refl) , _ , refl , t , _)
+pattern _·_ t u  = op (_ , here refl , _ , refl , t , u , _)
 
-infixl 8 _·_
-infixr 7 ƛ_ 
+ƛ'_ : Tm _ B (A ∙ Γ) → Tm _ (A ↣ B) Γ
+ƛ' t = op (_ , there (here refl) , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , _)
 
-𝑰 : ∀  {A} → Tm (A ↣ A) Γ
-𝑰 = ƛ ` here refl
+_·'_ : Tm _ (A ↣ B) Γ → Tm _ A Γ → Tm _ B Γ
+t ·' u = op (_ , here refl , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , u , _)
 
-𝐾₁ : Tm (A ↣ B ↣ A) Γ
-𝐾₁  = ƛ ƛ ` there (here refl)
+infixl 8 _·_ _·'_
+infixr 7 ƛ_  ƛ'_
 
-_ : Tm A (A ∙ Γ)
-_ = 𝑰 · ` here refl
+𝑰 : Tm _ (A ↣ A) Γ
+𝑰 = ƛ' ` here refl
 
-height : Tm A Γ → ℕ
+𝐾₁ : Tm _ (A ↣ B ↣ A) Γ
+𝐾₁  = ƛ' ƛ' ` there (here refl)
+
+_ : Tm _ A (A ∙ Γ)
+_ = 𝑰 ·' ` here refl
+
+height : Tm _ A Γ → ℕ
 height (` x)   = 0
 height (t · u) = suc (height t ⊔ height u)
 height (ƛ t)   = suc (height t)

@@ -5,4 +5,4 @@ depend:
   standard-library-2.0
 
 flags:
-  --auto-inline
+  --auto-inline --guardedness --with-K

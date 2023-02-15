@@ -1,3 +1,5 @@
+{-# OPTIONS --with-K --safe #-}
+
 open import Prelude
   hiding (_++_)
 open import Syntax.Simple.Description

@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K --safe #-}
+
 open import Prelude
 
 module Syntax.Context.Base where

@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 module Example.STLC where
 
 open import Prelude
@@ -10,7 +12,7 @@ open import Syntax.Typed.Description {ΛₜD}
 
 ΛₒD : Desc
 ΛₒD =
-  2 ▷ ρ[ ∅ ⊢ ` # 1 ↣ ` # 0 ]  ρ[ ∅ ⊢ ` # 1 ] ∅ ⦂ ` # 0 ∙
+  2 ▷ ρ[ ∅ ⊢ ` # 1 ↣ ` # 0 ]  ρ[ ∅ ⊢ ` # 1 ] ∅ ⦂ ` # 0         ∙
   2 ▷ ρ[ ` # 1 ∙ ∅ ⊢ ` # 0 ]                 ∅ ⦂ ` # 1 ↣ ` # 0 ∙
   ∅
 {-
@@ -26,26 +28,20 @@ private variable
   A B : Λₜ  m
   Γ Δ : Cxt m
 
-pattern ƛ_ t     = op (_ , there (here refl) , _ , refl , t , _)
-pattern _·_ t u  = op (_ , here refl , _ , refl , t , u , _)
+pattern ƛ_ t     = op (_ , there (here refl) , _ ∷ _ ∷ [] , refl , t , _)
+pattern _·_ t u  = op (_ , here refl , _ ∷ _ ∷ [] , refl , t , u , _)
 
-ƛ'_ : Tm _ B (A ∙ Γ) → Tm _ (A ↣ B) Γ
-ƛ' t = op (_ , there (here refl) , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , _)
-
-_·'_ : Tm _ (A ↣ B) Γ → Tm _ A Γ → Tm _ B Γ
-t ·' u = op (_ , here refl , _ ∙ₛ _ ∙ₛ ∅ₛ , refl , t , u , _)
-
-infixl 8 _·_ _·'_
-infixr 7 ƛ_  ƛ'_
+infixl 8 _·_
+infixr 7 ƛ_
 
 𝑰 : Tm _ (A ↣ A) Γ
-𝑰 = ƛ' ` here refl
+𝑰 = ƛ ` here refl
 
 𝐾₁ : Tm _ (A ↣ B ↣ A) Γ
-𝐾₁  = ƛ' ƛ' ` there (here refl)
+𝐾₁  = ƛ ƛ ` there (here refl)
 
 _ : Tm _ A (A ∙ Γ)
-_ = 𝑰 ·' ` here refl
+_ = 𝑰 · ` here refl
 
 height : Tm _ A Γ → ℕ
 height (` x)   = 0

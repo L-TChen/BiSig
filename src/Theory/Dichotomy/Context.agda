@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 open import Prelude
 
 module Theory.Dichotomy.Context (Id : Set) where

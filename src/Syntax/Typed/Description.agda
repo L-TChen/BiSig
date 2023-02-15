@@ -1,3 +1,5 @@
+{-# OPTIONS --with-K --safe #-}
+
 open import Prelude
 
 import Syntax.Simple.Description as S

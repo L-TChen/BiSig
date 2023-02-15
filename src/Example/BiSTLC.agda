@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K #-}
+{-# OPTIONS --safe #-}
 
 module Example.BiSTLC where
 

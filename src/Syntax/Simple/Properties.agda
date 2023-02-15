@@ -5,6 +5,8 @@ module Syntax.Simple.Properties {D : Desc} where
 open import Syntax.Simple.Term D
 
 import      Data.Fin      as F
+open import Data.Vec      as V
+  using (lookup)
 open import Data.Product.Properties
 open import Data.List.Properties
 open import Data.List.Relation.Unary.Any.Properties
@@ -21,65 +23,65 @@ op-inj
   → ts ≡ us
 op-inj refl = refl
 
+-- module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
+--   ≡-fv-inv : (A : Tm Γ)
+--     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+--     → x ∈ fv A
+--     → σ₁ x ≡ σ₂ x
+--   ≡-fv-inv (` x)             eq (here refl) = eq
+--   ≡-fv-inv (op (Ξ , i , ts)) eq j = ≡-fv-invⁿ Ξ ts (op-inj eq) j
+-- 
+--   ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
+--     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+--     → x ∈ fvⁿ As
+--     → σ₁ x ≡ σ₂ x
+--   ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
+--   ... | inl j = ≡-fv-inv     A (,-injectiveˡ p) j
+--   ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j 
+
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
-  ≡-fv-inv : (A : Tm Γ)
+  ≡-fv-inv : (A : Tm Γ) 
     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
     → x ∈ fv A
-    → σ₁ x ≡ σ₂ x
-  ≡-fv-inv (` x)             eq (here refl) = eq
-  ≡-fv-inv (op (Ξ , i , ts)) eq j = ≡-fv-invⁿ Ξ ts (op-inj eq) j
+    → lookup σ₁ x ≡ lookup σ₂ x
+  ≡-fv-inv (` x)             p (here refl) = p
+  ≡-fv-inv (op (Ξ , i , ts)) p j = ≡-fv-invⁿ Ξ ts (op-inj p) j
 
   ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
     → x ∈ fvⁿ As
-    → σ₁ x ≡ σ₂ x
+    → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
-  ... | inl j = ≡-fv-inv     A (,-injectiveˡ p) j
-  ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j 
-
--- module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
---   ≡-fv-inv : (A : Tm Γ) 
---     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
---     → x ∈ fv A
---     → lookup σ₁ x ≡ lookup σ₂ x
---   ≡-fv-inv (` x)             p (here refl) = p
---   ≡-fv-inv (op (Ξ , i , ts)) p j = ≡-fv-invⁿ Ξ ts (op-inj p) j
-
---   ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
---     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
---     → x ∈ fvⁿ As
---     → lookup σ₁ x ≡ lookup σ₂ x
---   ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
---   ... | inl j = ≡-fv-inv      A  (,-injectiveˡ p) j
---   ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j
-
-module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
-  ≡-fv : (A : Tm Γ)
-    → (∀ {x} → x ∈ fv A → σ₁ x ≡ σ₂ x)
-    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
-  ≡-fv (` x)             eq = eq (here refl)
-  ≡-fv (op (Ξ , _ , ts)) eq = cong (λ ts → op (Ξ , _ , ts)) (≡-fvⁿ Ξ ts eq) 
-
-  ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
-    → (∀ {x} → x ∈ fvⁿ  As → σ₁ x ≡ σ₂ x)
-    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
-  ≡-fvⁿ zero    _        _  = refl
-  ≡-fvⁿ (suc n) (A , As) eq = cong₂ _,_
-    (≡-fv A (λ k → eq (++⁺ˡ k))) (≡-fvⁿ n As λ k → eq (++⁺ʳ (fv A) k))
+  ... | inl j = ≡-fv-inv      A  (,-injectiveˡ p) j
+  ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j
 
 -- module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
 --   ≡-fv : (A : Tm Γ)
---     → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
+--     → (∀ {x} → x ∈ fv A → σ₁ x ≡ σ₂ x)
 --     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
---   ≡-fv (` x)             p = p (here refl)
---   ≡-fv (op (n , _ , ts)) p = cong (λ ts → op (n , _ , ts)) (≡-fvⁿ n ts p)
-
+--   ≡-fv (` x)             eq = eq (here refl)
+--   ≡-fv (op (Ξ , _ , ts)) eq = cong (λ ts → op (Ξ , _ , ts)) (≡-fvⁿ Ξ ts eq) 
+-- 
 --   ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
---     → (∀ {x} → x ∈ fvⁿ  As → lookup σ₁ x ≡ lookup σ₂ x)
+--     → (∀ {x} → x ∈ fvⁿ  As → σ₁ x ≡ σ₂ x)
 --     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
---   ≡-fvⁿ zero    _        _ = refl
---   ≡-fvⁿ (suc n) (A , As) p = cong₂ _,_
---     (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvⁿ n As λ k → p (++⁺ʳ (fv A) k))
+--   ≡-fvⁿ zero    _        _  = refl
+--   ≡-fvⁿ (suc n) (A , As) eq = cong₂ _,_
+--     (≡-fv A (λ k → eq (++⁺ˡ k))) (≡-fvⁿ n As λ k → eq (++⁺ʳ (fv A) k))
+
+module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
+  ≡-fv : (A : Tm Γ)
+    → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
+    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+  ≡-fv (` x)             p = p (here refl)
+  ≡-fv (op (n , _ , ts)) p = cong (λ ts → op (n , _ , ts)) (≡-fvⁿ n ts p)
+
+  ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
+    → (∀ {x} → x ∈ fvⁿ  As → lookup σ₁ x ≡ lookup σ₂ x)
+    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+  ≡-fvⁿ zero    _        _ = refl
+  ≡-fvⁿ (suc n) (A , As) p = cong₂ _,_
+    (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvⁿ n As λ k → p (++⁺ʳ (fv A) k))
 
 -- -- sub-inv₂
 -- --   : ∀ {n} {i : n ∈ _}

@@ -1,3 +1,5 @@
+{-# OPTIONS --with-K --safe #-}
+
 open import Prelude
 
 module Syntax.Simple.Description where

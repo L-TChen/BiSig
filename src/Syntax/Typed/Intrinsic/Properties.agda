@@ -21,6 +21,7 @@ private
     A B   : TExp m
     Γ Δ   : Cxt m
 
-rename-id=id : (t : Tm m A Γ) → rename id t ≡ t
-rename-id=id (` x)  = refl
-rename-id=id (op (D , D∈Ds , σ , eq , ts)) =  cong op {!!}   
+-- rename-id=id : (t : Tm m A Γ) → rename id t ≡ t
+-- rename-id=id (` x)  = refl
+-- rename-id=id (op (D , D∈Ds , σ , eq , ts)) =  cong op {!!}   
+

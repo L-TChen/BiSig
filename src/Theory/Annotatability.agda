@@ -41,15 +41,16 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
   ... | ι mod B _ , j , refl = mod , op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
 
   annotateMap : (D  : T.ArgsD n) (D′ : B.ArgsD n) → eraseᵃˢ D′ ≡ D
-    → (T.⟦ D  ⟧ᵃˢ Tm  m) σ Γ
-    → (B.⟦ D′ ⟧ᵃˢ BTm m) σ Γ
+    → T.⟦ D  ⟧ᵃˢ (Tm  m) σ Γ
+    → B.⟦ D′ ⟧ᵃˢ (BTm m) σ Γ
   annotateMap ∅        ∅                refl _        = _
-  annotateMap (_ ∙ _) (Θ ⊢[ m ] C ∙ Ds) refl (t , ts) = annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
+  annotateMap (_ ∙ _) (Θ ⊢[ m ] C ∙ Ds) refl (t , ts) =
+    annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
 
   annotateMapᵃ : (Θ : TExps n)
     → (mod : Mode)
-    → (T.⟦ Θ ⟧ᵃ Tm  m     A) σ Γ
-    → (B.⟦ Θ ⟧ᵃ BTm m mod A) σ Γ
+    → T.⟦ Θ ⟧ᵃ (Tm m A)      σ Γ
+    → B.⟦ Θ ⟧ᵃ (BTm m mod A) σ Γ
   annotateMapᵃ ∅       m t with annotate t
   annotateMapᵃ ∅ Check t | Check , t′ = t′
   annotateMapᵃ ∅ Infer t | Check , t′ = _ ∋ t′

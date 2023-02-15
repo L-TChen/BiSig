@@ -23,6 +23,6 @@ _++_ : AList m n → AList n l → AList m l
 []           ++ σ₂ = σ₂
 (t / x ∷ σ₁) ++ σ₂ = t / x ∷ (σ₁ ++ σ₂)
 
--- toSub : AList m n → Sub m n
--- toSub []          = ids
--- toSub (t / x ∷ p) = (t for x) ⨟ toSub p
+toSub : AList m n → Sub m n
+toSub []          = ids
+toSub (t / x ∷ ρ) = (t for x) ⨟ toSub ρ

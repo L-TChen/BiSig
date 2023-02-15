@@ -25,7 +25,7 @@ private variable
   X     : Mode → Set ℓ
 
 ⟦_⟧ᵃ : (Θ : List (TExp n)) (X : Mode → Set ℓ) (P : Cxt m → X mod → Set ℓ′)
-  → TSub n m → Cxt m → R.⟦ Θ ⟧ᵃ X mod → Set ℓ′
+  → TSub n m → Cxt m → R.⟦ Θ ⟧ᵃ (X mod) → Set ℓ′
 ⟦ ∅     ⟧ᵃ X P σ Γ t       = P Γ t
 ⟦ A ∙ D ⟧ᵃ X P σ Γ (x , t) = ⟦ D ⟧ᵃ X P σ (x ⦂ ⟪ σ ⟫ A , Γ) t
 

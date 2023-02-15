@@ -5,7 +5,8 @@ import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
 
-import      Data.Fin  as F
+-- import Data.Fin  as F
+import Data.Vec as V
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp)
@@ -61,9 +62,9 @@ twkᵐⁿ : {D : B.ArgsD k} (m n {l} : ℕ)
 twkᵐᵃ : {D : List (TExp k)} (m n {l} : ℕ)
   → ⟦ D ⟧ᵃ (Raw (m + l) mod) → ⟦ D ⟧ᵃ (Raw (m + n + l) mod)
 
-twkᵐ  m n = trename  (insert-mid m n)
-twkᵐⁿ m n = trenameⁿ (insert-mid m n)
-twkᵐᵃ m n = trenameᵃ (insert-mid m n)
+twkᵐ  m n = trename  (V.tabulate (insert-mid m n)) -- (insert-mid m n)
+twkᵐⁿ m n = trenameⁿ (V.tabulate (insert-mid m n)) -- (insert-mid m n)
+twkᵐᵃ m n = trenameᵃ (V.tabulate (insert-mid m n)) -- (insert-mid m n)
 
 module _ (σ : Sub m n) where mutual
   tsub : Raw m mod → Raw n mod

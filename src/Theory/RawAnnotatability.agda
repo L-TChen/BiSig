@@ -45,16 +45,16 @@ mutual
     in n , le , mod , op (D , i , refl , ts′)
 
   annotateRawⁿ : (Ds : ArgsD Ξ)
-    → R.⟦ Ds ⟧ᵃˢ Raw m
-    → ∃[ n ] (m ≤ n) × M.⟦ Ds ⟧ᵃˢ MRaw n
+    → R.⟦ Ds ⟧ᵃˢ (Raw m)
+    → ∃[ n ] (m ≤ n) × M.⟦ Ds ⟧ᵃˢ (MRaw n)
   annotateRawⁿ {Ξ} {m} ∅                     _ = m , ≤-refl , _
   annotateRawⁿ {Ξ} {m} (Θ B.⊢[ mod ] A ∙ Ds) (t , ts) with annotateRawᵃ Θ mod t | annotateRawⁿ Ds ts
   ... | n₁ , less-than-or-equal {k₁} refl , t′ | n₂ , less-than-or-equal {k₂} refl , ts′ =
     m + k₁ + k₂ , m≤m+a+b , twkˡᵃ (less-than-or-equal refl) t′ , twkᵐⁿ m k₁ ts′
 
   annotateRawᵃ : (Θ : TExps n) (mod : Mode)
-    → R.⟦ Θ ⟧ᵃ Raw m
-    → ∃[ n ] (m ≤ n) × M.⟦ Θ ⟧ᵃ MRaw n mod
+    → R.⟦ Θ ⟧ᵃ (Raw m)
+    → ∃[ n ] (m ≤ n) × M.⟦ Θ ⟧ᵃ (MRaw n mod)
   annotateRawᵃ ∅       mod t with annotateRaw t
   annotateRawᵃ ∅ Check t | n , le , Check , t′ = n , le , t′
   annotateRawᵃ ∅ Check t | n , le , Infer , t′ = n , le , t′ ↑

@@ -37,14 +37,14 @@ mutual
     op (eraseᶜ D , ∈-map⁺ eraseᶜ i , σ , q , forgetMap _ ts)
 
   forgetMap : (D : B.ArgsD n)
-    → (B.⟦ D         ⟧ᵃˢ BTm Ξ) σ Γ
-    → (T.⟦ eraseᵃˢ D ⟧ᵃˢ Tm  Ξ)  σ Γ
+    → B.⟦ D         ⟧ᵃˢ (BTm Ξ) σ Γ
+    → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm  Ξ) σ Γ
   forgetMap ∅        _                   = _
   forgetMap (Θ ⊢[ mod ] C ∙ Ds) (t , ts) =
     forgetMapᵃ Θ t , forgetMap Ds ts
 
   forgetMapᵃ : (Θ : TExps n)
-    → (B.⟦ Θ ⟧ᵃ BTm Ξ mod A) σ Γ
-    → (T.⟦ Θ ⟧ᵃ Tm  Ξ     A) σ Γ
+    → B.⟦ Θ ⟧ᵃ (BTm Ξ mod A) σ Γ
+    → T.⟦ Θ ⟧ᵃ (Tm  Ξ     A) σ Γ
   forgetMapᵃ ∅       t = forget t
   forgetMapᵃ (A ∙ Θ) t = forgetMapᵃ Θ t

@@ -164,10 +164,12 @@ thick {m = suc m} (suc x) (suc y) with thick x y
 ... | just y′ = just (suc y′)
 ... | nothing = nothing
 
--- _for_
---   : Tm Ξ → Fin (suc Ξ)
---   → Sub (suc Ξ) Ξ
--- (t for x) y with thick x y
--- ... | just y′ = ` y′
--- ... | nothing = t
-
+_for_
+  : Tm Ξ → Fin (suc Ξ)
+  → Sub (suc Ξ) Ξ
+(t for x) = V.tabulate helper
+  where
+    helper : Fin (suc _) → Tm _
+    helper y with thick x y
+    ... | just y′ = ` y′
+    ... | nothing = t

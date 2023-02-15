@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import Prelude
 
 import Syntax.Simple.Description as S
@@ -52,16 +54,16 @@ mutual
   uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
   uniq-⇉ {t = op (ι Infer C Ds , i , refl , _)} (⊢op _ (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
     let (C⊆xs , _ , SDs) = MC i in
-    ≡-fv C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
+    ≡-fv _ _ C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-⇉Map
     : (Ds : ArgsD n)
     → ModeCorrectᵃˢ ∅ Ds
-    → {ts : R.⟦ Ds ⟧ᵃˢ Raw m}
-    → (⊢ts : (⟦ Ds ⟧ᵃˢ Raw m , ⊢⇄) σ₁ Γ ts)
-    → (⊢us : (⟦ Ds ⟧ᵃˢ Raw m , ⊢⇄) σ₂ Γ ts)
+    → {ts : R.⟦ Ds ⟧ᵃˢ (Raw m)}
+    → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₁ Γ ts)
+    → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₂ Γ ts)
     → ∀ {x} → x ∈ Known ∅ Ds
-    → σ₁ x ≡ σ₂ x
+    → V.lookup σ₁ x ≡ V.lookup σ₂ x -- σ₁ x ≡ σ₂ x
   uniq-⇉Map ∅                     _             _          _          ()
   uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
@@ -72,15 +74,18 @@ mutual
   uniq-⇉Mapᵃ
     : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
-    → {t : R.⟦ Θ ⟧ᵃ Raw m Infer}
-    → (⊢t : (⟦ Θ ⟧ᵃ Raw m , ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
-    → (⊢u : (⟦ Θ ⟧ᵃ Raw m , ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
-    → (∀ {x} → x ∈ xs → σ₁ x ≡ σ₂ x)
+    → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
+    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
+    -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
+    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
+    -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
+    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x) -- σ₁ x ≡ σ₂ x)
     → ∀ {x} → x ∈ fv C
-    → σ₁ x ≡ σ₂ x
+    → V.lookup σ₁ x ≡ V.lookup σ₂ x
   uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
-  uniq-⇉Mapᵃ C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f = let A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) in 
-    uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ , _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+  uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂ = σ₂} C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f =
+    let A₁=A₂ = ≡-fv σ₁ σ₂ A λ x∈fvA → f (A⊆xs x∈fvA) in 
+    uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
 ¬switch
   : {t : Raw⇉ m}
@@ -102,7 +107,7 @@ mutual
   synthetise Γ (` x)   with lookup Γ x
   ... | no ¬p = no λ where
     (n , less-than-or-equal refl , σ , A , ⊢` x∈) → ¬p ({!!} , {!!})
-  ... | yes (A , x) = yes (_ , ≤-refl , `_ , A , ⊢` {!x!})
+  ... | yes (A , x) = yes (_ , ≤-refl , ids , A , ⊢` {!x!})
   synthetise Γ (t ⦂ A) with inherit Γ A t
   ... | no ¬p = no λ where (n , n≤m , σ , A , ⊢⦂ ⊢t) → ¬p (n , n≤m , σ , ⊢t)
   ... | yes (n , n≤m , σ , ⊢t) = yes (n , n≤m , σ , sub σ A  , ⊢⦂ ⊢t)

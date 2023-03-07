@@ -26,9 +26,15 @@ import Syntax.BiTyped.RawNoMode.Term
 import Syntax.BiTyped.Extrinsic.Functor
 import Syntax.BiTyped.Extrinsic.Term
 
+-- [TODO] Type-level specifications should make it clear that we’re operating on the same syntax tree throughout.
+--        For example: scope checking, bidirectionalisation of raw terms, conversion between extrinsic and intrinsic terms
+-- [TODO] What format (intrinsic vs extrinsic) does the compiler need eventually?
+-- [TODO] User interface (for extending existing systems): correct and convenient bidirectional annotation of a base type system
+-- [TODO] history of parser generators
+
 -- Theory of Bidirectional Type Checking
 import Theory.Annotatability
-import Theory.RawAnnotatability
+import Theory.RawAnnotatability  -- [TODO] metavariables needed for converting to bidirectional raw syntax
 import Theory.Soundness
 
 import Theory.Erasure.Description
@@ -38,7 +44,8 @@ import Theory.Dichotomy.Context
 import Theory.Dichotomy.Term
 
 import Theory.ModeCorrectness.Description
-import Theory.ModeCorrectness.Term -- not finished yet
+import Theory.ModeCorrectness.Term -- [TODO] not finished yet
+                                   -- [TODO] migrate to de Bruijn–indexed raw terms
 
 -- Examples
 

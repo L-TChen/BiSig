@@ -44,7 +44,7 @@ MC : {CD : ConD} → (CD ∈ D) → _
 MC i = A.lookup mc i
 
 mutual
-  -- It should follow from syntax directedness: 
+  -- It should follow from syntax directedness:
   -- decompose this lemma into some more conceptual results
   uniq-⇉
     : {t : Raw⇉ m}
@@ -84,7 +84,7 @@ mutual
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
   uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
   uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂ = σ₂} C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f =
-    let A₁=A₂ = ≡-fv σ₁ σ₂ A λ x∈fvA → f (A⊆xs x∈fvA) in 
+    let A₁=A₂ = ≡-fv σ₁ σ₂ A λ x∈fvA → f (A⊆xs x∈fvA) in
     uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
 ¬switch

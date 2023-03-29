@@ -10,7 +10,7 @@ open import Syntax.Simple.Term D
   hiding (_≟_)
 open import Syntax.Simple.Association D
 
-open import Data.Fin
+open import Data.Fin as F
 open import Data.List.Membership.Propositional.Properties
 
 private variable
@@ -48,16 +48,18 @@ mutual
   checkⁿ {n = suc l} x (t , ts) x∉ts =
     check x t (x∉ts ∘ ∈-++⁺ˡ) , checkⁿ x ts (x∉ts ∘ ∈-++⁺ʳ (fv t))
 
-flexFlex : (x y : Fin m) → ∃ (AList m)
-flexFlex {m = suc m} x y with thick x y
-... | just y′ = m , ((` y′) / x ∷ [])
-... | nothing = suc m , []
-
 flexRigid : (x : Fin m) (t : Tm m) → Maybe (∃ (AList m))
 flexRigid {m = suc m} x t with checkFv x t
 ... | yes _ = nothing
 ... | no ¬p = just (m , (check x t ¬p / x ∷ []))
 
+-- [TODO] How to make it proof-relevant?
+flexFlex : (x y : Fin m) → ∃ (AList m)
+flexFlex {m = suc m} x y with x F.≟ y
+... | yes p = suc m , []
+... | no ¬p = m , (` punchOut ¬p) / x ∷ []
+
+-- [TODO] (acc : ∃[ k ] k ≤ m × AList m k)
 mutual
   amgu : (t u : Tm m) (acc : ∃ (AList m))
     → Maybe (∃ (AList m))
@@ -68,7 +70,7 @@ mutual
   amgu {m} (` x)  u      (_ , [])        = flexRigid x u
   amgu {m} t      (` y)  (_ , [])        = flexRigid y t
   amgu {m} t      u      (n , r / z ∷ σ) with amgu (⟪ r for z ⟫ t) (⟪ r for z ⟫ u) (n , σ)
-  ... | just σ′  = just (r / z ∷′ σ′)
+  ... | just σ′ = just (r / z ∷′ σ′)
   ... | nothing = nothing
 
   amguⁿ : (ts us : Tm m ^ l) (acc : ∃ (AList m))

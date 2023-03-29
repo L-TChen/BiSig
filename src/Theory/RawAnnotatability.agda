@@ -33,36 +33,45 @@ module _ where
     m + a + b
     ∎
 
+toCheck : MRaw m mod
+  → MRaw m Check
+toCheck {_} {Check} t = t
+toCheck {_} {Infer} t = t ↑
+
+cast : MRaw m mod
+  → (mod′ : Mode)
+  → MRaw (suc m) mod′ ⊎ MRaw m mod′
+cast             t Check = inr (toCheck t)
+cast {_} {Infer} t Infer = inr t
+cast {_} {Check} t Infer = inl (twkˡ (≤-step ≤-refl) t ⦂ ` fromℕ _)
+
 -- For a term with n many type variables, the index of the newly generated type variable is `suc n`.
 mutual
   annotateRaw
     : Raw m
     → ∃[ n ] (m ≤ n) × ∃[ mod ] MRaw n mod
-  annotateRaw {m} (` x)   = m , ≤-refl  , Infer , ` x
-  annotateRaw {m} (t ⦂ A) with annotateRaw t
-  ... | n , p , Check , t′ = n , p , Infer , (t′   ⦂ wk≤ˡ p A)
-  ... | n , p , Infer , t′ = n , p , Infer , (t′ ↑ ⦂ wk≤ˡ p A)
-  annotateRaw {m} (op (D@(ι mod B Ds) , i , ts)) =
+  annotateRaw (` x)   = _ , ≤-refl  , Infer , ` x
+  annotateRaw (t ⦂ A) with annotateRaw t
+  ... | n , p , mod , t′ = n , p , Infer , (toCheck t′ ⦂ wk≤ˡ p A) 
+  annotateRaw (op (D@(ι mod B Ds) , i , ts)) =
     let n , le , ts′ = annotateRawⁿ Ds ts
     in n , le , mod , op (D , i , refl , ts′)
 
   annotateRawⁿ : (Ds : ArgsD Ξ)
     → R.⟦ Ds ⟧ᵃˢ (Raw m)
     → ∃[ n ] (m ≤ n) × M.⟦ Ds ⟧ᵃˢ (MRaw n)
-  annotateRawⁿ {Ξ} {m} ∅                     _ = m , ≤-refl , _
-  annotateRawⁿ {Ξ} {m} (Θ B.⊢[ mod ] A ∙ Ds) (t , ts) with annotateRawᵃ Θ mod t | annotateRawⁿ Ds ts
+  annotateRawⁿ         ∅                     _ = _ , ≤-refl , _
+  annotateRawⁿ {m = m} (Θ B.⊢[ mod ] A ∙ Ds) (t , ts) with annotateRawᵃ Θ mod t | annotateRawⁿ Ds ts
   ... | n₁ , less-than-or-equal {k₁} refl , t′ | n₂ , less-than-or-equal {k₂} refl , ts′ =
     m + k₁ + k₂ , m≤m+a+b , twkˡᵃ (less-than-or-equal refl) t′ , twkᵐⁿ m k₁ ts′
 
   annotateRawᵃ : (Θ : TExps n) (mod : Mode)
     → R.⟦ Θ ⟧ᵃ (Raw m)
     → ∃[ n ] (m ≤ n) × M.⟦ Θ ⟧ᵃ (MRaw n mod)
-  annotateRawᵃ ∅       mod t with annotateRaw t
-  annotateRawᵃ ∅ Check t | n , le , Check , t′ = n , le , t′
-  annotateRawᵃ ∅ Check t | n , le , Infer , t′ = n , le , t′ ↑
-  annotateRawᵃ ∅ Infer t | n , le , Check , t′ =
-    suc n , ≤-step le , (twkˡ (≤-step ≤-refl) t′ ⦂ ` fromℕ n)
-  annotateRawᵃ ∅ Infer t | n , le , Infer , t′ = n , le , t′
+  annotateRawᵃ ∅ mod t with annotateRaw t
+  ... | n , p , mod′ , t with cast t mod
+  ... | inl tₗ = suc n , ≤-step p , tₗ
+  ... | inr tᵣ = n , p , tᵣ
   annotateRawᵃ (A ∙ Θ) mod (x , t) =
     let n , le , t′ = annotateRawᵃ Θ mod t
     in n , le , x , t′

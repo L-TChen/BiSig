@@ -85,6 +85,8 @@ infixr 8 ⟨_⟩ ⟪_⟫
 ⟪_⟫ : Sub m n → Tm m → Tm n
 ⟪ f ⟫ t = sub f t
 
+{-# DISPLAY sub σ t = ⟪ σ ⟫ t #-}
+
 ids : Sub m m
 ids = V.tabulate `_ -- `_
 
@@ -155,21 +157,13 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _,_ p q)
 
-thick : (x y : Fin (suc m)) → Maybe (Fin m)
-thick {m = zero}  zero zero       = nothing
-thick {m = suc m} zero zero       = nothing
-thick {m = suc m} zero (suc y)    = just y
-thick {m = suc m} (suc x) zero    = just zero
-thick {m = suc m} (suc x) (suc y) with thick x y
-... | just y′ = just (suc y′)
-... | nothing = nothing
-
+-- likely to be enriched to proof-relevant
 _for_
   : Tm Ξ → Fin (suc Ξ)
   → Sub (suc Ξ) Ξ
 (t for x) = V.tabulate helper
   where
     helper : Fin (suc _) → Tm _
-    helper y with thick x y
-    ... | just y′ = ` y′
-    ... | nothing = t
+    helper y with x F.≟ y
+    ... | no ¬p = ` F.punchOut ¬p
+    ... | yes _ = t

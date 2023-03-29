@@ -20,7 +20,7 @@ private variable
 
 data _⦂_∈_ {T : Set} (x : Id) (A : T) : Context T → Set where
   zero
-    :  x ⦂ A ∈ x ⦂ A , Γ
+    : x ⦂ A ∈ x ⦂ A , Γ
   suc
     : (¬p : x ≢ y)
     → (i : x ⦂ A ∈ Γ)
@@ -37,13 +37,13 @@ uniq-∈ : x ⦂ A ∈ Γ → x ⦂ B ∈ Γ → A ≡ B
 -- uniq-∈ (suc ¬p x∈) (suc ¬p₁ y∈) = uniq-∈ x∈ y∈
 
 -- If `--with-K` is turned on, then the following definition suffices.
-uniq-∈ zero       zero       = refl
-uniq-∈ (suc _ i) (suc _ j)   = uniq-∈ i j
-uniq-∈ zero       (suc ¬p j) = ⊥-elim₀ (¬p refl)
-uniq-∈ (suc ¬p i) zero       = ⊥-elim₀ (¬p refl)
+uniq-∈ (zero ) (zero ) = refl
+uniq-∈ (suc _ i)   (suc _ j)   = uniq-∈ i j
+uniq-∈ (zero ) (suc ¬p j)  = ⊥-elim₀ (¬p refl)
+uniq-∈ (suc ¬p i)  (zero ) = ⊥-elim₀ (¬p refl)
 
 ext∈ : x ≢ y
   → ¬ (∃[ A ] x ⦂ A ∈ Γ)
   → ¬ (∃[ A ] x ⦂ A ∈ y ⦂ B , Γ)
-ext∈ ¬p ¬∃ (A , zero)     = ¬p refl
+ext∈ ¬p ¬∃ (A , zero )     = ¬p refl
 ext∈ ¬p ¬∃ (A , suc ¬q i) = ¬∃ (A , i)

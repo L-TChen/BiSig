@@ -32,8 +32,9 @@ data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
     : x ⦂ A ∈ Γ
     → ⊢⇄ Infer A Γ (` x)
   ⊢⦂
-    : ⊢⇄ Check A Γ t
-    → ⊢⇄ Infer A Γ (t ⦂ A)
+    : ⊢⇄ Check B Γ t
+    → A ≡ B
+    → ⊢⇄ Infer A Γ (t ⦂ B)
   ⊢⇉
     : ⊢⇄ Infer A Γ t
     → A ≡ B

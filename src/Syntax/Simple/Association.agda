@@ -28,3 +28,7 @@ _++_ : AList m n → AList n l → AList m l
 toSub : AList m n → Sub m n
 toSub []          = ids
 toSub (t / x ∷ ρ) = (t for x) ⨟ toSub ρ
+
+AList→≥ : AList m n → n ≤ m
+AList→≥ []           = ≤-refl
+AList→≥ (t / x ∷ ge) = ≤-step (AList→≥ ge)

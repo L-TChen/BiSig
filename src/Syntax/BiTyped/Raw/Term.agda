@@ -84,3 +84,9 @@ module _ (σ : Sub m n) where mutual
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
   tsubᵃ {D = ∅}     t       = tsub t
   tsubᵃ {D = A ∙ D} (x , t) = x , tsubᵃ t
+
+infixr 8 ⟪_⟫ₜ
+⟪_⟫ₜ : Sub m n → Raw m mod → Raw n mod
+⟪ σ ⟫ₜ t = tsub σ t
+
+{-# DISPLAY tsub σ t = ⟪ σ ⟫ₜ t #-}

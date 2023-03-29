@@ -15,3 +15,7 @@ cxtSub : {m n : ℕ} → Sub m n
   → Cxt m → Cxt n
 cxtSub σ ∅       = ∅
 cxtSub σ ((x , A) ∙ Γ) = (x , sub σ A) ∙ cxtSub σ Γ
+
+⟪_⟫cxt = cxtSub
+
+{-# DISPLAY cxtSub σ Γ = ⟪ σ ⟫cxt Γ #-}

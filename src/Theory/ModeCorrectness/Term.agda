@@ -1,5 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
+{-# OPTIONS --with-K #-} 
 open import Prelude
 
 import Syntax.Simple.Description as S
@@ -22,6 +21,7 @@ open import Syntax.NamedContext.Decidable _≟Id_
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
+open import Syntax.Simple.Association        SD
 open import Syntax.Simple.Properties         {SD}
 open import Syntax.Simple.Unification        {SD}
 
@@ -51,7 +51,7 @@ mutual
     → (⊢t : Γ ⊢ t ⇉ A) (⊢u : Γ ⊢ t ⇉ B)
     → A ≡ B
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
-  uniq-⇉ (⊢⦂ ⊢t)  (⊢⦂ ⊢u) = refl
+  uniq-⇉ (⊢⦂ ⊢t refl)  (⊢⦂ ⊢u refl) = refl
   uniq-⇉ {t = op (ι Infer C Ds , i , refl , _)} (⊢op _ (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
     let (C⊆xs , _ , SDs) = MC i in
     ≡-fv _ _ C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
@@ -79,7 +79,7 @@ mutual
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
     → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
-    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x) -- σ₁ x ≡ σ₂ x)
+    → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
   uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
@@ -94,77 +94,41 @@ mutual
   → ¬ (Γ ⊢ (t ↑) ⇇ B)
 ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
+sub-∈ : ∀ {x} (σ : TSub m n)
+  → x ⦂ A         ∈ Γ
+  → x ⦂ ⟪ σ ⟫ A ∈ ⟪ σ ⟫cxt Γ
+sub-∈ σ zero        = zero 
+sub-∈ σ (suc ¬p x∈) = suc ¬p (sub-∈ σ x∈)
+
+subst-∈→∈
+  : ∀ (Γ : Cxt m) x
+  → ¬ (∃[ A ] (x ⦂ A ∈ Γ))
+  → (σ : TSub m n)
+  → ¬ (∃[ B ] (x ⦂ B ∈ ⟪ σ ⟫cxt Γ))
+subst-∈→∈ (_ ∙ _)       _ ¬∃ σ (D , zero)      = ¬∃ (_ , zero)
+subst-∈→∈ ((y , C) ∙ Γ) x ¬∃ σ (D , suc ¬p x∈) =
+  subst-∈→∈ Γ x (λ where (_ , x∈) → ¬∃ (_ , suc ¬p x∈)) σ (_ , x∈)
+
 mutual
   synthetise
-    : (Γ : Cxt m) (t : Raw⇉ m)
-    → Dec (∃[ n ] n ≤ m × Σ[ σ ∈ TSub m n ] ∃[ A ] (cxtSub σ Γ ⊢ tsub σ t ⇉ A))
-     -- [TODO] Replace TSub by AList
+    : (Γ : Cxt m)              (t : Raw⇉ m) (σ : AList m n)
+    → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ] (⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇉ ⟪ toSub σ ⟫ A))
   inherit
-    : (Γ : Cxt m) (A : TExp m) (t : Raw⇇ m)
-    → Dec (∃[ n ] (n ≤ m × Σ[ σ ∈ TSub m n ] (cxtSub σ Γ ⊢ tsub σ t ⇇ sub σ A)))
-     -- [TODO] Replace TSub by AList
+    : (Γ : Cxt m) (A : TExp m) (t : Raw⇇ m) (σ : AList m n)
+    → Dec (∃[ k ] (Σ[ σ ∈ AList m k ] (⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇇ ⟪ toSub σ ⟫ A)))
 
-  synthetise Γ (` x)   with lookup Γ x
-  ... | no ¬p = no λ where
-    (n , less-than-or-equal refl , σ , A , ⊢` x∈) → ¬p ({!!} , {!!})
-  ... | yes (A , x) = yes (_ , ≤-refl , ids , A , ⊢` {!x!})
-  synthetise Γ (t ⦂ A) with inherit Γ A t
-  ... | no ¬p = no λ where (n , n≤m , σ , A , ⊢⦂ ⊢t) → ¬p (n , n≤m , σ , ⊢t)
-  ... | yes (n , n≤m , σ , ⊢t) = yes (n , n≤m , σ , sub σ A  , ⊢⦂ ⊢t)
-  synthetise Γ (op (D , i , refl , ts))  = {!!}
+  synthetise Γ (` x)   σ with lookup Γ x
+  ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)
+  ... | yes (A , x) = yes (_ , σ , A , ⊢` (sub-∈ (toSub σ) x))
+  synthetise Γ (t ⦂ A) σ with inherit Γ A t σ
+  ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
+  ... | yes (n , σ , ⊢t) = yes (_ , σ , A , ⊢⦂ ⊢t refl)
+  synthetise Γ (op x)  σ = {!!}
 
-  inherit Γ A (t ↑) with synthetise Γ t
-  ... | no ¬p = no λ where (n , n≤m , σ , ⊢⇉ ⊢t refl) → ¬p (n , n≤m , σ , sub σ A , ⊢t)
-  ... | yes (n , n≤m , σ , B , ⊢t) = {!amgu B (sub σ A)!} -- we should check if A and B are unifiable.
-  inherit Γ A (op (D , i , refl , ts)) = {!!}
--- mutual
---   synthesise
---     : (Γ : Context T) (t : Raw⇉)
---     → Dec (∃[ A ] Γ ⊢ t ⇉ A)
---   synthesise Γ (` x)   with lookup Γ x
---   ... | no ¬p       = no λ where (A , ⊢` x∈) → ¬p (A , x∈)
---   ... | yes (A , x) = yes (A , ⊢` x)
---   synthesise Γ (t ⦂ A) with check Γ t A
---   ... | no ¬p = no λ where (B , ⊢⦂ ⊢t) → ¬p ⊢t
---   ... | yes p = yes (A , ⊢⦂ p)
---   synthesise Γ (op (ι Infer C Ds , i , ts)) with MC i
---   ... | (C⊆xs , _ , SDs) with synthesiseᵃˢ Ds SDs Γ ts
---   ... | no ¬p = no λ where (A , ⊢op _ (σ , refl , ⊢ts)) → ¬p (σ , ⊢ts)
---   ... | yes (σ , ⊢ts) = yes (⟪ σ ⟫ C , ⊢op (_ , i , ts) (σ , refl , ⊢ts))
-
---   check
---     : (Γ : Context T) (t : Raw⇇) (A : T)
---     → Dec (Γ ⊢ t ⇇ A)
---   check Γ (t ↑)  A with synthesise  Γ t
---   ... | no ¬p = no λ where (⊢⇉ ⊢t refl) → ¬p (A , ⊢t)
---   ... | yes (B , ⊢t) with B ≟T A
---   ... | no ¬q   = no (¬switch ⊢t ¬q)
---   ... | yes A=B = yes (⊢⇉ ⊢t A=B)
---   check Γ (op (ι Check C Ds , i , ts)) A with checkᵃˢ C A Ds (MC i) Γ ts
---   ... | no ¬p = no λ where (⊢op _ p) → ¬p p
---   ... | yes (σ , eq , ⊢ts) = yes (⊢op (_ , i , ts) (σ , eq , ⊢ts))
-
---   synthesiseᵃˢ
---     : (Ds : ArgsD Ξ)
---     → ModeCorrectᵃˢ ∅ Ds
---     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
---     → Dec (∃[ σ ] (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts)
---   synthesiseᵃˢ DS SDs Γ ts = {!   !}
-
---   synthesiseSubᵃˢ
---     : (Ds : ArgsD Ξ)
---     → ModeCorrectᵃˢ ∅ Ds
---     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
---     → ∀ {x} → (i : x ∈ Known ∅ Ds) → {!   !}
---   synthesiseSubᵃˢ ∅ _ _ _ ()
---   synthesiseSubᵃˢ (Θ ⊢[ Infer ] C ∙ Ds) Mc Γ ts i = {!   !}
---   synthesiseSubᵃˢ (Θ ⊢[ Check ] C ∙ Ds) Mc Γ ts i = {!   !}
-
---   checkᵃˢ
---     : (C : TExp Ξ)
---     → (A : T)
---     → (Ds : ArgsD Ξ)
---     → ModeCorrectᵃˢ (fv C) Ds
---     → (Γ : Context T) (ts : R.⟦ Ds ⟧ᵃˢ Raw)
---     → Dec (∃[ σ ] (⟪ σ ⟫ C ≡ A × (⟦ Ds ⟧ᵃˢ Raw , ⊢⇄) σ Γ ts))
---   checkᵃˢ C A DS SDs Γ ts = {!   !}
+  inherit Γ A (t ↑)  σ with synthetise Γ t σ
+  ... | no ¬p = no λ where (n , σ′ , ⊢⇉ ⊢t refl) → ¬p (n , σ′ , A , ⊢t)
+  ... | yes (l , σ , B , ⊢t)  = {!!} -- we need to compare A and B, if A and B are not unifiable, then amgu needs to provide a proof of A ≢ B
+--  ... | yes (l , σ , B , ⊢t)  with amgu A B (_ , σ)
+--  ... | nothing       = no  λ where (_ , σ′ , ⊢t′) → ¬switch ⊢t {!!} {!⊢t′!} -- [TODO] A proof-releant unification is needed
+--  ... | just (l , σ′) = yes (l , σ′ , ⊢⇉ {!!} {!!})
+  inherit Γ A (op x) σ = {!!}

@@ -43,14 +43,14 @@ op-inj refl = refl
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
-    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+    → A ⟪ σ₁ ⟫ ≡ A ⟪ σ₂ ⟫
     → x ∈ fv A
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-inv (` x)             p (here refl) = p
   ≡-fv-inv (op (Ξ , i , ts)) p j = ≡-fv-invⁿ Ξ ts (op-inj p) j
 
   ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
-    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+    → subⁿ σ₁ As ≡ subⁿ σ₂ As
     → x ∈ fvⁿ As
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
@@ -74,13 +74,13 @@ module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
 module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
   ≡-fv : (A : Tm Γ)
     → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
-    → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
+    → A ⟪ σ₁ ⟫ ≡ A ⟪ σ₂ ⟫
   ≡-fv (` x)             p = p (here refl)
   ≡-fv (op (n , _ , ts)) p = cong (λ ts → op (n , _ , ts)) (≡-fvⁿ n ts p)
 
   ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
     → (∀ {x} → x ∈ fvⁿ  As → lookup σ₁ x ≡ lookup σ₂ x)
-    → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
+    → subⁿ σ₁ As ≡ subⁿ σ₂ As
   ≡-fvⁿ zero    _        _ = refl
   ≡-fvⁿ (suc n) (A , As) p = cong₂ _,_
     (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvⁿ n As λ k → p (++⁺ʳ (fv A) k))

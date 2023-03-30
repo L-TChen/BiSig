@@ -11,7 +11,7 @@ import Data.Vec.Properties as V
 
 private variable
   Γ Ξ Δ : ℕ
-  n m l : ℕ
+  n m l k : ℕ
   A B : Set
 
 infix 9 `_
@@ -61,37 +61,37 @@ wk≤ˡ (less-than-or-equal refl) = wkˡ
 weaken : Tm m → Tm (suc m)
 weaken = rename (V.tabulate suc)
 
-⟨_⟩ : Ren m n → Tm m → Tm n
-⟨ f ⟩ t = rename f t
+infixl 8 _⟨_⟩ _⟪_⟫
+
+_⟨_⟩ : Tm m → Ren m n → Tm n
+t ⟨ f ⟩ = rename f t
 
 idr : Ren m m
 idr = V.allFin _
 
 Sub : (m n : ℕ) → Set
-Sub m n = Vec (Tm n) m -- Fin m → Tm n
+Sub m n = Vec (Tm n) m
 
 module _ (σ : Sub m n) where mutual
   sub : Tm m → Tm n
-  sub (` x)  = V.lookup σ x -- σ x
-  sub (op (_ , i , ts)) = op (_ , i , subⁿ _ ts)
+  sub (` x)  = V.lookup σ x
+  sub (op (_ , i , ts)) = op (_ , i , subⁿ ts)
 
-  subⁿ : ∀ l
+  subⁿ : {l : ℕ}
     → Tm m ^ l → Tm n ^ l
-  subⁿ zero    _        = _
-  subⁿ (suc n) (t , ts) = sub t , subⁿ n ts
+  subⁿ {zero}  _        = _
+  subⁿ {suc n} (t , ts) = sub t , subⁿ ts
 
-infixr 8 ⟨_⟩ ⟪_⟫
+_⟪_⟫ : Tm m → Sub m n → Tm n
+t ⟪ f ⟫ = sub f t
 
-⟪_⟫ : Sub m n → Tm m → Tm n
-⟪ f ⟫ t = sub f t
-
-{-# DISPLAY sub σ t = ⟪ σ ⟫ t #-}
+{-# DISPLAY sub σ t = t ⟪ σ ⟫ #-}
 
 ids : Sub m m
 ids = V.tabulate `_ -- `_
 
 _⨟_ : Sub m n → Sub n l → Sub m l
-(σ₁ ⨟ σ₂) = V.tabulate λ i → ⟪ σ₂ ⟫ (V.lookup σ₁ i) -- ⟪ σ₂ ⟫ (σ₁ i)
+(σ₁ ⨟ σ₂) = V.tabulate λ i →  (V.lookup σ₁ i)⟪ σ₂ ⟫
 
 ∅ₛ : Sub 0 n
 ∅ₛ = []
@@ -103,20 +103,29 @@ _∙ₛ_ : Tm n → Sub m n → Sub (suc m) n
 
 infixr 5 _∙ₛ_
 
-mutual
+module _ {m : ℕ} where mutual
   sub-id : (t : Tm m)
-    → ⟪ ids ⟫ t ≡ t
-  sub-id {m = zero} (op (_ , i , ts)) =
-    cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
-  sub-id {m = suc m} (` x)  = V.lookup∘tabulate `_ x
-  sub-id {m = suc m} (op (_ , i , ts)) =
-    cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
+    → t ⟪ ids ⟫ ≡ t
+  sub-id (` x)             = V.lookup∘tabulate `_ x
+  sub-id (op (_ , i , ts)) = cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
 
   sub-idⁿ : (t : Tm m ^ l)
-    → subⁿ ids l t ≡ t
-  sub-idⁿ {l = zero}  t        = refl
-  sub-idⁿ {l = suc l} (t , ts) =
+    → subⁿ ids t ≡ t
+  sub-idⁿ {zero}  t        = refl
+  sub-idⁿ {suc l} (t , ts) =
     cong₂ _,_ (sub-id t) (sub-idⁿ ts)
+
+module _ {m n l : ℕ} (ρ : Sub m n) (σ : Sub n l) where mutual
+  sub-assoc : (t : Tm m)
+    → t ⟪ ρ ⨟ σ ⟫ ≡ t ⟪ ρ ⟫ ⟪ σ ⟫
+  sub-assoc (` x)             = V.lookup∘tabulate (λ i → V.lookup ρ i ⟪ σ ⟫) x
+  sub-assoc (op (k , i , ts)) = cong (λ ts → op (_ , i , ts)) (sub-assocⁿ ts)
+
+  sub-assocⁿ : (ts : Tm m ^ k)
+    → subⁿ (ρ ⨟ σ) ts ≡ subⁿ σ (subⁿ ρ ts) 
+  sub-assocⁿ {zero}  ts       = refl
+  sub-assocⁿ {suc k} (t , ts) = cong₂ _,_ (sub-assoc t) (sub-assocⁿ ts)
+
 
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
@@ -157,13 +166,102 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _,_ p q)
 
--- likely to be enriched to proof-relevant
+sub-for : (Tm m) → (x y : Fin (suc m)) → Tm m
+sub-for t x y with x F.≟ y
+... | no ¬p = ` F.punchOut ¬p
+... | yes _ = t
+
 _for_
-  : Tm Ξ → Fin (suc Ξ)
-  → Sub (suc Ξ) Ξ
-(t for x) = V.tabulate helper
-  where
-    helper : Fin (suc _) → Tm _
-    helper y with x F.≟ y
-    ... | no ¬p = ` F.punchOut ¬p
-    ... | yes _ = t
+  : Tm m → Fin (suc m)
+  → Sub (suc m) m
+(t for x) = V.tabulate (sub-for t x)
+
+sub-t-for-x-x
+  : {t : Tm m} {x : Fin (suc m)}
+  → sub-for t x x ≡ t
+sub-t-for-x-x {x = x} with x F.≟ x
+... | yes p = refl
+... | no ¬p = ⊥-elim₀ (¬p refl)
+
+sub-t-for-x-y
+  : {x y : Fin (suc m)} {t : Tm m} 
+  → (¬p : x ≢ y)
+  → sub-for t x y ≡ ` F.punchOut ¬p 
+sub-t-for-x-y {x = x} {y} ¬p with x F.≟ y
+... | yes p = ⊥-elim₀ (¬p p)
+... | no ¬p = refl
+
+sub-for-x-in-x : {t : Tm m} (x : Fin (suc m))
+  → ` x ⟪ t for x ⟫ ≡ t
+sub-for-x-in-x {t = t} x = begin
+  ` x ⟪ t for x ⟫
+    ≡⟨ V.lookup∘tabulate (sub-for t x) x ⟩
+  sub-for t x x
+    ≡⟨ sub-t-for-x-x ⟩
+  t
+    ∎
+  where open ≡-Reasoning
+
+sub-for-x-in-y : {t : Tm m} {x y : Fin (suc m)}
+  → (¬p : x ≢ y)
+  → ` y ⟪ t for x ⟫ ≡ ` F.punchOut ¬p
+sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
+  ` y ⟪ t for x ⟫
+    ≡⟨ V.lookup∘tabulate (sub-for t x) y ⟩
+  sub-for t x y
+    ≡⟨ sub-t-for-x-y ¬p ⟩
+  ` F.punchOut ¬p
+    ∎
+  where open ≡-Reasoning
+
+-- Utilities for checking free variables
+
+open import Data.List.Membership.Propositional.Properties
+mutual
+  checkFv : (x : Fin m) (t : Tm m) → Dec (x ∈ fv t)
+  checkFv x (` y)  with x F.≟ y
+  ... | yes p = yes (here p)
+  ... | no ¬p = no λ where (here p) → ¬p p
+  checkFv x (op (_ , _ , ts)) = checkFvⁿ x ts
+
+  checkFvⁿ : (x : Fin m) (t : Tm m ^ l) → Dec (x ∈ fvⁿ t)
+  checkFvⁿ {l = zero}  _ _        = no λ ()
+  checkFvⁿ {l = suc l} x (t , ts) with checkFv x t
+  ... | yes p = yes (∈-++⁺ˡ p)
+  ... | no ¬p with checkFvⁿ x ts
+  ... | yes q = yes (∈-++⁺ʳ (fv t) q)
+  ... | no ¬q = no λ where x → case ∈-++⁻ (fv t) x of λ where
+    (inl ∈t)  → ¬p ∈t
+    (inr ∈ts) → ¬q ∈ts
+
+mutual
+  punchOutTm : (x : Fin (suc Ξ)) (t : Tm (suc Ξ))
+    → ¬ x ∈ fv t → Tm Ξ
+  punchOutTm x (` y)  x∉ with x F.≟ y
+  ... | yes x=y = ⊥-elim₀ (x∉ (here x=y))
+  ... | no ¬x=y = ` F.punchOut ¬x=y
+  punchOutTm x (op (_ , i , ts)) x∉ =
+    op (_ , i , punchOutTmⁿ x ts x∉)
+
+  punchOutTmⁿ : (x : Fin (suc Ξ)) (ts : Tm (suc Ξ) ^ n)
+    → ¬ x ∈ fvⁿ ts → Tm Ξ ^ n
+  punchOutTmⁿ {n = zero}  _ _        _    = _ 
+  punchOutTmⁿ {n = suc l} x (t , ts) x∉ =
+    punchOutTm x t (x∉ ∘ ∈-++⁺ˡ) , punchOutTmⁿ x ts (x∉ ∘ ∈-++⁺ʳ (fv t))
+
+module _ {u : Tm m} {x : Fin (suc m)} where mutual
+  sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : ¬ x ∈ fv t)
+    → t ⟪ u for x ⟫ ≡ punchOutTm x t x∉
+  sub-for-nonfree=punchOut (` y)  x∉ with x F.≟ y
+  ... | yes p = ⊥-elim₀ (x∉ (here p))
+  ... | no ¬p = sub-for-x-in-y ¬p
+  sub-for-nonfree=punchOut (op (_ , i , ts)) x∉ =
+    cong (λ ts → op (_ , i , ts)) (sub-for-nonfree=punchOutⁿ ts x∉)
+
+  sub-for-nonfree=punchOutⁿ : (ts : Tm (suc m) ^ n)
+    → (x∉ : ¬ x ∈ fvⁿ ts)
+    → subⁿ (u for x) ts ≡ punchOutTmⁿ x ts x∉
+  sub-for-nonfree=punchOutⁿ {n = zero}  _        _  = refl
+  sub-for-nonfree=punchOutⁿ {n = suc n} (t , ts) x∉ =
+    cong₂ _,_ (sub-for-nonfree=punchOut t $ x∉ ∘ ∈-++⁺ˡ)
+      (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ ∈-++⁺ʳ (fv t)))

@@ -29,17 +29,17 @@ private variable
 ⟦_⟧ᵃ : (Θ : List (TExp n)) (X : Mode → Set ℓ) (P : Cxt m → X mod → Set ℓ′)
   → TSub n m → Cxt m → R.⟦ Θ ⟧ᵃ (X mod) → Set ℓ′
 ⟦ ∅     ⟧ᵃ X P σ Γ t       = P Γ t
-⟦ A ∙ D ⟧ᵃ X P σ Γ (x , t) = ⟦ D ⟧ᵃ X P σ (x ⦂ ⟪ σ ⟫ A , Γ) t
+⟦ A ∙ D ⟧ᵃ X P σ Γ (x , t) = ⟦ D ⟧ᵃ X P σ (x ⦂ A ⟪ σ ⟫ , Γ) t
 
 ⟦_⟧ᵃˢ : (D : ArgsD n) (X : Mode → Set ℓ) (P : Pred ℓ′ m X)
   → TSub n m → Cxt m → R.⟦ D ⟧ᵃˢ X → Set ℓ′
 ⟦ ∅               ⟧ᵃˢ X _ _ _ _        = ⊤
 ⟦ Θ ⊢[ m ] B ∙ Ds ⟧ᵃˢ X P σ Γ (t , ts) =
-  ⟦ Θ ⟧ᵃ X (P m (⟪ σ ⟫ B)) σ Γ t × ⟦ Ds ⟧ᵃˢ X P σ Γ ts
+  ⟦ Θ ⟧ᵃ X (P m (B ⟪ σ ⟫)) σ Γ t × ⟦ Ds ⟧ᵃˢ X P σ Γ ts
 
 ⟦_⟧ᶜ : (D : ConD) → Pred ℓ′ m X → Pred ℓ′ m (R.⟦ D ⟧ᶜ X)
 ⟦ ι {n} mod B D ⟧ᶜ P mod′ A Γ (mod≡mod′ , t) =
-  Σ[ σ ∈ TSub n _ ] ⟪ σ ⟫ B ≡ A × ⟦ D ⟧ᵃˢ _ P σ Γ t
+  Σ[ σ ∈ TSub n _ ] B ⟪ σ ⟫ ≡ A × ⟦ D ⟧ᵃˢ _ P σ Γ t
 
 ⟦_⟧ : (D : Desc) → Pred ℓ′ n X → Pred ℓ′ n (R.⟦ D ⟧ X)
 ⟦ Ds ⟧ P m A Γ (D , _ , t) = ⟦ D ⟧ᶜ P m A Γ t

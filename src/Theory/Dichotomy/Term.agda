@@ -35,8 +35,8 @@ mutual
   ∥_∥⇉
     : Γ ⊢ t ⇉ A
     → Tm⇉ m A ∥ Γ ∥ctx
-  ∥ ⊢` x     ∥⇉ = ` ∥ x ∥∈
-  ∥ ⊢⦂ t     ∥⇉ = _ ∋ ∥ t ∥⇇
+  ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
+  ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
   ∥ ⊢op (ι Infer B D , i , q , t) (σ , B=A , p) ∥⇉ =
     op (_ , i , q , σ , B=A , ∥-∥map D p)
 

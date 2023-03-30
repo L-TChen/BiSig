@@ -75,9 +75,9 @@ mutual
     : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
     → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
-    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
+    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟪ σ₁ ⟫)) σ₁ Γ t)
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
-    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
+    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟪ σ₂ ⟫)) σ₂ Γ t)
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
@@ -96,7 +96,7 @@ mutual
 
 sub-∈ : ∀ {x} (σ : TSub m n)
   → x ⦂ A         ∈ Γ
-  → x ⦂ ⟪ σ ⟫ A ∈ ⟪ σ ⟫cxt Γ
+  → x ⦂ A ⟪ σ ⟫ ∈ ⟪ σ ⟫cxt Γ
 sub-∈ σ zero        = zero 
 sub-∈ σ (suc ¬p x∈) = suc ¬p (sub-∈ σ x∈)
 
@@ -111,24 +111,26 @@ subst-∈→∈ ((y , C) ∙ Γ) x ¬∃ σ (D , suc ¬p x∈) =
 
 mutual
   synthetise
-    : (Γ : Cxt m)              (t : Raw⇉ m) (σ : AList m n)
-    → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ] (⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇉ ⟪ toSub σ ⟫ A))
+    : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
+    → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
+        ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇉ (A ⟪ toSub σ ⟫))
   inherit
-    : (Γ : Cxt m) (A : TExp m) (t : Raw⇇ m) (σ : AList m n)
-    → Dec (∃[ k ] (Σ[ σ ∈ AList m k ] (⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇇ ⟪ toSub σ ⟫ A)))
+    : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m) 
+    → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
+        ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇇ (A ⟪ toSub σ ⟫))
 
   synthetise Γ (` x)   σ with lookup Γ x
   ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)
   ... | yes (A , x) = yes (_ , σ , A , ⊢` (sub-∈ (toSub σ) x))
-  synthetise Γ (t ⦂ A) σ with inherit Γ A t σ
+  synthetise Γ (t ⦂ A) σ with inherit Γ t σ A
   ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
   ... | yes (n , σ , ⊢t) = yes (_ , σ , A , ⊢⦂ ⊢t refl)
   synthetise Γ (op x)  σ = {!!}
 
-  inherit Γ A (t ↑)  σ with synthetise Γ t σ
+  inherit Γ (t ↑)  σ A with synthetise Γ t σ
   ... | no ¬p = no λ where (n , σ′ , ⊢⇉ ⊢t refl) → ¬p (n , σ′ , A , ⊢t)
   ... | yes (l , σ , B , ⊢t)  = {!!} -- we need to compare A and B, if A and B are not unifiable, then amgu needs to provide a proof of A ≢ B
 --  ... | yes (l , σ , B , ⊢t)  with amgu A B (_ , σ)
 --  ... | nothing       = no  λ where (_ , σ′ , ⊢t′) → ¬switch ⊢t {!!} {!⊢t′!} -- [TODO] A proof-releant unification is needed
 --  ... | just (l , σ′) = yes (l , σ′ , ⊢⇉ {!!} {!!})
-  inherit Γ A (op x) σ = {!!}
+  inherit Γ (op x) σ A = {!!}

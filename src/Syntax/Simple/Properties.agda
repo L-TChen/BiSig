@@ -1,23 +1,40 @@
 {-# OPTIONS --with-K --safe #-}
 
 open import Prelude
+  hiding (_++_)
 open import Syntax.Simple.Description
 
-module Syntax.Simple.Properties {D : Desc} where
-open import Syntax.Simple.Term D
+module Syntax.Simple.Properties (D : Desc) where
 
-import      Data.Fin      as F
-open import Data.Vec      as V
-  using (lookup)
+open import Syntax.Simple.Term        D
+open import Syntax.Simple.Association D
+open import Syntax.Simple.Unification D
+
+open import Data.Fin            as F
+  using (_↑ˡ_; _↑ʳ_; punchOut)
+
+open import Data.Vec            as V
+  using (lookup; tabulate)
+open import Data.Vec.Properties as V
+  using (lookup∘tabulate)
+
 open import Data.Product.Properties
 open import Data.List.Properties
+open import Data.List.Membership.Propositional.Properties
 open import Data.List.Relation.Unary.Any.Properties
 
 private variable
-  Γ Δ Ξ n : ℕ
+  Γ Δ Ξ m n l i j k : ℕ
   ts us   : Tm Ξ ^ n
   σ₁ σ₂   : Sub Γ Δ
   x y     : Fin Ξ
+
+------------------------------------------------------------------------------
+-- Trivial proofs
+
+var≢op : (x : Fin m) (i : l ∈ D) (ts : Tm m ^ l)
+  → ` x ≢ op (_ , i , ts)
+var≢op x i ts ()
 
 op-inj
   : {i : n ∈ D} {ts us : Tm Ξ ^ n}
@@ -25,21 +42,143 @@ op-inj
   → ts ≡ us
 op-inj refl = refl
 
--- module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
---   ≡-fv-inv : (A : Tm Γ)
---     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
---     → x ∈ fv A
---     → σ₁ x ≡ σ₂ x
---   ≡-fv-inv (` x)             eq (here refl) = eq
---   ≡-fv-inv (op (Ξ , i , ts)) eq j = ≡-fv-invⁿ Ξ ts (op-inj eq) j
--- 
---   ≡-fv-invⁿ : (n : ℕ) (As : Tm Γ ^ n)
---     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
---     → x ∈ fvⁿ As
---     → σ₁ x ≡ σ₂ x
---   ≡-fv-invⁿ (suc n) (A , As) p i with ++⁻ (fv A) i
---   ... | inl j = ≡-fv-inv     A (,-injectiveˡ p) j
---   ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j 
+------------------------------------------------------------------------------
+-- Substitution has an identity and is associative 
+
+module _ {m : ℕ} where mutual
+  sub-id : (t : Tm m)
+    → t ⟪ ids ⟫ ≡ t
+  sub-id (` x)             = lookup∘tabulate `_ x
+  sub-id (op (_ , i , ts)) = cong (λ ts → op (_ , i , ts)) (sub-idⁿ ts)
+
+  sub-idⁿ : (t : Tm m ^ l)
+    → subⁿ ids t ≡ t
+  sub-idⁿ {zero}  t        = refl
+  sub-idⁿ {suc l} (t , ts) =
+    cong₂ _,_ (sub-id t) (sub-idⁿ ts)
+
+module _ {m n l : ℕ} (ρ : Sub m n) (σ : Sub n l) where mutual
+  sub-assoc : (t : Tm m)
+    → t ⟪ ρ ⨟ σ ⟫ ≡ t ⟪ ρ ⟫ ⟪ σ ⟫
+  sub-assoc (` x)             = lookup∘tabulate (λ i → lookup ρ i ⟪ σ ⟫) x
+  sub-assoc (op (k , i , ts)) = cong (λ ts → op (_ , i , ts)) (sub-assocⁿ ts)
+
+  sub-assocⁿ : (ts : Tm m ^ k)
+    → subⁿ (ρ ⨟ σ) ts ≡ subⁿ σ (subⁿ ρ ts) 
+  sub-assocⁿ {zero}  ts       = refl
+  sub-assocⁿ {suc k} (t , ts) = cong₂ _,_ (sub-assoc t) (sub-assocⁿ ts)
+
+
+------------------------------------------------------------------------------
+-- Proofs about ⟪ t for x ⟫
+
+sub-t-for-x-x
+  : {t : Tm m} {x : Fin (suc m)}
+  → sub-for t x x ≡ t
+sub-t-for-x-x {x = x} with x F.≟ x
+... | yes p = refl
+... | no ¬p = ⊥-elim₀ (¬p refl)
+
+sub-t-for-x-y
+  : {x y : Fin (suc m)} {t : Tm m} 
+  → (¬p : x ≢ y)
+  → sub-for t x y ≡ ` punchOut ¬p 
+sub-t-for-x-y {x = x} {y} ¬p with x F.≟ y
+... | yes p = ⊥-elim₀ (¬p p)
+... | no ¬p = refl
+
+sub-for-x-in-x : {t : Tm m} (x : Fin (suc m))
+  → ` x ⟪ t for x ⟫ ≡ t
+sub-for-x-in-x {t = t} x = begin
+  ` x ⟪ t for x ⟫
+    ≡⟨ lookup∘tabulate (sub-for t x) x ⟩
+  sub-for t x x
+    ≡⟨ sub-t-for-x-x ⟩
+  t
+    ∎
+  where open ≡-Reasoning
+
+sub-for-x-in-y : {t : Tm m} {x y : Fin (suc m)}
+  → (¬p : x ≢ y)
+  → ` y ⟪ t for x ⟫ ≡ ` punchOut ¬p
+sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
+  ` y ⟪ t for x ⟫
+    ≡⟨ lookup∘tabulate (sub-for t x) y ⟩
+  sub-for t x y
+    ≡⟨ sub-t-for-x-y ¬p ⟩
+  ` F.punchOut ¬p
+    ∎
+  where open ≡-Reasoning
+  
+module _ {u : Tm m} {x : Fin (suc m)} where mutual
+  sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : x ∉ₜ t)
+    → t ⟪ u for x ⟫ ≡ punchOutTm x t x∉
+  sub-for-nonfree=punchOut (` y)  x∉ with x F.≟ y
+  ... | yes p = ⊥-elim₀ (x∉ (here p))
+  ... | no ¬p = sub-for-x-in-y ¬p
+  sub-for-nonfree=punchOut (op (_ , i , ts)) x∉ =
+    cong (λ ts → op (_ , i , ts)) (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ ops))
+
+  sub-for-nonfree=punchOutⁿ : (ts : Tm (suc m) ^ n)
+    → (x∉ : x ∉ₜₛ ts)
+    → subⁿ (u for x) ts ≡ punchOutTmⁿ x ts x∉
+  sub-for-nonfree=punchOutⁿ {n = zero}  _        _  = refl
+  sub-for-nonfree=punchOutⁿ {n = suc n} (t , ts) x∉ =
+    cong₂ _,_ (sub-for-nonfree=punchOut t $ x∉ ∘ head)
+      (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ tail))
+
+punchOut-for-x≢y
+  : {x y : Fin (suc m)}
+  → (¬p : x ≢ y)
+  → ` x ⟪ (` punchOut ¬p) for x ⟫ ≡ ` y ⟪ (` punchOut ¬p) for x ⟫
+punchOut-for-x≢y {x = x} {y} ¬p = begin
+  ` x ⟪ (` punchOut ¬p) for x ⟫
+    ≡⟨ sub-for-x-in-x x ⟩
+  ` punchOut ¬p
+    ≡⟨ (sym $ sub-for-x-in-y ¬p) ⟩
+  ` y ⟪ (` punchOut ¬p) for x ⟫
+    ∎
+  where open ≡-Reasoning
+
+------------------------------------------------------------------------------
+-- Proofs about free variables
+
+mutual
+  ∈ₜ→∈fv : {x : Fin m} {t : Tm m} → x ∈ₜ t → x ∈ fv t
+  ∈ₜ→∈fv (here p) = here p
+  ∈ₜ→∈fv (ops p)  = ∈ₜ→∈fvⁿ p
+
+  ∈ₜ→∈fvⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ₜₛ ts → x ∈ fvⁿ ts
+  ∈ₜ→∈fvⁿ (head x∈)     = ∈-++⁺ˡ        (∈ₜ→∈fv x∈)
+  ∈ₜ→∈fvⁿ (tail {t = t} x∈) = ∈-++⁺ʳ (fv t) (∈ₜ→∈fvⁿ x∈)
+
+mutual 
+  ∈fv→∈ₜ : {x : Fin m} {t : Tm m} → x ∈ fv t → x ∈ₜ t
+  ∈fv→∈ₜ {t = ` x}  (here px) = here px
+  ∈fv→∈ₜ {t = op _} x∈        = ops $ ∈fv→∈ₜⁿ x∈
+
+  ∈fv→∈ₜⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ fvⁿ ts → x ∈ₜₛ ts
+  ∈fv→∈ₜⁿ {x} {l = suc l} {ts = t , ts} x∈ with ∈-++⁻ (fv t) x∈
+  ... | inl x∈t  = head (∈fv→∈ₜ x∈t)
+  ... | inr x∈ts = tail (∈fv→∈ₜⁿ x∈ts)
+{-
+mutual
+  checkFv : (x : Fin m) (t : Tm m) → Dec (x ∈ fv t)
+  checkFv x (` y)  with x F.≟ y
+  ... | yes p = yes (here p)
+  ... | no ¬p = no λ where (here p) → ¬p p
+  checkFv x (op (_ , _ , ts)) = checkFvⁿ x ts
+
+  checkFvⁿ : (x : Fin m) (t : Tm m ^ l) → Dec (x ∈ fvⁿ t)
+  checkFvⁿ {l = zero}  _ _        = no λ ()
+  checkFvⁿ {l = suc l} x (t , ts) with checkFv x t
+  ... | yes p = yes (∈-++⁺ˡ p)
+  ... | no ¬p with checkFvⁿ x ts
+  ... | yes q = yes (∈-++⁺ʳ (fv t) q)
+  ... | no ¬q = no λ where x → case ∈-++⁻ (fv t) x of λ where
+    (inl ∈t)  → ¬p ∈t
+    (inr ∈ts) → ¬q ∈ts
+-}
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
@@ -57,20 +196,6 @@ module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ... | inl j = ≡-fv-inv      A  (,-injectiveˡ p) j
   ... | inr j = ≡-fv-invⁿ n As (,-injectiveʳ p) j
 
--- module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
---   ≡-fv : (A : Tm Γ)
---     → (∀ {x} → x ∈ fv A → σ₁ x ≡ σ₂ x)
---     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
---   ≡-fv (` x)             eq = eq (here refl)
---   ≡-fv (op (Ξ , _ , ts)) eq = cong (λ ts → op (Ξ , _ , ts)) (≡-fvⁿ Ξ ts eq) 
--- 
---   ≡-fvⁿ : (n : ℕ) (As : Tm Γ ^ n)
---     → (∀ {x} → x ∈ fvⁿ  As → σ₁ x ≡ σ₂ x)
---     → subⁿ σ₁ _ As ≡ subⁿ σ₂ _ As
---   ≡-fvⁿ zero    _        _  = refl
---   ≡-fvⁿ (suc n) (A , As) eq = cong₂ _,_
---     (≡-fv A (λ k → eq (++⁺ˡ k))) (≡-fvⁿ n As λ k → eq (++⁺ʳ (fv A) k))
-
 module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
   ≡-fv : (A : Tm Γ)
     → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
@@ -85,75 +210,107 @@ module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
   ≡-fvⁿ (suc n) (A , As) p = cong₂ _,_
     (≡-fv A λ k → p (++⁺ˡ k)) (≡-fvⁿ n As λ k → p (++⁺ʳ (fv A) k))
 
--- -- sub-inv₂
--- --   : ∀ {n} {i : n ∈ _}
--- --   → (ts : Tm Γ ^ n) (σ : SubFv (fvⁿ ts) Δ)
--- --   → ∀ {x} → (j k : x ∈ fvⁿ ts) 
--- --   → sub-inv₁ {i = i} ts σ j ≡ sub-inv₁ {i = i} ts σ k
--- -- sub-inv₂ {n = zero}  _        σ       () 
--- -- sub-inv₂ {n = suc n} (t , ts) (σ , p) j k with ++⁻ (fv t) j | ++⁻ (fv t) k
--- -- ... | inl ∈t  | inl ∈t′  = p (++⁺ˡ ∈t) (++⁺ˡ ∈t′)
--- -- ... | inl ∈t  | inr ∈ts  = p (++⁺ˡ ∈t) (++⁺ʳ (fv t) ∈ts)
--- -- ... | inr ∈ts | inl ∈t   = p (++⁺ʳ (fv t) ∈ts) (++⁺ˡ ∈t)
--- -- ... | inr ∈ts | inr ∈ts′ = p (++⁺ʳ (fv t) ∈ts) (++⁺ʳ (fv t) ∈ts′)
-
-
 SubFv : List (Fin Ξ) → ℕ → Set
-SubFv xs Δ = Σ[ ys ∈ List (Fin _ × Tm Δ) ] map proj₁ ys ≡ xs -- Vec (Tm Δ) (length xs)
+SubFv xs Δ = Σ[ ys ∈ List (Fin _ × Tm Δ) ] map proj₁ ys ≡ xs
 
 Covered : {Ξ : ℕ} → List (Fin Ξ) → Set
 Covered xs = (x : Fin _) → x ∈ xs
 
--- -- sub-inv₁
--- --   : ∀ {n} {i : n ∈ _} → (ts : Tm Γ ^ n)
--- --   → SubFv (fvⁿ ts) Δ
--- --   → SubFv (fv (op (n , i , ts))) Δ
--- -- sub-inv₁ {n = zero}  _        σ ()
--- -- sub-inv₁ {n = suc n} (t , ts) σ j with ++⁻ (fv t) j
--- -- ... | inl ∈t  = σ (++⁺ˡ ∈t)
--- -- ... | inr ∈ts = σ (++⁺ʳ (fv t) ∈ts)
+------------------------------------------------------------------------------
+-- Association list implies the inequality relation
 
--- -- fromSub : {xs : List (Fin Ξ)}
--- --   → (∀ x → x ∈ xs)
--- --   → Sub Ξ Δ
--- --   → SubFv xs Δ
--- -- fromSub ∀x σ {x} _ = V.lookup σ x
+AList→≥ : AList m n → n ≤ m
+AList→≥ []           = ≤-refl
+AList→≥ (t / x ∷ ge) = ≤-step (AList→≥ ge)
 
--- -- lem : {xs : List (Fin Ξ)}
--- --   → (p : ∀ x → x ∈ xs)
--- --   → (σ : SubFv xs Δ)
--- --   → ∀ {x} (i : x ∈ xs)
--- --   → fromSub p (toSub p σ) i ≡ σ i
--- -- lem {suc Ξ} {xs = zero ∙ xs} p σ {zero}  i = {!   !}
--- -- lem {suc Ξ} {xs = zero ∙ xs} p σ {suc y} i = {!   !}
--- -- lem {suc Ξ} {xs = suc x ∙ xs} p σ {y}    i = {!   !}
+------------------------------------------------------------------------------
+-- Proofs about toSub
 
--- -- mutual
--- --   subByFv : (A : Tm Γ)
--- --     → SubFv (fv A) Δ
--- --     → Tm Δ
--- --   subByFv (` x)             σ = σ {x} (here refl)
--- --   subByFv (op (n , i , ts)) σ = op (n , i , subByFvⁿ ts σ)
+toSub-⨟
+  : (ρ : AList m n) (σ : AList n l) 
+  → (t : Tm m)
+  → t ⟪ ρ ++ σ ⟫ₐ ≡ t ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
+toSub-⨟ []          σ t = cong _⟪ σ ⟫ₐ (sym $ sub-id t)
+toSub-⨟ (u / x ∷ ρ) σ t = begin
+  t ⟪ (u for x) ⨟ toSub (ρ ++ σ) ⟫
+    ≡⟨ sub-assoc (u for x) (toSub (ρ ++ σ)) t ⟩
+  t ⟪ u for x ⟫ ⟪ ρ ++ σ ⟫ₐ
+    ≡⟨ toSub-⨟ ρ σ (t ⟪ u for x ⟫) ⟩
+  t ⟪ u for x ⟫ ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
+    ≡⟨ cong (_⟪ σ ⟫ₐ) (sym $ sub-assoc (u for x) (toSub ρ) t) ⟩
+  t ⟪ toSub (u / x ∷ ρ ) ⟫ ⟪ σ ⟫ₐ
+    ∎
+  where open ≡-Reasoning
 
--- --   subByFvⁿ : (A : Tm Ξ ^ n)
--- --     → SubFv (fvⁿ A) Δ
--- --     → Tm Δ ^ n
--- --   subByFvⁿ {n = zero}  _        _ = _
--- --   subByFvⁿ {n = suc n} (t , ts) σ =
--- --     subByFv t (σ ∘ ++⁺ˡ) , subByFvⁿ ts (σ ∘ ++⁺ʳ (fv t))
+toSub-/∷[]
+  : {u : Tm m} (x : Fin (suc m))
+  → (t : Tm (suc m))
+  → t ⟪ u / x ∷ [] ⟫ₐ ≡ t ⟪ u for x ⟫
+toSub-/∷[] {_} {u} x t = begin
+  t ⟪ u / x ∷ [] ⟫ₐ
+    ≡⟨ sub-assoc (u for x) ids t ⟩
+  t ⟪ u for x ⟫ ⟪ ids ⟫
+    ≡⟨ sub-id _ ⟩
+  t ⟪ u for x ⟫
+    ∎
+  where open ≡-Reasoning
 
--- -- mutual
--- --   closed-subst-invariant
--- --     : (A : Tm Γ)
--- --     → fv A ≡ ∅
--- --     → ⟪ σ₁ ⟫ A ≡ ⟪ σ₂ ⟫ A
--- --   closed-subst-invariant (op (n , i , ts)) p =
--- --     cong (λ ts → op (n , i , ts)) (closed-subst-invariantMap ts p)
+------------------------------------------------------------------------------
+-- Proofs that amgu does provide a maximal general unifier
 
--- --   closed-subst-invariantMap : {n : ℕ}
--- --     → (As : Tm Γ ^ n)
--- --     → fvMap As ≡ ∅
--- --     → subMap σ₁ n As ≡ subMap σ₂ n As
--- --   closed-subst-invariantMap {n = zero}  _        _ = refl
--- --   closed-subst-invariantMap {n = suc n} (t , ts) p =
--- --     cong₂ _,_ (closed-subst-invariant t (++-conicalˡ (fv t) (fvMap ts) p)) (closed-subst-invariantMap ts (++-conicalʳ (fv t) (fvMap ts) p))
+flexFlex-is-unifier
+  : (x y : Fin m)
+  → let σ = flexFlex x y .proj₂ in
+    ` x ⟪ σ ⟫ₐ ≡ ` y ⟪ σ ⟫ₐ
+flexFlex-is-unifier {m = suc m} x y with x F.≟ y
+... | yes refl = refl
+... | no ¬p = begin
+  ` x ⟪ flexFlex-≢ ¬p ⟫ₐ
+    ≡⟨ toSub-/∷[] x (` x) ⟩
+  ` x ⟪ (` punchOut ¬p) for x ⟫
+    ≡⟨ punchOut-for-x≢y ¬p ⟩
+  ` y ⟪ (` punchOut ¬p) for x ⟫
+    ≡⟨ sym $ toSub-/∷[] x (` y) ⟩
+  ` y ⟪ flexFlex-≢ ¬p ⟫ₐ
+    ∎
+  where open ≡-Reasoning
+
+flexRigid∉-is-unifier
+  : (x : Fin (suc m)) (t : Tm (suc m))  (x∉ : x ∉ₜ t)
+  → let σ = flexRigid∉ x t x∉ in
+    t ⟪ σ ⟫ₐ ≡ ` x ⟪ σ ⟫ₐ
+flexRigid∉-is-unifier x t x∉ = begin
+  t ⟪ flexRigid∉ x t x∉ ⟫ₐ
+    ≡⟨⟩
+  t ⟪ punchOutTm x t x∉ / x ∷ [] ⟫ₐ
+    ≡⟨ toSub-/∷[] x t ⟩
+  t ⟪ punchOutTm x t x∉ for x ⟫
+    ≡⟨ sub-for-nonfree=punchOut t x∉ ⟩
+  punchOutTm x t x∉
+    ≡⟨ sym $ sub-for-x-in-x x ⟩
+  ` x ⟪ (punchOutTm x t x∉) for x ⟫
+     ≡⟨ (sym $ toSub-/∷[] x (` x)) ⟩
+  ` x ⟪ flexRigid∉ x t x∉ ⟫ₐ
+  ∎
+  where open ≡-Reasoning
+
+module _ {x : Fin m} {σ : AList m n} where mutual
+  lem : (t : Tm m) 
+    → Dec (` x ⟪ σ ⟫ₐ ≡ t ⟪ σ ⟫ₐ) 
+  lem (` y)  with x F.≟ y
+  ... | yes refl = yes refl
+  ... | no ¬p    = no {!!}
+  lem (op x) = {!!}
+
+  lemⁿ : {us : Tm n ^ l} {ts : Tm m ^ l}
+    → x ∈ₜₛ ts
+    → Dec (us ≡ ts ⟪ σ ⟫ₐₛ)
+  lemⁿ = {!!}
+
+flexRigid-unify : (x : Fin m) (t : Tm m) 
+  → Dec (Σ[ (_ , σ) ∈ ∃ (AList m) ] t ⟪ σ ⟫ₐ ≡ ` x ⟪ σ ⟫ₐ )
+flexRigid-unify {suc m} x t with x ∈ₜ? t
+... | no ¬p = yes ((_ , flexRigid∉ x t ¬p) , flexRigid∉-is-unifier x t ¬p)
+flexRigid-unify {suc m} x (` y)    | yes (here refl) = yes ((_ , []) , refl)
+flexRigid-unify {suc m} x t@(op _) | yes x∈t = no {!!}
+-- no λ where ((_ , σ) , t⟪σ⟫=σx) → {!!}

@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --with-K --safe #-}
 
 module Prelude where
 
@@ -49,7 +49,7 @@ open import Relation.Nullary                      public
 open import Relation.Binary                       public
   using (Decidable)
 open import Relation.Binary.PropositionalEquality public
-  using (_≡_; refl; sym; cong; cong₂; subst; _≢_; module ≡-Reasoning)
+  using (_≡_; refl; sym; trans; cong; cong₂; subst; _≢_; module ≡-Reasoning)
 
 open import Level                                 public
   using (Level; Lift; lift)
@@ -134,11 +134,3 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
     
 ≤-refl : ∀ {m} → m ≤ m
 ≤-refl = less-than-or-equal (ℕₚ.+-identityʳ _)
-
--- m≤m+a+b : {m a b : ℕ}
---   → m ≤ m + a + b
--- m≤m+a+b {m} {a} {b} = less-than-or-equal {m} {m + a + b} {a + b} $ begin
---   m + (a + b)
---     ≡⟨ sym (ℕₚ.+-assoc m a b) ⟩
---   m + a + b
---   ∎ where open ≡-Reasoning

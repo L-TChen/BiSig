@@ -56,8 +56,8 @@ _▷_⇉_ : (n : ℕ) (D : ArgsD n) (A : TExp n) → ConD
 _▷_⇇_ : (n : ℕ) (D : ArgsD n) (A : TExp n) → ConD
 Ξ ▷ D ⇇ A = ι Check A D
 
-fvArgD : (D : ArgD n) → List (Fin n)
-fvArgD D = fv $ ArgD.type D
+-- fvArgD : (D : ArgD n) → List (Fin n)
+-- fvArgD D = fv $ ArgD.type D
 
 modeArgD : ArgD n → Mode
 modeArgD D = ArgD.mode D

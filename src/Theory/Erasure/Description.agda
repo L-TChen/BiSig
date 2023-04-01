@@ -1,6 +1,7 @@
 {-# OPTIONS --safe #-}
 
 open import Prelude
+  hiding (map)
 
 import Syntax.Simple.Description  as S
 
@@ -16,10 +17,10 @@ eraseᵃ : B.ArgD Ξ → T.ArgD Ξ
 eraseᵃ (Θ ⊢[ m ] B)= Θ ⊢ B
 
 eraseᵃˢ : B.ArgsD Ξ → T.ArgsD Ξ
-eraseᵃˢ = map eraseᵃ
+eraseᵃˢ = L.map eraseᵃ
 
 eraseᶜ : B.ConD → T.ConD
 eraseᶜ (ι {n} mod A D) = ι A (eraseᵃˢ D)
 
 erase : B.Desc → T.Desc
-erase Ds = map eraseᶜ Ds
+erase Ds = L.map eraseᶜ Ds

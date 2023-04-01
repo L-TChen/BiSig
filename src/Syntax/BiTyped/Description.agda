@@ -41,7 +41,7 @@ Desc : Set
 Desc = List ConD
 
 ρ-syntax : ArgD n → ArgsD n → ArgsD n
-ρ-syntax D Ds = D ∙ Ds
+ρ-syntax D Ds = D ∷ Ds
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
 

@@ -29,7 +29,7 @@ Desc : Set
 Desc = List ConD -- a list of typing rules
 
 ρ-syntax : ∀ {Ξ} → ArgD Ξ → ArgsD Ξ → ArgsD Ξ
-ρ-syntax D Ds = D ∙ Ds
+ρ-syntax D Ds = D ∷ Ds
 
 syntax ρ-syntax D Ds = ρ[ D ] Ds
 infixr 7 ρ-syntax

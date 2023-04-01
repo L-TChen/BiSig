@@ -1,4 +1,5 @@
 open import Prelude
+  hiding (lookup)
 
 module Syntax.NamedContext.Decidable {Id : Set} (_≟_ : (x y : Id) → Dec (x ≡ y)) where
 
@@ -9,7 +10,7 @@ private variable
 
 lookup : (Γ : Context T) (x : Id)
   → Dec (∃[ A ] x ⦂ A ∈ Γ)
-lookup ∅           x = no λ ()
+lookup []          x = no λ ()
 lookup (y ⦂ B , Γ) x with x ≟ y
 ... | yes refl = yes (B , zero )
 ... | no ¬p    with lookup Γ x

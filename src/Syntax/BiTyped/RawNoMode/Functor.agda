@@ -23,12 +23,12 @@ Fam₀ : Set₁
 Fam₀ = Fam lzero
 
 ⟦_⟧ᵃ : (D : List (TExp Ξ)) → Set ℓ → Set ℓ
-⟦ ∅     ⟧ᵃ X = X
-⟦ A ∙ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
+⟦ []    ⟧ᵃ X = X
+⟦ A ∷ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
 
 ⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : Fam ℓ) → Set ℓ
-⟦ ∅               ⟧ᵃˢ _ = ⊤
-⟦ Θ ⊢[ _ ] _ ∙ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
+⟦ []              ⟧ᵃˢ _ = ⊤
+⟦ Θ ⊢[ _ ] _ ∷ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ
 ⟦ ι _ _ Ds ⟧ᶜ X = ⟦ Ds ⟧ᵃˢ X

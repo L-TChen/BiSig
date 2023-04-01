@@ -48,14 +48,14 @@ mutual
   renameMap : (D : ArgsD n)
     → Ren Γ Δ
     → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
-  renameMap ∅                 f _        = _
-  renameMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
+  renameMap []                 f _        = _
+  renameMap (Θ ⊢[ _ ] _ ∷ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
   renameMapᵃ : (Θ : List (TExp n))
     → Ren Γ Δ
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
-  renameMapᵃ ∅       f t = rename f t
-  renameMapᵃ (A ∙ Δ) f t = renameMapᵃ Δ (ext f) t
+  renameMapᵃ []       f t = rename f t
+  renameMapᵃ (A ∷ Δ) f t = renameMapᵃ Δ (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -65,15 +65,15 @@ infixr 5 ⟨_⟩_
 Sub : (Γ Δ : Cxt m) → Set
 Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm _ Infer A Δ
 
-exts : Sub Γ Δ → Sub (A ∙ Γ) (A ∙ Δ)
+exts : Sub Γ Δ → Sub (A ∷ Γ) (A ∷ Δ)
 exts f (here px) = ` here px
 exts f (there x) = rename there (f x)
 
 extsⁿ : {Ξ : Cxt m}
   → Sub Γ Δ → Sub (Ξ ++ Γ) (Ξ ++ Δ)
-extsⁿ {Ξ = ∅}     f x         = f x
-extsⁿ {Ξ = A ∙ Ξ} f (here px) = ` here px
-extsⁿ {Ξ = A ∙ Ξ} f (there x) = rename there (extsⁿ f x)
+extsⁿ {Ξ = []}     f x         = f x
+extsⁿ {Ξ = A ∷ Ξ} f (here px) = ` here px
+extsⁿ {Ξ = A ∷ Ξ} f (there x) = rename there (extsⁿ f x)
 
 mutual
   sub : Sub Γ Δ
@@ -87,14 +87,14 @@ mutual
   subMap : (D : ArgsD n)
     → Sub Γ Δ
     → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
-  subMap ∅        f _        = _
-  subMap (Θ ⊢[ _ ] _ ∙ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
+  subMap []        f _        = _
+  subMap (Θ ⊢[ _ ] _ ∷ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
   subMapᵃ : (Θ : List (TExp n))
     → Sub Γ Δ
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
-  subMapᵃ ∅       f t = sub f t
-  subMapᵃ (A ∙ Δ) f t = subMapᵃ Δ (exts f) t
+  subMapᵃ []       f t = sub f t
+  subMapᵃ (A ∷ Δ) f t = subMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
 ⟪_⟫_ : Sub Γ Δ
@@ -110,10 +110,10 @@ module _ {X : Fam m ℓ} (α : (D -Alg) X) where mutual
 
   foldMap : (D : ArgsD n)
     → ⟦ D ⟧ᵃˢ (Tm m) σ ⇒₁ ⟦ D ⟧ᵃˢ X σ
-  foldMap ∅        _        = _
-  foldMap (Θ ⊢[ _ ] _ ∙ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
+  foldMap []        _                = _
+  foldMap (Θ ⊢[ _ ] _ ∷ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
   foldMapᵃ : (Θ : List (TExp n))
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ ⇒₁ ⟦ Θ ⟧ᵃ (X mod A) σ
-  foldMapᵃ ∅       t = fold t
-  foldMapᵃ (A ∙ Δ) t = foldMapᵃ Δ t
+  foldMapᵃ []      t = fold t
+  foldMapᵃ (A ∷ Δ) t = foldMapᵃ Δ t

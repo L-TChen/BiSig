@@ -9,33 +9,53 @@ open import Data.Empty                         public
   using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
   using (⊥; ⊥-elim)
+
 open import Data.Unit                          public
   using () renaming (⊤ to ⊤₀; tt to tt₀)
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
-open import Data.Nat                           public
-  using (ℕ; zero; suc; _+_; _⊔_; less-than-or-equal)
-  renaming (_≤″_ to _≤_)
-import Data.Nat.Properties 
---  renaming (_≤′_ to _≤_; ≤′-refl to ≤-refl; ≤′-step to ≤-step)
-module ℕₚ = Data.Nat.Properties
 
-open import Data.Fin                           public
-  using (Fin; #_; zero; suc; fromℕ)
-open import Data.Fin.Literals                  public
-
-open import Data.List                          public 
-  using (List; length; map; _++_; zip)
-  renaming ([] to ∅; _∷_ to _∙_)
 open import Data.Maybe                         public
   using (Maybe; nothing; just)
-open import Data.List.Membership.Propositional public
-open import Data.List.Relation.Unary.Any       public
-  using (Any; here; there) 
-open import Data.List.Relation.Unary.All       public
-  using (All)
-open import Data.Vec                           public
-  using (Vec; []; _∷_)
+
+module N where
+  open import Data.Nat as N       public
+  open import Data.Nat.Properties public
+open N public
+  using (ℕ; zero; suc; _⊔_; _+_; less-than-or-equal; +-assoc)
+  renaming (_≤″_ to _≤_)
+
+module F where
+  open import Data.Fin          public
+  open import Data.Fin.Literals public
+open F public
+  using (Fin; #_; zero; suc; fromℕ; punchOut; punchIn; _↑ˡ_; _↑ʳ_)
+
+module L where
+  open import Data.List                          public 
+  open import Data.List.Properties               public
+
+  open import Data.List.Relation.Unary.Any       public
+    using (here; there)
+  open import Data.List.Membership.Propositional public
+    using (_∈_)
+  open import Data.List.Membership.Propositional.Properties public
+  open import Data.List.Relation.Unary.All       public
+    using (All)
+  open import Data.List.Relation.Binary.Subset.Propositional public
+    using (_⊆_)
+open L public using
+  ( List; []; _∷_; length; _++_; zip
+  ; _∈_; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
+  ; All; _⊆_)
+
+module V where
+  open import Data.Vec            public
+  open import Data.Vec.Properties public
+open V public using
+  (Vec; []; _∷_; map; insert; lookup; tabulate
+  ; allFin; lookup∘tabulate)
+
 open import Data.String                        public
   using (String)
 open import Data.Product                       public
@@ -58,6 +78,10 @@ open import Level                                 public
 variable
   ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ : Level
 
+private variable
+  m n l : ℕ
+  A : Set ℓ
+
 infixr -10 _⇒₁_ _⇒_
 _⇒₁_ : {I : Set ℓ′}
   → (X : I → Set ℓ₁) (Y : I → Set ℓ₂) → Set _
@@ -79,18 +103,14 @@ there i   ≟∈ there j   with i ≟∈ j
 here _    ≟∈ there _   = no λ ()
 there _   ≟∈ here  _   = no λ ()
 
-_^_ : Set → ℕ → Set
-X ^ zero  = ⊤₀
-X ^ suc n = X × X ^ n
+_^_ : Set ℓ → ℕ → Set ℓ
+X ^ n = Vec X n
 
 Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
 Lift₀ {ℓ} = Lift {ℓ} lzero -- Lift {ℓ} lzero
 
 {-# DISPLAY Lift lzero A = Lift₀ A #-}
-
-private variable
-  n : ℕ
-  A : Set ℓ
+{-
 
 strengthL : List (Fin (suc n)) → List (Fin n)
 strengthL ∅            = ∅
@@ -117,7 +137,7 @@ succ∈ {xs = suc x ∙ xs} (there i)   = there (succ∈ i)
 update : (i : Fin n) (x : A) → Vec A n → Vec A n
 update zero    y (x ∷ xs) = y ∷ xs
 update (suc i) y (x ∷ xs) = x ∷ update i y xs
-
+-}
 ------------------------------------------------------------------------------
 -- Properties of ≤
 ------------------------------------------------------------------------------
@@ -125,7 +145,7 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
 ≤-step : {m n : ℕ} → m ≤ n → m ≤ suc n
 ≤-step {m} {n} (less-than-or-equal eq) = less-than-or-equal (begin
   m + (suc _)
-    ≡⟨ ℕₚ.+-suc m _ ⟩
+    ≡⟨ N.+-suc m _ ⟩
   suc (m + _)
     ≡⟨ cong suc eq ⟩
   suc n
@@ -133,4 +153,10 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
   where open ≡-Reasoning
     
 ≤-refl : ∀ {m} → m ≤ m
-≤-refl = less-than-or-equal (ℕₚ.+-identityʳ _)
+≤-refl = less-than-or-equal (N.+-identityʳ _)
+
+-- Fin 
+insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
+insert-mid m n i with F.splitAt m i
+... | inl j = (j F.↑ˡ _) F.↑ˡ _
+... | inr k = (m + n) F.↑ʳ k

@@ -13,9 +13,6 @@ open import Syntax.Context SD
 open import Syntax.Typed.Intrinsic.Functor
 open import Syntax.Typed.Intrinsic.Term D
 
-open import Data.List.Membership.Propositional
-open import Data.List.Relation.Unary.Any using (here; there)
-
 private
   variable
     n m   : ℕ

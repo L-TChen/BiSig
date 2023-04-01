@@ -1,5 +1,6 @@
 {-# OPTIONS --with-K #-} 
 open import Prelude
+  hiding (lookup)
 
 import Syntax.Simple.Description as S
 open import Syntax.BiTyped.Description
@@ -12,9 +13,7 @@ module Theory.ModeCorrectness.Term {SD : S.Desc}
 
 open B {SD} Id
 
-import      Data.Vec                     as V
 import      Data.List.Relation.Unary.All as A
-open import Data.List.Relation.Unary.Any.Properties
 
 open import Syntax.NamedContext           SD Id
 open import Syntax.NamedContext.Decidable _≟Id_
@@ -22,8 +21,8 @@ open import Syntax.NamedContext.Decidable _≟Id_
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
 open import Syntax.Simple.Association        SD
-open import Syntax.Simple.Properties         {SD}
-open import Syntax.Simple.Unification        {SD}
+open import Syntax.Simple.Properties         SD
+open import Syntax.Simple.Unification        SD
 
 import      Syntax.BiTyped.Raw.Functor       {SD} Id as R
 open import Syntax.BiTyped.Raw.Term               Id D
@@ -58,16 +57,16 @@ mutual
 
   uniq-⇉Map
     : (Ds : ArgsD n)
-    → ModeCorrectᵃˢ ∅ Ds
+    → ModeCorrectᵃˢ [] Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw m)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₂ Γ ts)
-    → ∀ {x} → x ∈ Known ∅ Ds
+    → ∀ {x} → x ∈ Known [] Ds
     → V.lookup σ₁ x ≡ V.lookup σ₂ x -- σ₁ x ≡ σ₂ x
-  uniq-⇉Map ∅                     _             _          _          ()
-  uniq-⇉Map (_ ⊢[ Check ] _ ∙ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
+  uniq-⇉Map []                    _             _          _          ()
+  uniq-⇉Map (_ ⊢[ Check ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
-  uniq-⇉Map (Θ ⊢[ Infer ] C ∙ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ++⁻ (fv C) i
+  uniq-⇉Map (Θ ⊢[ Infer ] C ∷ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ∈-++⁻ (fv C) i
   ... | inl j = uniq-⇉Mapᵃ C Θ SD ⊢t ⊢u (uniq-⇉Map Ds SDs ⊢ts ⊢us) j
   ... | inr j = uniq-⇉Map Ds SDs ⊢ts ⊢us j
 
@@ -82,8 +81,8 @@ mutual
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
-  uniq-⇉Mapᵃ C ∅       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
-  uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂ = σ₂} C (A ∙ Θ) (A⊆xs , SD) ⊢t ⊢u f =
+  uniq-⇉Mapᵃ C []       _           ⊢t ⊢u f = ≡-fv-inv C (uniq-⇉ ⊢t ⊢u)
+  uniq-⇉Mapᵃ {σ₁ = σ₁} {σ₂ = σ₂} C (A ∷ Θ) (A⊆xs , SD) ⊢t ⊢u f =
     let A₁=A₂ = ≡-fv σ₁ σ₂ A λ x∈fvA → f (A⊆xs x∈fvA) in
     uniq-⇉Mapᵃ C Θ SD (subst (λ A → (⟦ Θ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
 
@@ -105,8 +104,8 @@ subst-∈→∈
   → ¬ (∃[ A ] (x ⦂ A ∈ Γ))
   → (σ : TSub m n)
   → ¬ (∃[ B ] (x ⦂ B ∈ ⟪ σ ⟫cxt Γ))
-subst-∈→∈ (_ ∙ _)       _ ¬∃ σ (D , zero)      = ¬∃ (_ , zero)
-subst-∈→∈ ((y , C) ∙ Γ) x ¬∃ σ (D , suc ¬p x∈) =
+subst-∈→∈ (_ ∷ _)       _ ¬∃ σ (D , zero)      = ¬∃ (_ , zero)
+subst-∈→∈ ((y , C) ∷ Γ) x ¬∃ σ (D , suc ¬p x∈) =
   subst-∈→∈ Γ x (λ where (_ , x∈) → ¬∃ (_ , suc ¬p x∈)) σ (_ , x∈)
 
 mutual

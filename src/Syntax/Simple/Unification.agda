@@ -10,9 +10,6 @@ open import Syntax.Simple.Term D
   hiding (_≟_)
 open import Syntax.Simple.Association D
 
-open import Data.Fin
-  using (_≟_; punchOut)
-
 private variable
   n m l : ℕ
 
@@ -32,7 +29,7 @@ flexFlex-≢ : {x y : Fin (suc m)}
 flexFlex-≢ {x = x} ¬p = (` punchOut ¬p) / x ∷ []
 
 flexFlex : (x y : Fin m) → ∃ (AList m)
-flexFlex {m = suc m} x y with x ≟ y
+flexFlex {m = suc m} x y with x F.≟ y
 ... | yes p = suc m , []
 ... | no ¬p = m , flexFlex-≢ ¬p 
 
@@ -52,6 +49,6 @@ mutual
   amguⁿ : (ts us : Tm m ^ l) (acc : ∃ (AList m))
     → Maybe (∃ (AList m))
   amguⁿ {l = zero}  _        _        acc = just acc
-  amguⁿ {l = suc l} (t , ts) (u , us) acc with amgu t u acc
+  amguⁿ {l = suc l} (t ∷ ts) (u ∷ us) acc with amgu t u acc
   ... | just acc′ = amguⁿ ts us acc′
   ... | nothing   = nothing

@@ -40,13 +40,13 @@ module _ (ρ : Ren m n) where mutual
 
   trenameⁿ : {D : B.ArgsD k}
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
-  trenameⁿ {D = ∅}     _        = _
-  trenameⁿ {D = A ∙ D} (t , ts) = trenameᵃ t , trenameⁿ ts
+  trenameⁿ {D = []}     _        = _
+  trenameⁿ {D = A ∷ D} (t , ts) = trenameᵃ t , trenameⁿ ts
 
   trenameᵃ : {D : List (TExp k)}
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
-  trenameᵃ {D = ∅}     t       = trename t
-  trenameᵃ {D = A ∙ D} (x , t) = x , trenameᵃ t
+  trenameᵃ {D = []}     t       = trename t
+  trenameᵃ {D = A ∷ D} (x , t) = x , trenameᵃ t
 
 twkˡ : m ≤ n → Raw m mod → Raw n mod
 twkˡⁿ : {D : B.ArgsD k} → m ≤ n
@@ -77,13 +77,13 @@ module _ (σ : Sub m n) where mutual
 
   tsubⁿ : {D : B.ArgsD k}
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
-  tsubⁿ {D = ∅}     _        = _
-  tsubⁿ {D = A ∙ D} (t , ts) = tsubᵃ t , tsubⁿ ts
+  tsubⁿ {D = []}     _        = _
+  tsubⁿ {D = A ∷ D} (t , ts) = tsubᵃ t , tsubⁿ ts
 
   tsubᵃ : {D : List (TExp k)}
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
-  tsubᵃ {D = ∅}     t       = tsub t
-  tsubᵃ {D = A ∙ D} (x , t) = x , tsubᵃ t
+  tsubᵃ {D = []}     t       = tsub t
+  tsubᵃ {D = A ∷ D} (x , t) = x , tsubᵃ t
 
 infixr 8 ⟪_⟫ₜ
 ⟪_⟫ₜ : Sub m n → Raw m mod → Raw n mod

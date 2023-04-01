@@ -29,7 +29,7 @@ module _ where
     → m ≤ m + a + b
   m≤m+a+b {m} {a} {b} = less-than-or-equal {m} {m + a + b} {a + b} $ begin
     m + (a + b)
-      ≡⟨ sym (ℕₚ.+-assoc m a b) ⟩
+      ≡⟨ sym (+-assoc m a b) ⟩
     m + a + b
     ∎
 
@@ -60,18 +60,18 @@ mutual
   annotateRawⁿ : (Ds : ArgsD Ξ)
     → R.⟦ Ds ⟧ᵃˢ (Raw m)
     → ∃[ n ] (m ≤ n) × M.⟦ Ds ⟧ᵃˢ (MRaw n)
-  annotateRawⁿ         ∅                     _ = _ , ≤-refl , _
-  annotateRawⁿ {m = m} (Θ B.⊢[ mod ] A ∙ Ds) (t , ts) with annotateRawᵃ Θ mod t | annotateRawⁿ Ds ts
+  annotateRawⁿ         []                    _ = _ , ≤-refl , _
+  annotateRawⁿ {m = m} (Θ B.⊢[ mod ] A ∷ Ds) (t , ts) with annotateRawᵃ Θ mod t | annotateRawⁿ Ds ts
   ... | n₁ , less-than-or-equal {k₁} refl , t′ | n₂ , less-than-or-equal {k₂} refl , ts′ =
     m + k₁ + k₂ , m≤m+a+b , twkˡᵃ (less-than-or-equal refl) t′ , twkᵐⁿ m k₁ ts′
 
   annotateRawᵃ : (Θ : TExps n) (mod : Mode)
     → R.⟦ Θ ⟧ᵃ (Raw m)
     → ∃[ n ] (m ≤ n) × M.⟦ Θ ⟧ᵃ (MRaw n mod)
-  annotateRawᵃ ∅ mod t with annotateRaw t
+  annotateRawᵃ [] mod t with annotateRaw t
   ... | n , p , mod′ , t with cast t mod
   ... | inl tₗ = suc n , ≤-step p , tₗ
   ... | inr tᵣ = n , p , tᵣ
-  annotateRawᵃ (A ∙ Θ) mod (x , t) =
+  annotateRawᵃ (A ∷ Θ) mod (x , t) =
     let n , le , t′ = annotateRawᵃ Θ mod t
     in n , le , x , t′

@@ -9,8 +9,8 @@ open import Syntax.Simple.Description
 
 ΛₜD : Desc
 ΛₜD = 0 -- base type
-    ∙ 2 -- function type
-    ∙ ∅
+    ∷ 2 -- function type
+    ∷ []
 
 open import Syntax.Simple.Term ΛₜD
   using (`_; op; ∅ₛ; _∙ₛ_)
@@ -25,5 +25,5 @@ data Λₜ : Set where
 
 open import Syntax.Context ΛₜD public
 
-pattern _↣_ A B = op (2 , there (here refl) , A , B , _)
+pattern _↣_ A B = op (2 , there (here refl) , A ∷ B ∷ [])
 infixr 8 _↣_

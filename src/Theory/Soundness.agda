@@ -49,12 +49,12 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
     : (D : B.ArgsD n)
     → B.⟦ D ⟧ᵃˢ         (BTm BD m) σ Γ
     → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm TD m)  σ Γ
-  forgetMap ∅                 _        = _
-  forgetMap (Θ ⊢[ m ] B ∙ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
+  forgetMap []                 _        = _
+  forgetMap (Θ ⊢[ m ] B ∷ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
  
   forgetMapᵃ
     : (Θ : TExps n)
     → B.⟦ Θ ⟧ᵃ (BTm BD m mod A) σ Γ
     → T.⟦ Θ ⟧ᵃ (Tm  TD m  A)    σ Γ
-  forgetMapᵃ ∅       t = forget t
-  forgetMapᵃ (_ ∙ Θ) t = forgetMapᵃ Θ t
+  forgetMapᵃ []       t = forget t
+  forgetMapᵃ (_ ∷ Θ) t = forgetMapᵃ Θ t

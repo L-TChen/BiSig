@@ -14,8 +14,8 @@ private variable
   Γ     : Named.Context T
 
 ∥_∥ctx : Named.Context T → Nameless.Context T
-∥ ∅         ∥ctx = ∅
-∥ x ⦂ A , Γ ∥ctx = A ∙ ∥ Γ ∥ctx
+∥ []        ∥ctx = []
+∥ x ⦂ A , Γ ∥ctx = A ∷ ∥ Γ ∥ctx
 
 ∥_∥∈ : x ⦂ A ∈ Γ → A ∈ ∥ Γ ∥ctx
 ∥ zero     ∥∈ = here refl

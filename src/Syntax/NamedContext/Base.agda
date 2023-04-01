@@ -10,7 +10,7 @@ infix  4 _⦂_∈_
 Context : (T : Set) → Set
 Context T = List (Id × T)
 
-pattern _⦂_,_ x A Γ = (x , A) ∙ Γ
+pattern _⦂_,_ x A Γ = (x , A) ∷ Γ
 
 private variable
   T   : Set

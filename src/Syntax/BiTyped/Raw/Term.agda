@@ -3,12 +3,9 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+open import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
-
--- import Data.Fin  as F
-import Data.Vec as V
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp)

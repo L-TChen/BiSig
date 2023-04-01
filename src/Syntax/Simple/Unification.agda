@@ -7,21 +7,20 @@ open import Syntax.Simple.Description
 module Syntax.Simple.Unification (D : Desc) where
 
 open import Syntax.Simple.Term D
-  hiding (_≟_)
 open import Syntax.Simple.Association D
 
 private variable
   n m l : ℕ
 
 -- 
-flexRigid∉ : (x : Fin (suc m)) (t : Tm (suc m))
+flexRigid∉ : {x : Fin (suc m)} {t : Tm (suc m)}
   → x ∉ₜ t → AList (suc m) m
-flexRigid∉ x t x∉ = punchOutTm x t x∉ / x ∷ []
+flexRigid∉ {x = x} x∉ = punchOutTm x∉ / x ∷ []
 
 flexRigid : (x : Fin m) (t : Tm m) → Maybe (∃ (AList m))
 flexRigid {m = suc m} x t with x ∈ₜ? t
 ... | yes _ = nothing
-... | no x∉ = just (_ , flexRigid∉ x t x∉)
+... | no x∉ = just (_ , flexRigid∉ x∉)
 
 flexFlex-≢ : {x y : Fin (suc m)}
   → (¬p : x ≢ y)
@@ -29,7 +28,7 @@ flexFlex-≢ : {x y : Fin (suc m)}
 flexFlex-≢ {x = x} ¬p = (` punchOut ¬p) / x ∷ []
 
 flexFlex : (x y : Fin m) → ∃ (AList m)
-flexFlex {m = suc m} x y with x F.≟ y
+flexFlex {m = suc m} x y with x ≟ y
 ... | yes p = suc m , []
 ... | no ¬p = m , flexFlex-≢ ¬p 
 

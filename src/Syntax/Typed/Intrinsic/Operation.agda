@@ -6,7 +6,7 @@ open import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc {SD}} where
 open import Syntax.Simple.Term        SD
-  using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps; _≟_ to _≟T_)
+  using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps)
 open import Syntax.Simple.Association SD
 
 open import Syntax.Context            SD

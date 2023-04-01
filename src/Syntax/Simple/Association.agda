@@ -7,7 +7,6 @@ open import Syntax.Simple.Description
 module Syntax.Simple.Association (D : Desc) where
 
 open import Syntax.Simple.Term D
-  renaming (_≟_ to _≟Tm_)
 
 private variable
   n m l : ℕ

@@ -158,5 +158,20 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
 -- Fin 
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
 insert-mid m n i with F.splitAt m i
-... | inl j = (j F.↑ˡ _) F.↑ˡ _
-... | inr k = (m + n) F.↑ʳ k
+... | inl j = (j ↑ˡ _) ↑ˡ _
+... | inr k = (m + n) ↑ʳ k
+
+
+record DecEq {a} (A : Set a) : Set a where
+  infix 4 _≟_
+  field
+    _≟_ : (x y : A) → Dec (x ≡ y)
+
+open DecEq ⦃...⦄ public
+
+instance
+  EqNat : DecEq ℕ
+  _≟_ ⦃ EqNat ⦄ = N._≟_
+
+  EqFin : DecEq (Fin n)
+  _≟_ ⦃ EqFin ⦄ = F._≟_

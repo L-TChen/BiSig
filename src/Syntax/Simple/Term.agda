@@ -39,28 +39,22 @@ mutual
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
 
-fv′ = fold (record { var = L.[_] ; alg = λ where
-  (_ , _ , fvs) → V.foldr _ L._++_ [] fvs })
-
-lem : (t : Tm n) → fv t ≡ fv′ t
-lem = {!!}
-
 mutual
-  _≟_ : (t u : Tm Ξ) → Dec (t ≡ u)
-  (` x) ≟ (` y) with  x F.≟ y
+  _≟ₜ_ : (t u : Tm Ξ) → Dec (t ≡ u)
+  (` x) ≟ₜ (` y) with  x ≟ y
   ... | yes p = yes (cong `_ p)
   ... | no ¬p = no λ where refl → ¬p refl
-  op (D , i , ts) ≟ op (_ , j , us) with i ≟∈ j
+  op (D , i , ts) ≟ₜ op (_ , j , us) with i ≟∈ j
   ... | no ¬p = no λ where refl → ¬p refl
   ... | yes refl with compareMap ts us
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong (λ ts → op (D , i , ts)) q)
-  (` x) ≟ op u  = no λ ()
-  op x  ≟ (` y) = no λ ()
+  (` x) ≟ₜ op u  = no λ ()
+  op x  ≟ₜ (` y) = no λ ()
 
   compareMap : (ts us : Tm Ξ ^ n) → Dec (ts ≡ us)
   compareMap []       []        = yes refl
-  compareMap (t ∷ ts) (u ∷ us) with t ≟ u
+  compareMap (t ∷ ts) (u ∷ us) with t ≟ₜ u
   ... | no ¬p = no λ where refl → ¬p refl
   ... | yes p with compareMap ts us
   ... | no ¬q = no λ where refl → ¬q refl
@@ -89,7 +83,7 @@ x ∉ₜₛ ts = ¬ x ∈ₜₛ ts
 
 mutual
   _∈ₜ?_ : (x : Fin m) (t : Tm m) → Dec (x ∈ₜ t)
-  x ∈ₜ? ` y with x F.≟ y
+  x ∈ₜ? ` y with x ≟ y
   ... | yes p = yes (here p)
   ... | no ¬p = no λ where (here p) → ¬p p
   x ∈ₜ? op (_ , _ , ts) with x ∈ₜₛ? ts
@@ -110,7 +104,7 @@ mutual
 mutual
   punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
     → ¬ x ∈ₜ t → Tm n
-  punchOutTm {_} {x} {` y}  x∉ with x F.≟ y
+  punchOutTm {_} {x} {` y}  x∉ with x ≟ y
   ... | yes x=y = ⊥-elim₀ (x∉ (here x=y))
   ... | no ¬x=y = ` punchOut ¬x=y
   punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
@@ -176,7 +170,7 @@ _∙ₛ_ : Tm n → Sub m n → Sub (suc m) n
 infixr 5 _∙ₛ_
 
 sub-for : (Tm m) → (x y : Fin (suc m)) → Tm m
-sub-for t x y with x F.≟ y
+sub-for t x y with x ≟ y
 ... | no ¬p = ` punchOut ¬p
 ... | yes _ = t
 

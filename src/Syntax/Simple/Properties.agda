@@ -62,7 +62,7 @@ module _ {m n l : ℕ} (ρ : Sub m n) (σ : Sub n l) where mutual
 sub-t-for-x-x
   : {t : Tm m} {x : Fin (suc m)}
   → sub-for t x x ≡ t
-sub-t-for-x-x {x = x} with x F.≟ x
+sub-t-for-x-x {x = x} with x ≟ x
 ... | yes p = refl
 ... | no ¬p = ⊥-elim₀ (¬p refl)
 
@@ -70,7 +70,7 @@ sub-t-for-x-y
   : {x y : Fin (suc m)} {t : Tm m} 
   → (¬p : x ≢ y)
   → sub-for t x y ≡ ` punchOut ¬p 
-sub-t-for-x-y {x = x} {y} ¬p with x F.≟ y
+sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
 ... | yes p = ⊥-elim₀ (¬p p)
 ... | no ¬p = refl
 
@@ -99,7 +99,7 @@ sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
   
 module _ {u : Tm m} {x : Fin (suc m)} where mutual
   sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : x ∉ₜ t)
-    → t ⟪ u for x ⟫ ≡ punchOutTm x t x∉
+    → t ⟪ u for x ⟫ ≡ punchOutTm x∉
   sub-for-nonfree=punchOut (` y)  x∉ with x F.≟ y
   ... | yes p = ⊥-elim₀ (x∉ (here p))
   ... | no ¬p = sub-for-x-in-y ¬p
@@ -108,7 +108,7 @@ module _ {u : Tm m} {x : Fin (suc m)} where mutual
 
   sub-for-nonfree=punchOutⁿ : (ts : Tm (suc m) ^ n)
     → (x∉ : x ∉ₜₛ ts)
-    → subⁿ (u for x) ts ≡ punchOutTmⁿ x ts x∉
+    → subⁿ (u for x) ts ≡ punchOutTmⁿ x∉
   sub-for-nonfree=punchOutⁿ []       _  = refl
   sub-for-nonfree=punchOutⁿ (t ∷ ts) x∉ =
     cong₂ _∷_ (sub-for-nonfree=punchOut t $ x∉ ∘ head)
@@ -250,7 +250,7 @@ flexFlex-is-unifier
   : (x y : Fin m)
   → let σ = flexFlex x y .proj₂ in
     ` x ⟪ σ ⟫ₐ ≡ ` y ⟪ σ ⟫ₐ
-flexFlex-is-unifier {m = suc m} x y with x F.≟ y
+flexFlex-is-unifier {m = suc m} x y with x ≟ y
 ... | yes refl = refl
 ... | no ¬p = begin
   ` x ⟪ flexFlex-≢ ¬p ⟫ₐ
@@ -265,20 +265,20 @@ flexFlex-is-unifier {m = suc m} x y with x F.≟ y
 
 flexRigid∉-is-unifier
   : (x : Fin (suc m)) (t : Tm (suc m))  (x∉ : x ∉ₜ t)
-  → let σ = flexRigid∉ x t x∉ in
+  → let σ = flexRigid∉ x∉ in
     t ⟪ σ ⟫ₐ ≡ ` x ⟪ σ ⟫ₐ
 flexRigid∉-is-unifier x t x∉ = begin
-  t ⟪ flexRigid∉ x t x∉ ⟫ₐ
+  t ⟪ flexRigid∉ x∉ ⟫ₐ
     ≡⟨⟩
-  t ⟪ punchOutTm x t x∉ / x ∷ [] ⟫ₐ
+  t ⟪ punchOutTm x∉ / x ∷ [] ⟫ₐ
     ≡⟨ toSub-/∷[] x t ⟩
-  t ⟪ punchOutTm x t x∉ for x ⟫
+  t ⟪ punchOutTm x∉ for x ⟫
     ≡⟨ sub-for-nonfree=punchOut t x∉ ⟩
-  punchOutTm x t x∉
+  punchOutTm x∉
     ≡⟨ sym $ sub-for-x-in-x x ⟩
-  ` x ⟪ (punchOutTm x t x∉) for x ⟫
+  ` x ⟪ (punchOutTm x∉) for x ⟫
      ≡⟨ (sym $ toSub-/∷[] x (` x)) ⟩
-  ` x ⟪ flexRigid∉ x t x∉ ⟫ₐ
+  ` x ⟪ flexRigid∉ x∉ ⟫ₐ
   ∎
   where open ≡-Reasoning
 

@@ -19,7 +19,7 @@ open import Syntax.NamedContext           SD Id
 open import Syntax.NamedContext.Decidable _≟Id_
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tms to TExps; Sub to TSub; _≟_ to _≟T_)
+  renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Simple.Association        SD
 open import Syntax.Simple.Properties         SD
 open import Syntax.Simple.Unification        SD

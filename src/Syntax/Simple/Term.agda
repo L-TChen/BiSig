@@ -7,13 +7,15 @@ module Syntax.Simple.Term (D : Desc) where
 
 private variable
   Γ Ξ Δ : ℕ
-  n m l k : ℕ
+  n m l k i j : ℕ
   A B : Set
 
 infix 9 `_
 data Tm (n : ℕ) : Set where
   `_ :       Fin n  → Tm n
   op : ⟦ D ⟧ (Tm n) → Tm n
+
+pattern op′ i ts = op (_ , i , ts)
 
 Tm₀ : Set
 Tm₀ = Tm 0
@@ -100,6 +102,16 @@ mutual
   ... | no ¬q = no λ where
     (head x∈) → ¬p x∈
     (tail x∈) → ¬q x∈
+
+length∈ₜₛ : {x : Fin m} {ts : Tm m ^ l} → x ∈ₜₛ ts → Fin l
+length∈ₜₛ (head x∈) = zero
+length∈ₜₛ (tail x∈) = suc (length∈ₜₛ x∈)
+
+lookup∈ₜₛ : {x : Fin m} {ts : Tm m ^ l}
+  → (i : x ∈ₜₛ ts)
+  → x ∈ₜ lookup ts (length∈ₜₛ i) 
+lookup∈ₜₛ (head x∈) = x∈
+lookup∈ₜₛ (tail x∈) = lookup∈ₜₛ x∈
 
 mutual
   punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
@@ -197,3 +209,83 @@ wk≤ˡ (less-than-or-equal refl) = wkˡ
 weaken : Tm m → Tm (suc m)
 weaken = rename (tabulate suc)
 
+------------------------------------------------------------------------------
+-- Order relation between substitutions
+
+private variable
+  t u v : Tm m
+
+_⊑_ : Sub m n → Sub m l → Set
+ρ ⊑ σ = ∃[ ρ′ ] ρ ≡ (σ ⨟ ρ′) 
+
+Subₚ = λ m → {n : ℕ} → Sub m n → Set
+
+Unifies : (t u : Tm m) → Subₚ m
+Unifies t u σ = t ⟪ σ ⟫ ≡ u ⟪ σ ⟫ 
+
+infixl 10 _[_⨟_]
+_[_⨟_] : (P : Subₚ m) (σ : Sub m n) → Subₚ n
+P [ σ ⨟ ρ ] = P (σ ⨟ ρ)
+
+{-
+lem : (P : Subₚ m) (σ₁ : Sub m n) (σ₂ : Sub n l) (ρ : Sub l k)
+  → P [ σ₁ ⨟_] [ σ₂ ⨟ ρ ] → P [ (σ₁ ⨟ σ₂) ⨟ ρ ]
+lem P σ₁ σ₂ ρ k = {!!}
+-}
+
+Max : Subₚ m → Subₚ m
+Max P σ = P σ ×
+  ({n : ℕ} (σ′ : Sub _ n) → P σ′ → σ′ ⊑  σ)
+
+------------------------------------------------------------------------------
+-- Zipper for Simple Terms
+
+_ʳ+_ : ℕ → ℕ → ℕ
+zero  ʳ+ m = m
+suc n ʳ+ m = n ʳ+ (suc m)
+
+infixl 5 _ʳ++_
+_ʳ++_ : Vec A n → Vec A m → Vec A (n ʳ+ m)
+[]       ʳ++ ys = ys
+(x ∷ xs) ʳ++ ys = xs ʳ++ (x ∷ ys)
+
+record Step (n : ℕ) : Set where
+  constructor step
+  field
+    {us-idx ts-idx} : ℕ 
+    us  : Tm n ^ us-idx
+    ts  : Tm n ^ ts-idx
+    pos : us-idx ʳ+ (suc ts-idx) ∈ D
+open Step public using ()
+
+Steps : ℕ → Set
+Steps n = List (Step n)
+
+_⟪_⟫′ : Steps m → Sub m n → Steps n
+[]       ⟪ σ ⟫′ = []
+(step us ts pos ∷ ps) ⟪ σ ⟫′ =
+  step (subⁿ σ us) (subⁿ σ ts) pos ∷ ps ⟪ σ ⟫′
+
+infixr 4.5 _▷₁_ _▷_
+
+_▷₁_ : Step n → Tm n → Tm n
+step us ts i ▷₁ t = op′ i $ us ʳ++ (t ∷ ts)
+
+_▷_ : Steps n → Tm n → Tm n
+[]           ▷ t = t
+(p ∷ ps) ▷ t = p ▷₁ (ps ▷ t)
+
+module _ {m : ℕ} {x : Fin m} where mutual
+  walk : {t : Tm m}
+    → x ∈ₜ t → Steps m
+  walk (here x)                      = []
+  walk (ops {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈  
+
+  walkTms : l ʳ+ (suc k) ∈ D
+    → (t : Tm m) (us : Tm m ^ l) (ts : Tm m ^ k)
+    → (x∈ : x ∈ₜₛ t ∷ ts)
+    → Steps m
+  walkTms i t₀ us ts (head x∈) = 
+    step us ts i ∷ walk x∈
+  walkTms i t₀ us (t ∷ ts) (tail x∈) =
+    walkTms i t (t₀ ∷ us) ts x∈

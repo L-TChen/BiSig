@@ -22,8 +22,8 @@ module N where
   open import Data.Nat as N       public
   open import Data.Nat.Properties public
 open N public
-  using (ℕ; zero; suc; _⊔_; _+_; less-than-or-equal; +-assoc)
-  renaming (_≤″_ to _≤_)
+  using (ℕ; zero; suc; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc)
+  renaming (_≤″_ to _≤_; _<″_ to _<_)
 
 module F where
   open import Data.Fin          public
@@ -103,6 +103,7 @@ there i   ≟∈ there j   with i ≟∈ j
 here _    ≟∈ there _   = no λ ()
 there _   ≟∈ here  _   = no λ ()
 
+infixl 4 _^_
 _^_ : Set ℓ → ℕ → Set ℓ
 X ^ n = Vec X n
 

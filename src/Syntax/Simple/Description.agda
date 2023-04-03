@@ -12,12 +12,6 @@ Desc = List ℕ
 ⟦_⟧ : Desc → Set → Set
 ⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] X ^ D
 
-∂⟦_⟧_ : Desc → Set → Set
-∂⟦ Ds ⟧ X = ∃[ D ]       -- the arity (for some f) is D + 1
-  Σ[ i ∈ (suc D ∈ Ds) ]  -- the i-th operation f
-  Fin (suc D)            -- the j-th position and 
-  × X ^ D                -- the other n many arguments for ar(f) = suc n
-  
 mapⁿ : {X Y : Set} {n : ℕ} (f : X → Y)
   → X ^ n → Y ^ n
 mapⁿ f xs = V.map f xs

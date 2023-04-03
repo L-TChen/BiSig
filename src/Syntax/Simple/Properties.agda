@@ -352,29 +352,28 @@ splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , r
 ʳ++-≡ (x ∷ xs) (x′ ∷ xs′) {ys} {ys′} eq with ʳ++-≡ xs xs′ {x ∷ ys} {x′ ∷ ys′} eq
 ... | refl , refl = refl , refl 
 
-lem : {A : Set}
-  → (xs {ys} : List A)
-  → xs L.++ ys ≡ [] → xs ≡ [] × ys ≡ []
-lem []       p = refl , p
-lem (x ∷ xs) ()
+[xs]≢[] : {A : Set}
+  → (xs : List A) {x : A}
+  → xs L.++ L.[ x ] ≢ []
+[xs]≢[] []       ()
+[xs]≢[] (x ∷ xs) ()
 
--- TODO: Prove that no-cycle terminates.
-{-# TERMINATING #-}
-no-cycle
-  : (t : Tm m) (ps : Steps m) 
-  → t ≡ ps ▷ t 
-  → ps ≡ []
-no-cycle _                   []                      _ = refl
-no-cycle (op (l , pos , vs)) (step {j} us ts _ ∷ ps) p with op-inj p
-... | refl , refl , eq with splitAt j vs
-... | ys , x ∷ zs , refl with lem ps (no-cycle x (ps L.++ _) x=ps▷p▷x) .proj₂ 
-  where
-    open ≡-Reasoning
-    x=ps▷p▷x = begin
-      x
-       ≡⟨ V.∷-injectiveˡ $ ʳ++-≡ ys us eq .proj₂ ⟩
-     ps ▷ step ys zs pos ▷₁ x
-       ≡⟨ ++-▷▷₁ ps (step ys zs pos) x ⟩
-     ps L.++ L.[ step ys zs pos ] ▷ x
-       ∎
-... | ()
+module _ {m : ℕ} where mutual
+  open ≡-Reasoning
+  no-cycle
+    : (t : Tm m) (ps : Steps m) 
+    → t ≡ ps ▷ t 
+    → ps ≡ []
+  no-cycle _                   []                      _ = refl
+  no-cycle (op (l , pos , vs)) (step {j} us ts _ ∷ ps) p with op-inj p
+  ... | refl , refl , eq with splitAt j vs
+  ... | ys , x ∷ zs , refl = ⊥-elim₀ ([xs]≢[] ps (no-cycle x (ps L.++ _) x=ps▷p▷x))
+    where
+      x=ps▷p▷x = begin
+        x
+          ≡⟨ V.∷-injectiveˡ $ ʳ++-≡ ys us eq .proj₂ ⟩
+        ps ▷ step ys zs pos ▷₁ x
+          ≡⟨ ++-▷▷₁ ps (step ys zs pos) x ⟩
+        ps L.++ L.[ step ys zs pos ] ▷ x
+        ∎
+

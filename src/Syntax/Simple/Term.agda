@@ -40,7 +40,16 @@ mutual
   fvⁿ : Tm Ξ ^ n → List (Fin Ξ)
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
+  
+mutual
+  size : Tm m → ℕ
+  size (` x)      = 1
+  size (op′ _ ts) = suc (sizeⁿ ts)
 
+  sizeⁿ : Tm m ^ l → ℕ
+  sizeⁿ []       = 0
+  sizeⁿ (t ∷ ts) = size t + sizeⁿ ts
+  
 mutual
   _≟ₜ_ : (t u : Tm Ξ) → Dec (t ≡ u)
   (` x) ≟ₜ (` y) with  x ≟ y
@@ -249,13 +258,20 @@ _ʳ++_ : Vec A n → Vec A m → Vec A (n ʳ+ m)
 []       ʳ++ ys = ys
 (x ∷ xs) ʳ++ ys = xs ʳ++ (x ∷ ys)
 
+splitAt : {A : Set}
+  → (m : ℕ) (xs : Vec A (m ʳ+ n))
+  → Σ[ ys ∈ Vec A m ] ∃[ zs ] xs ≡ ys ʳ++ zs
+splitAt zero    xs = [] , xs , refl
+splitAt (suc m) xs with splitAt m xs
+splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , refl
+
 record Step (n : ℕ) : Set where
   constructor step
   field
-    {us-idx ts-idx} : ℕ 
-    us  : Tm n ^ us-idx
-    ts  : Tm n ^ ts-idx
-    pos : us-idx ʳ+ (suc ts-idx) ∈ D
+    {iᵤ iₜ} : ℕ 
+    pos : iᵤ ʳ+ suc iₜ ∈ D
+    us  : Tm n ^ iᵤ
+    ts  : Tm n ^ iₜ
 open Step public using ()
 
 Steps : ℕ → Set
@@ -263,16 +279,16 @@ Steps n = List (Step n)
 
 _⟪_⟫′ : Steps m → Sub m n → Steps n
 []       ⟪ σ ⟫′ = []
-(step us ts pos ∷ ps) ⟪ σ ⟫′ =
-  step (subⁿ σ us) (subⁿ σ ts) pos ∷ ps ⟪ σ ⟫′
+(step pos us ts ∷ ps) ⟪ σ ⟫′ =
+  step pos (subⁿ σ us) (subⁿ σ ts) ∷ ps ⟪ σ ⟫′
 
 infixr 4.5 _▷₁_ _▷_
 
 _▷₁_ : Step n → Tm n → Tm n
-step us ts i ▷₁ t = op′ i $ us ʳ++ (t ∷ ts)
+step i us ts ▷₁ t = op′ i $ us ʳ++ (t ∷ ts)
 
 _▷_ : Steps n → Tm n → Tm n
-[]           ▷ t = t
+[]       ▷ t = t
 (p ∷ ps) ▷ t = p ▷₁ (ps ▷ t)
 
 module _ {m : ℕ} {x : Fin m} where mutual
@@ -286,6 +302,61 @@ module _ {m : ℕ} {x : Fin m} where mutual
     → (x∈ : x ∈ₜₛ t ∷ ts)
     → Steps m
   walkTms i t₀ us ts (head x∈) = 
-    step us ts i ∷ walk x∈
+    step i us ts ∷ walk x∈
   walkTms i t₀ us (t ∷ ts) (tail x∈) =
     walkTms i t (t₀ ∷ us) ts x∈
+
+<′-wf : WellFounded _<′_
+<′-wf = acc ∘ helper
+  where
+    helper : (y x : ℕ) → x N.<′ y → Acc N._<′_ x
+    helper (suc _) x N.≤′-refl     = <′-wf x
+    helper (suc y) x (N.≤′-step p) = helper y x p 
+
+module _ where
+  open Subrelation {_<₁_ = _<_ } {_<₂_ = _<′_} (N.≤⇒≤′ ∘ N.≤″⇒≤)
+  <-wf : WellFounded _<_
+  <-wf = wellFounded <′-wf
+  
+module _ {m : ℕ} where
+  open import Relation.Binary.Construct.On
+
+  _≺_ : Tm m → Tm m → Set
+  _≺_ = _<_ on size
+
+  ≺-wf : WellFounded _≺_
+  ≺-wf = wellFounded size <-wf 
+
+size-ʳ++
+  : (ys : Tm m ^ j) (xs : Tm m ^ i)
+  → sizeⁿ (ys ʳ++ xs) ≡ sizeⁿ ys + sizeⁿ xs
+size-ʳ++ []       xs = refl
+size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
+... | p = begin
+  sizeⁿ (ys ʳ++ (x ∷ xs))
+    ≡⟨ p ⟩
+  sizeⁿ ys + (size x + sizeⁿ xs)
+    ≡⟨ (sym $ +-assoc (sizeⁿ ys) _ _) ⟩
+  (sizeⁿ ys + size x) + sizeⁿ xs
+    ≡⟨ cong (_+ sizeⁿ xs) (+-comm (sizeⁿ ys) (size x))  ⟩
+  size x + sizeⁿ ys + sizeⁿ xs
+    ∎
+  where open ≡-Reasoning
+
+ʳ++-size
+  : (k : j ʳ+ (suc i) ∈ D) (ys : Tm m ^ j) (x : Tm m) (xs : Tm m ^ i)
+  → size x < size (op′ k (ys ʳ++ (x ∷ xs)))
+ʳ++-size {j} {i} {m} k ys x xs = less-than-or-equal $ cong suc $ begin
+  size x + (sizeⁿ xs + sizeⁿ ys)
+    ≡⟨ (sym $ +-assoc (size x) (sizeⁿ xs) (sizeⁿ ys)) ⟩
+  (size x + sizeⁿ xs) + sizeⁿ ys
+    ≡⟨ +-comm (size x + sizeⁿ xs) (sizeⁿ ys) ⟩
+  sizeⁿ ys + (size x + sizeⁿ xs)
+    ≡⟨ (sym $ size-ʳ++ ys (x ∷ xs)) ⟩
+  sizeⁿ (ys ʳ++ (x ∷ xs))
+    ∎
+  where open ≡-Reasoning
+    
+▷₁-size : (t : Tm m) (p : Step m)
+  → (_<_ on size) t (p ▷₁ t)
+▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 

@@ -22,8 +22,10 @@ module N where
   open import Data.Nat as N       public
   open import Data.Nat.Properties public
 open N public
-  using (ℕ; zero; suc; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc)
+  using (ℕ; zero; suc; _<′_; <′-base; <′-step; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
   renaming (_≤″_ to _≤_; _<″_ to _<_)
+
+{-# DISPLAY N._≤′_ (suc n) m = n <′ m #-}
 
 module F where
   open import Data.Fin          public
@@ -52,6 +54,10 @@ open L public using
 module V where
   open import Data.Vec            public
   open import Data.Vec.Properties public
+  open import Data.Vec.Relation.Unary.Any       public
+    using (Any; here; there)
+  open import Data.Vec.Membership.Propositional public
+    using (_∈_)
 open V public using
   (Vec; []; _∷_; map; insert; lookup; tabulate
   ; allFin; lookup∘tabulate)
@@ -67,9 +73,14 @@ open import Data.Sum                           public
 open import Relation.Nullary                      public
   using (Dec; yes; no; _because_; ¬_)
 open import Relation.Binary                       public
-  using (Decidable)
+  using (Decidable; Rel)
 open import Relation.Binary.PropositionalEquality public
   using (_≡_; refl; sym; trans; cong; cong₂; subst; _≢_; module ≡-Reasoning)
+
+module WF where
+  open import Induction.WellFounded  public
+open WF public
+  hiding (module All)
 
 open import Level                                 public
   using (Level; Lift; lift)

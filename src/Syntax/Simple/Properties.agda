@@ -35,6 +35,20 @@ op-inj₃
   → ts ≡ us
 op-inj₃ refl = refl
 
+ʳ++-≡ : {A : Set}
+  → (xs xs′ : Vec A n) {ys ys′ : Vec A m}
+  → xs ʳ++ ys ≡ xs′ ʳ++ ys′
+  → xs ≡ xs′ × ys ≡ ys′
+ʳ++-≡ []       []         {ys} {ys′} p = refl , p
+ʳ++-≡ (x ∷ xs) (x′ ∷ xs′) {ys} {ys′} eq with ʳ++-≡ xs xs′ {x ∷ ys} {x′ ∷ ys′} eq
+... | refl , refl = refl , refl 
+
+[xs]≢[] : {A : Set}
+  → (xs : List A) {x : A}
+  → xs L.++ L.[ x ] ≢ []
+[xs]≢[] []       ()
+[xs]≢[] (x ∷ xs) ()
+
 ------------------------------------------------------------------------------
 -- Substitution has an identity and is associative 
 
@@ -294,7 +308,7 @@ flexRigid∉-is-unifier x t x∉ = begin
 ++-▷ : (ps qs : Steps n) (t : Tm n)
   → ps L.++ qs ▷ t ≡ ps ▷ qs ▷ t
 ++-▷ []                 qs t = refl
-++-▷ (step us ts i ∷ ps) qs t = 
+++-▷ (step i us ts ∷ ps) qs t = 
   cong (λ u → op $ _ , i , us ʳ++ (u ∷ ts)) (++-▷ ps qs t) 
 
 ++-▷▷₁ : (ps : Steps n) (p : Step n) (t : Tm n)
@@ -327,7 +341,7 @@ sub-▷
   : {σ : Sub m n} (ps : Steps m) (t : Tm m)
   → (ps ▷ t) ⟪ σ ⟫ ≡ ps ⟪ σ ⟫′ ▷ (t ⟪ σ ⟫)
 sub-▷ []                          t = refl
-sub-▷ {σ = σ} (step us ts _ ∷ ps) t =
+sub-▷ {σ = σ} (step _ us ts ∷ ps) t =
   cong (λ ts → op′ _ ts) $ begin
     subⁿ σ (us ʳ++ ((ps ▷ t) ∷ ts))
       ≡⟨ sub-ʳ++ us _ ⟩
@@ -337,43 +351,28 @@ sub-▷ {σ = σ} (step us ts _ ∷ ps) t =
       ∎
   where open ≡-Reasoning
 
-splitAt : {A : Set}
-  → (m : ℕ) (xs : Vec A (m ʳ+ n))
-  → Σ[ ys ∈ Vec A m ] ∃[ zs ] xs ≡ ys ʳ++ zs
-splitAt zero    xs = [] , xs , refl
-splitAt (suc m) xs with splitAt m xs
-splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , refl
+no-cycle
+  : (t : Tm m) (ps : Steps m)
+  → t ≡ ps ▷ t 
+  → ps ≡ []
+no-cycle t ps = no-cycle′ t ps (≺-wf t)
 
-ʳ++-≡ : {A : Set}
-  → (xs xs′ : Vec A n) {ys ys′ : Vec A m}
-  → xs ʳ++ ys ≡ xs′ ʳ++ ys′
-  → xs ≡ xs′ × ys ≡ ys′
-ʳ++-≡ []       []         {ys} {ys′} p = refl , p
-ʳ++-≡ (x ∷ xs) (x′ ∷ xs′) {ys} {ys′} eq with ʳ++-≡ xs xs′ {x ∷ ys} {x′ ∷ ys′} eq
-... | refl , refl = refl , refl 
-
-[xs]≢[] : {A : Set}
-  → (xs : List A) {x : A}
-  → xs L.++ L.[ x ] ≢ []
-[xs]≢[] []       ()
-[xs]≢[] (x ∷ xs) ()
-
-module _ {m : ℕ} where mutual
-  open ≡-Reasoning
-  no-cycle
-    : (t : Tm m) (ps : Steps m) 
-    → t ≡ ps ▷ t 
-    → ps ≡ []
-  no-cycle _                   []                      _ = refl
-  no-cycle (op (l , pos , vs)) (step {j} us ts _ ∷ ps) p with op-inj p
-  ... | refl , refl , eq with splitAt j vs
-  ... | ys , x ∷ zs , refl = ⊥-elim₀ ([xs]≢[] ps (no-cycle x (ps L.++ _) x=ps▷p▷x))
-    where
-      x=ps▷p▷x = begin
-        x
-          ≡⟨ V.∷-injectiveˡ $ ʳ++-≡ ys us eq .proj₂ ⟩
-        ps ▷ step ys zs pos ▷₁ x
-          ≡⟨ ++-▷▷₁ ps (step ys zs pos) x ⟩
-        ps L.++ L.[ step ys zs pos ] ▷ x
-        ∎
-
+  where
+    no-cycle′
+      : (t : Tm m) (ps : Steps m) → Acc _≺_ t
+      → t ≡ ps ▷ t 
+      → ps ≡ []
+    no-cycle′ _                   []                      ac _ = refl
+    no-cycle′ (op (l , pos , vs)) (step {j} k us ts ∷ ps) (acc g) p with op-inj p
+    ... | refl , refl , eq with splitAt j vs
+    ... | ys , x ∷ zs , refl with ▷₁-size x (step k ys zs)
+    ... | x< = ⊥-elim₀ $ [xs]≢[] _ $ no-cycle′ x (ps L.++ _) (g x x<) x=ps▷p▷x
+      where
+        open ≡-Reasoning
+        x=ps▷p▷x = begin
+          x
+            ≡⟨ V.∷-injectiveˡ $ ʳ++-≡ ys us eq .proj₂ ⟩
+          ps ▷ step k ys zs ▷₁ x
+            ≡⟨ ++-▷▷₁ ps (step k ys zs) x ⟩
+          ps L.++ L.[ step k ys zs ] ▷ x
+          ∎

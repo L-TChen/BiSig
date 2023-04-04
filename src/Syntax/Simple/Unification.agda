@@ -35,9 +35,9 @@ flexFlex {m = suc m} x y with x ≟ y
 mutual
   amgu : (t u : Tm m) (acc : ∃ (AList m))
     → Maybe (∃ (AList m))
-  amgu {m} (op (_ , i , ts)) (op (_ , j , us)) acc with i ≟∈ j
+  amgu {m} (op (_ , i , ts)) (op (_ , j , us)) ac with i ≟∈ j
   ... | no ¬p    = nothing
-  ... | yes refl = amguⁿ ts us acc
+  ... | yes refl = amguⁿ ts us ac
   amgu (` x)  (` y)  (_ , []) = just (flexFlex x y)
   amgu (` x)  u      (_ , []) = flexRigid x u
   amgu t      (` y)  (_ , []) = flexRigid y t
@@ -47,7 +47,7 @@ mutual
 
   amguⁿ : (ts us : Tm m ^ l) (acc : ∃ (AList m))
     → Maybe (∃ (AList m))
-  amguⁿ {l = zero}  _        _        acc = just acc
-  amguⁿ {l = suc l} (t ∷ ts) (u ∷ us) acc with amgu t u acc
+  amguⁿ {l = zero}  _        _        ac = just ac
+  amguⁿ {l = suc l} (t ∷ ts) (u ∷ us) ac with amgu t u ac
   ... | just acc′ = amguⁿ ts us acc′
   ... | nothing   = nothing

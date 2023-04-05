@@ -5,6 +5,8 @@ open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
 
+import Relation.Binary.Construct.On as On
+
 private variable
   Γ Ξ Δ : ℕ
   n m l k i j : ℕ
@@ -249,22 +251,6 @@ Max P σ = P σ ×
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms
 
-_ʳ+_ : ℕ → ℕ → ℕ
-zero  ʳ+ m = m
-suc n ʳ+ m = n ʳ+ (suc m)
-
-infixl 5 _ʳ++_
-_ʳ++_ : Vec A n → Vec A m → Vec A (n ʳ+ m)
-[]       ʳ++ ys = ys
-(x ∷ xs) ʳ++ ys = xs ʳ++ (x ∷ ys)
-
-splitAt : {A : Set}
-  → (m : ℕ) (xs : Vec A (m ʳ+ n))
-  → Σ[ ys ∈ Vec A m ] ∃[ zs ] xs ≡ ys ʳ++ zs
-splitAt zero    xs = [] , xs , refl
-splitAt (suc m) xs with splitAt m xs
-splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , refl
-
 record Step (n : ℕ) : Set where
   constructor step
   field
@@ -306,57 +292,8 @@ module _ {m : ℕ} {x : Fin m} where mutual
   walkTms i t₀ us (t ∷ ts) (tail x∈) =
     walkTms i t (t₀ ∷ us) ts x∈
 
-<′-wf : WellFounded _<′_
-<′-wf = acc ∘ helper
-  where
-    helper : (y x : ℕ) → x N.<′ y → Acc N._<′_ x
-    helper (suc _) x N.≤′-refl     = <′-wf x
-    helper (suc y) x (N.≤′-step p) = helper y x p 
+_≺_ : Tm m → Tm m → Set
+_≺_ = _<_ on size
 
-module _ where
-  open Subrelation {_<₁_ = _<_ } {_<₂_ = _<′_} (N.≤⇒≤′ ∘ N.≤″⇒≤)
-  <-wf : WellFounded _<_
-  <-wf = wellFounded <′-wf
-  
-module _ {m : ℕ} where
-  open import Relation.Binary.Construct.On
-
-  _≺_ : Tm m → Tm m → Set
-  _≺_ = _<_ on size
-
-  ≺-wf : WellFounded _≺_
-  ≺-wf = wellFounded size <-wf 
-
-size-ʳ++
-  : (ys : Tm m ^ j) (xs : Tm m ^ i)
-  → sizeⁿ (ys ʳ++ xs) ≡ sizeⁿ ys + sizeⁿ xs
-size-ʳ++ []       xs = refl
-size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
-... | p = begin
-  sizeⁿ (ys ʳ++ (x ∷ xs))
-    ≡⟨ p ⟩
-  sizeⁿ ys + (size x + sizeⁿ xs)
-    ≡⟨ (sym $ +-assoc (sizeⁿ ys) _ _) ⟩
-  (sizeⁿ ys + size x) + sizeⁿ xs
-    ≡⟨ cong (_+ sizeⁿ xs) (+-comm (sizeⁿ ys) (size x))  ⟩
-  size x + sizeⁿ ys + sizeⁿ xs
-    ∎
-  where open ≡-Reasoning
-
-ʳ++-size
-  : (k : j ʳ+ (suc i) ∈ D) (ys : Tm m ^ j) (x : Tm m) (xs : Tm m ^ i)
-  → size x < size (op′ k (ys ʳ++ (x ∷ xs)))
-ʳ++-size {j} {i} {m} k ys x xs = less-than-or-equal $ cong suc $ begin
-  size x + (sizeⁿ xs + sizeⁿ ys)
-    ≡⟨ (sym $ +-assoc (size x) (sizeⁿ xs) (sizeⁿ ys)) ⟩
-  (size x + sizeⁿ xs) + sizeⁿ ys
-    ≡⟨ +-comm (size x + sizeⁿ xs) (sizeⁿ ys) ⟩
-  sizeⁿ ys + (size x + sizeⁿ xs)
-    ≡⟨ (sym $ size-ʳ++ ys (x ∷ xs)) ⟩
-  sizeⁿ (ys ʳ++ (x ∷ xs))
-    ∎
-  where open ≡-Reasoning
-    
-▷₁-size : (t : Tm m) (p : Step m)
-  → (_<_ on size) t (p ▷₁ t)
-▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 
+≺-wf : WellFounded (_≺_ {m})
+≺-wf = On.wellFounded size <-wf 

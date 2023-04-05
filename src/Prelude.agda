@@ -22,10 +22,8 @@ module N where
   open import Data.Nat as N       public
   open import Data.Nat.Properties public
 open N public
-  using (ℕ; zero; suc; _<′_; <′-base; <′-step; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
+  using (ℕ; zero; suc; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
   renaming (_≤″_ to _≤_; _<″_ to _<_)
-
-{-# DISPLAY N._≤′_ (suc n) m = n <′ m #-}
 
 module F where
   open import Data.Fin          public
@@ -122,34 +120,29 @@ Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
 Lift₀ {ℓ} = Lift {ℓ} lzero -- Lift {ℓ} lzero
 
 {-# DISPLAY Lift lzero A = Lift₀ A #-}
-{-
 
-strengthL : List (Fin (suc n)) → List (Fin n)
-strengthL ∅            = ∅
-strengthL (zero ∙ xs)  = strengthL xs
-strengthL (suc x ∙ xs) = x ∙ strengthL xs
+------------------------------------------------------------------------------
+-- Reverse append of Vector
+------------------------------------------------------------------------------
 
-pred∈ : {y : Fin n} {xs : List (Fin (suc n))}
-  → suc y ∈ xs → y ∈ strengthL xs
-pred∈ {xs = _           } (here refl) = here refl
-pred∈ {xs = (zero ∙ xs) } (there i)   = pred∈ i
-pred∈ {xs = (suc x ∙ xs)} (there i)   = there (pred∈ i)
+_ʳ+_ : ℕ → ℕ → ℕ
+zero  ʳ+ m = m
+suc n ʳ+ m = n ʳ+ (suc m)
 
-succ∈ : {y : Fin n} {xs : List (Fin (suc n))}
-  → y ∈ strengthL xs → (suc y) ∈ xs
-succ∈ {xs = zero  ∙ xs} i           = there (succ∈ i)
-succ∈ {xs = suc x ∙ xs} (here refl) = here refl
-succ∈ {xs = suc x ∙ xs} (there i)   = there (succ∈ i)
+infixl 6 _ʳ+_
+infixl 5 _ʳ++_
 
-∈-length : {x : A} {xs : List A}
-  → x ∈ xs → Fin (length xs)
-∈-length (here _)  = zero
-∈-length (there x) = suc (∈-length x)
+_ʳ++_ : Vec A n → Vec A m → Vec A (n ʳ+ m)
+[]       ʳ++ ys = ys
+(x ∷ xs) ʳ++ ys = xs ʳ++ (x ∷ ys)
 
-update : (i : Fin n) (x : A) → Vec A n → Vec A n
-update zero    y (x ∷ xs) = y ∷ xs
-update (suc i) y (x ∷ xs) = x ∷ update i y xs
--}
+splitAt : {A : Set}
+  → (m : ℕ) (xs : Vec A (m ʳ+ n))
+  → Σ[ ys ∈ Vec A m ] ∃[ zs ] xs ≡ ys ʳ++ zs
+splitAt zero    xs = [] , xs , refl
+splitAt (suc m) xs with splitAt m xs
+splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , refl
+
 ------------------------------------------------------------------------------
 -- Properties of ≤
 ------------------------------------------------------------------------------
@@ -166,6 +159,60 @@ update (suc i) y (x ∷ xs) = x ∷ update i y xs
     
 ≤-refl : ∀ {m} → m ≤ m
 ≤-refl = less-than-or-equal (N.+-identityʳ _)
+
+------------------------------------------------------------------------------
+-- n ≤′ m is k + n ≡ m, i.e. n ≤ m with the LHS of the identity reversed.
+------------------------------------------------------------------------------
+
+record _≤′_ (m n : ℕ) : Set where
+  constructor less-than-or-equal′
+  field
+    {k}   : ℕ
+    proof : k + m ≡ n
+
+infix 4 _≤′_ _<′_ _≥′_ _>′_
+
+_<′_ : Rel ℕ _
+m <′ n = suc m ≤′ n
+
+_≥′_ : Rel ℕ _
+m ≥′ n = n ≤′ m
+
+_>′_ : Rel ℕ _
+m >′ n = n <′ m
+
+≤⇒≤′ : {n m : ℕ} → n ≤ m → n ≤′ m
+≤⇒≤′ {n} {m} (less-than-or-equal p) = less-than-or-equal′ $ begin
+  _ + n
+    ≡⟨ +-comm _ n ⟩
+  n + _
+    ≡⟨ p ⟩
+  m ∎
+  where open ≡-Reasoning
+
+≤′⇒≤ : {n m : ℕ} → n ≤′ m → n ≤ m
+≤′⇒≤ {n} {m} (less-than-or-equal′ p) = less-than-or-equal $ (begin
+  n + _
+    ≡⟨ +-comm n _ ⟩
+  _ + n
+    ≡⟨ p ⟩
+  m ∎)
+  where open ≡-Reasoning
+
+------------------------------------------------------------------------------
+-- Well-Foundedness of _<_ and _<′_
+------------------------------------------------------------------------------
+
+<′-wf : WellFounded _<′_
+<′-wf = acc ∘ helper
+  where
+    helper : (y x : ℕ) → x <′ y → Acc _<′_ x
+    helper zero    x (less-than-or-equal′ {k} p) = ⊥-elim₀ (N.m+1+n≢0 _ p)
+    helper (suc x) x (less-than-or-equal′ {zero} refl)  = <′-wf x
+    helper (suc y) x (less-than-or-equal′ {suc k} refl) = helper y x (less-than-or-equal′ refl)
+
+<-wf : WellFounded _<_
+<-wf = Subrelation.wellFounded  ≤⇒≤′ <′-wf
 
 -- Fin 
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)

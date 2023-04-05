@@ -10,6 +10,8 @@ open import Syntax.Simple.Term        D
 open import Syntax.Simple.Association D
 open import Syntax.Simple.Unification D
 
+open N using (_+_)
+
 private variable
   Γ Δ Ξ m n l i j k : ℕ
   ts us   : Tm Ξ ^ n
@@ -351,25 +353,63 @@ sub-▷ {σ = σ} (step _ us ts ∷ ps) t =
       ∎
   where open ≡-Reasoning
 
+------------------------------------------------------------------------------
+-- t ≺ (p ▷ t)
+------------------------------------------------------------------------------
+size-ʳ++
+  : (ys : Tm m ^ j) (xs : Tm m ^ i)
+  → sizeⁿ (ys ʳ++ xs) ≡ sizeⁿ ys + sizeⁿ xs
+size-ʳ++ []       xs = refl
+size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
+... | p = begin
+  sizeⁿ (ys ʳ++ (x ∷ xs))
+    ≡⟨ p ⟩
+  sizeⁿ ys + (size x + sizeⁿ xs)
+    ≡⟨ (sym $ +-assoc (sizeⁿ ys) _ _) ⟩
+  (sizeⁿ ys + size x) + sizeⁿ xs
+    ≡⟨ cong (_+ sizeⁿ xs) (+-comm (sizeⁿ ys) (size x))  ⟩
+  size x + sizeⁿ ys + sizeⁿ xs
+    ∎
+  where open ≡-Reasoning
+
+ʳ++-size
+  : (k : j ʳ+ (suc i) ∈ D) (ys : Tm m ^ j) (x : Tm m) (xs : Tm m ^ i)
+  → size x < size (op′ k (ys ʳ++ (x ∷ xs)))
+ʳ++-size {j} {i} {m} k ys x xs = less-than-or-equal $ cong suc $ begin
+  size x + (sizeⁿ xs + sizeⁿ ys)
+    ≡⟨ (sym $ +-assoc (size x) (sizeⁿ xs) (sizeⁿ ys)) ⟩
+  (size x + sizeⁿ xs) + sizeⁿ ys
+    ≡⟨ +-comm (size x + sizeⁿ xs) (sizeⁿ ys) ⟩
+  sizeⁿ ys + (size x + sizeⁿ xs)
+    ≡⟨ (sym $ size-ʳ++ ys (x ∷ xs)) ⟩
+  sizeⁿ (ys ʳ++ (x ∷ xs))
+    ∎
+  where open ≡-Reasoning
+    
+▷₁-size : (t : Tm m) (p : Step m)
+  → t ≺ (p ▷₁ t)
+▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 
+
+------------------------------------------------------------------------------
+-- No Cycle Lemma
+------------------------------------------------------------------------------
+
 no-cycle
   : (t : Tm m) (ps : Steps m)
   → t ≡ ps ▷ t 
   → ps ≡ []
 no-cycle t ps = no-cycle′ t ps (≺-wf t)
-
   where
+    open ≡-Reasoning
     no-cycle′
       : (t : Tm m) (ps : Steps m) → Acc _≺_ t
       → t ≡ ps ▷ t 
       → ps ≡ []
-    no-cycle′ _                   []                      ac _ = refl
+    no-cycle′ _                   []                      _       _ = refl
     no-cycle′ (op (l , pos , vs)) (step {j} k us ts ∷ ps) (acc g) p with op-inj p
     ... | refl , refl , eq with splitAt j vs
     ... | ys , x ∷ zs , refl with ▷₁-size x (step k ys zs)
-    ... | x< = ⊥-elim₀ $ [xs]≢[] _ $ no-cycle′ x (ps L.++ _) (g x x<) x=ps▷p▷x
-      where
-        open ≡-Reasoning
-        x=ps▷p▷x = begin
+    ... | x< = ⊥-elim₀ $ [xs]≢[] _ $ no-cycle′ x (ps L.++ _) (g x x<) $ begin
           x
             ≡⟨ V.∷-injectiveˡ $ ʳ++-≡ ys us eq .proj₂ ⟩
           ps ▷ step k ys zs ▷₁ x

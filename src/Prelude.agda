@@ -163,7 +163,6 @@ splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , r
 ------------------------------------------------------------------------------
 -- n ≤′ m is k + n ≡ m, i.e. n ≤ m with the LHS of the identity reversed.
 ------------------------------------------------------------------------------
-
 record _≤′_ (m n : ℕ) : Set where
   constructor less-than-or-equal′
   field
@@ -190,19 +189,9 @@ m >′ n = n <′ m
   m ∎
   where open ≡-Reasoning
 
-≤′⇒≤ : {n m : ℕ} → n ≤′ m → n ≤ m
-≤′⇒≤ {n} {m} (less-than-or-equal′ p) = less-than-or-equal $ (begin
-  n + _
-    ≡⟨ +-comm n _ ⟩
-  _ + n
-    ≡⟨ p ⟩
-  m ∎)
-  where open ≡-Reasoning
-
 ------------------------------------------------------------------------------
 -- Well-Foundedness of _<_ and _<′_
 ------------------------------------------------------------------------------
-
 <′-wf : WellFounded _<′_
 <′-wf = acc ∘ helper
   where

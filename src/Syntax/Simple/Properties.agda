@@ -170,24 +170,6 @@ mutual
   ∈fv→∈ₜⁿ {x} {l = suc l} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
   ... | inl x∈t  = head (∈fv→∈ₜ x∈t)
   ... | inr x∈ts = tail (∈fv→∈ₜⁿ x∈ts)
-{-
-mutual
-  checkFv : (x : Fin m) (t : Tm m) → Dec (x ∈ fv t)
-  checkFv x (` y)  with x ≟ y
-  ... | yes p = yes (here p)
-  ... | no ¬p = no λ where (here p) → ¬p p
-  checkFv x (op (_ , _ , ts)) = checkFvⁿ x ts
-
-  checkFvⁿ : (x : Fin m) (t : Tm m ^ l) → Dec (x ∈ fvⁿ t)
-  checkFvⁿ {l = zero}  _ _        = no λ ()
-  checkFvⁿ {l = suc l} x (t , ts) with checkFv x t
-  ... | yes p = yes (∈-++⁺ˡ p)
-  ... | no ¬p with checkFvⁿ x ts
-  ... | yes q = yes (∈-++⁺ʳ (fv t) q)
-  ... | no ¬q = no λ where x → case ∈-++⁻ (fv t) x of λ where
-    (inl ∈t)  → ¬p ∈t
-    (inr ∈ts) → ¬q ∈ts
--}
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
@@ -320,14 +302,14 @@ flexRigid∉-is-unifier x t x∉ = begin
 
 module _ {m : ℕ} {x : Fin m} where mutual
   ▷walk=id : {t : Tm m} → (x∈ : x ∈ₜ t)
-    → walk x∈ ▷ ` x ≡ t
+    → t ≡ walk x∈ ▷ ` x
   ▷walk=id (here refl)              = refl
   ▷walk=id (ops {_} {i} {t ∷ _} x∈) = ▷walks=id i t [] x∈ 
 
   ▷walks=id : (i : l ʳ+ (suc k) ∈ D)
     → (t : Tm m) (us : Tm m ^ l) {ts : Tm m ^ k}
     → (x∈ : x ∈ₜₛ t ∷ ts)
-    → walkTms i t us ts x∈ ▷ ` x ≡ op′ i (us ʳ++ (t ∷ ts))
+    → op′ i (us ʳ++ (t ∷ ts)) ≡ walkTms i t us ts x∈ ▷ ` x
   ▷walks=id {l} {k} i t us (head x∈) =
     cong (λ t → op′ _ (us ʳ++ (t ∷ _))) (▷walk=id x∈)
   ▷walks=id i t₀ us {t ∷ _} (tail x∈) = ▷walks=id i t (t₀ ∷ us) x∈
@@ -391,6 +373,13 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
 ▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 
 
 ------------------------------------------------------------------------------
+-- 
+------------------------------------------------------------------------------
+
+sub-ps=[] : {σ : Sub m n} {ps : Steps m} → ps ⟪ σ ⟫′ ≡ [] → ps ≡ []
+sub-ps=[] { ps = [] } _ = refl
+
+------------------------------------------------------------------------------
 -- No Cycle Lemma
 ------------------------------------------------------------------------------
 
@@ -402,7 +391,7 @@ no-cycle t ps = no-cycle′ t ps (≺-wf t)
   where
     open ≡-Reasoning
     no-cycle′
-      : (t : Tm m) (ps : Steps m) → Acc _≺_ t
+      : (t : Tm m) (ps : Steps m) (@0 ac : Acc _≺_ t)
       → t ≡ ps ▷ t 
       → ps ≡ []
     no-cycle′ _                   []                      _       _ = refl
@@ -416,3 +405,31 @@ no-cycle t ps = no-cycle′ t ps (≺-wf t)
             ≡⟨ ++-▷▷₁ ps (step k ys zs) x ⟩
           ps L.++ L.[ step k ys zs ] ▷ x
           ∎
+
+unify-occurrence
+  : (σ : Sub m n) {x : Fin m} {t : Tm m}
+  → x ∈ₜ t → ` x ⟪ σ ⟫ ≡ t ⟪ σ ⟫ → t ≡ ` x
+unify-occurrence σ {x} {t} x∈ eq = begin
+  t
+    ≡⟨ ▷walk=id x∈ ⟩
+  ps ▷ ` x
+    ≡⟨ cong (_▷ ` x) ps=[] ⟩
+  [] ▷ ` x
+    ≡⟨⟩
+  ` x
+  ∎ 
+  where
+    open ≡-Reasoning
+
+    ps = walk x∈
+
+    ps=[] : ps ≡ []
+    ps=[] = sub-ps=[] $ no-cycle (t ⟪ σ ⟫) (ps ⟪ σ ⟫′) $ begin
+      t ⟪ σ ⟫
+        ≡⟨ cong _⟪ σ ⟫ (▷walk=id x∈) ⟩
+      (ps ▷ ` x) ⟪ σ ⟫
+        ≡⟨ sub-▷ ps (` x) ⟩
+      ps ⟪ σ ⟫′ ▷ ` x ⟪ σ ⟫
+        ≡⟨ cong ((ps ⟪ σ ⟫′) ▷_) eq ⟩
+      ps ⟪ σ ⟫′ ▷ t ⟪ σ ⟫
+        ∎

@@ -73,6 +73,7 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _∷_ p q)
 
+-- [TODO] Generalise it to an Any predicate
 infix 4 _∈ₜ_ _∈ₜₛ_ _∈ₜ?_ _∈ₜₛ?_ _∉ₜ_ _∉ₜₛ_
 
 mutual 

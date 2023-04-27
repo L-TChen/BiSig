@@ -28,7 +28,7 @@ data Raw (m : ℕ) : Fam₀ where
 --  twkˡ : Raw m → Raw (m + n)
 --  twkˡ (` x)   = ` x
 --  twkˡ (t ⦂ A) = twkˡ t ⦂ wkˡ A
---  twkˡ (op (D , i , ts)) = op (D , i , twkˡⁿ ts)
+--  twkˡ (op (i , ts)) = op (i , twkˡⁿ ts)
 --
 --  twkˡⁿ : {D : B.ArgsD Ξ}
 --    → (⟦ D ⟧ᵃˢ Raw m) → (⟦ D ⟧ᵃˢ Raw (m + n))

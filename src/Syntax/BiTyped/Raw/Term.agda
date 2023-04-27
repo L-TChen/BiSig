@@ -33,7 +33,7 @@ module _ (ρ : Ren m n) where mutual
   trename (` x)   = ` x
   trename (t ⦂ A) = trename t ⦂ rename ρ A
   trename (t ↑)   = trename t ↑
-  trename (op (_ , i , refl , ts))  = op (_ , i , refl , trenameⁿ ts)
+  trename (op (i , refl , ts))  = op (i , refl , trenameⁿ ts)
 
   trenameⁿ : {D : B.ArgsD k}
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
@@ -70,7 +70,7 @@ module _ (σ : Sub m n) where mutual
   tsub (` x)   = ` x
   tsub (t ⦂ A) = tsub t ⦂ sub σ A
   tsub (t ↑)   = tsub t ↑
-  tsub (op (D , i , refl , ts)) = op (D , i , refl , tsubⁿ ts)
+  tsub (op (i , refl , ts)) = op (i , refl , tsubⁿ ts)
 
   tsubⁿ : {D : B.ArgsD k}
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)

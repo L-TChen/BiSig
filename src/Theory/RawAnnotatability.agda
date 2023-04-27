@@ -52,10 +52,10 @@ mutual
     → ∃[ n ] (m ≤ n) × ∃[ mod ] MRaw n mod
   annotateRaw (` x)   = _ , ≤-refl  , Infer , ` x
   annotateRaw (t ⦂ A) with annotateRaw t
-  ... | n , p , mod , t′ = n , p , Infer , (toCheck t′ ⦂ wk≤ˡ p A) 
-  annotateRaw (op (D@(ι mod B Ds) , i , ts)) =
-    let n , le , ts′ = annotateRawⁿ Ds ts
-    in n , le , mod , op (D , i , refl , ts′)
+  ... | n , p , mod , t′ = n , p , Infer , (toCheck t′ ⦂ wk≤ˡ p A)
+  annotateRaw (op (i , ts)) =
+    let n , le , ts′ = annotateRawⁿ _ ts
+    in n , le , _ , op (i , refl , ts′)
 
   annotateRawⁿ : (Ds : ArgsD Ξ)
     → R.⟦ Ds ⟧ᵃˢ (Raw m)

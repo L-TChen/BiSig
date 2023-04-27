@@ -34,15 +34,15 @@ private variable
 ⟦ Δ ⊢[ m ] B ∷ Ds ⟧ᵃˢ X σ Γ = ⟦ Δ ⟧ᵃ (X m (B ⟪ σ ⟫)) σ Γ × ⟦ Ds ⟧ᵃˢ X σ Γ
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam m ℓ) → Fam m ℓ
-⟦ ι m₀ B D ⟧ᶜ X m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (B ⟪ σ ⟫ ≡ A × (⟦ D ⟧ᵃˢ X) σ Γ)
+⟦ ι m₀ B D ⟧ᶜ X m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (B ⟪ σ ⟫ ≡ A × ⟦ D ⟧ᵃˢ X σ Γ)
 
 ⟦_⟧ : (D : Desc) (X : Fam m ℓ) → Fam m ℓ
-⟦ Ds ⟧ X m A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X m A Γ
+⟦ D ⟧ X m A Γ = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X m A Γ
 
 record _-Alg (D : Desc) (X : Fam m ℓ) : Set ℓ where
   field
-    var     : _∈_       ⇒ X Infer
-    toInfer : X Check   ⇒ X Infer
-    toCheck : X Infer   ⇒ X Check
-    alg : (⟦ D ⟧ X) mod ⇒ X mod
+    var     : _∈_     ⇒ X Infer
+    toInfer : X Check ⇒ X Infer
+    toCheck : X Infer ⇒ X Check
+    alg : ⟦ D ⟧ X mod ⇒ X mod
 open _-Alg public

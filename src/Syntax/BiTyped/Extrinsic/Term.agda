@@ -40,8 +40,8 @@ data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
     → A ≡ B
     → ⊢⇄ Check B Γ (t ↑)
   ⊢op
-    : (t : (R.⟦ D ⟧ (Raw m)) mod)
-    → (⊢t : (⟦ D ⟧ ⊢⇄) mod A Γ t)
+    : (t : R.⟦ D ⟧ (Raw m) mod)
+    → (⊢t : ⟦ D ⟧ ⊢⇄ mod A Γ t)
     → ⊢⇄ mod A Γ (op t)
 
 _⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set

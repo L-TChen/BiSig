@@ -23,4 +23,4 @@ eraseᶜ : B.ConD → T.ConD
 eraseᶜ (ι {n} mod A D) = ι A (eraseᵃˢ D)
 
 erase : B.Desc → T.Desc
-erase Ds = L.map eraseᶜ Ds
+erase (desc Op decOp rules) = desc Op decOp (eraseᶜ ∘ rules)

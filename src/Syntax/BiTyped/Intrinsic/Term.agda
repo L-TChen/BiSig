@@ -39,11 +39,10 @@ Tm⇇ m = Tm m Check
 mutual
   rename : Ren Γ Δ
     → Tm m mod A Γ → Tm m mod A Δ
-  rename f (`  x)                        = ` f x
-  rename f (A ∋ t)                       = A ∋ rename f t
-  rename f (⇉ t by eq)                   = ⇉ rename f t by eq
-  rename f (op (D , x , p , σ , q , ts)) =
-    op (D , x , p , σ , q , renameMap _ f ts)
+  rename f (`  x)                    = ` f x
+  rename f (A ∋ t)                   = A ∋ rename f t
+  rename f (⇉ t by eq)               = ⇉ rename f t by eq
+  rename f (op (i , p , σ , q , ts)) = op (i , p , σ , q , renameMap _ f ts)
 
   renameMap : (D : ArgsD n)
     → Ren Γ Δ
@@ -54,8 +53,8 @@ mutual
   renameMapᵃ : (Θ : List (TExp n))
     → Ren Γ Δ
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
-  renameMapᵃ []       f t = rename f t
-  renameMapᵃ (A ∷ Δ) f t = renameMapᵃ Δ (ext f) t
+  renameMapᵃ []      f t = rename f t
+  renameMapᵃ (A ∷ Δ) f t = renameMapᵃ Δ (ext f) t
 
 infixr 5 ⟨_⟩_
 ⟨_⟩_ : Ren Γ Δ
@@ -78,11 +77,11 @@ extsⁿ {Ξ = A ∷ Ξ} f (there x) = rename there (extsⁿ f x)
 mutual
   sub : Sub Γ Δ
     → ∀ {A} → Tm m mod A Γ → Tm m mod A Δ
-  sub f (` x)                         = f x
-  sub f (A ∋ t)                       = A ∋ sub f t
-  sub f (⇉ t by eq)                   = ⇉ (sub f t) by eq
-  sub f (op (D , x , p , σ , q , ts)) =
-    op (D , x , p , σ , q , subMap _ f ts)
+  sub f (` x)                     = f x
+  sub f (A ∋ t)                   = A ∋ sub f t
+  sub f (⇉ t by eq)               = ⇉ (sub f t) by eq
+  sub f (op (i , p , σ , q , ts)) =
+    op (i , p , σ , q , subMap _ f ts)
 
   subMap : (D : ArgsD n)
     → Sub Γ Δ
@@ -106,7 +105,7 @@ module _ {X : Fam m ℓ} (α : (D -Alg) X) where mutual
   fold (` x)         = α .var x
   fold (A ∋ t)       = α .toInfer (fold t)
   fold (⇉ t by refl) = α .toCheck (fold t)
-  fold (op (D , x , p , σ , q , ts)) = α .alg (D , x , p , σ , q , foldMap (ConD.args D) ts)
+  fold (op (i , p , σ , q , ts)) = α .alg (i , p , σ , q , foldMap _ ts)
 
   foldMap : (D : ArgsD n)
     → ⟦ D ⟧ᵃˢ (Tm m) σ ⇒₁ ⟦ D ⟧ᵃˢ X σ

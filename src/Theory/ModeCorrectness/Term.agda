@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K #-} 
+{-# OPTIONS --with-K #-}
 open import Prelude
   hiding (lookup)
 
@@ -39,8 +39,8 @@ private variable
   σ σ₁ σ₂ : TSub n m
   mod     : Mode
 
-MC : {CD : ConD} → (CD ∈ D) → _
-MC i = A.lookup mc i
+-- MC : {CD : ConD} → (CD ∈ D) → _
+-- MC i = A.lookup mc i
 
 mutual
   -- It should follow from syntax directedness:
@@ -51,9 +51,16 @@ mutual
     → A ≡ B
   uniq-⇉ (⊢` x)   (⊢` y)  = uniq-∈ x y
   uniq-⇉ (⊢⦂ ⊢t refl)  (⊢⦂ ⊢u refl) = refl
-  uniq-⇉ {t = op (ι Infer C Ds , i , refl , _)} (⊢op _ (_ , refl , ⊢ts)) (⊢op _ (_ , refl , ⊢us)) =
-    let (C⊆xs , _ , SDs) = MC i in
-    ≡-fv _ _ C λ x → uniq-⇉Map Ds SDs ⊢ts ⊢us (C⊆xs x)
+  uniq-⇉ (⊢op (i , meq , rs) (ts , refl , ⊢ts)) (⊢op _ (us , refl , ⊢us)) =
+    uniq-⇉ᶜ (mc i) meq ⊢ts ⊢us
+
+  uniq-⇉ᶜ : ∀ {D} → ModeCorrectᶜ D → ConD.mode D ≡ Infer
+          → ∀ {rs ts us}
+          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ ts Γ rs
+          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ us Γ rs
+          → ConD.type D ⟪ ts ⟫ ≡ ConD.type D ⟪ us ⟫
+  uniq-⇉ᶜ {D = D} (C⊆xs , _ , SDs) refl ⊢ts ⊢us =
+    ≡-fv _ _ (ConD.type D) λ x → uniq-⇉Map _ SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-⇉Map
     : (Ds : ArgsD n)
@@ -96,7 +103,7 @@ mutual
 sub-∈ : ∀ {x} (σ : TSub m n)
   → x ⦂ A         ∈ Γ
   → x ⦂ A ⟪ σ ⟫ ∈ ⟪ σ ⟫cxt Γ
-sub-∈ σ zero        = zero 
+sub-∈ σ zero        = zero
 sub-∈ σ (suc ¬p x∈) = suc ¬p (sub-∈ σ x∈)
 
 subst-∈→∈
@@ -114,7 +121,7 @@ mutual
     → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
         ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇉ (A ⟪ toSub σ ⟫))
   inherit
-    : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m) 
+    : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
     → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
         ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇇ (A ⟪ toSub σ ⟫))
 

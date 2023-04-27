@@ -37,8 +37,14 @@ record ConD : Set where
     type   : TExp vars
     args   : ArgsD vars
 
-Desc : Set
-Desc = List ConD
+record Desc : Set₁ where
+  constructor desc
+  field
+    Op    : Set
+    decOp : DecEq Op
+    rules : Op → ConD
+
+open Desc public
 
 ρ-syntax : ArgD n → ArgsD n → ArgsD n
 ρ-syntax D Ds = D ∷ Ds

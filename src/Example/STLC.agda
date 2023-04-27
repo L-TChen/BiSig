@@ -10,16 +10,24 @@ open import Example.Implicational
 open import Syntax.Typed.Description {ΛₜD}
   renaming (_⊢_ to infix 4 _⊢_)
 
+data ΛOp : Set where
+  `app `abs : ΛOp
+
+decΛOp : DecEq ΛOp
+decΛOp = record { _≟_ = dec }
+  where
+    dec : ∀ x y → Dec (x ≡ y)
+    dec `app `app = yes refl
+    dec `app `abs = no λ ()
+    dec `abs `app = no λ ()
+    dec `abs `abs = yes refl
+
 ΛₒD : Desc
-ΛₒD =
-  2 ▷ ρ[ [] ⊢ ` # 1 ↣ ` # 0 ]  ρ[ [] ⊢ ` # 1 ] [] ⦂ ` # 0         ∷
-  2 ▷ ρ[ ` # 1 ∷ [] ⊢ ` # 0 ]                 [] ⦂ ` # 1 ↣ ` # 0 ∷
-  []
-{-
-    σ[ A ] σ[ B ] ▷ ρ[ ⊢ A ↣ B ] ρ[ ⊢ A ] ι ⦂ B      -- application
-  ∷ σ[ A ] σ[ B ] ▷ ρ[ A ∷ ⊢ B ] ι          ⦂ A ↣ B  -- abstraction
-  ∷ []
--}
+ΛₒD = record
+  { Op    = ΛOp
+  ; decOp = decΛOp
+  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢ ` # 1 ↣ ` # 0 ]  ρ[ [] ⊢ ` # 1 ] [] ⦂ ` # 0
+              ; `abs → 2 ▷ ρ[ ` # 1 ∷ [] ⊢ ` # 0 ]                  [] ⦂ ` # 1 ↣ ` # 0 } }
 
 open import Syntax.Typed.Intrinsic.Term ΛₒD
 
@@ -28,8 +36,8 @@ private variable
   A B : Λₜ  m
   Γ Δ : Cxt m
 
-pattern ƛ_ t     = op (_ , there (here refl) , _ ∷ _ ∷ [] , refl , t , _)
-pattern _·_ t u  = op (_ , here refl , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern _·_ t u  = op (`app , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern ƛ_ t     = op (`abs , _ ∷ _ ∷ [] , refl , t , _)
 
 infixl 8 _·_
 infixr 7 ƛ_

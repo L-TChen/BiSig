@@ -35,4 +35,4 @@ Fam₀ = Fam lzero
 -- (⟦ ι _     _ D ⟧ᶜ X) _    = ⊥
 
 ⟦_⟧ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-⟦ Ds ⟧ X mod = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X mod
+⟦ D ⟧ X mod = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X mod

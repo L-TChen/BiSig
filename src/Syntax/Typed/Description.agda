@@ -25,8 +25,14 @@ record ConD : Set where
     type   : TExp  vars  -- the target type
     args   : ArgsD vars  -- the arguments of a typing rule
 
-Desc : Set
-Desc = List ConD -- a list of typing rules
+record Desc : Set₁ where
+  constructor desc
+  field
+    Op    : Set
+    decOp : DecEq Op
+    rules : Op → ConD
+
+open Desc public
 
 ρ-syntax : ∀ {Ξ} → ArgD Ξ → ArgsD Ξ → ArgsD Ξ
 ρ-syntax D Ds = D ∷ Ds

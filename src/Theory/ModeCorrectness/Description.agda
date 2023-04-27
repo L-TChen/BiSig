@@ -31,7 +31,9 @@ module _ (xs₀ : List (Fin n)) where
   ModeCorrectᵃˢ (Θ ⊢[ Infer ] C ∷ Ds) = let xs = Known Ds in
     ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
 
+ModeCorrectᶜ : ConD → Set
+ModeCorrectᶜ (ι Check C Ds) = ModeCorrectᵃˢ (fv C) Ds
+ModeCorrectᶜ (ι Infer C Ds) = ModeCorrectᵃˢ []     ([] ⊢[ Check ] C ∷ Ds)
+
 ModeCorrect : Desc → Set
-ModeCorrect = All λ
-  where (ι Check C Ds) → ModeCorrectᵃˢ (fv C) Ds
-        (ι Infer C Ds) → ModeCorrectᵃˢ []      ([] ⊢[ Check ] C ∷ Ds)
+ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)

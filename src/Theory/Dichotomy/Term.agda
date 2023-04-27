@@ -37,27 +37,27 @@ mutual
     → Tm⇉ m A ∥ Γ ∥ctx
   ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
-  ∥ ⊢op (ι Infer B D , i , q , t) (σ , B=A , p) ∥⇉ =
-    op (_ , i , q , σ , B=A , ∥-∥map D p)
+  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇉ =
+    op (i , q , σ , B=A , ∥-∥map _ p)
 
   ∥_∥⇇
     : Γ ⊢ t ⇇ A
     → Tm⇇ m A ∥ Γ ∥ctx
   ∥ ⊢⇉ t  p ∥⇇ = ⇉ ∥ t ∥⇉ by p
-  ∥ ⊢op (ι Check B D , i , q , t) (σ , B=A , p) ∥⇇ =
-    op (_ , i , q , σ , B=A , ∥-∥map D p)
+  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇇ =
+    op (i , q , σ , B=A , ∥-∥map _ p)
 
   ∥-∥map : (D : ArgsD n)
     → {t : R.⟦ D ⟧ᵃˢ (Raw m)}
     → E.⟦ D ⟧ᵃˢ (Raw m) ⊢⇄ σ Γ t
-    → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥ctx 
+    → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥ctx
   ∥-∥map []                 _        = tt
   ∥-∥map (Θ ⊢[ m ] B ∷ Ds) (p , ps) = ∥-∥mapᵃ Θ p , ∥-∥map Ds ps
 
   ∥-∥mapᵃ : (Θ : TExps n)
     → {t : R.⟦ Θ ⟧ᵃ (Raw m mod)}
     → E.⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ mod A) σ Γ t
-    → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥ctx 
+    → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥ctx
   ∥-∥mapᵃ {mod = Check} []       p = ∥ p ∥⇇
   ∥-∥mapᵃ {mod = Infer} []       p = ∥ p ∥⇉
   ∥-∥mapᵃ               (A ∷ Θ) p = ∥-∥mapᵃ Θ p

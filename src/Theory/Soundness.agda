@@ -32,7 +32,7 @@ private variable
 -- A bidirectional typing is sound with respect to a base typing
 -- if every bidirectional typing rule corresonds to a base typing rule.
 Soundness : B.Desc → T.Desc → Set
-Soundness BDs TDs = ∀ {D} → D ∈ BDs → eraseᶜ D ∈ TDs
+Soundness BD TD = (j : BD .Op) → Σ[ i ∈ TD .Op ] eraseᶜ (BD .rules j) ≡ TD .rules i
 
 module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget
@@ -41,8 +41,12 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
-  forget (op (_ , i , _ , σ , A=B , ts)) =
-    op (_ , s i , σ , A=B , forgetMap _ ts)
+  forget (op (i , r))  = op (_ , forgetᶜ (proj₂ (s i)) r)
+
+  forgetᶜ
+    : ∀ {D D′} → eraseᶜ D′ ≡ D
+    → B.⟦ D′ ⟧ᶜ (BTm BD m) mod A Γ → T.⟦ D ⟧ᶜ (Tm TD m) A Γ
+  forgetᶜ refl (_ , σ , A=B , ts) = σ , A=B , forgetMap _ ts
   -- p is ignored.
 
   forgetMap
@@ -51,7 +55,7 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
     → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm TD m)  σ Γ
   forgetMap []                 _        = _
   forgetMap (Θ ⊢[ m ] B ∷ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
- 
+
   forgetMapᵃ
     : (Θ : TExps n)
     → B.⟦ Θ ⟧ᵃ (BTm BD m mod A) σ Γ

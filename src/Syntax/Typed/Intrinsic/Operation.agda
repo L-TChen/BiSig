@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-} 
+{-# OPTIONS --safe #-}
 
 open import Prelude
 import Syntax.Simple.Description as S
@@ -31,14 +31,14 @@ private
 --   ... | no ¬p = no λ where refl → ¬p refl
 --   (` _)  ≟ op _ = no λ ()
 --   op _ ≟ (` _)  = no λ ()
--- 
+--
 --   compareMap : ∀ D → (t u : (⟦ D ⟧ Tm m) A Γ) → Dec (t ≡ u)
 --   compareMap D (_ , i , t) (_ , j , u) with i ≟∈ j
 --   ... | no ¬p = no λ where refl → ¬p refl
 --   compareMap _ (D , i , t) (_ , _ , u) | yes refl with compareMapᶜ D t u
 --   ... | no ¬q = no λ where refl → ¬q refl
 --   ... | yes q = yes (cong (λ t → (D , i , t)) q)
--- 
+--
 --   compareMapᶜ : (D : ConD)
 --     → (t u : (⟦ D ⟧ᶜ Tm m) A Γ) → Dec (t ≡ u)
 --   compareMapᶜ (ι B D) (σ , _ , ts) (σ′ , _ , us) with σ ≟s σ′
@@ -46,7 +46,7 @@ private
 --   compareMapᶜ (ι B D) (σ , refl , ts) (σ′ , refl , us) | yes refl with compareMapᵃˢ D ts us
 --   ... | no ¬q = no λ where refl → ¬q refl
 --   ... | yes q = yes (cong (λ ts → σ , refl , ts) q)
--- 
+--
 --   compareMapᵃˢ : (D : ArgsD n)
 --     → (t u : (⟦ D ⟧ᵃˢ Tm m) σ Γ) → Dec (t ≡ u)
 --   compareMapᵃˢ ∅            _        _        = yes refl
@@ -55,8 +55,8 @@ private
 --   ... | yes p with compareMapᵃˢ Ds ts us
 --   ... | no ¬q = no λ where refl → ¬q refl
 --   ... | yes q = yes (cong₂ _,_ p q)
--- 
---   compareMapᵃ : (Θ : TExps n) 
+--
+--   compareMapᵃ : (Θ : TExps n)
 --     → (t u : (⟦ Θ ⟧ᵃ Tm m A) σ Γ) → Dec (t ≡ u)
 --   compareMapᵃ ∅       t u = t ≟ u
 --   compareMapᵃ (A ∙ Δ) t u = compareMapᵃ Δ t u

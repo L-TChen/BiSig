@@ -42,4 +42,4 @@ private variable
   Σ[ σ ∈ TSub n _ ] B ⟪ σ ⟫ ≡ A × ⟦ D ⟧ᵃˢ _ P σ Γ t
 
 ⟦_⟧ : (D : Desc) → Pred ℓ′ n X → Pred ℓ′ n (R.⟦ D ⟧ X)
-⟦ Ds ⟧ P m A Γ (D , _ , t) = ⟦ D ⟧ᶜ P m A Γ t
+⟦ D ⟧ P m A Γ (i , t) = ⟦ D .rules i ⟧ᶜ P m A Γ t

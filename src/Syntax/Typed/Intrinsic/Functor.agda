@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-} 
+{-# OPTIONS --safe #-}
 
 open import Prelude
 
@@ -38,7 +38,7 @@ private variable
 ⟦ ι {n} B D ⟧ᶜ X A Γ = Σ[ σ ∈ TSub n _ ] (B ⟪ σ ⟫ ≡ A × ⟦ D ⟧ᵃˢ X σ Γ)
 
 ⟦_⟧ : (D : Desc) (X : Fam ℓ m) → Fam ℓ m
-⟦ Ds ⟧ X A Γ = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X A Γ
+⟦ D ⟧ X A Γ = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X A Γ
 
 record _-Alg (D : Desc) (X : Fam ℓ m) : Set ℓ where
   field

@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-} 
+{-# OPTIONS --safe #-}
 
 open import Prelude
 import Syntax.Simple.Description as S
@@ -22,5 +22,4 @@ private
 
 -- rename-id=id : (t : Tm m A Γ) → rename id t ≡ t
 -- rename-id=id (` x)  = refl
--- rename-id=id (op (D , D∈Ds , σ , eq , ts)) =  cong op {!!}   
-
+-- rename-id=id (op (i , σ , eq , ts)) =  cong op {!!}

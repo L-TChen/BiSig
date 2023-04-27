@@ -8,7 +8,7 @@ open import Syntax.BiTyped.Description as B
 module Theory.Erasure.Term {SD : S.Desc} {D : B.Desc {SD}} where
 
 open import Syntax.Context     SD
-open import Syntax.Simple.Term SD 
+open import Syntax.Simple.Term SD
   hiding () renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 
 open import Syntax.BiTyped.Intrinsic.Functor as B
@@ -33,8 +33,8 @@ mutual
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
-  forget (op (D , i , p , σ , q , ts)) =
-    op (eraseᶜ D , ∈-map⁺ eraseᶜ i , σ , q , forgetMap _ ts)
+  forget (op (i , p , σ , q , ts)) =
+    op (i , σ , q , forgetMap _ ts)
 
   forgetMap : (D : B.ArgsD n)
     → B.⟦ D         ⟧ᵃˢ (BTm Ξ) σ Γ

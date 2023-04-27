@@ -6,6 +6,7 @@ open import Prelude
   hiding (_↣_)
 
 open import Example.Implicational
+open import Example.STLC using (ΛOp; `app; `abs; decΛOp)
 
 private variable
   T     : Set
@@ -16,22 +17,23 @@ private variable
 
 open import Syntax.BiTyped.Description {ΛₜD}
 
-ΛₒD : Desc
-ΛₒD =
-  2 ▷ ρ[ [] ⇉ (` # 1) ↣ (` # 0) ] ρ[ [] ⇇ ` # 1 ] [] ⇉ ` # 0 ∷
-  -- Γ ⊢ t ⇉ (A → B)             Γ ⊢ u ⇇ A
-  -- --------------------------------------
-  --   Γ ⊢ t u ⇉ B
-  2 ▷ ρ[ ` # 1 ∷ [] ⇇ ` # 0 ]                    [] ⇇ (` # 1) ↣ (` # 0) ∷
-  -- Γ , x : A ⊢ t ⇇ B
-  -----------------------
-  -- Γ ⊢ λ x . t ⇇ A → B
-  []
+Λ⇆D : Desc
+Λ⇆D = record
+  { Op    = ΛOp
+  ; decOp = decΛOp
+  ; rules = λ { `app → 2 ▷ ρ[ [] ⇉ (` # 1) ↣ (` # 0) ] ρ[ [] ⇇ ` # 1 ] [] ⇉ ` # 0
+                    -- Γ ⊢ t ⇉ (A → B)    Γ ⊢ u ⇇ A
+                    -- ----------------------------
+                    --   Γ ⊢ t u ⇉ B
+              ; `abs → 2 ▷ ρ[ ` # 1 ∷ [] ⇇ ` # 0 ] [] ⇇ (` # 1) ↣ (` # 0) } }
+                    -- Γ , x : A ⊢ t ⇇ B
+                    -----------------------
+                    -- Γ ⊢ λ x . t ⇇ A → B
 
-open import Syntax.BiTyped.Intrinsic.Term ΛₒD
+open import Syntax.BiTyped.Intrinsic.Term Λ⇆D
 
-pattern _·′_ t u = op (_ , here refl , refl , _ ∷ _ ∷ [] , refl , t , u , _)
-pattern ƛ′_  t   = op (_ , there (here refl) , refl , _ ∷ _ ∷ [] , refl , t , _)
+pattern ƛ′_  t   = op (`abs , refl , _ ∷ _ ∷ [] , refl , t , _)
+pattern _·′_ t u = op (`app , refl , _ ∷ _ ∷ [] , refl , t , u , _)
 
 mutual
   data Λ⇉ {m : ℕ} : Λₜ m → Cxt m → Set where
@@ -74,7 +76,7 @@ from-toΛ (` x)       = refl
 from-toΛ (_ ∋ t)     = cong (_ ∋_) (from-toΛ t)
 from-toΛ (⇉ t by eq) = cong (⇉_by eq)  (from-toΛ t)
 from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
-from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)    
+from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)
 
 to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
 to-fromΛ Infer (` x)       = refl

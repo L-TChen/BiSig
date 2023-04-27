@@ -12,16 +12,16 @@ open import Syntax.Simple.Description
     ∷ 2 -- function type
     ∷ []
 
-open import Syntax.Simple.Term ΛₜD
-  using (`_; op; ∅ₛ; _∙ₛ_)
-  renaming (Tm to Λₜ)
-  public
-
 {-
 data Λₜ : Set where
   ι   :              Λₜ
   _↣_ : (A B : Λₜ) → Λₜ
 -}
+
+open import Syntax.Simple.Term ΛₜD
+  using (`_; op; ∅ₛ; _∙ₛ_)
+  renaming (Tm to Λₜ)
+  public
 
 open import Syntax.Context ΛₜD public
 

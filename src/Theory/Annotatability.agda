@@ -25,10 +25,10 @@ private variable
   A B C : TExp n
   Γ Δ   : Cxt n
 
--- -- A bidirectional typing annotates a base typing if every typing rule in the base typing
--- -- has a corresponding typing rule.
-Annotatability : (BD : B.Desc) (TD : T.Desc) → Set
-Annotatability BD TD = {D : T.ConD} → D ∈ TD → ∃[ D′ ] (D′ ∈ BD × eraseᶜ D′ ≡ D)
+-- A bidirectional typing annotates a base typing if every typing rule in the base typing
+-- has a corresponding typing rule.
+Annotatability : B.Desc → T.Desc → Set
+Annotatability BD TD = (i : TD .Op) → Σ[ j ∈ BD .Op ] eraseᶜ (BD .rules j) ≡ TD .rules i
 
 module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
   open import Syntax.Typed.Intrinsic.Term   TD
@@ -38,14 +38,18 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
   annotate
     :          Tm  m     A Γ
     → ∃[ mod ] BTm m mod A Γ
-  annotate (` x)  = Infer , ` x
-  annotate (op (D , i , σ , B=A , ts)) with s i
-  ... | ι mod B _ , j , refl = mod , op (_ , j , refl , σ , B=A , annotateMap _ _ refl ts)
+  annotate (` x)        = Infer , ` x
+  annotate (op (i , r)) = _ , op (_ , annotateᶜ (proj₂ (s i)) r)
 
-  annotateMap : (D  : T.ArgsD n) (D′ : B.ArgsD n) → eraseᵃˢ D′ ≡ D
+  annotateᶜ : ∀ {D D′} → eraseᶜ D′ ≡ D
+    → T.⟦ D ⟧ᶜ (Tm m) A Γ
+    → B.⟦ D′ ⟧ᶜ (BTm m) (D′ .ConD.mode) A Γ
+  annotateᶜ refl (σ , A=B , ts) = refl , σ , A=B , annotateMap _ _ refl ts
+
+  annotateMap : (D : T.ArgsD n) (D′ : B.ArgsD n) → eraseᵃˢ D′ ≡ D
     → T.⟦ D  ⟧ᵃˢ (Tm  m) σ Γ
     → B.⟦ D′ ⟧ᵃˢ (BTm m) σ Γ
-  annotateMap []        []                refl _        = _
+  annotateMap []      []                refl _        = _
   annotateMap (_ ∷ _) (Θ ⊢[ m ] C ∷ Ds) refl (t , ts) =
     annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
 

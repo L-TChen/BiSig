@@ -34,4 +34,4 @@ Fam₀ = Fam lzero
 ⟦ ι _ _ Ds ⟧ᶜ X = ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] ⟦ D ⟧ᶜ X
+⟦ D ⟧ X = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X

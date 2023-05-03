@@ -28,9 +28,9 @@ record ConD : Set where
 record Desc : Set₁ where
   constructor desc
   field
-    Op    : Set
-    decOp : DecEq Op
-    rules : Op → ConD
+    Op        : Set
+    ⦃ decOp ⦄ : DecEq Op
+    rules     : Op → ConD
 
 open Desc public
 

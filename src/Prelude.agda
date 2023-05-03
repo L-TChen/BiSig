@@ -64,6 +64,7 @@ open import Data.String                        public
   using (String)
 open import Data.Product                       public
   using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; <_,_>)
+open import Data.Product.Properties            public
 open import Data.Sum                           public
   using (_⊎_; [_,_])
   renaming (inj₁ to inl; inj₂ to inr)
@@ -192,13 +193,13 @@ m >′ n = n <′ m
 ------------------------------------------------------------------------------
 -- Well-Foundedness of _<_ and _<′_
 ------------------------------------------------------------------------------
+<′-accs : (y x : ℕ) → x <′ y → Acc _<′_ x
+<′-accs zero    x (less-than-or-equal′ {k} p) = ⊥-elim₀ (N.m+1+n≢0 _ p)
+<′-accs (suc y) y (less-than-or-equal′ {zero}  refl) = acc (<′-accs y)
+<′-accs (suc y) x (less-than-or-equal′ {suc k} refl) = <′-accs y x (less-than-or-equal′ {k = k} refl)
+
 <′-wf : WellFounded _<′_
-<′-wf = acc ∘ helper
-  where
-    helper : (y x : ℕ) → x <′ y → Acc _<′_ x
-    helper zero    x (less-than-or-equal′ {k} p) = ⊥-elim₀ (N.m+1+n≢0 _ p)
-    helper (suc x) x (less-than-or-equal′ {zero} refl)  = <′-wf x
-    helper (suc y) x (less-than-or-equal′ {suc k} refl) = helper y x (less-than-or-equal′ refl)
+<′-wf = acc ∘ <′-accs
 
 <-wf : WellFounded _<_
 <-wf = Subrelation.wellFounded  ≤⇒≤′ <′-wf

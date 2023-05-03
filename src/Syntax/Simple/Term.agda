@@ -15,7 +15,7 @@ private variable
 infix 9 `_
 data Tm (n : ℕ) : Set where
   `_ :       Fin n  → Tm n
-  op : ⟦ D ⟧ (Tm n) → Tm n
+  op : ⟦ D ⟧ (Tm n) → Tm n -- Σ_{m ∈ Ds} (Vec (Tm n) m) → Tm n
 
 pattern op′ i ts = op (_ , i , ts)
 
@@ -221,33 +221,6 @@ wk≤ˡ (less-than-or-equal refl) = wkˡ
 weaken : Tm m → Tm (suc m)
 weaken = rename (tabulate suc)
 
-------------------------------------------------------------------------------
--- Order relation between substitutions
-
-private variable
-  t u v : Tm m
-
-_⊑_ : Sub m n → Sub m l → Set
-ρ ⊑ σ = ∃[ ρ′ ] ρ ≡ (σ ⨟ ρ′) 
-
-Subₚ = λ m → {n : ℕ} → Sub m n → Set
-
-Unifies : (t u : Tm m) → Subₚ m
-Unifies t u σ = t ⟪ σ ⟫ ≡ u ⟪ σ ⟫ 
-
-infixl 10 _[_⨟_]
-_[_⨟_] : (P : Subₚ m) (σ : Sub m n) → Subₚ n
-P [ σ ⨟ ρ ] = P (σ ⨟ ρ)
-
-{-
-lem : (P : Subₚ m) (σ₁ : Sub m n) (σ₂ : Sub n l) (ρ : Sub l k)
-  → P [ σ₁ ⨟_] [ σ₂ ⨟ ρ ] → P [ (σ₁ ⨟ σ₂) ⨟ ρ ]
-lem P σ₁ σ₂ ρ k = {!!}
--}
-
-Max : Subₚ m → Subₚ m
-Max P σ = P σ ×
-  ({n : ℕ} (σ′ : Sub _ n) → P σ′ → σ′ ⊑  σ)
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms

@@ -12,6 +12,8 @@ open import Syntax.Simple.Unification D
 
 open N using (_+_)
 
+open ≡-Reasoning
+
 private variable
   Γ Δ Ξ m n l i j k : ℕ
   ts us   : Tm Ξ ^ n
@@ -19,17 +21,50 @@ private variable
   x y     : Fin Ξ
 
 ------------------------------------------------------------------------------
+-- Order relation between substitutions
+
+private variable
+  t u v : Tm m
+
+_⊑_ : Sub m n → Sub m l → Set
+ρ ⊑ σ = ∃[ ρ′ ] ρ ≡ (σ ⨟ ρ′) 
+
+Subₚ   = λ m → {n : ℕ} → Sub   m n → Set
+AListₚ = λ m → {n : ℕ} → AList m n → Set
+
+Unifies : (t u : Tm m) → Subₚ m
+Unifies t u σ = t ⟪ σ ⟫ ≡ u ⟪ σ ⟫ 
+
+Unifiesₐ : (t u : Tm m) → AListₚ m
+Unifiesₐ t u σ = Unifies t u (toSub σ)
+
+infixl 10 _[_⨟_]
+_[_⨟_] : (P : Subₚ m) (σ : Sub m n) → Subₚ n
+P [ σ ⨟ ρ ] = P (σ ⨟ ρ)
+
+Max : Subₚ m → Subₚ m
+Max P σ = P σ ×
+  ({n : ℕ} (σ′ : Sub _ n) → P σ′ → σ′ ⊑  σ)
+  
+------------------------------------------------------------------------------
 -- Trivial proofs
 
 var≢op : (x : Fin m) (i : l ∈ D) (ts : Tm m ^ l)
-  → ` x ≢ op (_ , i , ts)
-var≢op x i ts ()
+  → op (_ , i , ts) ≢ ` x
+var≢op _ _ _ ()
 
 op-inj
   : {(l , i , ts) (k , j , us) : ⟦ D ⟧ (Tm Ξ)}
-  → op′ i ts ≡ op′ j us
+  → op (l , i , ts) ≡ op (k , j , us)
   → Σ (l ≡ k) λ where refl → Σ (i ≡ j) λ where refl → ts ≡ us
 op-inj refl = refl , refl , refl
+
+op-inj₁₂
+  : {(l , i , ts) (k , j , us) : ⟦ D ⟧ (Tm Ξ)}
+  → op (l , i , ts) ≡ op (k , j , us)
+  → (l , i) ≡ (k , j)
+op-inj₁₂ refl = refl
+
 
 op-inj₃
   : {i : n ∈ D} {ts us : Tm Ξ ^ n}
@@ -105,7 +140,6 @@ sub-for-x-in-x {t = t} x = begin
     ≡⟨ sub-t-for-x-x ⟩
   t
     ∎
-  where open ≡-Reasoning
 
 sub-for-x-in-y : {t : Tm m} {x y : Fin (suc m)}
   → (¬p : x ≢ y)
@@ -117,7 +151,6 @@ sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
     ≡⟨ sub-t-for-x-y ¬p ⟩
   ` F.punchOut ¬p
     ∎
-  where open ≡-Reasoning
   
 module _ {u : Tm m} {x : Fin (suc m)} where mutual
   sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : x ∉ₜ t)
@@ -147,7 +180,6 @@ punchOut-for-x≢y {x = x} {y} ¬p = begin
     ≡⟨ (sym $ sub-for-x-in-y ¬p) ⟩
   ` y ⟪ (` punchOut ¬p) for x ⟫
     ∎
-  where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Proofs about free variables
@@ -158,16 +190,16 @@ mutual
   ∈ₜ→∈fv (ops p)  = ∈ₜ→∈fvⁿ p
 
   ∈ₜ→∈fvⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ₜₛ ts → x ∈ fvⁿ ts
-  ∈ₜ→∈fvⁿ (head x∈)     = ∈-++⁺ˡ        (∈ₜ→∈fv x∈)
-  ∈ₜ→∈fvⁿ (tail {t = t} x∈) = ∈-++⁺ʳ (fv t) (∈ₜ→∈fvⁿ x∈)
+  ∈ₜ→∈fvⁿ (head x∈)         = ∈-++⁺ˡ        (∈ₜ→∈fv x∈)
+  ∈ₜ→∈fvⁿ (tail {_} {t} x∈) = ∈-++⁺ʳ (fv t) (∈ₜ→∈fvⁿ x∈)
 
-mutual 
-  ∈fv→∈ₜ : {x : Fin m} {t : Tm m} → x ∈ fv t → x ∈ₜ t
-  ∈fv→∈ₜ {t = ` x}  (here px) = here px
-  ∈fv→∈ₜ {t = op _} x∈        = ops $ ∈fv→∈ₜⁿ x∈
+module _ {m : ℕ} where mutual 
+  ∈fv→∈ₜ : {t : Tm m} {x : Fin m} → x ∈ fv t → x ∈ₜ t
+  ∈fv→∈ₜ {` x}  (here px) = here px
+  ∈fv→∈ₜ {op _} x∈        = ops $ ∈fv→∈ₜⁿ x∈
 
   ∈fv→∈ₜⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ fvⁿ ts → x ∈ₜₛ ts
-  ∈fv→∈ₜⁿ {x} {l = suc l} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
+  ∈fv→∈ₜⁿ  {suc l} {x} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
   ... | inl x∈t  = head (∈fv→∈ₜ x∈t)
   ... | inr x∈ts = tail (∈fv→∈ₜⁿ x∈ts)
 
@@ -218,73 +250,72 @@ AList→≥ (t / x ∷ ge) = ≤-step (AList→≥ ge)
 ------------------------------------------------------------------------------
 -- Proofs about toSub
 
-toSub-⨟
-  : (ρ : AList m n) (σ : AList n l) 
-  → (t : Tm m)
-  → t ⟪ ρ ++ σ ⟫ₐ ≡ t ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
-toSub-⨟ []          σ t = cong _⟪ σ ⟫ₐ (sym $ sub-id t)
-toSub-⨟ (u / x ∷ ρ) σ t = begin
-  t ⟪ (u for x) ⨟ toSub (ρ ++ σ) ⟫
-    ≡⟨ sub-assoc (u for x) (toSub (ρ ++ σ)) t ⟩
-  t ⟪ u for x ⟫ ⟪ ρ ++ σ ⟫ₐ
-    ≡⟨ toSub-⨟ ρ σ (t ⟪ u for x ⟫) ⟩
-  t ⟪ u for x ⟫ ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
-    ≡⟨ cong (_⟪ σ ⟫ₐ) (sym $ sub-assoc (u for x) (toSub ρ) t) ⟩
-  t ⟪ toSub (u / x ∷ ρ ) ⟫ ⟪ σ ⟫ₐ
-    ∎
-  where open ≡-Reasoning
+toSub-∷
+  : {u : Tm m} (x : Fin (suc m)) (ρ : AList m n)
+  → (t : Tm (suc m))
+  → t ⟪ u / x ∷ ρ ⟫ₐ ≡ t ⟪ u for x ⟫ ⟪ ρ ⟫ₐ
+toSub-∷ {_} {_} {u} x ρ t = sub-assoc (u for x) (toSub ρ) t
 
-toSub-/∷[]
+toSub-∷[]
   : {u : Tm m} (x : Fin (suc m))
   → (t : Tm (suc m))
   → t ⟪ u / x ∷ [] ⟫ₐ ≡ t ⟪ u for x ⟫
-toSub-/∷[] {_} {u} x t = begin
+toSub-∷[] {_} {u} x t = begin
   t ⟪ u / x ∷ [] ⟫ₐ
-    ≡⟨ sub-assoc (u for x) ids t ⟩
-  t ⟪ u for x ⟫ ⟪ ids ⟫
+    ≡⟨ toSub-∷ x [] t ⟩
+  t ⟪ u for x ⟫ ⟪ [] ⟫ₐ
     ≡⟨ sub-id _ ⟩
-  t ⟪ u for x ⟫
+  t ⟪ u for x ⟫ 
     ∎
-  where open ≡-Reasoning
+
+toSub-++
+  : (ρ : AList m n) (σ : AList n l) 
+  → (t : Tm m)
+  → t ⟪ ρ ++ σ ⟫ₐ ≡ t ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
+toSub-++ []          σ t = cong _⟪ σ ⟫ₐ (sym $ sub-id t)
+toSub-++ (u / x ∷ ρ) σ t = begin
+  t ⟪ (u for x) ⨟ toSub (ρ ++ σ) ⟫
+    ≡⟨ toSub-∷ x (ρ ++ σ) t ⟩
+  t ⟪ u for x ⟫ ⟪ ρ ++ σ ⟫ₐ
+    ≡⟨ toSub-++ ρ σ (t ⟪ u for x ⟫) ⟩
+  t ⟪ u for x ⟫ ⟪ ρ ⟫ₐ ⟪ σ ⟫ₐ
+    ≡⟨ cong (_⟪ σ ⟫ₐ) (sym $ toSub-∷ x ρ t) ⟩
+  t ⟪ toSub (u / x ∷ ρ ) ⟫ ⟪ σ ⟫ₐ
+    ∎
 
 ------------------------------------------------------------------------------
 -- Proofs that amgu does provide a maximal general unifier
 
-flexFlex-is-unifier
-  : (x y : Fin m)
-  → let σ = flexFlex x y .proj₂ in
-    ` x ⟪ σ ⟫ₐ ≡ ` y ⟪ σ ⟫ₐ
-flexFlex-is-unifier {m = suc m} x y with x ≟ y
-... | yes refl = refl
-... | no ¬p = begin
+flexFlex≢-Unifies
+  : {x y : Fin (suc m)}
+  → (¬p : x ≢ y)
+  → Unifiesₐ (` x) (` y) (flexFlex-≢ ¬p)
+flexFlex≢-Unifies {_} {x} {y} ¬p = begin
   ` x ⟪ flexFlex-≢ ¬p ⟫ₐ
-    ≡⟨ toSub-/∷[] x (` x) ⟩
+    ≡⟨ toSub-∷[] x (` x) ⟩
   ` x ⟪ (` punchOut ¬p) for x ⟫
     ≡⟨ punchOut-for-x≢y ¬p ⟩
   ` y ⟪ (` punchOut ¬p) for x ⟫
-    ≡⟨ sym $ toSub-/∷[] x (` y) ⟩
+    ≡⟨ sym $ toSub-∷[] x (` y) ⟩
   ` y ⟪ flexFlex-≢ ¬p ⟫ₐ
     ∎
-  where open ≡-Reasoning
 
-flexRigid∉-is-unifier
+flexRigid∉-Unifies
   : (x : Fin (suc m)) (t : Tm (suc m))  (x∉ : x ∉ₜ t)
-  → let σ = flexRigid∉ x∉ in
-    t ⟪ σ ⟫ₐ ≡ ` x ⟪ σ ⟫ₐ
-flexRigid∉-is-unifier x t x∉ = begin
+  → Unifiesₐ t (` x) (flexRigid∉ x∉)
+flexRigid∉-Unifies x t x∉ = begin
   t ⟪ flexRigid∉ x∉ ⟫ₐ
     ≡⟨⟩
   t ⟪ punchOutTm x∉ / x ∷ [] ⟫ₐ
-    ≡⟨ toSub-/∷[] x t ⟩
+    ≡⟨ toSub-∷[] x t ⟩
   t ⟪ punchOutTm x∉ for x ⟫
     ≡⟨ sub-for-nonfree=punchOut t x∉ ⟩
   punchOutTm x∉
     ≡⟨ sym $ sub-for-x-in-x x ⟩
   ` x ⟪ (punchOutTm x∉) for x ⟫
-     ≡⟨ (sym $ toSub-/∷[] x (` x)) ⟩
+     ≡⟨ (sym $ toSub-∷[] x (` x)) ⟩
   ` x ⟪ flexRigid∉ x∉ ⟫ₐ
   ∎
-  where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Occurrence check
@@ -333,7 +364,6 @@ sub-▷ {σ = σ} (step _ us ts ∷ ps) t =
       ≡⟨ cong (λ t → subⁿ σ us ʳ++ (t ∷ subⁿ σ ts)) (sub-▷ ps t) ⟩
     subⁿ σ us ʳ++ (((ps ⟪ σ ⟫′) ▷ (t ⟪ σ ⟫)) ∷ subⁿ σ ts)
       ∎
-  where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- t ≺ (p ▷ t)
@@ -352,7 +382,6 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
     ≡⟨ cong (_+ sizeⁿ xs) (+-comm (sizeⁿ ys) (size x))  ⟩
   size x + sizeⁿ ys + sizeⁿ xs
     ∎
-  where open ≡-Reasoning
 
 ʳ++-size
   : (k : j ʳ+ (suc i) ∈ D) (ys : Tm m ^ j) (x : Tm m) (xs : Tm m ^ i)
@@ -366,7 +395,6 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
     ≡⟨ (sym $ size-ʳ++ ys (x ∷ xs)) ⟩
   sizeⁿ (ys ʳ++ (x ∷ xs))
     ∎
-  where open ≡-Reasoning
     
 ▷₁-size : (t : Tm m) (p : Step m)
   → t ≺ (p ▷₁ t)
@@ -389,7 +417,6 @@ no-cycle
   → ps ≡ []
 no-cycle t ps = no-cycle′ t ps (≺-wf t)
   where
-    open ≡-Reasoning
     no-cycle′
       : (t : Tm m) (ps : Steps m) (@0 ac : Acc _≺_ t)
       → t ≡ ps ▷ t 
@@ -419,8 +446,6 @@ unify-occurrence σ {x} {t} x∈ eq = begin
   ` x
   ∎ 
   where
-    open ≡-Reasoning
-
     ps = walk x∈
 
     ps=[] : ps ≡ []
@@ -433,3 +458,45 @@ unify-occurrence σ {x} {t} x∈ eq = begin
         ≡⟨ cong ((ps ⟪ σ ⟫′) ▷_) eq ⟩
       ps ⟪ σ ⟫′ ▷ t ⟪ σ ⟫
         ∎
+
+------------------------------------------------------------------------------
+-- Correctness of amgu
+------------------------------------------------------------------------------
+
+flexFlex-Unifies
+  : (x y : Fin m)
+  → ∃[ l ] Σ[ σ ∈ AList m l ] Unifiesₐ (` x) (` y) σ
+flexFlex-Unifies {suc m} x y with x ≟ y
+... | yes refl = _ , [] , refl
+... | no ¬p    = m , (flexFlex-≢ ¬p) , flexFlex≢-Unifies ¬p
+
+flexRigid-UnifiesOrNot
+  : (x : Fin m) (i : k ∈ D) (ts : Tm m ^ k)
+  → Dec (∃[ l ] Σ[ σ ∈ AList m l ] Unifiesₐ (op′ i ts) (` x) σ)
+flexRigid-UnifiesOrNot {suc m} x i ts with x ∈ₜ? op′ i ts
+... | no x∉  = yes (m , flexRigid∉ x∉ , flexRigid∉-Unifies x (op′ i ts) x∉)
+... | yes x∈ = no λ where
+  (l , σ , p) →  var≢op x i ts (unify-occurrence (toSub σ) x∈ (sym p)) 
+
+{-
+mutual
+  amgu⁺ : (t u : Tm m) (σ : AList m n)
+    → Dec (∃[ l ] Σ[ ρ ∈ AList n l ] Unifiesₐ t u (σ ++ ρ))
+  amgu⁺ (op′ i ts) (op′ j us) ρ with i ≟∈ j
+  ... | no ¬p    = no λ where (_ , ρ , p) → ¬p (op-inj₁₂ p)
+  ... | yes refl = {!!}
+  amgu⁺ (` x)               (` y) []          = yes (flexFlex-Unifies x y)
+  amgu⁺ t@(op (_ , i , ts)) (` y) []          = flexRigid-UnifiesOrNot y i ts
+  amgu⁺ (` x)               u     []          = {!!}
+  amgu⁺ t                   u     (r / z ∷ σ) with amgu⁺ (t ⟪ r for z ⟫) (u ⟪ r for z ⟫) σ
+  ... | no ¬p = {!!}
+  ... | yes (_ , ρ , p) = yes $ _ , ρ , (begin
+    t ⟪ (r / z ∷ σ) ++ ρ ⟫ₐ
+      ≡⟨ toSub-∷ z (σ ++ ρ) t ⟩
+    t ⟪ r for z ⟫ ⟪ σ ++ ρ ⟫ₐ
+      ≡⟨ p ⟩
+    u ⟪ r for z ⟫ ⟪ σ ++ ρ ⟫ₐ
+      ≡⟨ (sym $ toSub-∷ z (σ ++ ρ) u) ⟩
+    u ⟪ (r / z ∷ σ) ++ ρ ⟫ₐ
+      ∎)
+-}

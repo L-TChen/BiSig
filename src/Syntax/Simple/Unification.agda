@@ -18,7 +18,7 @@ flexRigid∉ : {x : Fin (suc m)} {t : Tm (suc m)}
 flexRigid∉ {x = x} x∉ = punchOutTm x∉ / x ∷ []
 
 flexRigid : (x : Fin m) (t : Tm m) → Maybe (∃ (AList m))
-flexRigid {m = suc m} x t with x ∈ₜ? t
+flexRigid {suc m} x t with x ∈ₜ? t
 ... | yes _ = nothing
 ... | no x∉ = just (_ , flexRigid∉ x∉)
 
@@ -28,26 +28,26 @@ flexFlex-≢ : {x y : Fin (suc m)}
 flexFlex-≢ {x = x} ¬p = (` punchOut ¬p) / x ∷ []
 
 flexFlex : (x y : Fin m) → ∃ (AList m)
-flexFlex {m = suc m} x y with x ≟ y
+flexFlex {suc m} x y with x ≟ y
 ... | yes p = suc m , []
 ... | no ¬p = m , flexFlex-≢ ¬p 
 
 mutual
-  amgu : (t u : Tm m) (acc : ∃ (AList m))
+  amgu : (t u : Tm m) (ac : ∃ (AList m))
     → Maybe (∃ (AList m))
-  amgu {m} (op (_ , i , ts)) (op (_ , j , us)) ac with i ≟∈ j
+  amgu (op (_ , i , ts)) (op (_ , j , us)) ac with i ≟∈ j
   ... | no ¬p    = nothing
   ... | yes refl = amguⁿ ts us ac
-  amgu (` x)  (` y)  (_ , []) = just (flexFlex x y)
-  amgu (` x)  u      (_ , []) = flexRigid x u
-  amgu t      (` y)  (_ , []) = flexRigid y t
-  amgu t      u      (n , r / z ∷ σ) with amgu (t ⟪ r for z ⟫) (u ⟪ r for z ⟫) (n , σ)
-  ... | just σ′ = just (r / z ∷′ σ′)
+  amgu (` x)  (` y)    (_ , []) = just (flexFlex x y)
+  amgu (` x)  u@(op _) (_ , []) = flexRigid x u
+  amgu t      (` y)    (_ , []) = flexRigid y t
+  amgu t      u        (n , r / z ∷ σ) with amgu (t ⟪ r for z ⟫) (u ⟪ r for z ⟫) (n , σ)
+  ... | just (l , σ′) = just (l , r / z ∷ σ′)
   ... | nothing = nothing
 
-  amguⁿ : (ts us : Tm m ^ l) (acc : ∃ (AList m))
+  amguⁿ : (ts us : Tm m ^ l) (ac : ∃ (AList m))
     → Maybe (∃ (AList m))
   amguⁿ {l = zero}  _        _        ac = just ac
   amguⁿ {l = suc l} (t ∷ ts) (u ∷ us) ac with amgu t u ac
-  ... | just acc′ = amguⁿ ts us acc′
+  ... | just ac′ = amguⁿ ts us ac′
   ... | nothing   = nothing

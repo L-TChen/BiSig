@@ -18,18 +18,24 @@ data AList : (m n : ℕ) → Set where
 _/_∷′_ : Tm m → Fin (suc m) → ∃ (AList m) → ∃ (AList (suc m))
 t / x ∷′ (n , σ) = n , (t / x ∷ σ)
 
+infixr 5 _++_ 
 _++_ : AList m n → AList n l → AList m l
 []           ++ σ₂ = σ₂
 (t / x ∷ σ₁) ++ σ₂ = t / x ∷ (σ₁ ++ σ₂)
 
 toSub : AList m n → Sub m n
-toSub []          = ids
+toSub []          = id
 toSub (t / x ∷ ρ) = (t for x) ⨟ toSub ρ
 
-infixl 8 _⟪_⟫ₐ _⟪_⟫ₐₛ
+instance
+  AListIsCategory : IsCategory ℕ AList
+  AListIsCategory = record
+    { id  = []
+    ; _⨟_ = _++_
+    }
 
-_⟪_⟫ₐ : Tm m → AList m n → Tm n
-t ⟪ σ ⟫ₐ = t ⟪ toSub σ ⟫
+  TmAListIsPresheaf : IsPresheaf Tm
+  TmAListIsPresheaf ._⟨_⟩ t σ = t ⟨ toSub σ ⟩
 
-_⟪_⟫ₐₛ : Tm m ^ l → AList m n → Tm n ^ l
-ts ⟪ σ ⟫ₐₛ = subⁿ (toSub σ) ts
+  TmsAListIsPresheaf : IsPresheaf (λ m → Tm m ^ l)
+  TmsAListIsPresheaf ._⟨_⟩ ts σ = ts ⟨ toSub σ ⟩

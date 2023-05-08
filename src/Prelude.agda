@@ -4,7 +4,7 @@ module Prelude where
 
 open import Axiom.UniquenessOfIdentityProofs   public
 open import Function                           public
-  hiding (_∋_)
+  hiding (_∋_; id)
 open import Data.Empty                         public
   using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
@@ -63,7 +63,7 @@ open V public using
 open import Data.String                        public
   using (String)
 open import Data.Product                       public
-  using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; <_,_>)
+  using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; ∃₂; <_,_>)
 open import Data.Product.Properties            public
 open import Data.Sum                           public
   using (_⊎_; [_,_])
@@ -71,6 +71,8 @@ open import Data.Sum                           public
 
 open import Relation.Nullary                      public
   using (Dec; yes; no; _because_; ¬_)
+open import Relation.Nullary.Decidable            public
+  using (map′)
 open import Relation.Binary                       public
   using (Decidable; Rel)
 open import Relation.Binary.PropositionalEquality public
@@ -84,6 +86,8 @@ open WF public
 open import Level                                 public
   using (Level; Lift; lift)
   renaming (zero to lzero; suc to lsuc; _⊔_ to lmax)
+
+open import Prelude.Category                      public
 
 variable
   ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ : Level
@@ -210,6 +214,12 @@ insert-mid m n i with F.splitAt m i
 ... | inl j = (j ↑ˡ _) ↑ˡ _
 ... | inr k = (m + n) ↑ʳ k
 
+------------------------------------------------------------------------------
+-- Type classes
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- Decidable Equality
 
 record DecEq {a} (A : Set a) : Set a where
   infix 4 _≟_

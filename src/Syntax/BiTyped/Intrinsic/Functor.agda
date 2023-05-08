@@ -27,14 +27,14 @@ private variable
 
 ⟦_⟧ᵃ : List (TExp n) → (Cxt m → Set ℓ) → Sub n m → Cxt m → Set ℓ
 ⟦ []    ⟧ᵃ X _ Γ = X Γ
-⟦ A ∷ D ⟧ᵃ X σ Γ = ⟦ D ⟧ᵃ X σ (A ⟪ σ ⟫ ∷ Γ)
+⟦ A ∷ D ⟧ᵃ X σ Γ = ⟦ D ⟧ᵃ X σ (A ⟨ σ ⟩ ∷ Γ)
 
 ⟦_⟧ᵃˢ : (D : ArgsD n) (X : Fam m ℓ) → Sub n m → Cxt m → Set ℓ
 ⟦ []              ⟧ᵃˢ _ σ _ = ⊤
-⟦ Δ ⊢[ m ] B ∷ Ds ⟧ᵃˢ X σ Γ = ⟦ Δ ⟧ᵃ (X m (B ⟪ σ ⟫)) σ Γ × ⟦ Ds ⟧ᵃˢ X σ Γ
+⟦ Δ ⊢[ m ] B ∷ Ds ⟧ᵃˢ X σ Γ = ⟦ Δ ⟧ᵃ (X m (B ⟨ σ ⟩)) σ Γ × ⟦ Ds ⟧ᵃˢ X σ Γ
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam m ℓ) → Fam m ℓ
-⟦ ι m₀ B D ⟧ᶜ X m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (B ⟪ σ ⟫ ≡ A × ⟦ D ⟧ᵃˢ X σ Γ)
+⟦ ι m₀ B D ⟧ᶜ X m A Γ = m₀ ≡ m × Σ[ σ ∈ Sub _ _ ] (B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X σ Γ)
 
 ⟦_⟧ : (D : Desc) (X : Fam m ℓ) → Fam m ℓ
 ⟦ D ⟧ X m A Γ = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X m A Γ

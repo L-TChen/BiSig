@@ -143,6 +143,12 @@ mutual
 Ren : ℕ → ℕ → Set
 Ren m n = Vec (Fin n) m
 
+instance
+  RenIsCategory : IsCategory ℕ Ren
+  RenIsCategory .id        = allFin _
+  RenIsCategory ._⨟_ σ₁ σ₂ = tabulate $ lookup σ₂ ∘ lookup σ₁
+
+
 module _ (ρ : Ren m n) where mutual
   rename : Tm m → Tm n
   rename (` x)             = ` lookup ρ x
@@ -152,6 +158,13 @@ module _ (ρ : Ren m n) where mutual
     → Tm m ^ l → Tm n ^ l
   renameⁿ []        = []
   renameⁿ (t ∷ ts) = rename t ∷ renameⁿ ts
+
+instance
+  TmRenIsPresheaf : IsPresheaf Tm
+  TmRenIsPresheaf ._⟨_⟩ t ρ = rename ρ t
+
+  TmsRenIsPresheaf : IsPresheaf (λ m → Tm m ^ l)
+  TmsRenIsPresheaf ._⟨_⟩ ts ρ = renameⁿ ρ ts
 
 Sub : (m n : ℕ) → Set
 Sub m n = Vec (Tm n) m
@@ -166,24 +179,28 @@ module _ (σ : Sub m n) where mutual
   subⁿ []       = []
   subⁿ (t ∷ ts) = sub t ∷ subⁿ ts
 
-infixl 8 _⟨_⟩ _⟪_⟫
+instance
+  SubIsCategory : IsCategory ℕ Sub
+  SubIsCategory .id        = tabulate `_
+  SubIsCategory ._⨟_ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
-_⟨_⟩ : Tm m → Ren m n → Tm n
-t ⟨ f ⟩ = rename f t
+instance
+  TmSubIsPresheaf : IsPresheaf Tm
+  TmSubIsPresheaf ._⟨_⟩ t σ = sub σ t
 
-_⟪_⟫ : Tm m → Sub m n → Tm n
-t ⟪ f ⟫ = sub f t
+  TmsSubIsPresheaf : IsPresheaf (λ m → Tm m ^ k)
+  TmsSubIsPresheaf ._⟨_⟩ t σ = subⁿ σ t
 
-{-# DISPLAY sub σ t = t ⟪ σ ⟫ #-}
+{-# DISPLAY sub σ t = t ⟨ σ ⟩ #-}
 
-idr : Ren m m
-idr = allFin _
+-- idr : Ren m m
+-- idr = allFin _
 
-ids : Sub m m
-ids = tabulate `_
+-- ids : Sub m m
+-- ids = tabulate `_
 
-_⨟_ : Sub m n → Sub n l → Sub m l
-(σ₁ ⨟ σ₂) = tabulate λ i →  (lookup σ₁ i)⟪ σ₂ ⟫
+-- _⨟_ : Sub m n → Sub n l → Sub m l
+-- (σ₁ ⨟ σ₂) = tabulate λ i →  (lookup σ₁ i)⟪ σ₂ ⟫
 
 ∅ₛ : Sub 0 n
 ∅ₛ = []
@@ -207,20 +224,19 @@ injectˡ : Ren m (m + n)
 injectˡ = tabulate λ i → _↑ˡ_ i _ -- λ i → F._↑ˡ_ i _
 
 wkʳ : Tm m → Tm (n + m)
-wkʳ = rename (tabulate (_↑ʳ_ _)) -- (F._↑ʳ_ _)
+wkʳ = _⟨ tabulate (_↑ʳ_ _) ⟩ 
 
 wkˡ : Tm m → Tm (m + n)
-wkˡ = rename injectˡ
+wkˡ = _⟨ injectˡ ⟩
 
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
-wkᵐ m n = rename (tabulate (insert-mid m n)) -- (insert-mid m n)
+wkᵐ m n = _⟨ tabulate (insert-mid m n) ⟩
 
 wk≤ˡ : m ≤ n → Tm m → Tm n
 wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
-weaken = rename (tabulate suc)
-
+weaken = _⟨ tabulate suc ⟩
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms
@@ -237,10 +253,14 @@ open Step public using ()
 Steps : ℕ → Set
 Steps n = List (Step n)
 
-_⟪_⟫′ : Steps m → Sub m n → Steps n
-[]       ⟪ σ ⟫′ = []
-(step pos us ts ∷ ps) ⟪ σ ⟫′ =
-  step pos (subⁿ σ us) (subⁿ σ ts) ∷ ps ⟪ σ ⟫′
+plugSteps : Steps m → Sub m n → Steps n
+plugSteps []       σ  = []
+plugSteps (step pos us ts ∷ ps) σ =
+  step pos (subⁿ σ us) (subⁿ σ ts) ∷ plugSteps ps σ
+
+instance
+  plugSubIsPresheaf : IsPresheaf Steps
+  plugSubIsPresheaf ._⟨_⟩ = plugSteps
 
 infixr 4.5 _▷₁_ _▷_
 

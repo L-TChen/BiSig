@@ -41,7 +41,7 @@ mutual
   amgu (` x)  (` y)    (_ , []) = just (flexFlex x y)
   amgu (` x)  u@(op _) (_ , []) = flexRigid x u
   amgu t      (` y)    (_ , []) = flexRigid y t
-  amgu t      u        (n , r / z ∷ σ) with amgu (t ⟪ r for z ⟫) (u ⟪ r for z ⟫) (n , σ)
+  amgu t      u        (n , r / z ∷ σ) with amgu (t ⟨ r for z ⟩) (u ⟨ r for z ⟩) (n , σ)
   ... | just (l , σ′) = just (l , r / z ∷ σ′)
   ... | nothing = nothing
 

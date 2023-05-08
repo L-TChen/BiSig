@@ -7,8 +7,9 @@ open import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
 
-open import Syntax.Simple.Term SD
+open import Syntax.Simple.Term        SD
   renaming (Tm to TExp)
+open import Syntax.Simple.Association SD
 
 open import Syntax.BiTyped.Raw.Functor {SD} Id
 
@@ -82,8 +83,15 @@ module _ (σ : Sub m n) where mutual
   tsubᵃ {D = []}     t       = tsub t
   tsubᵃ {D = A ∷ D} (x , t) = x , tsubᵃ t
 
+{-
 infixr 8 ⟪_⟫ₜ
 ⟪_⟫ₜ : Sub m n → Raw m mod → Raw n mod
 ⟪ σ ⟫ₜ t = tsub σ t
 
 {-# DISPLAY tsub σ t = ⟪ σ ⟫ₜ t #-}
+-}
+
+instance
+  RawSubIsPresheaf : {mod : Mode} → IsPresheaf λ m → Raw m mod
+  RawSubIsPresheaf ._⟨_⟩ t σ = tsub (toSub σ) t
+

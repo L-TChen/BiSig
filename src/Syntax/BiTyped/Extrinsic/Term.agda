@@ -44,6 +44,8 @@ data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
     → (⊢t : ⟦ D ⟧ ⊢⇄ mod A Γ t)
     → ⊢⇄ mod A Γ (op t)
 
+infix 6 _⊢_⇉_ _⊢_⇇_
+
 _⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set
 Γ ⊢ t ⇉ A = ⊢⇄ Infer A Γ t
 

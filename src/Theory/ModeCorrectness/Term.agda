@@ -58,7 +58,7 @@ mutual
           → ∀ {rs ts us}
           → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ ts Γ rs
           → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ us Γ rs
-          → ConD.type D ⟪ ts ⟫ ≡ ConD.type D ⟪ us ⟫
+          → ConD.type D ⟨ ts ⟩ ≡ ConD.type D ⟨ us ⟩
   uniq-⇉ᶜ {D = D} (C⊆xs , _ , SDs) refl ⊢ts ⊢us =
     ≡-fv _ _ (ConD.type D) λ x → uniq-⇉Map _ SDs ⊢ts ⊢us (C⊆xs x)
 
@@ -81,9 +81,9 @@ mutual
     : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
     → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
-    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟪ σ₁ ⟫)) σ₁ Γ t)
+    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₁ ⟩)) σ₁ Γ t)
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
-    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟪ σ₂ ⟫)) σ₂ Γ t)
+    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₂ ⟩)) σ₂ Γ t)
     -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
@@ -102,7 +102,7 @@ mutual
 
 sub-∈ : ∀ {x} (σ : TSub m n)
   → x ⦂ A         ∈ Γ
-  → x ⦂ A ⟪ σ ⟫ ∈ ⟪ σ ⟫cxt Γ
+  → x ⦂ A ⟨ σ ⟩ ∈ Γ ⟨ σ ⟩
 sub-∈ σ zero        = zero
 sub-∈ σ (suc ¬p x∈) = suc ¬p (sub-∈ σ x∈)
 
@@ -110,7 +110,7 @@ subst-∈→∈
   : ∀ (Γ : Cxt m) x
   → ¬ (∃[ A ] (x ⦂ A ∈ Γ))
   → (σ : TSub m n)
-  → ¬ (∃[ B ] (x ⦂ B ∈ ⟪ σ ⟫cxt Γ))
+  → ¬ (Σ[ B ∈ TExp _ ] (x ⦂ B ∈ Γ ⟨ σ ⟩))
 subst-∈→∈ (_ ∷ _)       _ ¬∃ σ (D , zero)      = ¬∃ (_ , zero)
 subst-∈→∈ ((y , C) ∷ Γ) x ¬∃ σ (D , suc ¬p x∈) =
   subst-∈→∈ Γ x (λ where (_ , x∈) → ¬∃ (_ , suc ¬p x∈)) σ (_ , x∈)
@@ -119,11 +119,11 @@ mutual
   synthetise
     : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
     → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
-        ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇉ (A ⟪ toSub σ ⟫))
+        Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
   inherit
     : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
     → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
-        ⟪ toSub σ ⟫cxt Γ ⊢ ⟪ toSub σ ⟫ₜ t ⇇ (A ⟪ toSub σ ⟫))
+        Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
 
   synthetise Γ (` x)   σ with lookup Γ x
   ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)

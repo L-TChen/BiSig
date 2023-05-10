@@ -140,14 +140,11 @@ mutual
   punchOutTmⁿ {ts = t ∷ ts} x∉ =
     punchOutTm (x∉ ∘ head) ∷ punchOutTmⁿ (x∉ ∘ tail)
 
+------------------------------------------------------------------------------
+-- Substitution structure
+
 Ren : ℕ → ℕ → Set
 Ren m n = Vec (Fin n) m
-
-instance
-  RenIsCategory : IsCategory ℕ Ren
-  RenIsCategory .id        = allFin _
-  RenIsCategory ._⨟_ σ₁ σ₂ = tabulate $ lookup σ₂ ∘ lookup σ₁
-
 
 module _ (ρ : Ren m n) where mutual
   rename : Tm m → Tm n
@@ -158,13 +155,12 @@ module _ (ρ : Ren m n) where mutual
     → Tm m ^ l → Tm n ^ l
   renameⁿ []        = []
   renameⁿ (t ∷ ts) = rename t ∷ renameⁿ ts
+  
+Ren-id : Ren m m
+Ren-id = allFin _
 
-instance
-  TmRenIsPresheaf : IsPresheaf Tm
-  TmRenIsPresheaf ._⟨_⟩ t ρ = rename ρ t
-
-  TmsRenIsPresheaf : IsPresheaf (λ m → Tm m ^ l)
-  TmsRenIsPresheaf ._⟨_⟩ ts ρ = renameⁿ ρ ts
+Ren-⨟  : Ren m n → Ren n l → Ren m l
+Ren-⨟ σ₁ σ₂ = tabulate $ lookup σ₂ ∘ lookup σ₁
 
 Sub : (m n : ℕ) → Set
 Sub m n = Vec (Tm n) m
@@ -179,28 +175,11 @@ module _ (σ : Sub m n) where mutual
   subⁿ []       = []
   subⁿ (t ∷ ts) = sub t ∷ subⁿ ts
 
-instance
-  SubIsCategory : IsCategory ℕ Sub
-  SubIsCategory .id        = tabulate `_
-  SubIsCategory ._⨟_ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
+Sub-id : Sub m m
+Sub-id = tabulate `_
 
-instance
-  TmSubIsPresheaf : IsPresheaf Tm
-  TmSubIsPresheaf ._⟨_⟩ t σ = sub σ t
-
-  TmsSubIsPresheaf : IsPresheaf (λ m → Tm m ^ k)
-  TmsSubIsPresheaf ._⟨_⟩ t σ = subⁿ σ t
-
-{-# DISPLAY sub σ t = t ⟨ σ ⟩ #-}
-
--- idr : Ren m m
--- idr = allFin _
-
--- ids : Sub m m
--- ids = tabulate `_
-
--- _⨟_ : Sub m n → Sub n l → Sub m l
--- (σ₁ ⨟ σ₂) = tabulate λ i →  (lookup σ₁ i)⟪ σ₂ ⟫
+Sub-⨟ : Sub m n → Sub n l → Sub m l
+Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
 ∅ₛ : Sub 0 n
 ∅ₛ = []
@@ -221,22 +200,22 @@ _for_
 t for x = tabulate (sub-for t x)
 
 injectˡ : Ren m (m + n)
-injectˡ = tabulate λ i → _↑ˡ_ i _ -- λ i → F._↑ˡ_ i _
+injectˡ = tabulate λ i → _↑ˡ_ i _
 
 wkʳ : Tm m → Tm (n + m)
-wkʳ = _⟨ tabulate (_↑ʳ_ _) ⟩ 
+wkʳ = rename $ tabulate (_↑ʳ_ _)
 
 wkˡ : Tm m → Tm (m + n)
-wkˡ = _⟨ injectˡ ⟩
+wkˡ = rename injectˡ
 
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
-wkᵐ m n = _⟨ tabulate (insert-mid m n) ⟩
+wkᵐ m n = rename $ tabulate (insert-mid m n)
 
 wk≤ˡ : m ≤ n → Tm m → Tm n
 wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
-weaken = _⟨ tabulate suc ⟩
+weaken = rename $ tabulate suc
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms
@@ -257,10 +236,6 @@ plugSteps : Steps m → Sub m n → Steps n
 plugSteps []       σ  = []
 plugSteps (step pos us ts ∷ ps) σ =
   step pos (subⁿ σ us) (subⁿ σ ts) ∷ plugSteps ps σ
-
-instance
-  plugSubIsPresheaf : IsPresheaf Steps
-  plugSubIsPresheaf ._⟨_⟩ = plugSteps
 
 infixr 4.5 _▷₁_ _▷_
 
@@ -291,3 +266,143 @@ _≺_ = _<_ on size
 
 ≺-wf : WellFounded (_≺_ {m})
 ≺-wf = On.wellFounded size <-wf 
+
+------------------------------------------------------------------------------
+-- Instances of Presheaves 
+
+open ≡-Reasoning
+
+module _ {m : ℕ} where mutual
+  rename-id : (t : Tm m)
+    → rename Ren-id t ≡ t
+  rename-id (` x)      = cong `_ (lookup∘tabulate (λ i → i) x)
+  rename-id (op′ i ts) = cong (op′ i) (renameⁿ-id ts)
+
+  renameⁿ-id : (ts : Tm m ^ l)
+    → renameⁿ Ren-id ts ≡ ts
+  renameⁿ-id []       = refl
+  renameⁿ-id (t ∷ ts) = cong₂ _∷_ (rename-id t) (renameⁿ-id ts)
+
+module _ {m : ℕ} (σ : Ren m n) (ρ : Ren n l) where mutual
+  rename-⨟ : (t : Tm m)
+    → rename (Ren-⨟ σ ρ) t ≡ rename ρ (rename σ t)
+  rename-⨟ (` x)      = cong `_ (lookup∘tabulate (lookup ρ ∘ lookup σ) x)
+  rename-⨟ (op′ i ts) = cong (op′ i) (renameⁿ-⨟ ts)
+
+  renameⁿ-⨟ : (ts : Tm m ^ k)
+    → renameⁿ (Ren-⨟ σ ρ) ts ≡ renameⁿ ρ (renameⁿ σ ts)
+  renameⁿ-⨟ []       = refl
+  renameⁿ-⨟ (t ∷ ts) = cong₂ _∷_ (rename-⨟ t) (renameⁿ-⨟ ts)
+
+module _ {m : ℕ} where mutual
+  sub-id : (t : Tm m)
+    → sub Sub-id t ≡ t
+  sub-id (` x)      = lookup∘tabulate `_ x
+  sub-id (op′ i ts) = cong (op′ i) (subⁿ-id ts)
+
+  subⁿ-id : (t : Tm m ^ l)
+    → subⁿ Sub-id t ≡ t
+  subⁿ-id []       = refl
+  subⁿ-id (t ∷ ts) =
+    cong₂ _∷_ (sub-id t) (subⁿ-id ts)
+
+module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where mutual
+  sub-⨟ : (t : Tm m)
+    → sub (Sub-⨟ σ ρ) t ≡ sub ρ (sub σ t)
+  sub-⨟ (` x)      = lookup∘tabulate (λ i → sub ρ (lookup σ i)) x
+  sub-⨟ (op′ i ts) = cong (λ ts → op′ i ts) (subⁿ-⨟ ts)
+
+  subⁿ-⨟ : (ts : Tm m ^ k)
+    → subⁿ (Sub-⨟ σ ρ) ts ≡ subⁿ ρ (subⁿ σ ts)
+  subⁿ-⨟ {zero}  []       = refl
+  subⁿ-⨟ {suc k} (t ∷ ts) = cong₂ _∷_ (sub-⨟ t) (subⁿ-⨟ ts)
+
+instance
+  RenIsCategory : IsCategory ℕ Ren
+  RenIsCategory .id      = Ren-id
+  RenIsCategory ._⨟_     = Ren-⨟
+  RenIsCategory .⨟-idᵣ σ = begin
+    σ ⨟ id
+      ≡⟨ tabulate-cong (λ i → lookup∘tabulate (λ i → i) (lookup σ i)) ⟩
+    tabulate (λ x → lookup σ x)
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+  RenIsCategory .⨟-idₗ σ = begin
+    id ⨟ σ
+      ≡⟨ tabulate-cong (λ i → cong (lookup σ) (lookup∘tabulate (λ i → i) i)) ⟩
+    tabulate (λ i → lookup σ i)
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+
+  SubIsCategory : IsCategory ℕ Sub
+  SubIsCategory .id      = Sub-id
+  SubIsCategory ._⨟_     = Sub-⨟ 
+  SubIsCategory .⨟-idᵣ σ = begin
+    σ ⨟ id
+      ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
+    tabulate (λ i → lookup σ i) 
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+  SubIsCategory .⨟-idₗ σ = begin
+    id ⨟ σ
+      ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
+    tabulate (λ i → sub σ (` i))
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+
+module _ {m : ℕ} where mutual
+  plugSteps-id : (ps : Steps m)
+    → plugSteps ps id ≡ ps
+  plugSteps-id []       = refl
+  plugSteps-id (step p us ts ∷ ps) = cong₂ _∷_
+    (cong₂ (step p) (subⁿ-id us) (subⁿ-id ts))
+    (plugSteps-id ps)
+
+module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where mutual
+  plugSteps-⨟ : (ps : Steps m)
+    → plugSteps ps (σ ⨟ ρ) ≡ plugSteps (plugSteps ps σ) ρ
+  plugSteps-⨟ []       = refl
+  plugSteps-⨟ (step p ts us ∷ ps) = cong₂ _∷_
+    (cong₂ (step p) (subⁿ-⨟ σ ρ ts ) (subⁿ-⨟ σ ρ us))
+    (plugSteps-⨟ ps)
+
+instance
+  TmRenIsPresheaf : IsPresheaf Tm
+  TmRenIsPresheaf ._⟨_⟩ t ρ = rename ρ t
+  TmRenIsPresheaf .⟨⟩-id t    = rename-id t
+  TmRenIsPresheaf .⟨⟩-⨟ σ ρ t = rename-⨟ σ ρ t 
+
+  TmsRenIsPresheaf : IsPresheaf (λ m → Tm m ^ l)
+  TmsRenIsPresheaf ._⟨_⟩ ts ρ = renameⁿ ρ ts
+  TmsRenIsPresheaf .⟨⟩-id ts    = renameⁿ-id ts
+  TmsRenIsPresheaf .⟨⟩-⨟ σ ρ ts = renameⁿ-⨟ σ ρ ts
+
+  TmSubIsPresheaf : IsPresheaf Tm
+  TmSubIsPresheaf ._⟨_⟩ t σ = sub σ t
+  TmSubIsPresheaf .⟨⟩-id = sub-id
+  TmSubIsPresheaf .⟨⟩-⨟  = sub-⨟
+
+  TmsSubIsPresheaf : IsPresheaf (λ m → Tm m ^ k)
+  TmsSubIsPresheaf ._⟨_⟩ t σ = subⁿ σ t
+  TmsSubIsPresheaf .⟨⟩-id       = subⁿ-id
+  TmsSubIsPresheaf .⟨⟩-⨟ σ ρ ts = subⁿ-⨟ σ ρ ts
+
+  plugSubIsPresheaf : IsPresheaf Steps
+  plugSubIsPresheaf ._⟨_⟩ = plugSteps
+  plugSubIsPresheaf .⟨⟩-id       = plugSteps-id
+  plugSubIsPresheaf .⟨⟩-⨟ σ ρ ts = plugSteps-⨟ σ ρ ts
+
+⨟-assoc
+  : (σ : Sub m n) (ρ : Sub n l) (γ : Sub l k)
+  → (σ ⨟ ρ) ⨟ γ ≡ σ ⨟ (ρ ⨟ γ)
+⨟-assoc σ ρ γ = tabulate-cong (λ i → begin
+  ` i ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
+    ≡⟨ cong (_⟨ γ ⟩) (⟨⟩-⨟ σ ρ (` i)) ⟩
+  (` i ⟨ σ ⟩ ⟨ ρ ⟩) ⟨ γ ⟩
+    ≡⟨ sym $ ⟨⟩-⨟ ρ γ (` i ⟨ σ ⟩) ⟩
+  (` i ⟨ σ ⟩) ⟨ ρ ⨟ γ ⟩
+    ∎)

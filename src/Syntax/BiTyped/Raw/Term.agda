@@ -14,7 +14,7 @@ open import Syntax.Simple.Association SD
 open import Syntax.BiTyped.Raw.Functor {SD} Id
 
 private variable
-  n m k : ℕ
+  n m k l : ℕ
   mod : Mode
 
 infix 4 _⦂_
@@ -71,7 +71,7 @@ module _ (σ : Sub m n) where mutual
   tsub (` x)   = ` x
   tsub (t ⦂ A) = tsub t ⦂ sub σ A
   tsub (t ↑)   = tsub t ↑
-  tsub (op (i , refl , ts)) = op (i , refl , tsubⁿ ts)
+  tsub (op (i , eq , ts)) = op (i , eq , tsubⁿ ts)
 
   tsubⁿ : {D : B.ArgsD k}
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
@@ -80,18 +80,54 @@ module _ (σ : Sub m n) where mutual
 
   tsubᵃ : {D : List (TExp k)}
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
-  tsubᵃ {D = []}     t       = tsub t
+  tsubᵃ {D = []}     t      = tsub t
   tsubᵃ {D = A ∷ D} (x , t) = x , tsubᵃ t
 
-{-
-infixr 8 ⟪_⟫ₜ
-⟪_⟫ₜ : Sub m n → Raw m mod → Raw n mod
-⟪ σ ⟫ₜ t = tsub σ t
+module _ {m : ℕ} where mutual
+  tsub-id : (t : Raw m mod)
+    → tsub id t ≡ t
+  tsub-id (` x)              = refl
+  tsub-id (t ⦂ A)            = cong₂ _⦂_ (tsub-id t) (⟨⟩-id {ℕ} {Sub} A)
+  tsub-id (t ↑)              = cong _↑ (tsub-id t)
+  tsub-id (op (i , eq , ts)) =
+    cong (λ ts → op (i , eq , ts)) (tsubⁿ-id ts)
 
-{-# DISPLAY tsub σ t = ⟪ σ ⟫ₜ t #-}
--}
+  tsubⁿ-id : {D : B.ArgsD k}
+    → (ts : ⟦ D ⟧ᵃˢ (Raw m))
+    → tsubⁿ id ts ≡ ts
+  tsubⁿ-id {D = []}     ts       = refl
+  tsubⁿ-id {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-id t) (tsubⁿ-id ts)
+
+  tsubᵃ-id : {D : List (TExp k)}
+    → (t : ⟦ D ⟧ᵃ (Raw m mod))
+    → tsubᵃ id t ≡ t
+  tsubᵃ-id {D = []}             = tsub-id
+  tsubᵃ-id {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-id t)
+
+module _ (σ : AList m n) (ρ : AList n l) where mutual
+  tsub-⨟ : (t : Raw m mod)
+    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
+  tsub-⨟ (` x)   = refl
+  tsub-⨟ (t ⦂ A) = cong₂ _⦂_ (tsub-⨟ t) (⟨⟩-⨟ σ ρ A)
+  tsub-⨟ (t ↑)   = cong _↑ (tsub-⨟ t)
+  tsub-⨟ (op (i , eq , ts)) = cong (λ ts → op (i , eq , ts)) (tsubⁿ-⨟ ts)
+
+  tsubⁿ-⨟ : {D : B.ArgsD k}
+    → (ts : ⟦ D ⟧ᵃˢ (Raw m))
+    → tsubⁿ (toSub (σ ⨟ ρ)) ts ≡ tsubⁿ (toSub ρ) (tsubⁿ (toSub σ) ts)
+  tsubⁿ-⨟ {D = []}     ts       = refl
+  tsubⁿ-⨟ {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-⨟ t) (tsubⁿ-⨟ ts)
+
+  tsubᵃ-⨟ : {D : List (TExp k)}
+    → (t : ⟦ D ⟧ᵃ (Raw m mod))
+    → tsubᵃ (toSub (σ ⨟ ρ)) t ≡ tsubᵃ (toSub ρ) (tsubᵃ (toSub σ) t)
+  tsubᵃ-⨟ {D = []}             = tsub-⨟
+  tsubᵃ-⨟ {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
 
 instance
-  RawSubIsPresheaf : {mod : Mode} → IsPresheaf λ m → Raw m mod
-  RawSubIsPresheaf ._⟨_⟩ t σ = tsub (toSub σ) t
+  RawAListIsPresheaf : {mod : Mode} → IsPresheaf λ m → Raw m mod
+  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
+  RawAListIsPresheaf .⟨⟩-id      = tsub-id
+  RawAListIsPresheaf .⟨⟩-⨟ σ ρ t = tsub-⨟ σ ρ t
+
 

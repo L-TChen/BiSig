@@ -27,7 +27,7 @@ Fam₀ = Fam lzero
 ⟦ A ∷ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
 
 ⟦_⟧ᵃˢ : (D : ArgsD n) (X : Fam ℓ) → Set ℓ
-⟦ []               ⟧ᵃˢ _ = ⊤
+⟦ []              ⟧ᵃˢ _ = ⊤
 ⟦ Θ ⊢[ m ] _ ∷ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ (X m) × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ

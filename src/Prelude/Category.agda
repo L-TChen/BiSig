@@ -6,56 +6,118 @@ open import Relation.Binary.PropositionalEquality
 open import Data.Product
 open import Level
 
+open ≡-Reasoning
+
 private variable
   a b c : Level
 
-record IsCategory (Obj : Set a) (Mor : Obj → Obj → Set b) : Set (a ⊔ b) where
+record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
   infixl 5 _⨟_
   field
     id      : {C     : Obj} → Mor C C
     _⨟_     : {C D E : Obj} → Mor C D → Mor D E → Mor C E
     
-{-
-    ⨟-assoc
-      : {C D E F : Obj}
-      → (f : Mor C D) (g : Mor D E) (h : Mor E F)
-      → f ⨟ g ⨟ h ≡ f ⨟ (g ⨟ h)
-    ⨟-idₗ
-      : {C D : Obj}
-      → (f : Mor C D)
-      → id ⨟ f ≡ f
-    ⨟-idᵣ
-      : {C D : Obj}
+    ⨟-idᵣ   : {C D   : Obj}
       → (f : Mor C D)
       → f ⨟ id ≡ f
--}
-  _⊑_
+
+    ⨟-idₗ   : {C D   : Obj}
+      → (f : Mor C D)
+      → id ⨟ f ≡ f
+
+{-
+    ⨟-assoc : {C D E F : Obj}
+      → (f : Mor C D) (g : Mor D E) (h : Mor E F)
+      → f ⨟ g ⨟ h ≡ f ⨟ (g ⨟ h)
+      -}
+
+  private variable
+    C D E : Obj
+  _⊒_
     : {C D E : Obj}
-    → Mor C D → Mor C E → Set b
-  _⊑_ {C} {D} {E} ρ σ = Σ[ ρ′ ∈ Mor E D ] ρ ≡ σ ⨟ ρ′
+    → Mor C D → Mor C E → Set
+  _⊒_ {C} {D} {E} f g = Σ[ h ∈ Mor E D ] f ≡ g ⨟ h
+
+  𝐘 : Obj → Set₁
+  𝐘 C = {D : Obj} → Mor C D → Set
+
+  infixl 8 _[_⨟_]
+  _[_⨟_]
+    : (P : 𝐘 C) (f : Mor C D)
+    → 𝐘 D
+  P [ f ⨟ g ] = P (f ⨟ g)
+
+  -- ???
+  Min : 𝐘 C → 𝐘 C
+  Min {C} P f = P f ×
+    (∀ {D} (g : Mor C D) → P g → g ⊒ f)
+
+  ∃ₘ : 𝐘 C → Set
+  ∃ₘ {C} P = ∃₂ λ (D : Obj) (f : Mor C D) → P f 
+
+  infix 2 ∃ₘ
+  syntax ∃ₘ (λ x → P) = ∃ₘ[ x ] P
+
 open IsCategory ⦃...⦄ public
   
-record Category {a b} : Set (suc (a ⊔ b)) where
+record Category : Set₁ where
   field
-    Obj        : Set a
-    Mor        : Obj → Obj → Set b
+    Obj        : Set
+    Mor        : Obj → Obj → Set
     isCategory : IsCategory Obj Mor
 open Category
 
-record IsPresheaf {Obj : Set a} {Mor : Obj → Obj → Set b}
-  (⦃ isCat ⦄ : IsCategory Obj Mor) (F : Obj → Set c) : Set (a ⊔ b ⊔ c) where
+record Functor
+  {Obj₁ : Set} {Mor₁ : Obj₁ → Obj₁ → Set} ⦃ isCat₁ : IsCategory Obj₁ Mor₁ ⦄ 
+  {Obj₂ : Set} {Mor₂ : Obj₂ → Obj₂ → Set} ⦃ isCat₂ : IsCategory Obj₂ Mor₂ ⦄ 
+  (Fₒ : Obj₁ → Obj₂)  : Set where
+  field
+    Fₘ  : {A B : Obj₁}
+      → Mor₁ A B → Mor₂ (Fₒ A) (Fₒ B)
+    Fₘ-id : {A : Obj₁} → Fₘ {A} id ≡ id
+    Fₘ-⨟  : {A B C : Obj₁}
+      → (f : Mor₁ A B) (g : Mor₁ B C)
+      → Fₘ (f ⨟ g) ≡ Fₘ f ⨟ Fₘ g
+open Functor ⦃...⦄ public
+
+record IsPresheaf {Obj : Set} {Mor : Obj → Obj → Set}
+  ⦃ isCat : IsCategory Obj Mor ⦄ (F : Obj → Set) : Set where
   infixl 8 _⟨_⟩
   field
     _⟨_⟩ : {C D : Obj}
       → F C → Mor C D → F D
-{-
-    ⟨⟩-id : {C : Obj}
-      → (t : F C)
-      → t ⟨ id ⟩ ≡ t
-    ⟨⟩-⨟  : {C D E : Obj}
-      → (f : Mor C D) (g : Mor D E)
-      → (t : F C)
-      → t ⟨ f ⨟ g ⟩ ≡ t ⟨ f ⟩ ⟨ g ⟩
--}
 
+    ⟨⟩-id : {C : Obj}
+      → (x : F C)
+      → x ⟨ id ⟩ ≡ x
+
+    ⟨⟩-⨟ : {C D E : Obj}
+      → (f  : Mor C D) (g : Mor D E)
+      → (x : F C) 
+      → x ⟨ f ⨟ g ⟩ ≡ x ⟨ f ⟩ ⟨ g ⟩
 open IsPresheaf ⦃...⦄ public
+{-
+module _
+  {Obj₁ : Set} {Mor₁ : Obj₁ → Obj₁ → Set} ⦃ isCat₁ : IsCategory Obj₁ Mor₁ ⦄ 
+  {Obj₂ : Set} {Mor₂ : Obj₂ → Obj₂ → Set} ⦃ isCat₂ : IsCategory Obj₂ Mor₂ ⦄ 
+  {Fₒ : Obj₁ → Obj₂} ⦃ func : Functor Fₒ ⦄
+  (P : Obj₂ → Set)
+  ⦃ isPresheaf : IsPresheaf P ⦄ where
+
+  presheaf∘functor : IsPresheaf λ C → P (Fₒ C)
+  presheaf∘functor ._⟨_⟩  x f = x ⟨ Fₘ f ⟩
+  presheaf∘functor .⟨⟩-id {C} x = begin
+    x ⟨ Fₘ id ⟩
+      ≡⟨ cong (x ⟨_⟩) Fₘ-id ⟩
+    x ⟨ id ⟩
+      ≡⟨ ⟨⟩-id _ ⟩
+    x
+      ∎
+  presheaf∘functor .⟨⟩-⨟ f g x  = begin
+    x ⟨ Fₘ (f ⨟ g) ⟩
+      ≡⟨ cong (x ⟨_⟩) (Fₘ-⨟ f g) ⟩
+    x ⟨ Fₘ f ⨟ Fₘ g ⟩
+      ≡⟨ ⟨⟩-⨟ (Fₘ f) (Fₘ g) x ⟩
+    x ⟨ Fₘ f ⟩ ⟨ Fₘ g ⟩
+      ∎
+-}

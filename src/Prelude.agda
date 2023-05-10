@@ -23,7 +23,7 @@ module N where
   open import Data.Nat.Properties public
 open N public
   using (ℕ; zero; suc; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
-  renaming (_≤″_ to _≤_; _<″_ to _<_)
+  renaming (_≤″_ to _≤_; _≥″_ to _≥_; _<″_ to _<_)
 
 module F where
   open import Data.Fin          public
@@ -58,12 +58,12 @@ module V where
     using (_∈_)
 open V public using
   (Vec; []; _∷_; map; insert; lookup; tabulate
-  ; allFin; lookup∘tabulate)
+  ; allFin; tabulate∘lookup; lookup∘tabulate; tabulate-cong)
 
 open import Data.String                        public
   using (String)
 open import Data.Product                       public
-  using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; ∃₂; <_,_>)
+  using (_×_; _,_; proj₁; proj₂; Σ; Σ-syntax; ∃; ∃-syntax; ∃₂; <_,_>; map₂; map₁)
 open import Data.Product.Properties            public
 open import Data.Sum                           public
   using (_⊎_; [_,_])
@@ -148,6 +148,19 @@ splitAt zero    xs = [] , xs , refl
 splitAt (suc m) xs with splitAt m xs
 splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , refl
 
+ʳ++-≡ : {A : Set}
+  → (xs xs′ : Vec A n) {ys ys′ : Vec A m}
+  → xs ʳ++ ys ≡ xs′ ʳ++ ys′
+  → xs ≡ xs′ × ys ≡ ys′
+ʳ++-≡ []       []         {ys} {ys′} p = refl , p
+ʳ++-≡ (x ∷ xs) (x′ ∷ xs′) {ys} {ys′} eq with ʳ++-≡ xs xs′ {x ∷ ys} {x′ ∷ ys′} eq
+... | refl , refl = refl , refl 
+
+[xs]≢[] : {A : Set}
+  → (xs : List A) {x : A}
+  → xs L.++ L.[ x ] ≢ []
+[xs]≢[] []       ()
+[xs]≢[] (x ∷ xs) ()
 ------------------------------------------------------------------------------
 -- Properties of ≤
 ------------------------------------------------------------------------------

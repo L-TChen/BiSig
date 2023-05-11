@@ -125,21 +125,6 @@ lookup∈ₜₛ : {x : Fin m} {ts : Tm m ^ l}
 lookup∈ₜₛ (head x∈) = x∈
 lookup∈ₜₛ (tail x∈) = lookup∈ₜₛ x∈
 
-mutual
-  punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
-    → ¬ x ∈ₜ t → Tm n
-  punchOutTm {_} {x} {` y}  x∉ with x ≟ y
-  ... | yes x=y = ⊥-elim₀ (x∉ (here x=y))
-  ... | no ¬x=y = ` punchOut ¬x=y
-  punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
-    op (_ , i , punchOutTmⁿ (x∉ ∘ ops))
-
-  punchOutTmⁿ : {x : Fin (suc Ξ)} {ts : Tm (suc Ξ) ^ n}
-    → ¬ x ∈ₜₛ ts → Tm Ξ ^ n
-  punchOutTmⁿ {ts = []}     _  = []
-  punchOutTmⁿ {ts = t ∷ ts} x∉ =
-    punchOutTm (x∉ ∘ head) ∷ punchOutTmⁿ (x∉ ∘ tail)
-
 ------------------------------------------------------------------------------
 -- Substitution structure
 
@@ -181,14 +166,6 @@ Sub-id = tabulate `_
 Sub-⨟ : Sub m n → Sub n l → Sub m l
 Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
-∅ₛ : Sub 0 n
-∅ₛ = []
-
-_∙ₛ_ : Tm n → Sub m n → Sub (suc m) n
-(t ∙ₛ σ) = t ∷ σ
-
-infixr 5 _∙ₛ_
-
 sub-for : (Tm m) → (x y : Fin (suc m)) → Tm m
 sub-for t x y with x ≟ y
 ... | no ¬p = ` punchOut ¬p
@@ -216,6 +193,29 @@ wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
 weaken = rename $ tabulate suc
+
+mutual
+  punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
+    → ¬ x ∈ₜ t → Tm n
+  punchOutTm {_} {x} {` y}  x∉ with x ≟ y
+  ... | yes x=y = ⊥-elim₀ (x∉ (here x=y))
+  ... | no ¬x=y = ` punchOut ¬x=y
+  punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
+    op (_ , i , punchOutTmⁿ (x∉ ∘ ops))
+
+  punchOutTmⁿ : {x : Fin (suc Ξ)} {ts : Tm (suc Ξ) ^ n}
+    → ¬ x ∈ₜₛ ts → Tm Ξ ^ n
+  punchOutTmⁿ {ts = []}     _  = []
+  punchOutTmⁿ {ts = t ∷ ts} x∉ =
+    punchOutTm (x∉ ∘ head) ∷ punchOutTmⁿ (x∉ ∘ tail)
+
+punchInTm : (x : Fin (suc m))
+  → Tm m → Tm (suc m)
+punchInTm x = sub (tabulate (`_ ∘ punchIn x))
+
+punchInTmⁿ : (x : Fin (suc m))
+  → Tm m ^ k → Tm (suc m) ^ k
+punchInTmⁿ x = subⁿ (tabulate (`_ ∘ punchIn x))
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms
@@ -294,6 +294,17 @@ module _ {m : ℕ} (σ : Ren m n) (ρ : Ren n l) where mutual
   renameⁿ-⨟ []       = refl
   renameⁿ-⨟ (t ∷ ts) = cong₂ _∷_ (rename-⨟ t) (renameⁿ-⨟ ts)
 
+Ren-assoc
+  : (σ : Ren m n) (ρ : Ren n l) (γ : Ren l k)
+  → Ren-⨟ (Ren-⨟ σ ρ) γ ≡ Ren-⨟ σ (Ren-⨟ ρ γ)
+Ren-assoc σ ρ γ = tabulate-cong (λ i → begin
+  lookup γ (lookup (Ren-⨟ σ ρ) i)  -- ` i ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
+    ≡⟨ cong (lookup γ) (lookup∘tabulate (lookup ρ ∘ lookup σ) i) ⟩
+  lookup γ (lookup ρ (lookup σ i))
+    ≡⟨ (sym $ lookup∘tabulate (lookup γ ∘ lookup ρ) (lookup σ i)) ⟩
+  lookup (tabulate (λ i → lookup γ (lookup ρ i))) (lookup σ i)
+    ∎)
+    
 module _ {m : ℕ} where mutual
   sub-id : (t : Tm m)
     → sub Sub-id t ≡ t
@@ -317,10 +328,22 @@ module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where mutual
   subⁿ-⨟ {zero}  []       = refl
   subⁿ-⨟ {suc k} (t ∷ ts) = cong₂ _∷_ (sub-⨟ t) (subⁿ-⨟ ts)
 
+Sub-assoc
+  : (σ : Sub m n) (ρ : Sub n l) (γ : Sub l k)
+  → Sub-⨟ (Sub-⨟ σ ρ) γ ≡ Sub-⨟ σ (Sub-⨟ ρ γ)
+Sub-assoc σ ρ γ = tabulate-cong (λ i → begin
+  sub γ (sub (Sub-⨟ σ ρ) (` i)) 
+    ≡⟨ cong (sub γ ) (sub-⨟ σ ρ (` i)) ⟩
+  sub γ (sub ρ (sub σ (` i)))
+    ≡⟨ sym $ sub-⨟ ρ γ (sub σ $ ` i) ⟩
+  sub (Sub-⨟ ρ γ) (sub σ (` i))
+    ∎)
+
 instance
   RenIsCategory : IsCategory ℕ Ren
   RenIsCategory .id      = Ren-id
   RenIsCategory ._⨟_     = Ren-⨟
+  RenIsCategory .⨟-assoc = Ren-assoc
   RenIsCategory .⨟-idᵣ σ = begin
     σ ⨟ id
       ≡⟨ tabulate-cong (λ i → lookup∘tabulate (λ i → i) (lookup σ i)) ⟩
@@ -339,6 +362,7 @@ instance
   SubIsCategory : IsCategory ℕ Sub
   SubIsCategory .id      = Sub-id
   SubIsCategory ._⨟_     = Sub-⨟ 
+  SubIsCategory .⨟-assoc = Sub-assoc
   SubIsCategory .⨟-idᵣ σ = begin
     σ ⨟ id
       ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
@@ -395,14 +419,3 @@ instance
   plugSubIsPresheaf ._⟨_⟩ = plugSteps
   plugSubIsPresheaf .⟨⟩-id       = plugSteps-id
   plugSubIsPresheaf .⟨⟩-⨟ σ ρ ts = plugSteps-⨟ σ ρ ts
-
-⨟-assoc
-  : (σ : Sub m n) (ρ : Sub n l) (γ : Sub l k)
-  → (σ ⨟ ρ) ⨟ γ ≡ σ ⨟ (ρ ⨟ γ)
-⨟-assoc σ ρ γ = tabulate-cong (λ i → begin
-  ` i ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
-    ≡⟨ cong (_⟨ γ ⟩) (⟨⟩-⨟ σ ρ (` i)) ⟩
-  (` i ⟨ σ ⟩ ⟨ ρ ⟩) ⟨ γ ⟩
-    ≡⟨ sym $ ⟨⟩-⨟ ρ γ (` i ⟨ σ ⟩) ⟩
-  (` i ⟨ σ ⟩) ⟨ ρ ⨟ γ ⟩
-    ∎)

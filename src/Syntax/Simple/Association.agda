@@ -23,12 +23,24 @@ _++_ : AList m n → AList n l → AList m l
 []           ++ σ₂ = σ₂
 (t / x ∷ σ₁) ++ σ₂ = t / x ∷ (σ₁ ++ σ₂)
 
+/∷-inv
+  : {t u : Tm m} {x y : Fin (suc m)} {σ ρ : AList m n}
+  → t / x ∷ σ ≡ u / y ∷ ρ
+  → t ≡ u × x ≡ y × σ ≡ ρ
+/∷-inv refl = refl , refl , refl
+
+------------------------------------------------------------------------------
+-- Association list implies the inequality relation
+
+AList→≥ : AList m n → m ≥ n
+AList→≥ []           = ≤-refl
+AList→≥ (t / x ∷ ge) = ≤-step (AList→≥ ge)
 ------------------------------------------------------------------------------
 -- Associativity of ++ 
 
 ++-assoc
   : (σ₁ : AList m n) {σ₂ : AList n l} {σ₃ : AList l k}
-  → σ₁ ++ (σ₂ ++ σ₃) ≡ (σ₁ ++ σ₂) ++ σ₃
+  → (σ₁ ++ σ₂) ++ σ₃ ≡ σ₁ ++ (σ₂ ++ σ₃)
 ++-assoc []                     = refl
 ++-assoc (t / x ∷ σ₁) {σ₂} {σ₃} = cong (t / x ∷_) (++-assoc σ₁)
 
@@ -51,12 +63,13 @@ instance
   AListIsCategory : IsCategory ℕ AList
   AListIsCategory .id      = []
   AListIsCategory ._⨟_     = _++_
-  AListIsCategory .⨟-idᵣ   = ++-idᵣ
-  AListIsCategory .⨟-idₗ σ = refl
+  AListIsCategory .⨟-assoc σ₁ _ _ = ++-assoc σ₁
+  AListIsCategory .⨟-idᵣ          = ++-idᵣ
+  AListIsCategory .⨟-idₗ σ        = refl
 
 toSub : AList m n → Sub m n
 toSub []          = id
-toSub (t / x ∷ ρ) = (t for x) ⨟ toSub ρ
+toSub (t / x ∷ ρ) = t for x ⨟ toSub ρ
 
 ------------------------------------------------------------------------------
 -- toSub is a functor

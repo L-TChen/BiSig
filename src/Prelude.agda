@@ -26,8 +26,9 @@ open N public
   renaming (_≤″_ to _≤_; _≥″_ to _≥_; _<″_ to _<_)
 
 module F where
-  open import Data.Fin          public
-  open import Data.Fin.Literals public
+  open import Data.Fin            public
+  open import Data.Fin.Literals   public
+  open import Data.Fin.Properties public
 open F public
   using (Fin; #_; zero; suc; fromℕ; punchOut; punchIn; _↑ˡ_; _↑ʳ_)
 

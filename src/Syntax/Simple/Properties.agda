@@ -17,8 +17,6 @@ private variable
   ts us   : Tm Ξ ^ n
   σ₁ σ₂   : Sub Γ Δ
   x y     : Fin Ξ
-
-private variable
   t u v : Tm m
 
 ------------------------------------------------------------------------------
@@ -50,11 +48,11 @@ op-inj₃ refl = refl
 -- Proofs about free variables
 
 mutual
-  ∈ₜ→∈fv : {x : Fin m} {t : Tm m} → x ∈ₜ t → x ∈ fv t
+  ∈ₜ→∈fv : x ∈ₜ t → x ∈ fv t
   ∈ₜ→∈fv (here p) = here p
   ∈ₜ→∈fv (ops p)  = ∈ₜ→∈fvⁿ p
 
-  ∈ₜ→∈fvⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ₜₛ ts → x ∈ fvⁿ ts
+  ∈ₜ→∈fvⁿ : x ∈ₜₛ ts → x ∈ fvⁿ ts
   ∈ₜ→∈fvⁿ (head x∈)         = ∈-++⁺ˡ        (∈ₜ→∈fv x∈)
   ∈ₜ→∈fvⁿ (tail {_} {t} x∈) = ∈-++⁺ʳ (fv t) (∈ₜ→∈fvⁿ x∈)
 
@@ -142,70 +140,24 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
 ▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 
 
 ------------------------------------------------------------------------------
--- Substitution, unification relation between substitutions
-
-module _ {Obj : Set} {Mor : Obj → Obj → Set} {Tm : Obj → Set}
-  ⦃ _ : IsCategory Obj Mor ⦄ ⦃ _ : IsPresheaf Tm ⦄ where
-  infix 4 _≈_by_
-
-  private variable
-    A B C : Obj
-
-  _≈_by_
-    : (t u : Tm A) → 𝐘 A
-  t ≈ u by σ = t ⟨ σ ⟩ ≡ u ⟨ σ ⟩
-
-  Unifies-sym
-    : (t u : Tm A) (σ : Mor A B)
-    → t ≈ u by σ → u ≈ t by σ
-  Unifies-sym t u σ eq = sym eq
-
-  unifies-⨟
-    : (σ : Mor A B) (ρ : Mor B C)
-    → (t u : Tm A)
-    → t ≈ u by σ
-    → t ≈ u by σ ⨟ ρ
-  unifies-⨟ σ ρ t u eq = begin
-    t ⟨ σ ⨟ ρ ⟩
-      ≡⟨ ⟨⟩-⨟ _ _ t ⟩
-    t ⟨ σ ⟩ ⟨ ρ ⟩
-      ≡⟨ cong _⟨ ρ ⟩ eq ⟩
-    u ⟨ σ ⟩ ⟨ ρ ⟩
-      ≡⟨ sym $ ⟨⟩-⨟ _ _ u ⟩
-    u ⟨ σ ⨟ ρ ⟩
-      ∎
-
-  id-minimal
-    : (σ : Mor A B)
-    → (t : Tm A)
-    → Min {Obj} (λ ρ → t ≈ t by σ ⨟ ρ) id
-  id-minimal σ t = refl , λ g eq → g , (begin
-    g
-      ≡⟨ sym (⨟-idₗ g) ⟩
-    id ⨟ g
-      ∎)
-
-------------------------------------------------------------------------------
--- Proofs about ⟪ t for x ⟫
+-- Proofs about ⟨ t for x ⟩
 
 sub-t-for-x-x
-  : {t : Tm m} {x : Fin (suc m)}
-  → sub-for t x x ≡ t
+  : sub-for t x x ≡ t
 sub-t-for-x-x {x = x} with x ≟ x
 ... | yes p = refl
 ... | no ¬p = ⊥-elim₀ (¬p refl)
 
 sub-t-for-x-y
-  : {x y : Fin (suc m)} {t : Tm m} 
-  → (¬p : x ≢ y)
+  : (¬p : x ≢ y)
   → sub-for t x y ≡ ` punchOut ¬p 
 sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
 ... | yes p = ⊥-elim₀ (¬p p)
 ... | no ¬p = refl
 
-sub-for-x-in-x : {t : Tm m} (x : Fin (suc m))
+x⟨t/x⟩=t : (x : Fin (suc m))
   → ` x ⟨ t for x ⟩ ≡ t
-sub-for-x-in-x {t = t} x = begin
+x⟨t/x⟩=t {_} {t} x = begin
   ` x ⟨ t for x ⟩
     ≡⟨ lookup∘tabulate (sub-for t x) x ⟩
   sub-for t x x
@@ -213,10 +165,10 @@ sub-for-x-in-x {t = t} x = begin
   t
     ∎
 
-sub-for-x-in-y : {t : Tm m} {x y : Fin (suc m)}
+y⟨t/x⟩=y : {t : Tm m} {x y : Fin (suc m)}
   → (¬p : x ≢ y)
   → ` y ⟨ t for x ⟩ ≡ ` punchOut ¬p
-sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
+y⟨t/x⟩=y {m} {t} {x} {y} ¬p = begin
   ` y ⟨ t for x ⟩
     ≡⟨ lookup∘tabulate (sub-for t x) y ⟩
   sub-for t x y
@@ -224,34 +176,37 @@ sub-for-x-in-y {m} {t} {x} {y} ¬p = begin
   ` F.punchOut ¬p
     ∎
 
+-- punchOutTm (punchInTm x t) _ = t 
+
 module _ {u : Tm m} {x : Fin (suc m)} where mutual
   sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : x ∉ₜ t)
     → t ⟨ u for x ⟩ ≡ punchOutTm x∉
   sub-for-nonfree=punchOut (` y)  x∉ with x ≟ y
   ... | yes p = ⊥-elim₀ (x∉ (here p))
-  ... | no ¬p = sub-for-x-in-y ¬p
+  ... | no ¬p = y⟨t/x⟩=y ¬p
   sub-for-nonfree=punchOut (op (_ , i , ts)) x∉ =
     cong (λ ts → op′ i ts) (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ ops))
 
   sub-for-nonfree=punchOutⁿ : (ts : Tm (suc m) ^ n)
     → (x∉ : x ∉ₜₛ ts)
-    → subⁿ (u for x) ts ≡ punchOutTmⁿ x∉
+    → ts ⟨ u for x ⟩ ≡ punchOutTmⁿ x∉
   sub-for-nonfree=punchOutⁿ []       _  = refl
   sub-for-nonfree=punchOutⁿ (t ∷ ts) x∉ =
     cong₂ _∷_ (sub-for-nonfree=punchOut t $ x∉ ∘ head)
       (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ tail))
 
-punchOut-for-x≢y
-  : {x y : Fin (suc m)}
-  → (¬p : x ≢ y)
-  → ` x ⟨ (` punchOut ¬p) for x ⟩ ≡ ` y ⟨ (` punchOut ¬p) for x ⟩
-punchOut-for-x≢y {x = x} {y} ¬p = begin
-  ` x ⟨ (` punchOut ¬p) for x ⟩
-    ≡⟨ sub-for-x-in-x x ⟩
-  ` punchOut ¬p
-    ≡⟨ (sym $ sub-for-x-in-y ¬p) ⟩
-  ` y ⟨ (` punchOut ¬p) for x ⟩
-    ∎
+module _ {m : ℕ} where
+  punchOut-for-x≢y
+    : {x y : Fin (suc m)}
+    → (¬p : x ≢ y)
+    → ` x ⟨ (` punchOut ¬p) for x ⟩ ≡ ` y ⟨ (` punchOut ¬p) for x ⟩
+  punchOut-for-x≢y {x = x} {y} ¬p = begin
+    ` x ⟨ (` punchOut ¬p) for x ⟩
+      ≡⟨ x⟨t/x⟩=t x ⟩
+    ` punchOut ¬p
+      ≡⟨ (sym $ y⟨t/x⟩=y ¬p) ⟩
+    ` y ⟨ (` punchOut ¬p) for x ⟩
+      ∎
 
 ------------------------------------------------------------------------------
 -- Occurrence check
@@ -308,6 +263,7 @@ sub-▷ {σ = σ} (step _ us ts ∷ ps) t =
 sub-ps=[] : {σ : Sub m n} {ps : Steps m} → ps ⟨ σ ⟩ ≡ [] → ps ≡ []
 sub-ps=[] { ps = [] } _ = refl
 
+
 ------------------------------------------------------------------------------
 -- No Cycle Lemma
 ------------------------------------------------------------------------------
@@ -337,7 +293,7 @@ no-cycle t ps = no-cycle′ t ps (≺-wf t)
 unify-occurrence
   : (σ : Sub m n) {x : Fin m} {t : Tm m}
   → x ∈ₜ t
-  → ` x ≈ t by σ
+  → ` x ⟨ σ ⟩ ≡ t ⟨ σ ⟩
   → t ≡ ` x
 unify-occurrence σ {x} {t} x∈ eq =
   let ps    = walk x∈

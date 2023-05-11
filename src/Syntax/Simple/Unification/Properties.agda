@@ -23,70 +23,103 @@ private variable
 
 private variable
   t u v : Tm m
-
-------------------------------------------------------------------------------
--- Association list implies the inequality relation
-
-AList→≥ : AList m n → m ≥ n
-AList→≥ []           = ≤-refl
-AList→≥ (t / x ∷ ge) = ≤-step (AList→≥ ge)
   
-------------------------------------------------------------------------------
--- Proofs about toSub
-
-{-
-toSub-∷
-  : {u : Tm m} (x : Fin (suc m)) (ρ : AList m n)
-  → (t : Tm (suc m))
-  → t ⟨ u / x ∷ ρ ⟩ ≡ t ⟨ u for x ⟩ ⟨ ρ ⟩
-toSub-∷ {_} {_} {u} x ρ t = ⟨⟩-⨟ (u for x) (toSub ρ) t
--}
-
-toSub-∷[]
-  : {u : Tm m} (x : Fin (suc m))
-  → (t : Tm (suc m))
-  → t ⟨ u / x ∷ [] ⟩ ≡ t ⟨ u for x ⟩
-toSub-∷[] {_} {u} x t = begin
-  t ⟨ u / x ∷ [] ⟩
-    ≡⟨ ⟨⟩-⨟ (u for x) (toSub []) t ⟩
-  t ⟨ u for x ⟩ ⟨ [] ⟩
-    ≡⟨ ⟨⟩-id {ℕ} {Sub} (t ⟨ u for x ⟩) ⟩
-  t ⟨ u for x ⟩
-    ∎
-
 ---------------------------------------------------------------------------
 -- Proofs that amgu does provide a maximal general unifier
 
-flexFlex≢-Unifies
-  : {x y : Fin (suc m)}
-  → (¬p : x ≢ y)
-  → ` x ≈ ` y by flexFlex-≢ ¬p
-flexFlex≢-Unifies {_} {x} {y} ¬p = begin
-  ` x ⟨ flexFlex-≢ ¬p ⟩
-    ≡⟨ toSub-∷[] x (` x) ⟩
-  ` x ⟨ (` punchOut ¬p) for x ⟩
-    ≡⟨ punchOut-for-x≢y ¬p ⟩
-  ` y ⟨ (` punchOut ¬p) for x ⟩
-    ≡⟨ sym $ toSub-∷[] x (` y) ⟩
-  ` y ⟨ flexFlex-≢ ¬p ⟩
-    ∎
+module _ {m : ℕ} where
 
-flexRigid∉-Unifies
-  : (x : Fin (suc m)) (t : Tm (suc m))  (x∉ : x ∉ₜ t)
-  → t ≈ ` x by flexRigid∉ x∉
-flexRigid∉-Unifies x t x∉ = begin
-  t ⟨ flexRigid∉ x∉ ⟩
-    ≡⟨⟩
-  t ⟨ punchOutTm x∉ / x ∷ [] ⟩
-    ≡⟨ toSub-∷[] x t ⟩
-  t ⟨ punchOutTm x∉ for x ⟩
-    ≡⟨ sub-for-nonfree=punchOut t x∉ ⟩
-  punchOutTm x∉
-    ≡⟨ sym $ sub-for-x-in-x x ⟩
-  ` x ⟨ (punchOutTm x∉) for x ⟩
-    ≡⟨ (sym $ toSub-∷[] x (` x)) ⟩
-  ` x ⟨ flexRigid∉ x∉ ⟩
-    ∎
+  helper
+    : (σ : Sub (suc m) m) (x : Fin (suc m)) (t : Tm m)
+    → (y : Fin (suc m))
+    → lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y
+      ≡ sub-for t x y ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
+  helper σ x t y = begin
+    lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y
+      ≡⟨⟩
+    lookup (tabulate λ i → lookup (t for x) i ⟨ tabulate (lookup σ ∘ punchIn x) ⟩) y
+      ≡⟨ lookup∘tabulate (_⟨ tabulate (lookup σ ∘ punchIn x) ⟩ ∘ lookup (t for x)) y ⟩
+    lookup (t for x) y ⟨ tabulate (lookup σ ∘ punchIn x) ⟩
+      ≡⟨ cong _⟨ tabulate (lookup σ ∘ punchIn x) ⟩ (lookup∘tabulate (sub-for t x) y) ⟩
+    sub-for t x y ⟨ tabulate (lookup σ ∘ punchIn x) ⟩
+      ≡⟨ cong (sub-for t x y ⟨_⟩)
+        (tabulate-cong (λ i → cong (_⟨ σ ⟩) (sym $ lookup∘tabulate (`_ ∘ punchIn x) i))) ⟩
+    sub-for t x y ⟨ tabulate (`_ ∘ punchIn x) ⨟ σ ⟩ 
+      ≡⟨ ⟨⟩-⨟ (tabulate (`_ ∘ punchIn x)) σ (sub-for t x y) ⟩
+    sub-for t x y ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
+      ∎
+      
+  lem
+    : (σ : Sub (suc m) m) (x : Fin (suc m)) (t : Tm m)
+    → ` x ⟨ σ ⟩ ≡ punchInTm x t ⟨ σ ⟩
+    → (y : Fin (suc m))
+    → lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y ≡ lookup σ y
+  lem σ x t eq y with x ≟ y
+  ... | yes refl = begin
+    lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) x
+      ≡⟨ helper σ x t x ⟩
+    sub-for t x x ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
+      ≡⟨ (cong (λ t → t ⟨ tabulate _ ⟩ ⟨ σ ⟩) $ sub-t-for-x-x {t = t} {x}) ⟩
+    t ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
+      ≡⟨ sym eq ⟩
+    lookup σ x
+      ∎
+  ... | no ¬p    = begin
+    lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y
+      ≡⟨ helper σ x t y ⟩
+    sub-for t x y ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
+      ≡⟨ (cong (λ t → t ⟨ tabulate _ ⟩ ⟨ σ ⟩) $ sub-t-for-x-y ¬p) ⟩
+    lookup (tabulate (`_ ∘ punchIn x)) (punchOut ¬p) ⟨ σ ⟩
+      ≡⟨ cong (sub σ) (lookup∘tabulate (`_ ∘ punchIn x) (punchOut ¬p)) ⟩
+    ` punchIn x (punchOut ¬p) ⟨ σ ⟩
+      ≡⟨ cong (lookup σ) (F.punchIn-punchOut ¬p) ⟩
+    lookup σ y
+      ∎
+
+  var-elim
+    : (σ : Sub (suc m) m) (x : Fin (suc m)) (t : Tm m)
+    → ` x ⟨ σ ⟩ ≡ punchInTm x t ⟨ σ ⟩
+    → t for x ⨟ tabulate (lookup σ ∘ punchIn x) ≡ σ 
+  var-elim σ x t eq = begin
+    t for x ⨟ tabulate (lookup σ ∘ punchIn x)
+      ≡⟨ (sym $ tabulate∘lookup _) ⟩
+    tabulate (lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)))
+      ≡⟨ tabulate-cong (lem σ x t eq) ⟩
+    tabulate (lookup σ)
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+
+  flexFlex≢-Unifies
+    : {x y : Fin (suc m)}
+    → (¬p : x ≢ y)
+    → ` x ≈ ` y by flexFlex-≢ ¬p
+  flexFlex≢-Unifies {x} {y} ¬p = begin
+    ` x ⟨ flexFlex-≢ ¬p ⟩
+      ≡⟨ ⟨⟩-⨟ (_ for x) id (` x) ⟩
+    ` x ⟨ (` punchOut ¬p) for x ⟩ ⟨ [] ⟩
+      ≡⟨ cong (_⟨ [] ⟩) $ punchOut-for-x≢y ¬p ⟩
+    ` y ⟨ (` punchOut ¬p) for x ⟩ ⟨ [] ⟩
+      ≡⟨ sym $ ⟨⟩-⨟ (_ for x) id (` y) ⟩
+    ` y ⟨ flexFlex-≢ ¬p ⟩
+      ∎
+
+  flexRigid∉-Unifies
+    : (x : Fin (suc m)) (t : Tm (suc m))  (x∉ : x ∉ₜ t)
+    → t ≈ ` x by flexRigid∉ x∉
+  flexRigid∉-Unifies x t x∉ = begin
+    t ⟨ flexRigid∉ x∉ ⟩
+      ≡⟨⟩
+    t ⟨ punchOutTm x∉ / x ∷ [] ⟩
+      ≡⟨ ⟨⟩-⨟ (_ for x) id t ⟩
+    t ⟨ punchOutTm x∉ for x ⟩ ⟨ [] ⟩
+      ≡⟨ cong (_⟨ [] ⟩) (sub-for-nonfree=punchOut t x∉) ⟩
+    punchOutTm x∉ ⟨ [] ⟩
+      ≡⟨ cong (_⟨ [] ⟩) (sym $ x⟨t/x⟩=t x) ⟩
+    ` x ⟨ (punchOutTm x∉) for x ⟩ ⟨ [] ⟩
+      ≡⟨ sym (⟨⟩-⨟ (_ for x) id (` x)) ⟩
+    ` x ⟨ flexRigid∉ x∉ ⟩
+      ∎
 
 ------------------------------------------------------------------------------
 -- Correctness of amgu
@@ -95,7 +128,7 @@ flexFlex-Unifies
   : (x y : Fin m)
   → ∃ₘ $ ` x ≈ ` y by_
 flexFlex-Unifies {suc m} x y with x ≟ y
-... | yes refl = _ , [] , refl
+... | yes refl = _ , id , refl
 ... | no ¬p    = _ , flexFlex-≢ ¬p , flexFlex≢-Unifies ¬p
 
 flexRigid-Unifies
@@ -158,8 +191,8 @@ mutual
   amgu⁺ (op′ i ts) (` y)      []          = flexRigid-Unifies y i ts
   amgu⁺ (` x)      (op′ i us) []          = flexRigid-Unifies′ x i us
   amgu⁺ t                   u (r / z ∷ σ) = map′
-    (map₂ λ (ρ , eq) → ρ , Lem₂ t u z r (σ ++ ρ) eq)
-    (map₂ λ (ρ , eq) → ρ , Lem₁ t u z r (σ ++ ρ) eq)
+    (map₂ λ (ρ , eq) → ρ , Lem₂ t u z r (σ ⨟ ρ) eq)
+    (map₂ λ (ρ , eq) → ρ , Lem₁ t u z r (σ ⨟ ρ) eq)
     $ amgu⁺ (t ⟨ r for z ⟩) (u ⟨ r for z ⟩) σ
 
   amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n)
@@ -172,26 +205,26 @@ mutual
     where
       (l₁ , ρ₁ , eq′) → let (ρ₂ , eq₂) = f .proj₂ ρ₁ (V.∷-injectiveʳ eq′)
         in ¬q (_ , ρ₂ , (begin
-          ts ⟨ (σ ++ ρ) ++ ρ₂ ⟩
-            ≡⟨ cong (ts ⟨_⟩) (sym $ ++-assoc σ) ⟩
-          ts ⟨ σ ++ (ρ ++ ρ₂) ⟩
-            ≡⟨ cong (λ ρ → ts ⟨ σ ++ ρ ⟩) (sym eq₂)  ⟩
-          ts ⟨ σ ++ ρ₁ ⟩
+          ts ⟨ (σ ⨟ ρ) ⨟ ρ₂ ⟩
+            ≡⟨ cong (ts ⟨_⟩) (⨟-assoc σ _ _) ⟩
+          ts ⟨ σ ⨟ (ρ ⨟ ρ₂) ⟩
+            ≡⟨ cong (λ ρ → ts ⟨ σ ⨟ ρ ⟩) (sym eq₂)  ⟩
+          ts ⟨ σ ⨟ ρ₁ ⟩
             ≡⟨ V.∷-injectiveʳ eq′ ⟩
-          us ⟨ σ ++ ρ₁ ⟩
-            ≡⟨ cong (λ ρ → us ⟨ σ ++ ρ ⟩) eq₂ ⟩
-          us ⟨ σ ++ (ρ ++ ρ₂) ⟩
-            ≡⟨ cong (us ⟨_⟩) (++-assoc σ) ⟩
-          us ⟨ (σ ++ ρ) ++ ρ₂ ⟩
+          us ⟨ σ ⨟ ρ₁ ⟩
+            ≡⟨ cong (λ ρ → us ⟨ σ ⨟ ρ ⟩) eq₂ ⟩
+          us ⟨ σ ⨟ (ρ ⨟ ρ₂) ⟩
+            ≡⟨ cong (us ⟨_⟩) (sym $ ⨟-assoc σ _ _) ⟩
+          us ⟨ (σ ⨟ ρ) ⨟ ρ₂ ⟩
             ∎))
         where postulate f : Min (λ ρ → ts ≈ us by σ ⨟ ρ) ρ
         -- TODO: Remove it and prove that amgu does produce the most general unifier.
-  ... | yes (_ , ρ′ , eq′) = yes (_ , ρ ++ ρ′ , (begin
-    (t ∷ ts) ⟨ σ ++ (ρ ++ ρ′) ⟩
-      ≡⟨ cong ((t ∷ ts) ⟨_⟩) (++-assoc σ) ⟩
-    (t ∷ ts) ⟨ (σ ++ ρ) ++ ρ′ ⟩
-      ≡⟨ cong₂ _∷_ (unifies-⨟ (σ ++ ρ) ρ′ t u eq) eq′ ⟩
-    (u ∷ us) ⟨ (σ ++ ρ) ++ ρ′ ⟩
-      ≡⟨ cong ((u ∷ us) ⟨_⟩) (sym $ ++-assoc σ) ⟩
-    (u ∷ us) ⟨ σ ++ ρ ++ ρ′ ⟩
+  ... | yes (_ , ρ′ , eq′) = yes (_ , ρ ⨟ ρ′ , (begin
+    (t ∷ ts) ⟨ σ ⨟ (ρ ⨟ ρ′) ⟩
+      ≡⟨ cong ((t ∷ ts) ⟨_⟩) (sym $ ⨟-assoc σ _ _) ⟩
+    (t ∷ ts) ⟨ (σ ⨟ ρ) ⨟ ρ′ ⟩
+      ≡⟨ cong₂ _∷_ (unifies-⨟ (σ ⨟ ρ) ρ′ t u eq) eq′ ⟩
+    (u ∷ us) ⟨ (σ ⨟ ρ) ⨟ ρ′ ⟩
+      ≡⟨ cong ((u ∷ us) ⟨_⟩) (⨟-assoc σ _ _) ⟩
+    (u ∷ us) ⟨ σ ⨟ (ρ ⨟ ρ′) ⟩
       ∎))

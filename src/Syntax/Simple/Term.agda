@@ -163,6 +163,9 @@ module _ (σ : Sub m n) where mutual
 Sub-id : Sub m m
 Sub-id = tabulate `_
 
+RenToSub : Ren m n → Sub m n
+RenToSub σ = map `_ σ
+
 Sub-⨟ : Sub m n → Sub n l → Sub m l
 Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
@@ -197,9 +200,7 @@ weaken = rename $ tabulate suc
 mutual
   punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
     → ¬ x ∈ₜ t → Tm n
-  punchOutTm {_} {x} {` y}  x∉ with x ≟ y
-  ... | yes x=y = ⊥-elim₀ (x∉ (here x=y))
-  ... | no ¬x=y = ` punchOut ¬x=y
+  punchOutTm {_} {x} {` y}  x∉ = ` punchOut (x∉ ∘ here)
   punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
     op (_ , i , punchOutTmⁿ (x∉ ∘ ops))
 
@@ -211,11 +212,11 @@ mutual
 
 punchInTm : (x : Fin (suc m))
   → Tm m → Tm (suc m)
-punchInTm x = sub (tabulate (`_ ∘ punchIn x))
+punchInTm x = rename (tabulate (punchIn x))
 
 punchInTmⁿ : (x : Fin (suc m))
   → Tm m ^ k → Tm (suc m) ^ k
-punchInTmⁿ x = subⁿ (tabulate (`_ ∘ punchIn x))
+punchInTmⁿ x = renameⁿ (tabulate (punchIn x))
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms

@@ -22,9 +22,13 @@ private variable
 ------------------------------------------------------------------------------
 -- Trivial proofs
 
-var≢op : (x : Fin m) (i : l ∈ D) (ts : Tm m ^ l)
+var≢op : {x : Fin m} {i : l ∈ D} {ts : Tm m ^ l}
   → op (_ , i , ts) ≢ ` x
-var≢op _ _ _ ()
+var≢op ()
+
+op≢var : {x : Fin m} {i : l ∈ D} {ts : Tm m ^ l}
+  → ` x ≢ op (_ , i , ts)
+op≢var()
 
 op-inj
   : {(l , i , ts) (k , j , us) : ⟦ D ⟧ (Tm Ξ)}
@@ -65,6 +69,9 @@ module _ {m : ℕ} where mutual
   ∈fv→∈ₜⁿ  {suc l} {x} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
   ... | inl x∈t  = head (∈fv→∈ₜ x∈t)
   ... | inr x∈ts = tail (∈fv→∈ₜⁿ x∈ts)
+
+∈→≡ : x ∈ₜ ` y → x ≡ y
+∈→≡  (here x=y) = x=y
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
@@ -113,6 +120,7 @@ size-ʳ++
 size-ʳ++ []       xs = refl
 size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
 ... | p = begin
+
   sizeⁿ (ys ʳ++ (x ∷ xs))
     ≡⟨ p ⟩
   sizeⁿ ys + (size x + sizeⁿ xs)
@@ -140,6 +148,28 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
 ▷₁-size t (step i ys xs) = ʳ++-size i ys t xs 
 
 ------------------------------------------------------------------------------
+-- Renames are also substitutions
+
+module _ {ρ : Fin m → Fin n} where mutual
+  rename-is-sub
+    : (t : Tm m)
+    → t ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ t ⟨ tabulate ρ ⟩
+  rename-is-sub (` x)      = begin
+    lookup (tabulate (`_ ∘ ρ)) x
+      ≡⟨ lookup∘tabulate (`_ ∘ ρ) x ⟩
+    ` ρ x
+      ≡⟨ cong `_ (sym $ lookup∘tabulate ρ x) ⟩
+    ` lookup (tabulate ρ) x
+      ∎
+  rename-is-sub (op′ i ts) = cong (op′ i) (rename-is-subⁿ ts)
+
+  rename-is-subⁿ
+    : (ts : Tm m ^ k)
+    → ts ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ ts ⟨ tabulate ρ ⟩
+  rename-is-subⁿ []       = refl
+  rename-is-subⁿ (t ∷ ts) = cong₂ _∷_ (rename-is-sub t) (rename-is-subⁿ ts)
+
+------------------------------------------------------------------------------
 -- Proofs about ⟨ t for x ⟩
 
 sub-t-for-x-x
@@ -147,13 +177,6 @@ sub-t-for-x-x
 sub-t-for-x-x {x = x} with x ≟ x
 ... | yes p = refl
 ... | no ¬p = ⊥-elim₀ (¬p refl)
-
-sub-t-for-x-y
-  : (¬p : x ≢ y)
-  → sub-for t x y ≡ ` punchOut ¬p 
-sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
-... | yes p = ⊥-elim₀ (¬p p)
-... | no ¬p = refl
 
 x⟨t/x⟩=t : (x : Fin (suc m))
   → ` x ⟨ t for x ⟩ ≡ t
@@ -165,6 +188,13 @@ x⟨t/x⟩=t {_} {t} x = begin
   t
     ∎
 
+sub-t-for-x-y
+  : (¬p : x ≢ y)
+  → sub-for t x y ≡ ` punchOut ¬p 
+sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
+... | yes p = ⊥-elim₀ (¬p p)
+... | no ¬p = refl
+
 y⟨t/x⟩=y : {t : Tm m} {x y : Fin (suc m)}
   → (¬p : x ≢ y)
   → ` y ⟨ t for x ⟩ ≡ ` punchOut ¬p
@@ -175,25 +205,6 @@ y⟨t/x⟩=y {m} {t} {x} {y} ¬p = begin
     ≡⟨ sub-t-for-x-y ¬p ⟩
   ` F.punchOut ¬p
     ∎
-
--- punchOutTm (punchInTm x t) _ = t 
-
-module _ {u : Tm m} {x : Fin (suc m)} where mutual
-  sub-for-nonfree=punchOut : (t : Tm (suc m)) (x∉ : x ∉ₜ t)
-    → t ⟨ u for x ⟩ ≡ punchOutTm x∉
-  sub-for-nonfree=punchOut (` y)  x∉ with x ≟ y
-  ... | yes p = ⊥-elim₀ (x∉ (here p))
-  ... | no ¬p = y⟨t/x⟩=y ¬p
-  sub-for-nonfree=punchOut (op (_ , i , ts)) x∉ =
-    cong (λ ts → op′ i ts) (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ ops))
-
-  sub-for-nonfree=punchOutⁿ : (ts : Tm (suc m) ^ n)
-    → (x∉ : x ∉ₜₛ ts)
-    → ts ⟨ u for x ⟩ ≡ punchOutTmⁿ x∉
-  sub-for-nonfree=punchOutⁿ []       _  = refl
-  sub-for-nonfree=punchOutⁿ (t ∷ ts) x∉ =
-    cong₂ _∷_ (sub-for-nonfree=punchOut t $ x∉ ∘ head)
-      (sub-for-nonfree=punchOutⁿ ts (x∉ ∘ tail))
 
 module _ {m : ℕ} where
   punchOut-for-x≢y
@@ -208,6 +219,76 @@ module _ {m : ℕ} where
     ` y ⟨ (` punchOut ¬p) for x ⟩
       ∎
 
+------------------------------------------------------------------------------
+-- punchInTm and punchOutTm
+module _ {m : ℕ} {x : Fin (suc m)} where
+  mutual
+    punchInTm-punchOutTm
+      : (x∉ : x ∉ₜ t)
+      → punchInTm x (punchOutTm x∉) ≡ t
+    punchInTm-punchOutTm {` y}      x∉ = cong `_ $ begin
+      lookup (tabulate (punchIn x)) (punchOut (x∉ ∘ here))
+        ≡⟨ lookup∘tabulate (punchIn x) _ ⟩
+      punchIn x (punchOut (x∉ ∘ here))
+        ≡⟨ punchIn-punchOut _ ⟩
+      y
+        ∎
+    punchInTm-punchOutTm {op′ i ts} x∉ = cong (op′ i) (punchInTm-punchOutTmⁿ (x∉ ∘ ops))
+
+    punchInTm-punchOutTmⁿ
+      : (x∉ : x ∉ₜₛ ts)
+      → punchInTmⁿ x (punchOutTmⁿ x∉) ≡ ts
+    punchInTm-punchOutTmⁿ {ts = []}     x∉ = refl
+    punchInTm-punchOutTmⁿ {ts = t ∷ ts} x∉ = cong₂ _∷_
+      (punchInTm-punchOutTm (x∉ ∘ head)) (punchInTm-punchOutTmⁿ (λ z → x∉ (tail z)))
+
+  mutual
+    x∉punchInTm : (t : Tm m) → x ∉ₜ punchInTm x t
+    x∉punchInTm (` y)      (here eq) = F.punchInᵢ≢i x y (sym $ begin
+      x ≡⟨ eq ⟩ lookup (tabulate (punchIn x)) y ≡⟨ lookup∘tabulate (punchIn x) y ⟩ punchIn x y ∎)
+    x∉punchInTm (op′ i ts) (ops x∈ts) = x∉punchInTmⁿ ts x∈ts
+
+    x∉punchInTmⁿ : (ts : Tm m ^ l) → x ∉ₜₛ punchInTmⁿ x ts
+    x∉punchInTmⁿ []       ()
+    x∉punchInTmⁿ (t ∷ ts) (head x∈) = x∉punchInTm t x∈
+    x∉punchInTmⁿ (t ∷ ts) (tail x∈) = x∉punchInTmⁿ ts x∈
+
+module _ {u : Tm m} {x : Fin (suc m)} where
+  mutual
+    punchIn-t⟨u/x⟩=t : (t : Tm m)
+      → punchInTm x t ⟨ u for x ⟩ ≡ t
+    punchIn-t⟨u/x⟩=t (` y)      = begin
+      punchInTm x (` y) ⟨ u for x ⟩
+        ≡⟨⟩
+      ` lookup (tabulate (punchIn x)) y ⟨ u for x ⟩
+        ≡⟨ cong (λ i → ` i ⟨ u for x ⟩) (lookup∘tabulate (punchIn x) y) ⟩
+      ` punchIn x y ⟨ u for x ⟩
+        ≡⟨⟩
+      lookup (tabulate (sub-for u x)) (punchIn x y)
+        ≡⟨ lookup∘tabulate (sub-for u x) (punchIn x y) ⟩
+      sub-for u x (punchIn x y)
+        ≡⟨ sub-t-for-x-y {t = u} (punchInᵢ≢i x y ∘ sym) ⟩
+      ` punchOut (punchInᵢ≢i x y ∘ sym)
+        ≡⟨ cong `_ (punchOut-punchIn x) ⟩
+      ` y
+        ∎
+    punchIn-t⟨u/x⟩=t (op′ i ts) = cong (op′ i) (punchIn-t⟨u/x⟩=tⁿ ts)
+
+    punchIn-t⟨u/x⟩=tⁿ : (ts : Tm m ^ l)
+      → punchInTmⁿ x ts ⟨ u for x ⟩ ≡ ts
+    punchIn-t⟨u/x⟩=tⁿ []       = refl
+    punchIn-t⟨u/x⟩=tⁿ (t ∷ ts) = cong₂ _∷_ (punchIn-t⟨u/x⟩=t t) (punchIn-t⟨u/x⟩=tⁿ ts)
+
+  mutual
+    t⟨u/x⟩=punchOut : {t : Tm (suc m)} (x∉ : x ∉ₜ t)
+      → t ⟨ u for x ⟩ ≡ punchOutTm x∉
+    t⟨u/x⟩=punchOut {t} x∉ = begin
+      t ⟨ u for x ⟩
+        ≡⟨ cong _⟨ u for x ⟩ (sym (punchInTm-punchOutTm x∉)) ⟩
+      punchInTm x (punchOutTm x∉) ⟨ u for x ⟩
+        ≡⟨ punchIn-t⟨u/x⟩=t (punchOutTm x∉) ⟩
+      punchOutTm x∉
+        ∎
 ------------------------------------------------------------------------------
 -- Occurrence check
 
@@ -290,12 +371,12 @@ no-cycle
   → ps ≡ []
 no-cycle t ps = no-cycle′ t ps (≺-wf t)
 
-unify-occurrence
+unify-occur
   : (σ : Sub m n) {x : Fin m} {t : Tm m}
   → x ∈ₜ t
   → ` x ⟨ σ ⟩ ≡ t ⟨ σ ⟩
-  → t ≡ ` x
-unify-occurrence σ {x} {t} x∈ eq =
+  → ` x ≡ t
+unify-occur σ {x} {t} x∈ eq =
   let ps    = walk x∈
       ps=[] = sub-ps=[] $ no-cycle (t ⟨ σ ⟩) (ps ⟨ σ ⟩) $ begin
         t ⟨ σ ⟩
@@ -306,7 +387,7 @@ unify-occurrence σ {x} {t} x∈ eq =
           ≡⟨ cong ((ps ⟨ σ ⟩) ▷_) eq ⟩
         ps ⟨ σ ⟩ ▷ t ⟨ σ ⟩
           ∎
-  in begin
+  in sym $ begin
     t
       ≡⟨ ▷walk=id x∈ ⟩
     ps ▷ ` x

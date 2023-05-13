@@ -19,7 +19,7 @@ data Λₜ : Set where
 -}
 
 open import Syntax.Simple.Term ΛₜD
-  using (`_; op; ∅ₛ; _∙ₛ_)
+  using (`_; op)
   renaming (Tm to Λₜ)
   public
 

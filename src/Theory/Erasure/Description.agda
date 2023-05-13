@@ -1,7 +1,6 @@
 {-# OPTIONS --safe #-}
 
 open import Prelude
-  hiding (map)
 
 import Syntax.Simple.Description  as S
 

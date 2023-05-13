@@ -164,7 +164,7 @@ Sub-id : Sub m m
 Sub-id = tabulate `_
 
 RenToSub : Ren m n → Sub m n
-RenToSub σ = map `_ σ
+RenToSub σ = V.map `_ σ
 
 Sub-⨟ : Sub m n → Sub n l → Sub m l
 Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)

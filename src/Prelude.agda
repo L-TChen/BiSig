@@ -4,7 +4,7 @@ module Prelude where
 
 open import Axiom.UniquenessOfIdentityProofs   public
 open import Function                           public
-  hiding (_∋_; id)
+  hiding (_∋_; id; Equivalence; _⇔_)
 open import Data.Empty                         public
   using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
@@ -59,7 +59,7 @@ module V where
   open import Data.Vec.Membership.Propositional public
     using (_∈_)
 open V public using
-  (Vec; []; _∷_; map; insert; lookup; tabulate
+  (Vec; []; _∷_; insert; lookup; tabulate
   ; allFin; tabulate∘lookup; lookup∘tabulate; tabulate-cong)
 
 open import Data.String                        public
@@ -89,6 +89,7 @@ open import Level                                 public
   using (Level; Lift; lift)
   renaming (zero to lzero; suc to lsuc; _⊔_ to lmax)
 
+open import Prelude.Equivalence                   public
 open import Prelude.Category                      public
 
 variable
@@ -96,15 +97,15 @@ variable
 
 private variable
   m n l : ℕ
-  A : Set ℓ
+  A B C : Set ℓ
 
 infixr -10 _⇒₁_ _⇒_
 _⇒₁_ : {I : Set ℓ′}
   → (X : I → Set ℓ₁) (Y : I → Set ℓ₂) → Set _
 X ⇒₁ Y = ∀ {i} → X i → Y i
 
-_⇒_ : {I : Set ℓ₁} {J : Set ℓ₂}
-  → (X : I → J → Set ℓ) (Y : I → J → Set ℓ′) → Set _
+_⇒_ : {I : Set ℓ₁} {J : I → Set ℓ₂}
+  → (X : (i : I) → J i → Set ℓ) (Y : (i : I) → J i → Set ℓ′) → Set _
 X ⇒ Y = ∀ {i j} → X i j → Y i j
 
 data Mode : Set where
@@ -233,6 +234,7 @@ insert-mid m n i with F.splitAt m i
 -- Type classes
 ------------------------------------------------------------------------------
 
+
 ------------------------------------------------------------------------------
 -- Decidable Equality
 
@@ -249,3 +251,4 @@ instance
 
   EqFin : DecEq (Fin n)
   _≟_ ⦃ EqFin ⦄ = F._≟_
+

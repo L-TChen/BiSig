@@ -22,6 +22,53 @@ private variable
   σ σ₁ σ₂ : Sub m n
   x y     : Fin m
   
+module _ {Obj : Set} {Mor : Obj → Obj → Set} {F : Obj → Set}
+  ⦃ _ : IsCategory Obj Mor ⦄ ⦃ _ : IsPresheaf F ⦄ where
+
+  private variable
+    a b c d e : Obj
+
+  infix 6 _≈_
+  
+  t⟨fgh⟩=t⟨f⟩⟨gh⟩
+    : (x : F a) (f : Mor a b) (g : Mor b c) (h : Mor c d)
+    → x ⟨ f ⨟ g ⨟ h ⟩ ≡ x ⟨ f ⟩ ⟨ g ⨟ h ⟩
+  t⟨fgh⟩=t⟨f⟩⟨gh⟩ x f g h = begin
+    x ⟨ f ⨟ g ⨟ h ⟩
+      ≡⟨ cong (x ⟨_⟩) (⨟-assoc f g h) ⟩
+    x ⟨ f ⨟ (g ⨟ h) ⟩
+      ≡⟨ ⟨⟩-⨟ f (g ⨟ h) x ⟩
+    x ⟨ f ⟩ ⟨ g ⨟ h ⟩
+      ∎
+
+  _≈_
+    : (x y : F a) → 𝐘 a
+  (x ≈ y) _ f = x ⟨ f ⟩ ≡ y ⟨ f ⟩
+
+  ≈-sym : (x y : F c) 
+    → x ≈ y ≗ y ≈ x
+  ≈-sym x y σ = record
+    { to   = sym
+    ; from = sym }
+    where open Equivalence
+
+{-
+  unifies-⨟
+    : (σ : Mor A B) (ρ : Mor B C)
+    → (t u : Tm A)
+    → t ≈ u $ σ
+    → t ≈ u $ σ ⨟ ρ
+  unifies-⨟ σ ρ t u eq = begin
+    t ⟨ σ ⨟ ρ ⟩
+      ≡⟨ ⟨⟩-⨟ _ _ t ⟩
+    t ⟨ σ ⟩ ⟨ ρ ⟩
+      ≡⟨ cong _⟨ ρ ⟩ eq ⟩
+    u ⟨ σ ⟩ ⟨ ρ ⟩
+      ≡⟨ sym $ ⟨⟩-⨟ _ _ u ⟩
+    u ⟨ σ ⨟ ρ ⟩
+      ∎
+-}   
+
 ---------------------------------------------------------------------------
 -- Variable Elimination Lemma
 
@@ -44,9 +91,9 @@ module Variable-Elimination {m : ℕ} (σ : Sub (suc m) n) (x : Fin (suc m)) (t 
       ≡⟨ ⟨⟩-⨟ (tabulate (`_ ∘ punchIn x)) σ (sub-for t x y) ⟩
     sub-for t x y ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
       ∎
-      
+   
   var-elim-pointwise
-    : ` x ≈ punchInTm x t $ σ
+    : (` x ≈ punchInTm x t) _ σ
     → (y : Fin (suc m))
     → lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y ≡ lookup σ y
   var-elim-pointwise eq y with x ≟ y
@@ -74,7 +121,7 @@ module Variable-Elimination {m : ℕ} (σ : Sub (suc m) n) (x : Fin (suc m)) (t 
       ∎
 
   var-elim
-    : ` x ≈ punchInTm x t $ σ
+    : (` x ≈ punchInTm x t) _ σ
     → t for x ⨟ tabulate (lookup σ ∘ punchIn x) ≡ σ 
   var-elim eq = begin
     t for x ⨟ tabulate (lookup σ ∘ punchIn x)
@@ -91,7 +138,7 @@ module _ {m : ℕ} {x : Fin (suc m)} where
   ≈-flexRigid∉
     : {t : Tm (suc m)}
     → (x∉ : x ∉ₜ t)
-    → ` x ≈ t $ punchOutTm x∉ for x
+    → (` x ≈ t) _ $ punchOutTm x∉ for x
   ≈-flexRigid∉ {t} x∉ = begin
     ` x ⟨ (punchOutTm x∉) for x ⟩
       ≡⟨ x⟨t/x⟩=t x ⟩
@@ -105,9 +152,9 @@ module _ {m : ℕ} {x : Fin (suc m)} where
   flexRigid∉-mgu
     : {t : Tm (suc m)}
     → (x∉ : x ∉ₜ t)
-    → Min (` x ≈ t) (punchOutTm x∉ for x)
+    → Min (` x ≈ t) _ (punchOutTm x∉ for x)
   flexRigid∉-mgu {t} x∉ = ≈-flexRigid∉ x∉ , λ σ eq →
-    tabulate (lookup σ ∘ punchIn x) , sym (var-elim σ x _ (begin
+    tabulate (lookup σ ∘ punchIn x) , (var-elim σ x _ (begin
       ` x ⟨ σ ⟩
         ≡⟨ eq  ⟩
       t ⟨ σ ⟩
@@ -115,149 +162,107 @@ module _ {m : ℕ} {x : Fin (suc m)} where
       punchInTm x (punchOutTm x∉) ⟨ σ ⟩
         ∎))
 
+-------------------------------------------------------------------------
+-- Definition of Most General Unifier and its variant with an accumulator
+-------------------------------------------------------------------------
+
+MGU : (t u : Tm m) →  𝐘 m
+MGU {m} t u n = Min (t ≈ u) n ∘ toSub
+
+AMGU : (t u : Tm m) (σ : AList m n) → 𝐘 n
+AMGU {m} {n} t u σ l = Min ((t ≈ u) [ toSub σ ⨟]) _ ∘ toSub
+
+AMGUⁿ : (ts us : Tm m ^ k) (σ : AList m n) → 𝐘 n
+AMGUⁿ {m} {k} {n} ts us σ l = Min ((ts ≈ us) [ toSub σ ⨟]) _ ∘ toSub
+
+toSub-⇔ : {P Q : 𝐘 m}
+  → P ≗ Q
+  → (λ _ → P _ ∘ toSub) ≗ λ _ → Q _ ∘ toSub 
+toSub-⇔ P=Q ρ = record { to = P=Q (toSub ρ) .to ; from = P=Q (toSub ρ) .from}
+  where open Equivalence
+
+AMGUⁿ=AMGU : {i : k ∈ D} (ts us : Tm m ^ k) (σ : AList m n)
+  → AMGUⁿ ts us σ ≗ AMGU (op′ i ts) (op′ i us) σ
+AMGUⁿ=AMGU {k} {m} {i = i} ts us σ = toSub-⇔ (Min≗ (ext≗ helper {toSub σ}))
+  where
+    helper : ∀ {n} (σ : Sub m n) → (ts ≈ us) _ σ ⇔ (op′ i ts ≈ op′ i us) _ σ  
+    helper σ = record { to   = cong (op′ i) ; from = op-inj₃ }
+
+MGU=AMGU-id : (t u : Tm m) → MGU t u ≗ AMGU t u id
+MGU=AMGU-id t u {n} σ = toSub-⇔ (Min≗ (P=Pid⨟- (t ≈ u))) σ
+
+∃MGU=∃AMGU-id : (t u : Tm m) → (∃₂ $ MGU t u) ⇔ (∃₂ $ AMGU t u [])
+∃MGU=∃AMGU-id t u = ≗→⇔ (MGU=AMGU-id t u)
+
+AMGU-sym
+  : (u t : Tm m) (σ : AList m n)
+  → AMGU t u σ ≗ AMGU u t σ
+AMGU-sym u t σ = toSub-⇔ (Min≗ λ ρ → ≈-sym t u (toSub σ ⨟ ρ))
+
+subst-equiv : (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m) (σ : AList m n)
+  → (∃₂ $ AMGU (t ⟨ r for x ⟩) (u ⟨ r for x ⟩) σ) ⇔ (∃₂ $ AMGU t u (r / x ∷ σ))
+subst-equiv t u x r σ = ≗→⇔ (toSub-⇔ (Min≗ helper))
+  where
+    open Equivalence
+    helper : (t ⟨ r for x ⟩ ≈ u ⟨ r for x ⟩ [ toSub σ ⨟])
+      ≗ (t ≈ u [ toSub (r / x ∷ σ) ⨟])
+    helper ρ .to   eq = begin
+      t ⟨ toSub (r / x ∷ σ) ⨟ ρ ⟩
+        ≡⟨ t⟨fgh⟩=t⟨f⟩⟨gh⟩ t (r for x) _ _ ⟩
+      t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
+        ≡⟨ eq ⟩
+      u ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
+        ≡⟨ sym (t⟨fgh⟩=t⟨f⟩⟨gh⟩ u (r for x) _ _) ⟩
+      u ⟨ toSub (r / x ∷ σ) ⨟ ρ ⟩
+        ∎
+    helper ρ .from eq = begin
+      t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
+        ≡⟨ (sym $ t⟨fgh⟩=t⟨f⟩⟨gh⟩ t (r for x) _ _) ⟩
+      t ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
+        ≡⟨ eq ⟩
+      u ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
+        ≡⟨ t⟨fgh⟩=t⟨f⟩⟨gh⟩ u (r for x) _ _ ⟩
+      u ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
+        ∎
+      
 ----------------------------------------------------------------------
 -- Correctness of amgu
 ----------------------------------------------------------------------
 flex-mgu′
-  : (x : Fin m) (t : Tm m) 
-  → Dec (∃₂ λ n (ρ : AList m n) → Min (` x ≈ t) (toSub ρ))
+  : (x : Fin m) (t : Tm m) → Dec (∃₂ $ MGU (` x) t)
 flex-mgu′ {suc m} x t with x ∈ₜ? t
-flex-mgu′ x (` y)     | yes (here refl) = yes (_ , id , id-minimal id (` y))
+flex-mgu′ x (` y)     | yes (here refl) = yes (_ , id ,
+  Min-id {ℕ} {Sub} (` y ≈ ` y) refl)
 flex-mgu′ x (op′ _ _) | yes x∈ = no λ where
   (_ , σ , eq , min) → op≢var (unify-occur (toSub σ) x∈ eq)
-... | no  x∉ = yes (_ , flexRigid∉ x∉ , minimal-⨟-id (_ for x) _ t (flexRigid∉-mgu x∉))
+... | no  x∉ = yes (_ , flexRigid∉ x∉ , Min-⨟-id {ℕ} {Sub} _ _ (flexRigid∉-mgu x∉))
 
 flex-mgu
   : (x : Fin m) (t : Tm m) 
-  → Dec (∃₂ λ n (ρ : AList m n) → Min (` x ≈ t [ id ⨟_]) (toSub ρ))
-flex-mgu x t = map′
-  (map₂ $ map₂ (Min-[id⨟]₁ {ℕ} {Sub} {Tm} _ _))
-  (map₂ $ map₂ (Min-[id⨟]₂ {ℕ} {Sub} {Tm} _ _))
-  (flex-mgu′ x t) 
-
--- [TODO]: Tidy up these ugly proofs!!!
-
-helper 
-  : (t : Tm (suc m)) (x : Fin (suc m)) (r : Tm m)
-  → (σ : AList m n) (ρ : Sub n l)
-  → t ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩ ≡ t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-helper t x r σ ρ = begin
-  t ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
-    ≡⟨ cong (t ⟨_⟩) (⨟-assoc (r for x) (toSub σ) ρ) ⟩
-  t ⟨ r for x ⨟ (toSub σ ⨟ ρ) ⟩
-    ≡⟨ ⟨⟩-⨟ (r for x) (toSub σ ⨟ ρ) t ⟩
-  t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-    ∎
-
-t≈u⟨r/x⟩[σ]→t≈u[r/x,σ]
-  : (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m)
-  → (σ : AList m n) (ρ : Sub n l)
-  → t ⟨ r for x ⟩ ≈ u ⟨ r for x ⟩ $ (toSub σ) ⨟ ρ
-  → t ≈ u $ toSub (r / x ∷ σ) ⨟ ρ
-t≈u⟨r/x⟩[σ]→t≈u[r/x,σ] t u x r σ ρ eq = begin
-  t ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
-    ≡⟨ helper t x r σ ρ ⟩
-  t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-    ≡⟨ eq ⟩
-  u ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-    ≡⟨ sym (helper u x r σ ρ) ⟩
-  u ⟨ toSub (r / x ∷ σ) ⨟ ρ ⟩
-    ∎
-
-t≈u[r/x,σ]→t≈u⟨r/x⟩[σ]
-  : (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m)
-  → (σ : AList m n) (ρ : Sub n l)
-  → t ≈ u $ toSub (r / x ∷ σ) ⨟ ρ
-  → t ⟨ r for x ⟩ ≈ u ⟨ r for x ⟩ $ (toSub σ) ⨟ ρ
-t≈u[r/x,σ]→t≈u⟨r/x⟩[σ] t u x r σ ρ eq = begin
-  t ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-    ≡⟨ (sym $ helper t x r σ ρ) ⟩
-  t ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
-    ≡⟨ eq ⟩
-  u ⟨ r for x ⨟ toSub σ ⨟ ρ ⟩
-    ≡⟨ helper u x r σ ρ ⟩
-  u ⟨ r for x ⟩ ⟨ toSub σ ⨟ ρ ⟩
-    ∎ 
-
-Lem₁
-  : (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m)
-  → (σ : AList m n) (ρ : AList n l)
-  → Min (t ⟨ r for x ⟩ ≈ u ⟨ r for x ⟩ [ toSub σ ⨟_]) (toSub ρ)
-  → Min (t ≈ u [ toSub (r / x ∷ σ) ⨟_]) (toSub ρ)
-Lem₁ t u x r σ ρ (Pρ , min) = t≈u⟨r/x⟩[σ]→t≈u[r/x,σ] t u x r σ (toSub ρ) Pρ ,
-  λ g t≈u → min g (t≈u[r/x,σ]→t≈u⟨r/x⟩[σ] t u x r σ g t≈u)
-
-Lem₂
-  : (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m)
-  → (σ : AList m n) (ρ : AList n l)
-  → Min (t ≈ u [ toSub (r / x ∷ σ) ⨟_]) (toSub ρ)
-  → Min (t ⟨ r for x ⟩ ≈ u ⟨ r for x ⟩ [ toSub σ ⨟_]) (toSub ρ)
-Lem₂ t u x r σ ρ (Pρ , min) = t≈u[r/x,σ]→t≈u⟨r/x⟩[σ] t u x r σ (toSub ρ) Pρ ,
-  λ g t≈u → min g (t≈u⟨r/x⟩[σ]→t≈u[r/x,σ] t u x r σ g t≈u)
-
+  → Dec (∃₂ $ AMGU (` x) t id)
+flex-mgu x t = Dec⇔ (∃MGU=∃AMGU-id (` x) t) (flex-mgu′ x t)
 
 mutual
-  amgu⁺ : (t u : Tm m) (σ : AList m n)
-    → Dec (∃₂ λ l (ρ : AList n l)
-        → Min (t ≈ u [ toSub σ ⨟_]) (toSub ρ))
-  amgu⁺ (` x)      t     []          = flex-mgu x t
-  amgu⁺ t          (` y) []          = map′
-    (map₂ $ map₂ λ {ρ} → minimal≈-sym id (toSub ρ) (` y) t)
-    (map₂ $ map₂ λ {ρ} → minimal≈-sym id (toSub ρ) t (` y))
-    (flex-mgu y t)
+  amgu⁺ : (t u : Tm m) (σ : AList m n) → Dec (∃₂ $ AMGU t u σ)
+
   amgu⁺ (op′ i ts) (op′ j us) σ with i ≟∈ j
   ... | no ¬p    = no λ where (_ , ρ , p , _) → ¬p (op-inj₁₂ p)
-  ... | yes refl = map′
-    (map₂ $ map₂ λ (Pρ , min) → cong (op′ i) Pρ , λ γ Pγ → min γ (op-inj₃ Pγ))
-    (map₂ $ map₂ λ (Pρ , min) → op-inj₃ Pρ , λ {_} γ Pγ → min γ (cong (op′ i) Pγ))
-    (amguⁿ⁺ ts us σ)
-  amgu⁺ t          u     (r / x ∷ σ) =
-    map′
-    (map₂ (λ (ρ , Minρ) → ρ , Lem₁ t u x r σ ρ Minρ))
-    (map₂ (λ (ρ , Minρ) → ρ , Lem₂ t u x r σ ρ Minρ))
-    (amgu⁺ (t ⟨ r for x ⟩) (u ⟨ r for x ⟩) σ)
+  ... | yes refl = Dec⇔ (≗→⇔ (AMGUⁿ=AMGU ts us σ)) $ amguⁿ⁺ ts us σ
 
-  amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n)
-    → Dec (∃₂ λ (l : ℕ) (ρ : AList n l)
-        → Min (ts ≈ us [ toSub σ ⨟_]) $ toSub ρ)
-  amguⁿ⁺ []       []       σ = yes (_ , [] , refl , λ ρ _ → ρ , sym (⨟-idₗ ρ))
+  amgu⁺ (` x)      t     []          = flex-mgu x t
+  amgu⁺ t          (` y) []          = Dec⇔
+    (≗→⇔ (AMGU-sym t (` y) [])) $ flex-mgu y t
+
+  amgu⁺ t          u     (r / x ∷ σ) =
+    Dec⇔ (subst-equiv t u x r σ) (amgu⁺ (t ⟨ r for x ⟩) (u ⟨ r for x ⟩) σ)
+
+  amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n) → Dec (∃₂ $ AMGUⁿ ts us σ)
+  amguⁿ⁺ []       []       σ = yes (_ , [] , refl , λ ρ Pρ → ρ , ⨟-idₗ ρ)
   amguⁿ⁺ (t ∷ ts) (u ∷ us) σ with amgu⁺ t u σ
   ... | no ¬p = no {!!}
   ... | yes (_ , ρ , Pρ , min) with amguⁿ⁺ ts us (σ ⨟ ρ)
   ... | no ¬q = {!!}
   ... | yes p = {!!}
 
--- mutual
---   amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n)
---     → Dec (∃ₘ λ ρ → ts ≈ us by σ ⨟ ρ)
---   amguⁿ⁺ []       []       σ = yes (_ , [] , refl)
---   amguⁿ⁺ (t ∷ ts) (u ∷ us) σ with amgu⁺ t u σ
---   ... | no ¬p = no λ where (_ , ρ , eq) → ¬p (_ , ρ , V.∷-injectiveˡ eq)
---   ... | yes (l , ρ , eq) with amguⁿ⁺ ts us (σ ++ ρ)
---   ... | no ¬q = no λ
---     where
---       (l₁ , ρ₁ , eq′) → let (ρ₂ , eq₂) = f .proj₂ ρ₁ (V.∷-injectiveʳ eq′)
---         in ¬q (_ , ρ₂ , (begin
---           ts ⟨ (σ ⨟ ρ) ⨟ ρ₂ ⟩
---             ≡⟨ cong (ts ⟨_⟩) (⨟-assoc σ _ _) ⟩
---           ts ⟨ σ ⨟ (ρ ⨟ ρ₂) ⟩
---             ≡⟨ cong (λ ρ → ts ⟨ σ ⨟ ρ ⟩) (sym eq₂)  ⟩
---           ts ⟨ σ ⨟ ρ₁ ⟩
---             ≡⟨ V.∷-injectiveʳ eq′ ⟩
---           us ⟨ σ ⨟ ρ₁ ⟩
---             ≡⟨ cong (λ ρ → us ⟨ σ ⨟ ρ ⟩) eq₂ ⟩
---           us ⟨ σ ⨟ (ρ ⨟ ρ₂) ⟩
---             ≡⟨ cong (us ⟨_⟩) (sym $ ⨟-assoc σ _ _) ⟩
---           us ⟨ (σ ⨟ ρ) ⨟ ρ₂ ⟩
---             ∎))
---         where postulate f : Min (λ ρ → ts ≈ us by σ ⨟ ρ) ρ
---         -- TODO: Remove it and prove that amgu does produce the most general unifier.
---   ... | yes (_ , ρ′ , eq′) = yes (_ , ρ ⨟ ρ′ , (begin
---     (t ∷ ts) ⟨ σ ⨟ (ρ ⨟ ρ′) ⟩
---       ≡⟨ cong ((t ∷ ts) ⟨_⟩) (sym $ ⨟-assoc σ _ _) ⟩
---     (t ∷ ts) ⟨ (σ ⨟ ρ) ⨟ ρ′ ⟩
---       ≡⟨ cong₂ _∷_ (unifies-⨟ (σ ⨟ ρ) ρ′ t u eq) eq′ ⟩
---     (u ∷ us) ⟨ (σ ⨟ ρ) ⨟ ρ′ ⟩
---       ≡⟨ cong ((u ∷ us) ⟨_⟩) (⨟-assoc σ _ _) ⟩
---     (u ∷ us) ⟨ σ ⨟ (ρ ⨟ ρ′) ⟩
---       ∎))
+mgu⁺ : (t u : Tm m) → Dec (∃₂ $ MGU t u)
+mgu⁺ t u = Dec⇔ (⇔-sym $ ∃MGU=∃AMGU-id t u) (amgu⁺ t u [])

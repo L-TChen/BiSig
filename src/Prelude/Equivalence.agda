@@ -19,6 +19,7 @@ record Equivalence (A : Set a) (B : Set b) : Set (a ⊔ b) where
     from : B → A
 open Equivalence
 
+infix 4 _⇔_
 _⇔_ : Set a → Set b → Set _
 A ⇔ B = Equivalence A B
 

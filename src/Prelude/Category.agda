@@ -5,6 +5,8 @@ module Prelude.Category where
 open import Relation.Binary.PropositionalEquality
   hiding (_≗_)
 open import Data.Product
+open import Data.Empty
+  using (⊥)
 open import Level
 open import Function using (_$_; _∘_)
 
@@ -47,17 +49,24 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
   𝐘 : Obj → Set₁
   𝐘 C = (D : Obj) → Mor C D → Set
 
-  infixl 5 _[_⨟]
   _[_⨟]
     : (P : 𝐘 C) (f : Mor C D) 
     → 𝐘 D
   (P [ f ⨟]) _ g = P _ (f ⨟ g)
 
+  infixl 5 _∧_
+  infixl 5 _[_⨟]
+  infix  4 _≗_
+  _∧_ : (P Q : 𝐘 C) → 𝐘 C
+  (P ∧ Q) D f = P D f × Q D f 
+
+  ¬ₘ : 𝐘 C → Set
+  ¬ₘ P = ∀ {D} f → P D f → ⊥
+  
   Min : 𝐘 C → 𝐘 C
   Min {C} P D f = P D f ×
     (∀ {D} (g : Mor C D) → P D g → f ⊑ g)
 
-  infix 4 _≗_
   _≗_ : (P Q : 𝐘 C) → Set
   _≗_ {C} P Q = {D : Obj} (f : Mor C D) → P D f ⇔ Q D f
 
@@ -86,21 +95,21 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
 
   ext≗
     : {P Q : 𝐘 C}
+    → (f : Mor C D)
     → P ≗ Q
-    → {f : Mor C D}
     → P [ f ⨟] ≗ Q [ f ⨟]
-  ext≗ {C} {D} P=Q {f} {E} g =
+  ext≗ {C} {D} f P=Q {E} g =
     record { to = P=Q (f ⨟ g) .to ; from = P=Q (f ⨟ g) .from }
     where open Equivalence
 
   ext∘ext≗
     : (P : 𝐘 C) (f : Mor C D) (g : Mor D E)
-    → P [ f ⨟] [ g ⨟] ≗ P [ f ⨟ g ⨟]
+    → P [ f ⨟ g ⨟] ≗ P [ f ⨟] [ g ⨟]
   ext∘ext≗ P f g h = record
-    { to   = subst (P _) (sym $ ⨟-assoc f g _)
-    ; from = subst (P _) (⨟-assoc f g _)
+    { to   = subst (P _) (⨟-assoc f g _)
+    ; from = subst (P _) (sym $ ⨟-assoc f g _)
     }
-
+    
   P=Pid⨟-
     : (P : 𝐘 C)
     → P ≗ P [ id ⨟]
@@ -144,6 +153,53 @@ record IsPresheaf {Obj : Set} {Mor : Obj → Obj → Set}
       → (f  : Mor C D) (g : Mor D E)
       → (x : F C) 
       → x ⟨ f ⨟ g ⟩ ≡ x ⟨ f ⟩ ⟨ g ⟩
+
+  private variable
+    A B C D E : Obj
+  
+  infix 6 _≈_
+  
+  _≈_
+    : (x y : F C) → 𝐘 C
+  (x ≈ y) _ f = x ⟨ f ⟩ ≡ y ⟨ f ⟩
+
+  ≈-sym : (x y : F C) 
+    → x ≈ y ≗ y ≈ x
+  ≈-sym x y σ = record
+    { to   = sym
+    ; from = sym }
+    where open Equivalence
+    
+  ≈-↑
+    : (σ : Mor C D) (ρ : Mor D E) (γ : Mor E A)
+    → (t u : F C)
+    → (t ≈ u [ σ ⨟]) _ ρ
+    → (t ≈ u [ σ ⨟]) _ (ρ ⨟ γ)
+  ≈-↑ σ ρ γ t u eq = begin
+    t ⟨ σ ⨟ (ρ ⨟ γ) ⟩
+      ≡⟨ cong (t ⟨_⟩) (sym $ ⨟-assoc σ ρ γ) ⟩
+    t ⟨ (σ ⨟ ρ) ⨟ γ ⟩
+      ≡⟨ ⟨⟩-⨟ (σ ⨟ ρ) γ t ⟩
+    t ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
+      ≡⟨ cong (_⟨ γ ⟩) eq ⟩
+    u ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
+      ≡⟨ sym (⟨⟩-⨟ (σ ⨟ ρ) γ u) ⟩
+    u ⟨ σ ⨟ ρ ⨟ γ ⟩
+      ≡⟨ cong (u ⟨_⟩) (⨟-assoc σ ρ γ) ⟩
+    u ⟨ σ ⨟ (ρ ⨟ γ) ⟩
+      ∎
+
+  t⟨fgh⟩=t⟨f⟩⟨gh⟩
+    : (x : F A) (f : Mor A B) (g : Mor B C) (h : Mor C D)
+    → x ⟨ f ⨟ g ⨟ h ⟩ ≡ x ⟨ f ⟩ ⟨ g ⨟ h ⟩
+  t⟨fgh⟩=t⟨f⟩⟨gh⟩ x f g h = begin
+    x ⟨ f ⨟ g ⨟ h ⟩
+      ≡⟨ cong (x ⟨_⟩) (⨟-assoc f g h) ⟩
+    x ⟨ f ⨟ (g ⨟ h) ⟩
+      ≡⟨ ⟨⟩-⨟ f (g ⨟ h) x ⟩
+    x ⟨ f ⟩ ⟨ g ⨟ h ⟩
+      ∎
+
 open IsPresheaf ⦃...⦄ public
 
 

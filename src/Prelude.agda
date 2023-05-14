@@ -69,7 +69,7 @@ open import Data.Product                       public
 open import Data.Product.Properties            public
 open import Data.Sum                           public
   using (_⊎_; [_,_])
-  renaming (inj₁ to inl; inj₂ to inr)
+  renaming (inj₁ to inl; inj₂ to inr; map to ⊎-map)
 
 open import Relation.Nullary                      public
   using (Dec; yes; no; _because_; ¬_)

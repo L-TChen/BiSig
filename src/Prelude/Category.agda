@@ -36,7 +36,7 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
       → (f ⨟ g) ⨟ h ≡ f ⨟ (g ⨟ h)
 
   private variable
-    C D E : Obj
+    B C D E : Obj
 
   infix 4 _⊒_ _⊑_
   _⊒_ _⊑_
@@ -66,6 +66,10 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
   Min : 𝐘 C → 𝐘 C
   Min {C} P D f = P D f ×
     (∀ {D} (g : Mor C D) → P D g → f ⊑ g)
+
+  ↑-closed : 𝐘 C → Set
+  ↑-closed {C} P = ∀ {D E} (f : Mor C D) (g : Mor C E)
+    → f ⊑ g → P _ f → P _ g  
 
   _≗_ : (P Q : 𝐘 C) → Set
   _≗_ {C} P Q = {D : Obj} (f : Mor C D) → P D f ⇔ Q D f
@@ -129,6 +133,40 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
     → Min P D f
     → Min P D (f ⨟ id)
   Min-⨟-id P f Pf = subst (Min P _) (sym (⨟-idᵣ _)) Pf
+
+  failure-propagate : {P Q : 𝐘 C} (f : Mor C D) (g : Mor D E)
+    → Min (P [ f ⨟]) _ g
+    → ¬ₘ $ Q [ f ⨟ g ⨟]
+    → ¬ₘ $ P ∧ Q [ f ⨟]
+  failure-propagate {Q = Q} f g Pρ ¬Q h P∧Q =
+    let (i , f⨟i=h) = Pρ .proj₂ h (P∧Q .proj₁) in
+    ¬Q i (subst (Q _) (begin
+      f ⨟ h
+        ≡⟨ cong (f ⨟_) (sym $ f⨟i=h) ⟩
+      f ⨟ (g ⨟ i)
+        ≡⟨ (sym $ ⨟-assoc f g i) ⟩
+      (f ⨟ g) ⨟ i ∎)
+    (P∧Q .proj₂))
+
+  optimist
+    : {P Q : 𝐘 C} (f : Mor C D) (g : Mor D E) (h : Mor E B)
+    → ↑-closed P → Min (P [ f ⨟]) _ g → Min (Q [ f ⨟ g ⨟]) _ h
+    → Min (P ∧ Q [ f ⨟]) _ (g ⨟ h)
+  optimist {P = P} {Q} f g h ↑P (Pfg , fMin) (Qfgh , fgMin) =
+    (↑P _ _ (h , ⨟-assoc _ _ _) Pfg , subst (Q _) (⨟-assoc _ _ _) Qfgh) , λ
+      i (Pfi , Qfi) →
+        let (j , g⨟j=i) = fMin i Pfi
+            (k , h⨟k=j) = fgMin j (subst (Q _) (f ⨟ i ≡⟨ cong (f ⨟_) (sym g⨟j=i) ⟩ f ⨟ (g ⨟ j) ≡⟨ (sym $ ⨟-assoc _ _ _) ⟩ (f ⨟ g) ⨟ j ∎) Qfi)
+        in k , (begin
+          (g ⨟ h) ⨟ k
+            ≡⟨ ⨟-assoc g h k ⟩
+          g ⨟ (h ⨟ k)
+            ≡⟨ cong (g ⨟_) h⨟k=j ⟩
+          g ⨟ j
+            ≡⟨ g⨟j=i ⟩
+          i
+           ∎)
+    
 open IsCategory ⦃...⦄ public
 
 record Category : Set₁ where

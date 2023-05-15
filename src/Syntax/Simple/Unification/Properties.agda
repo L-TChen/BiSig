@@ -176,37 +176,6 @@ module _(t u : Tm m) (ts us : Tm m ^ k) (σ : Sub m n) where
   t∷ts≈u∷us⇔t≈u∧ts≈us : ((t ∷ ts) ≈ (u ∷ us)) _ σ ⇔ ((t ≈ u) ∧ (ts ≈ us)) _ σ
   t∷ts≈u∷us⇔t≈u∧ts≈us = record { to = V.∷-injective ; from = λ (t=u , ts=us) → cong₂ _∷_ t=u ts=us }
 
-failure-propagate : {P Q : 𝐘 m} (σ : Sub m n) (ρ : Sub n l)
-  → Min (P [ σ ⨟]) _ ρ
-  → ¬ₘ $ Q [ σ ⨟ ρ ⨟]
-  → ¬ₘ $ P ∧ Q [ σ ⨟]
-failure-propagate {Q = Q} σ ρ Pρ ¬Q γ P∧Q =
-  let (γ′ , ρ⨟γ′=γ) = Pρ .proj₂ γ (P∧Q .proj₁) in
-  ¬Q γ′ (subst (Q _) (begin
-    σ ⨟ γ
-      ≡⟨ cong (σ ⨟_) (sym $ ρ⨟γ′=γ) ⟩
-    σ ⨟ (ρ ⨟ γ′)
-      ≡⟨ (sym $ ⨟-assoc σ ρ γ′) ⟩
-    (σ ⨟ ρ) ⨟ γ′ ∎)
-  (P∧Q .proj₂))
-
-optimist : (t u : Tm m) (ts us : Tm m ^ k)
-  → (σ : AList m n)  
-  → (ρ : AList n l) → AMGU t u σ _ ρ
-  → (γ : AList l o) → AMGUⁿ ts us (σ ⨟ ρ) _ γ
-  → AMGUⁿ (t ∷ ts) (u ∷ us) σ _ (ρ ⨟ γ)
-optimist t u ts us σ ρ (t≈u , Pρ) γ (ts≈us , Pγ) = ?
-{-
-  (begin
-  (t ∷ ts) ⟨ toSub σ ⨟ toSub (ρ ⨟ γ) ⟩
-    ≡⟨ {!!} ⟩
-  (t ∷ ts) ⟨ toSub σ ⨟ (toSub ρ ⨟ toSub γ) ⟩
-    ≡⟨ {!!} ⟩
-  (u ∷ us) ⟨ toSub σ ⨟ (toSub ρ ⨟ toSub γ) ⟩
-    ≡⟨ {!!} ⟩
-  (u ∷ us) ⟨ toSub σ ⨟ toSub (ρ ⨟ γ) ⟩
-    ∎) , λ ργ′ Pργ′ → {!!}
--}
     
 ----------------------------------------------------------------------
 -- Correctness of FlexRigid
@@ -289,8 +258,7 @@ mutual
       us ⟨ toSub (σ ⨟ ρ) ⨟ γ ⟩
         ∎)) γ
       $ V.∷-injective ts≈us 
-  ... | inl (_ , γ , ts≈us) = inl (_ , ρ ⨟ γ ,
-    optimist t u ts us σ ρ t≈u γ ts≈us)
+  ... | inl (_ , γ , ts≈us) = inl (_ , ρ ⨟ γ , ?)
 
 mgu⁺ : (t u : Tm m) → DecMGU t u
 mgu⁺ t u with amgu⁺ t u []

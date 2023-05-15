@@ -318,6 +318,7 @@ module _ {m : ℕ} where mutual
   subⁿ-id (t ∷ ts) =
     cong₂ _∷_ (sub-id t) (subⁿ-id ts)
 
+
 module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where mutual
   sub-⨟ : (t : Tm m)
     → sub (Sub-⨟ σ ρ) t ≡ sub ρ (sub σ t)
@@ -340,9 +341,28 @@ Sub-assoc σ ρ γ = tabulate-cong (λ i → begin
   sub (Sub-⨟ ρ γ) (sub σ (` i))
     ∎)
 
+Sub-⨟-idᵣ : (σ : Sub m n)
+  → Sub-⨟ σ Sub-id ≡ σ 
+Sub-⨟-idᵣ σ = begin
+  Sub-⨟ σ Sub-id
+    ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
+  tabulate (λ i → lookup σ i) 
+    ≡⟨ tabulate∘lookup σ ⟩
+  σ
+    ∎
+
+Sub-⨟-idₗ : (σ : Sub m n) → Sub-⨟ Sub-id σ ≡ σ 
+Sub-⨟-idₗ σ = begin
+  Sub-⨟ Sub-id σ
+    ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
+  tabulate (λ i → sub σ (` i))
+    ≡⟨ tabulate∘lookup σ ⟩
+  σ
+    ∎
+
 instance
   RenIsCategory : IsCategory ℕ Ren
-  RenIsCategory .id      = Ren-id
+  RenIsCategory .id      = Ren-id -- Ren-id
   RenIsCategory ._⨟_     = Ren-⨟
   RenIsCategory .⨟-assoc = Ren-assoc
   RenIsCategory .⨟-idᵣ σ = begin
@@ -355,7 +375,7 @@ instance
   RenIsCategory .⨟-idₗ σ = begin
     id ⨟ σ
       ≡⟨ tabulate-cong (λ i → cong (lookup σ) (lookup∘tabulate (λ i → i) i)) ⟩
-    tabulate (λ i → lookup σ i)
+    tabulate (lookup σ)
       ≡⟨ tabulate∘lookup σ ⟩
     σ
       ∎
@@ -364,20 +384,8 @@ instance
   SubIsCategory .id      = Sub-id
   SubIsCategory ._⨟_     = Sub-⨟ 
   SubIsCategory .⨟-assoc = Sub-assoc
-  SubIsCategory .⨟-idᵣ σ = begin
-    σ ⨟ id
-      ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
-    tabulate (λ i → lookup σ i) 
-      ≡⟨ tabulate∘lookup σ ⟩
-    σ
-      ∎
-  SubIsCategory .⨟-idₗ σ = begin
-    id ⨟ σ
-      ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
-    tabulate (λ i → sub σ (` i))
-      ≡⟨ tabulate∘lookup σ ⟩
-    σ
-      ∎
+  SubIsCategory .⨟-idᵣ   = Sub-⨟-idᵣ
+  SubIsCategory .⨟-idₗ   = Sub-⨟-idₗ
 
 module _ {m : ℕ} where mutual
   plugSteps-id : (ps : Steps m)

@@ -48,6 +48,10 @@ op-inj₃
   → ts ≡ us
 op-inj₃ refl = refl
 
+op-cong⇔ : {i : k ∈ D}
+  → (ts ≡ us) ⇔ (op′ i ts ≡ op′ i us)
+op-cong⇔ = record { to = cong (op′ _ ) ; from = op-inj₃ }
+
 ------------------------------------------------------------------------------
 -- Proofs about free variables
 

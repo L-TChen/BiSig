@@ -4,13 +4,17 @@ module Prelude.Category where
 
 open import Relation.Binary.PropositionalEquality
   hiding (_≗_)
+open import Relation.Nullary.Decidable
+
 open import Data.Product
 open import Data.Empty
   using (⊥)
 open import Level
 open import Function using (_$_; _∘_)
+open import Relation.Nullary.Reflects     
 
 open import Prelude.Equivalence
+open import Prelude.Logic
 
 open ≡-Reasoning
 
@@ -35,10 +39,18 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
       → (f : Mor C D) (g : Mor D E) (h : Mor E F)
       → (f ⨟ g) ⨟ h ≡ f ⨟ (g ⨟ h)
 
+  𝐘 : Obj → Set₁
+  𝐘 C = (D : Obj) → Mor C D → Set
+
   private variable
     B C D E : Obj
+    P Q     : 𝐘 C
 
+  infixl 5 _∧_
   infix 4 _⊒_ _⊑_
+  infix  3 ¬′_
+  infix  2 _≗_
+  
   _⊒_ _⊑_
     : {C D E : Obj}
     → Mor C D → Mor C E → Set
@@ -46,22 +58,32 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
 
   _⊑_ f g = g ⊒ f
 
-  𝐘 : Obj → Set₁
-  𝐘 C = (D : Obj) → Mor C D → Set
+
+  _∧_ : (P Q : 𝐘 C) → 𝐘 C
+  (P ∧ Q) D f = P D f × Q D f
+
+  ⊥′ : 𝐘 C
+  ⊥′ _ _ = ⊥
+
+  ¬′_ : (X : 𝐘 C) → Set _
+  ¬′_  X = X ⇒ ⊥′
+  
+  _≗_ : (X Y : 𝐘 C) → Set _
+  X ≗ Y = ∀ {i} j → X i j ⇔ Y i j
+
+  ≗→⇔ : P ≗ Q → ∃₂ P ⇔ ∃₂ Q
+  ≗→⇔ P=Q = record
+    { to   = map₂ (map₂ (P=Q _ .to))
+    ; from = map₂ (map₂ (P=Q _ .from))
+    }
+    where open Equivalence
 
   _[_⨟]
     : (P : 𝐘 C) (f : Mor C D) 
     → 𝐘 D
   (P [ f ⨟]) _ g = P _ (f ⨟ g)
 
-  infixl 5 _∧_
   infixl 5 _[_⨟]
-  infix  4 _≗_
-  _∧_ : (P Q : 𝐘 C) → 𝐘 C
-  (P ∧ Q) D f = P D f × Q D f 
-
-  ¬ₘ : 𝐘 C → Set
-  ¬ₘ P = ∀ {D} f → P D f → ⊥
   
   Min : 𝐘 C → 𝐘 C
   Min {C} P D f = P D f ×
@@ -71,23 +93,8 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
   ↑-closed {C} P = ∀ {D E} (f : Mor C D) (g : Mor C E)
     → f ⊑ g → P _ f → P _ g  
 
-  _≗_ : (P Q : 𝐘 C) → Set
-  _≗_ {C} P Q = {D : Obj} (f : Mor C D) → P D f ⇔ Q D f
-
-  ≗-sym : {P Q : 𝐘 C}
-    → P ≗ Q → Q ≗ P
-  ≗-sym = ⇔-sym ∘_
-
-  ≗→⇔ : {P Q : 𝐘 C} → P ≗ Q → ∃₂ P ⇔ ∃₂ Q 
-  ≗→⇔ P=Q = record
-    { to   = map₂ (map₂ (P=Q _ .to))
-    ; from = map₂ (map₂ (P=Q _ .from))
-    }
-    where open Equivalence
-
   Min≗
-    : {P Q : 𝐘 C}
-    → P ≗ Q
+    : P ≗ Q
     → Min P ≗ Min Q
   Min≗ P=Q f = record
     { to   = λ (Pf , min) → (P=Q f .to Pf) ,
@@ -98,8 +105,7 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
     where open Equivalence
 
   ext≗
-    : {P Q : 𝐘 C}
-    → (f : Mor C D)
+    : (f : Mor C D)
     → P ≗ Q
     → P [ f ⨟] ≗ Q [ f ⨟]
   ext≗ {C} {D} f P=Q {E} g =
@@ -134,13 +140,14 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
     → Min P D (f ⨟ id)
   Min-⨟-id P f Pf = subst (Min P _) (sym (⨟-idᵣ _)) Pf
 
-  failure-propagate : {P Q : 𝐘 C} (f : Mor C D) (g : Mor D E)
+  failure-propagate
+    : (f : Mor C D) (g : Mor D E)
     → Min (P [ f ⨟]) _ g
-    → ¬ₘ $ Q [ f ⨟ g ⨟]
-    → ¬ₘ $ P ∧ Q [ f ⨟]
-  failure-propagate {Q = Q} f g Pρ ¬Q h P∧Q =
+    → ¬′ Q [ f ⨟ g ⨟]
+    → ¬′ P ∧ Q [ f ⨟]
+  failure-propagate {Q = Q} f g Pρ ¬Q {_} {h} P∧Q =
     let (i , f⨟i=h) = Pρ .proj₂ h (P∧Q .proj₁) in
-    ¬Q i (subst (Q _) (begin
+    ¬Q (subst (Q _) (begin
       f ⨟ h
         ≡⟨ cong (f ⨟_) (sym $ f⨟i=h) ⟩
       f ⨟ (g ⨟ i)
@@ -149,9 +156,9 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
     (P∧Q .proj₂))
 
   optimist
-    : {P Q : 𝐘 C} (f : Mor C D) (g : Mor D E) (h : Mor E B)
+    : (f : Mor C D) (g : Mor D E) (h : Mor E B)
     → ↑-closed P → Min (P [ f ⨟]) _ g → Min (Q [ f ⨟ g ⨟]) _ h
-    → Min (P ∧ Q [ f ⨟]) _ (g ⨟ h)
+    → Min ((P ∧ Q) [ f ⨟]) _ (g ⨟ h)
   optimist {P = P} {Q} f g h ↑P (Pfg , fMin) (Qfgh , fgMin) =
     (↑P _ _ (h , ⨟-assoc _ _ _) Pfg , subst (Q _) (⨟-assoc _ _ _) Qfgh) , λ
       i (Pfi , Qfi) →
@@ -209,22 +216,20 @@ record IsPresheaf {Obj : Set} {Mor : Obj → Obj → Set}
     where open Equivalence
     
   ≈-↑
-    : (σ : Mor C D) (ρ : Mor D E) (γ : Mor E A)
-    → (t u : F C)
-    → (t ≈ u [ σ ⨟]) _ ρ
-    → (t ≈ u [ σ ⨟]) _ (ρ ⨟ γ)
-  ≈-↑ σ ρ γ t u eq = begin
-    t ⟨ σ ⨟ (ρ ⨟ γ) ⟩
-      ≡⟨ cong (t ⟨_⟩) (sym $ ⨟-assoc σ ρ γ) ⟩
-    t ⟨ (σ ⨟ ρ) ⨟ γ ⟩
-      ≡⟨ ⟨⟩-⨟ (σ ⨟ ρ) γ t ⟩
-    t ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
+    : (t u : F C)
+    → ↑-closed (t ≈ u)
+  ≈-↑ t u σ ρ (γ , σ⨟γ=ρ) eq = begin
+    t ⟨ ρ ⟩
+      ≡⟨ cong (t ⟨_⟩) (sym σ⨟γ=ρ) ⟩
+    t ⟨ σ ⨟ γ ⟩
+      ≡⟨ ⟨⟩-⨟ σ γ t ⟩
+    t ⟨ σ ⟩ ⟨ γ ⟩
       ≡⟨ cong (_⟨ γ ⟩) eq ⟩
-    u ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
-      ≡⟨ sym (⟨⟩-⨟ (σ ⨟ ρ) γ u) ⟩
-    u ⟨ σ ⨟ ρ ⨟ γ ⟩
-      ≡⟨ cong (u ⟨_⟩) (⨟-assoc σ ρ γ) ⟩
-    u ⟨ σ ⨟ (ρ ⨟ γ) ⟩
+    u ⟨ σ ⟩ ⟨ γ ⟩
+      ≡⟨ sym (⟨⟩-⨟ σ γ u) ⟩
+    u ⟨ σ ⨟ γ ⟩
+      ≡⟨ cong (u ⟨_⟩) σ⨟γ=ρ ⟩
+    u ⟨ ρ ⟩
       ∎
 
   t⟨fgh⟩=t⟨f⟩⟨gh⟩

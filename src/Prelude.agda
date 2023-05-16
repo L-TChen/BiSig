@@ -90,6 +90,7 @@ open import Level                                 public
   renaming (zero to lzero; suc to lsuc; _⊔_ to lmax)
 
 open import Prelude.Equivalence                   public
+open import Prelude.Logic                         public
 open import Prelude.Category                      public
 
 variable
@@ -98,15 +99,6 @@ variable
 private variable
   m n l : ℕ
   A B C : Set ℓ
-
-infixr -10 _⇒₁_ _⇒_
-_⇒₁_ : {I : Set ℓ′}
-  → (X : I → Set ℓ₁) (Y : I → Set ℓ₂) → Set _
-X ⇒₁ Y = ∀ {i} → X i → Y i
-
-_⇒_ : {I : Set ℓ₁} {J : I → Set ℓ₂}
-  → (X : (i : I) → J i → Set ℓ) (Y : (i : I) → J i → Set ℓ′) → Set _
-X ⇒ Y = ∀ {i j} → X i j → Y i j
 
 data Mode : Set where
   Check Infer : Mode

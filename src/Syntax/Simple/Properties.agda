@@ -50,7 +50,7 @@ op-inj₃ refl = refl
 
 op-cong⇔ : {i : k ∈ D}
   → (ts ≡ us) ⇔ (op′ i ts ≡ op′ i us)
-op-cong⇔ = record { to = cong (op′ _ ) ; from = op-inj₃ }
+op-cong⇔ = record { to = cong (op′ _) ; from = op-inj₃ }
 
 ------------------------------------------------------------------------------
 -- Proofs about free variables
@@ -157,19 +157,21 @@ size-ʳ++ (x ∷ ys) xs with size-ʳ++ ys (x ∷ xs)
 module _ {ρ : Fin m → Fin n} where mutual
   rename-is-sub
     : (t : Tm m)
-    → t ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ t ⟨ tabulate ρ ⟩
-  rename-is-sub (` x)      = begin
+    → t ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ t ⟨ ρ ⟩
+  rename-is-sub (` x)      = lookup∘tabulate _ x
+  {- begin
     lookup (tabulate (`_ ∘ ρ)) x
       ≡⟨ lookup∘tabulate (`_ ∘ ρ) x ⟩
     ` ρ x
       ≡⟨ cong `_ (sym $ lookup∘tabulate ρ x) ⟩
     ` lookup (tabulate ρ) x
       ∎
+   -}
   rename-is-sub (op′ i ts) = cong (op′ i) (rename-is-subⁿ ts)
 
   rename-is-subⁿ
     : (ts : Tm m ^ k)
-    → ts ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ ts ⟨ tabulate ρ ⟩
+    → ts ⟨ tabulate (`_ ∘ ρ) ⟩ ≡ ts ⟨ ρ ⟩
   rename-is-subⁿ []       = refl
   rename-is-subⁿ (t ∷ ts) = cong₂ _∷_ (rename-is-sub t) (rename-is-subⁿ ts)
 
@@ -230,13 +232,15 @@ module _ {m : ℕ} {x : Fin (suc m)} where
     punchInTm-punchOutTm
       : (x∉ : x ∉ₜ t)
       → punchInTm x (punchOutTm x∉) ≡ t
-    punchInTm-punchOutTm {` y}      x∉ = cong `_ $ begin
+    punchInTm-punchOutTm {` y}      x∉ = cong `_ (punchIn-punchOut (x∉ ∘ here))
+    {- cong `_ $ begin
       lookup (tabulate (punchIn x)) (punchOut (x∉ ∘ here))
         ≡⟨ lookup∘tabulate (punchIn x) _ ⟩
       punchIn x (punchOut (x∉ ∘ here))
         ≡⟨ punchIn-punchOut _ ⟩
       y
         ∎
+        -}
     punchInTm-punchOutTm {op′ i ts} x∉ = cong (op′ i) (punchInTm-punchOutTmⁿ (x∉ ∘ ops))
 
     punchInTm-punchOutTmⁿ
@@ -248,8 +252,14 @@ module _ {m : ℕ} {x : Fin (suc m)} where
 
   mutual
     x∉punchInTm : (t : Tm m) → x ∉ₜ punchInTm x t
-    x∉punchInTm (` y)      (here eq) = F.punchInᵢ≢i x y (sym $ begin
-      x ≡⟨ eq ⟩ lookup (tabulate (punchIn x)) y ≡⟨ lookup∘tabulate (punchIn x) y ⟩ punchIn x y ∎)
+    x∉punchInTm (` y)      (here eq) = F.punchInᵢ≢i x y (sym eq)
+    {- (sym $ begin
+      x
+        ≡⟨ eq ⟩
+      lookup (tabulate (punchIn x)) y
+        ≡⟨ lookup∘tabulate (punchIn x) y ⟩
+      punchIn x y ∎)
+    -}
     x∉punchInTm (op′ i ts) (ops x∈ts) = x∉punchInTmⁿ ts x∈ts
 
     x∉punchInTmⁿ : (ts : Tm m ^ l) → x ∉ₜₛ punchInTmⁿ x ts
@@ -264,6 +274,17 @@ module _ {u : Tm m} {x : Fin (suc m)} where
     punchIn-t⟨u/x⟩=t (` y)      = begin
       punchInTm x (` y) ⟨ u for x ⟩
         ≡⟨⟩
+      lookup (u for x) (punchIn x y)
+        ≡⟨ lookup∘tabulate (sub-for u x) (punchIn x y) ⟩
+      sub-for u x (punchIn x y)
+        ≡⟨ sub-t-for-x-y {t = u} (punchInᵢ≢i x y ∘ sym) ⟩
+      ` punchOut (punchInᵢ≢i x y ∘ sym)
+        ≡⟨ cong `_ (punchOut-punchIn x) ⟩
+      ` y
+        ∎
+    {- begin
+      punchInTm x (` y) ⟨ u for x ⟩
+        ≡⟨⟩
       ` lookup (tabulate (punchIn x)) y ⟨ u for x ⟩
         ≡⟨ cong (λ i → ` i ⟨ u for x ⟩) (lookup∘tabulate (punchIn x) y) ⟩
       ` punchIn x y ⟨ u for x ⟩
@@ -276,6 +297,7 @@ module _ {u : Tm m} {x : Fin (suc m)} where
         ≡⟨ cong `_ (punchOut-punchIn x) ⟩
       ` y
         ∎
+        -}
     punchIn-t⟨u/x⟩=t (op′ i ts) = cong (op′ i) (punchIn-t⟨u/x⟩=tⁿ ts)
 
     punchIn-t⟨u/x⟩=tⁿ : (ts : Tm m ^ l)

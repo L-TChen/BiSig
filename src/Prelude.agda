@@ -156,6 +156,10 @@ splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , r
   → xs L.++ L.[ x ] ≢ []
 [xs]≢[] []       ()
 [xs]≢[] (x ∷ xs) ()
+
+∷-injectivity-⇔ : {A : Set ℓ} (t u : A) (ts us : Vec A n)
+  → ((t V.∷ ts) ≡ (u ∷ us)) ⇔ ((t ≡ u) × (ts ≡ us))
+∷-injectivity-⇔ t u ts us = record { to = V.∷-injective ; from = λ (t=u , ts=us) → cong₂ _∷_ t=u ts=us }
 ------------------------------------------------------------------------------
 -- Properties of ≤
 ------------------------------------------------------------------------------

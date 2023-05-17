@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K  #-}
+{-# OPTIONS --with-K --rewriting #-}
 
 open import Prelude
   hiding (_++_; _+_)
@@ -53,13 +53,14 @@ module Variable-Elimination (σ : Sub (suc m) n) (x : Fin (suc m)) (t : Tm m) wh
     lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) x
       ≡⟨ helper x ⟩
     sub-for t x x ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
-      ≡⟨ (cong (λ t → t ⟨ tabulate _ ⟩ ⟨ σ ⟩) $ sub-t-for-x-x {t = t} {x}) ⟩
+      ≡⟨ cong (λ t → t ⟨ tabulate _ ⟩ ⟨ σ ⟩) $ sub-t-for-x-x {t = t} {x} ⟩  
     t ⟨ tabulate (`_ ∘ punchIn x) ⟩ ⟨ σ ⟩
-      ≡⟨ (cong _⟨ σ ⟩ $ rename-is-sub t) ⟩
-    t ⟨ tabulate (punchIn x) ⟩ ⟨ σ ⟩
+      ≡⟨ cong (_⟨ σ ⟩) (rename-is-sub t) ⟩
+    t ⟨ punchIn y ⟩ ⟨ σ ⟩
       ≡⟨ sym eq ⟩
     lookup σ x
       ∎
+      
   ... | no ¬p    = begin
     lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y
       ≡⟨ helper y ⟩
@@ -111,15 +112,6 @@ module _ (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m) (σ : Sub m n) where
 -------------------------------------------------------------------------
 -- Definitions of Most General Unifier and its variant with an accumulator
 -------------------------------------------------------------------------
-MGU : (t u : Tm m) →  𝐘 {_} {Sub} m
-MGU t u = Min (t ≈ u)
-
-AMGU : (t u : Tm m) (σ : Sub m n) → 𝐘 n
-AMGU t u σ = Min (t ≈ u [ σ ⨟])
-
-AMGUⁿ : (ts us : Tm m ^ k) (σ : Sub m n) → 𝐘 n
-AMGUⁿ ts us σ = Min (ts ≈ us [ σ ⨟])
-
 DecMinₐ : (P : 𝐘 {_} {Sub} m) → Set
 DecMinₐ P = (∃₂ λ n σ → Min P n (toSub σ)) ⊎ ¬′ P
 
@@ -129,6 +121,15 @@ DecMin⇔ : {P Q : 𝐘 {_} {Sub} m}
 DecMin⇔ P=Q (inl (_ , σ , Pσ , minPσ)) = inl (_ , σ , P=Q (toSub σ) .to Pσ ,
   λ ρ Qρ → minPσ ρ (P=Q _ .from Qρ))
 DecMin⇔ P=Q (inr ¬P) = inr λ Qσ → ¬P (P=Q _ .from Qσ) 
+
+MGU : (t u : Tm m) →  𝐘 {_} {Sub} m
+MGU t u = Min (t ≈ u)
+
+AMGU : (t u : Tm m) (σ : Sub m n) → 𝐘 n
+AMGU t u σ = Min (t ≈ u [ σ ⨟])
+
+AMGUⁿ : (ts us : Tm m ^ k) (σ : Sub m n) → 𝐘 n
+AMGUⁿ ts us σ = Min (ts ≈ us [ σ ⨟])
 
 DecMGU : (t u : Tm m) → Set
 DecMGU t u = DecMinₐ (t ≈ u)
@@ -140,15 +141,12 @@ DecAMGUⁿ : (ts us : Tm m ^ k) (σ : AList m n) → Set
 DecAMGUⁿ ts us σ = DecMinₐ $ ts ≈ us [ toSub σ ⨟] 
 
 -------------------------------------------------------------------------
--- Equivalences between most general unifiers
+-- A Trivial Equivalence
 -------------------------------------------------------------------------
-
-[]≈[] : (σ : Sub m n) → AMGUⁿ [] [] σ _ id
-[]≈[] σ = refl , λ where ρ refl → ρ , ⨟-idₗ ρ
 
 module _(t u : Tm m) (ts us : Tm m ^ k) where 
   Tms≈ : (σ : Sub m n) → ((t ∷ ts) ≈ (u ∷ us)) _ σ ⇔ ((t ≈ u) ∧ (ts ≈ us)) _ σ
-  Tms≈ σ = record { to = V.∷-injective ; from = λ (t=u , ts=us) → cong₂ _∷_ t=u ts=us }
+  Tms≈ σ = ∷-injectivity-⇔ _ _ _ _
     
   MinTms≈ : (σ : Sub m n)
     → Min ((t ∷ ts) ≈ (u ∷ us) [ σ ⨟]) ≗ Min ((t ≈ u) ∧ (ts ≈ us) [ σ ⨟])
@@ -185,8 +183,7 @@ module _ {m : ℕ} {x : Fin (suc m)} {t : Tm (suc m)} (x∉ : x ∉ₜ t) where
 ----------------------------------------------------------------------
 flex-mgu : (x : Fin m) (t : Tm m) → DecMGU (` x) t
 flex-mgu {suc m} x t with x ∈ₜ? t
-flex-mgu x (` y)     | yes (here refl) = inl (_ , id ,
-  Min-id {ℕ} {Sub} (` y ≈ ` y) refl)
+flex-mgu x (` y)     | yes (here refl) = inl (_ , id , Min-id {ℕ} {Sub} (` y ≈ ` y) refl)
 flex-mgu x (op′ _ _) | yes x∈ = inr λ where
   {j = σ} eq → op≢var (unify-occur σ x∈  eq)
 ... | no  x∉ = inl (_ , flex∉ x∉ , Min-⨟-id _ _ (flexRigid∉-mgu x∉))
@@ -199,6 +196,8 @@ flex-amgu x t =  DecMin⇔ (P=Pid⨟- (` x ≈ t)) $ flex-mgu x t
 ----------------------------------------------------------------------
 
 mutual
+  open import Syntax.Simple.Rewrite
+
   amgu⁺ : (t u : Tm m) (σ : AList m n) → DecAMGU t u σ
 
   amgu⁺ (` x)      t     []          = flex-amgu x t
@@ -212,7 +211,7 @@ mutual
   ... | yes refl =  DecMin⇔ (λ _ → op-cong⇔) $ amguⁿ⁺ ts us σ 
 
   amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n) → DecAMGUⁿ ts us σ
-  amguⁿ⁺ []       []       σ = inl (_ , id , []≈[] (toSub σ))
+  amguⁿ⁺ []       []       σ = inl (_ , id , refl , λ ρ _ → ρ , ⨟-idₗ ρ)
   amguⁿ⁺ (t ∷ ts) (u ∷ us) σ with amgu⁺ t u σ
   ... | inr t≉u = inr λ {_} {ρ} eq → t≉u (V.∷-injectiveˡ eq)
   ... | inl (_ , ρ , t≈u) with amguⁿ⁺ ts us (σ ⨟ ρ)
@@ -220,7 +219,8 @@ mutual
   -- Liang-Ting (2023-05-16): Is there any better way to treat the following conversion
   -- between toSub (σ ⨟ ρ) = toSub σ ⨟ toSub ρ? 
 
-    failure-propagate {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) t≈u (λ {_} {γ} eq → ts≉us (begin
+    failure-propagate {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) t≈u (λ {_} {γ} eq → ts≉us eq)
+        {- (begin
       ts ⟨ toSub (σ ⨟ ρ) ⨟ γ ⟩
         ≡⟨ cong (λ ρ → ts ⟨ ρ ⨟ γ ⟩) (toSub-++ σ ρ) ⟩
       ts ⟨ toSub σ ⨟ toSub ρ ⨟ γ ⟩
@@ -228,16 +228,19 @@ mutual
       us ⟨ toSub σ ⨟ toSub ρ ⨟ γ ⟩
         ≡⟨ cong (λ ρ → us ⟨ ρ ⨟ γ ⟩) (sym (toSub-++ σ ρ)) ⟩
       us ⟨ toSub (σ ⨟ ρ) ⨟ γ ⟩
-        ∎))
+        ∎))-}
       (V.∷-injective ts≈us)
-  ... | inl (_ , γ , ts≈us) = inl (_ , ρ ⨟ γ , (MinTms≈ t u ts us (toSub σ) (toSub $ ρ ⨟ γ) .from goal′))
+  ... | inl (_ , γ , ts≈us) = inl (_ , ρ ⨟ γ , (MinTms≈ t u ts us (toSub σ) (toSub $ ρ ⨟ γ) .from goal))
     where
-      goal : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ ((toSub ρ) ⨟ (toSub γ))
-      goal = optimist {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u
+      goal = optimist (t ≈ u) (ts ≈ us) (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u ts≈us
+      {-
+      goal′ : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ ((toSub ρ) ⨟ (toSub γ))
+      goal′ = optimist {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u
         (subst (λ σ → Min (ts ≈ us [ σ ⨟]) _ (toSub γ)) (toSub-++ σ ρ) ts≈us)
 
-      goal′ : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ (toSub (ρ ⨟ γ))
-      goal′ = subst (λ γ → Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ γ) (sym $ toSub-++ ρ γ) goal
+      goal : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ (toSub (ρ ⨟ γ))
+      goal = subst (λ γ → Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ γ) (sym $ toSub-++ ρ γ) goal′
+      -}
 
 mgu⁺ : (t u : Tm m) → DecMGU t u
 mgu⁺ t u = DecMin⇔ (⇔-sym ∘ P=Pid⨟- (t ≈ u)) (amgu⁺ t u [])

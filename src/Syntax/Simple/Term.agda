@@ -15,7 +15,7 @@ private variable
 infix 9 `_
 data Tm (n : ℕ) : Set where
   `_ :       Fin n  → Tm n
-  op : ⟦ D ⟧ (Tm n) → Tm n -- Σ_{m ∈ Ds} (Vec (Tm n) m) → Tm n
+  op : ⟦ D ⟧ (Tm n) → Tm n
 
 pattern op′ i ts = op (_ , i , ts)
 
@@ -129,11 +129,11 @@ lookup∈ₜₛ (tail x∈) = lookup∈ₜₛ x∈
 -- Substitution structure
 
 Ren : ℕ → ℕ → Set
-Ren m n = Vec (Fin n) m
+Ren m n = Fin m → Fin n -- Vec (Fin n) m
 
 module _ (ρ : Ren m n) where mutual
   rename : Tm m → Tm n
-  rename (` x)             = ` lookup ρ x
+  rename (` x)             = ` ρ x -- ` lookup ρ x
   rename (op (_ , i , ts)) = op (_ , i , renameⁿ ts)
 
   renameⁿ : {l : ℕ}
@@ -142,10 +142,10 @@ module _ (ρ : Ren m n) where mutual
   renameⁿ (t ∷ ts) = rename t ∷ renameⁿ ts
   
 Ren-id : Ren m m
-Ren-id = allFin _
+Ren-id = λ i → i -- allFin _
 
 Ren-⨟  : Ren m n → Ren n l → Ren m l
-Ren-⨟ σ₁ σ₂ = tabulate $ lookup σ₂ ∘ lookup σ₁
+Ren-⨟ σ₁ σ₂ = σ₂ ∘ σ₁ -- tabulate $ lookup σ₂ ∘ lookup σ₁
 
 Sub : (m n : ℕ) → Set
 Sub m n = Vec (Tm n) m
@@ -164,7 +164,7 @@ Sub-id : Sub m m
 Sub-id = tabulate `_
 
 RenToSub : Ren m n → Sub m n
-RenToSub σ = V.map `_ σ
+RenToSub σ = tabulate (`_ ∘ σ) -- V.map `_ σ
 
 Sub-⨟ : Sub m n → Sub n l → Sub m l
 Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
@@ -180,22 +180,22 @@ _for_
 t for x = tabulate (sub-for t x)
 
 injectˡ : Ren m (m + n)
-injectˡ = tabulate λ i → _↑ˡ_ i _
+injectˡ = λ i → _↑ˡ_ i _ -- tabulate λ i → _↑ˡ_ i _
 
 wkʳ : Tm m → Tm (n + m)
-wkʳ = rename $ tabulate (_↑ʳ_ _)
+wkʳ = rename (_↑ʳ_ _) -- rename $ tabulate (_↑ʳ_ _)
 
 wkˡ : Tm m → Tm (m + n)
 wkˡ = rename injectˡ
 
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
-wkᵐ m n = rename $ tabulate (insert-mid m n)
+wkᵐ m n = rename (insert-mid m n) -- rename $ tabulate (insert-mid m n)
 
 wk≤ˡ : m ≤ n → Tm m → Tm n
 wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm m → Tm (suc m)
-weaken = rename $ tabulate suc
+weaken = rename suc -- rename $ tabulate suc
 
 mutual
   punchOutTm : {x : Fin (suc n)} {t : Tm (suc n)}
@@ -212,11 +212,11 @@ mutual
 
 punchInTm : (x : Fin (suc m))
   → Tm m → Tm (suc m)
-punchInTm x = rename (tabulate (punchIn x))
+punchInTm x = rename (punchIn x)-- rename (tabulate (punchIn x))
 
 punchInTmⁿ : (x : Fin (suc m))
   → Tm m ^ k → Tm (suc m) ^ k
-punchInTmⁿ x = renameⁿ (tabulate (punchIn x))
+punchInTmⁿ x = renameⁿ (punchIn x) -- renameⁿ (tabulate (punchIn x))
 
 ------------------------------------------------------------------------------
 -- Zipper for Simple Terms
@@ -276,7 +276,7 @@ open ≡-Reasoning
 module _ {m : ℕ} where mutual
   rename-id : (t : Tm m)
     → rename Ren-id t ≡ t
-  rename-id (` x)      = cong `_ (lookup∘tabulate (λ i → i) x)
+  rename-id (` x)      = refl -- cong `_ (lookup∘tabulate (λ i → i) x)
   rename-id (op′ i ts) = cong (op′ i) (renameⁿ-id ts)
 
   renameⁿ-id : (ts : Tm m ^ l)
@@ -287,7 +287,7 @@ module _ {m : ℕ} where mutual
 module _ {m : ℕ} (σ : Ren m n) (ρ : Ren n l) where mutual
   rename-⨟ : (t : Tm m)
     → rename (Ren-⨟ σ ρ) t ≡ rename ρ (rename σ t)
-  rename-⨟ (` x)      = cong `_ (lookup∘tabulate (lookup ρ ∘ lookup σ) x)
+  rename-⨟ (` x)      = refl -- cong `_ (lookup∘tabulate (lookup ρ ∘ lookup σ) x)
   rename-⨟ (op′ i ts) = cong (op′ i) (renameⁿ-⨟ ts)
 
   renameⁿ-⨟ : (ts : Tm m ^ k)
@@ -298,13 +298,15 @@ module _ {m : ℕ} (σ : Ren m n) (ρ : Ren n l) where mutual
 Ren-assoc
   : (σ : Ren m n) (ρ : Ren n l) (γ : Ren l k)
   → Ren-⨟ (Ren-⨟ σ ρ) γ ≡ Ren-⨟ σ (Ren-⨟ ρ γ)
-Ren-assoc σ ρ γ = tabulate-cong (λ i → begin
+Ren-assoc σ ρ γ = refl
+  {- tabulate-cong (λ i → begin
   lookup γ (lookup (Ren-⨟ σ ρ) i)  -- ` i ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
     ≡⟨ cong (lookup γ) (lookup∘tabulate (lookup ρ ∘ lookup σ) i) ⟩
   lookup γ (lookup ρ (lookup σ i))
     ≡⟨ (sym $ lookup∘tabulate (lookup γ ∘ lookup ρ) (lookup σ i)) ⟩
   lookup (tabulate (λ i → lookup γ (lookup ρ i))) (lookup σ i)
     ∎)
+  -}
     
 module _ {m : ℕ} where mutual
   sub-id : (t : Tm m)
@@ -365,20 +367,25 @@ instance
   RenIsCategory .id      = Ren-id -- Ren-id
   RenIsCategory ._⨟_     = Ren-⨟
   RenIsCategory .⨟-assoc = Ren-assoc
-  RenIsCategory .⨟-idᵣ σ = begin
+  RenIsCategory .⨟-idᵣ σ = refl
+  {-
+    begin
     σ ⨟ id
       ≡⟨ tabulate-cong (λ i → lookup∘tabulate (λ i → i) (lookup σ i)) ⟩
     tabulate (λ x → lookup σ x)
       ≡⟨ tabulate∘lookup σ ⟩
     σ
       ∎
-  RenIsCategory .⨟-idₗ σ = begin
+   -}
+  RenIsCategory .⨟-idₗ σ = refl
+  {- begin
     id ⨟ σ
       ≡⟨ tabulate-cong (λ i → cong (lookup σ) (lookup∘tabulate (λ i → i) i)) ⟩
     tabulate (lookup σ)
       ≡⟨ tabulate∘lookup σ ⟩
     σ
       ∎
+  -}
 
   SubIsCategory : IsCategory ℕ Sub
   SubIsCategory .id      = Sub-id

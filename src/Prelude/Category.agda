@@ -156,10 +156,11 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) : Set where
     (P∧Q .proj₂))
 
   optimist
-    : (f : Mor C D) (g : Mor D E) (h : Mor E B)
+    : (P : 𝐘 C) (Q : 𝐘 C)
+    → (f : Mor C D) (g : Mor D E) (h : Mor E B)
     → ↑-closed P → Min (P [ f ⨟]) _ g → Min (Q [ f ⨟ g ⨟]) _ h
     → Min ((P ∧ Q) [ f ⨟]) _ (g ⨟ h)
-  optimist {P = P} {Q} f g h ↑P (Pfg , fMin) (Qfgh , fgMin) =
+  optimist P Q f g h ↑P (Pfg , fMin) (Qfgh , fgMin) =
     (↑P _ _ (h , ⨟-assoc _ _ _) Pfg , subst (Q _) (⨟-assoc _ _ _) Qfgh) , λ
       i (Pfi , Qfi) →
         let (j , g⨟j=i) = fMin i Pfi

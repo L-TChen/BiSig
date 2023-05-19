@@ -10,7 +10,7 @@ module Syntax.BiTyped.Intrinsic.Term {SD : S.Desc} (D : T.Desc SD) where
 open T SD
 
 open import Syntax.Simple.Term SD
-  using () renaming (Tm to TExp; Sub to TSub)
+  using () renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Context SD
 
 open import Syntax.BiTyped.Intrinsic.Functor {SD}
@@ -30,7 +30,7 @@ data Tm (m : ℕ) : Fam₀ m where
   _∋_
     : (A : TExp m) (t : Tm m Check A Γ)
     → Tm m Infer A Γ
-  ⇉_by_ : (t : Tm m Infer A Γ) (eq : A ≡ B)
+  ⇉_by_ : (t : Tm m Infer A Γ) (eq : B ≡ A)
     → Tm m Check B Γ
   op : ⟦ D ⟧ (Tm m) mod ⇒ Tm m mod
 
@@ -52,7 +52,7 @@ mutual
   renameMap []                 f _        = _
   renameMap (Θ ⊢[ _ ] _ ∷ Ds) f (t , ts) = renameMapᵃ Θ f t , renameMap Ds f ts
 
-  renameMapᵃ : (Θ : List (TExp n))
+  renameMapᵃ : (Θ : TExps n)
     → Ren Γ Δ
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
   renameMapᵃ []      f t = rename f t
@@ -88,13 +88,13 @@ mutual
   subMap : (D : ArgsD n)
     → Sub Γ Δ
     → ⟦ D ⟧ᵃˢ (Tm m) σ Γ → ⟦ D ⟧ᵃˢ (Tm m) σ Δ
-  subMap []        f _        = _
+  subMap []                f _        = _
   subMap (Θ ⊢[ _ ] _ ∷ Ds) f (t , ts) = subMapᵃ Θ f t , subMap Ds f ts
 
-  subMapᵃ : (Θ : List (TExp n))
+  subMapᵃ : (Θ : TExps n)
     → Sub Γ Δ
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Γ → ⟦ Θ ⟧ᵃ (Tm m mod A) σ Δ
-  subMapᵃ []       f t = sub f t
+  subMapᵃ []      f t = sub f t
   subMapᵃ (A ∷ Δ) f t = subMapᵃ Δ (exts f) t
 
 infixr 5 ⟪_⟫_
@@ -114,7 +114,7 @@ module _ {X : Fam m ℓ} (α : (D -Alg) X) where mutual
   foldMap []        _                = _
   foldMap (Θ ⊢[ _ ] _ ∷ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
 
-  foldMapᵃ : (Θ : List (TExp n))
+  foldMapᵃ : (Θ : TExps n)
     → ⟦ Θ ⟧ᵃ (Tm m mod A) σ ⇒₁ ⟦ Θ ⟧ᵃ (X mod A) σ
   foldMapᵃ []      t = fold t
   foldMapᵃ (A ∷ Δ) t = foldMapᵃ Δ t

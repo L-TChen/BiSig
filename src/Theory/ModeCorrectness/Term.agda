@@ -1,4 +1,5 @@
 {-# OPTIONS --with-K --rewriting #-}
+
 open import Prelude
   hiding (lookup)
 
@@ -14,8 +15,10 @@ module Theory.ModeCorrectness.Term {SD : S.Desc}
 open M SD Id
 open B SD
 
-import      Data.List.Relation.Unary.All as A
+-- import      Data.List.Relation.Unary.All as A
 
+open import Syntax.Context                SD
+  renaming (Cxt to UCxt)
 open import Syntax.NamedContext           SD Id
 open import Syntax.NamedContext.Decidable _≟Id_
 
@@ -32,12 +35,10 @@ open import Syntax.BiTyped.Extrinsic.Functor     SD Id
 open import Syntax.BiTyped.Extrinsic.Term           Id D
 open import Syntax.BiTyped.Extrinsic.Properties     Id D
 
-import Syntax.BiTyped.Intrinsic.Functor  {SD}       as I
-open import Syntax.BiTyped.Intrinsic.Term            D
-
-open import Theory.Ontologisation.Context         Id
+open import Theory.Ontologisation.Context           Id
 
 private variable
+  mod   : Mode
   n m l : ℕ
   A B   : TExp n
   xs    : List (Fin n)
@@ -45,7 +46,6 @@ private variable
   Ds    : ArgsD n
   AD    : ArgD  n
   σ σ₁ σ₂ ρ γ : TSub n m
-  mod     : Mode
   t u     : Raw m mod
 
 -- MC : {CD : ConD} → (CD ∈ D) → _
@@ -91,9 +91,7 @@ mutual
     → ModeCorrectᵃ xs Θ
     → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
     → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₁ ⟩)) σ₁ Γ t)
-    -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₁ ⟫ C)) σ₁ Γ t)
     → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₂ ⟩)) σ₂ Γ t)
-    -- (⟦ Θ ⟧ᵃ (Raw m) ⊢⇄ Infer (⟪ σ₂ ⟫ C)) σ₂ Γ t)
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
@@ -105,9 +103,9 @@ mutual
 ¬switch
   : {t : Raw⇉ m}
   → Γ ⊢ t ⇉ A
-  → A ≢ B
+  → B ≢ A
   → ¬ (Γ ⊢ (t ↑) ⇇ B)
-¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
+¬switch ⊢t B≠A (⊢⇉ B=A ⊢t′) rewrite uniq-⇉ ⊢t ⊢t′ = B≠A B=A
 
 ------------------------------------------------------------------------------
 -- A type checker
@@ -115,57 +113,66 @@ mutual
 module _ {m : ℕ} where mutual
   synthesise
     : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
-    → Maybe (∃₂ λ k (σ : AList m k) → Σ[ A ∈ TExp m ] {!? ⊢ ?!}) -- Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
+    → Maybe (∃₂ λ k (ρ : AList n k)
+      → Σ[ A ∈ TExp m ] (Typability A Γ t [ toSub σ ⨟]) _ (toSub ρ))
 
   inherit
     : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
-    → Maybe (∃₂ λ k (σ : AList m k) → {!!} ) -- Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
+    → Maybe (∃₂ λ k (ρ : AList n k)
+      → (Typability A Γ t [ toSub σ ⨟]) _ (toSub ρ))
 
-  synthesise = {!!}
-  inherit    = {!!}
---   synthetise Γ (` x)   σ with lookup Γ x
---   ... | no _         = nothing
---   ... | yes (A , x∈) = just ((_ , σ , A , ⊢` (sub-∈ (toSub σ) x∈)))
+  synthesise Γ (` x)   σ with lookup Γ x
+  ... | no _         = nothing
+  ... | yes (A , x∈) = just (_ , id , A , ⊢` (sub-∈ (toSub σ ⨟ id) x∈))
 
---   synthetise Γ (t ⦂ A) σ with inherit Γ t σ A
---   ... | nothing = nothing
---   ... | just (n , σ , ⊢t) = just (_ , σ , A , ⊢⦂ ⊢t refl)
+  synthesise Γ (t ⦂ A) σ with inherit Γ t σ A
+  ... | nothing = nothing
+  ... | just (n , ρ , ⊢t) = just (_ , ρ , A , ⊢⦂ ⊢t refl)
 
---   synthetise Γ (op (i , eq , ts)) σ = {!!}
+  synthesise Γ (op (i , eq , ts)) σ = {!!}
 
---   inherit Γ (t ↑) σ A  with synthetise Γ t σ
---   ... | nothing = nothing
---   ... | just (_ , ρ , B , ⊢t) with amgu⁺ A B ρ
---   ... | inr _ = nothing
---   ... | inl (_ , γ , A≈B , min) = just (_ , ρ ⨟ γ , ⊢⇉ {!!} (sym A≈B))
+  inherit Γ (t ↑) σ A  with synthesise Γ t σ
+  ... | nothing = nothing
+  ... | just (_ , ρ , B , ⊢t) with amgu⁺ A B (σ ⨟ ρ)
+  ... | inr _ = nothing
+  ... | inl (_ , γ , A≈B , min) rewrite ⨟-assoc (toSub σ) (toSub ρ) (toSub γ) =
+    just (_ , ρ ⨟ γ , ⊢⇉ A≈B
+      (⊢⟨σ⟩↑ B Γ t (toSub $ σ ⨟ ρ) (toSub σ ⨟ toSub (ρ ⨟ γ))
+        (toSub γ , ⨟-assoc (toSub σ) (toSub ρ) (toSub γ)) ⊢t))
 
---   inherit Γ (op (i , eq , ts)) σ A = {!!}
+  inherit Γ (op (i , eq , ts)) σ A = {!!}
 
--- ------------------------------------------------------------------------------
--- -- A proof-relevant type checker
+------------------------------------------------------------------------------
+-- A proof-relevant type checker
 
--- module _ {m : ℕ} where mutual
---   synthetise⁺
---     : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
---     → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
---         Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
---   inherit⁺
---     : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
---     → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
---         Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
+module _ {m : ℕ} where mutual
+  synthetise⁺
+    : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
+    → Dec (∃₂ λ l (ρ : AList n l) → Σ[ A ∈ TExp m ]
+        (Typability A Γ t [ toSub σ ⨟]) l (toSub ρ) )
+  inherit⁺
+    : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
+    → Dec (∃[ l ] Σ[ ρ ∈ AList n l ]
+        (Typability A Γ t [ toSub σ ⨟]) l (toSub ρ))
 
---   synthetise⁺ Γ (` x)   σ with lookup Γ x
---   ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)
---   ... | yes (A , x) = yes (_ , σ , A , ⊢` (sub-∈ (toSub σ) x))
---   synthetise⁺ Γ (t ⦂ A) σ with inherit⁺ Γ t σ A
---   ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
---   ... | yes (n , σ , ⊢t) = yes (_ , σ , A , ⊢⦂ ⊢t refl)
---   synthetise⁺ Γ (op x)  σ = {!!}
+  synthetise⁺ Γ (` x)   σ with lookup Γ x
+  ... | no ¬p        = no λ where
+    (l , σ′ , A , ⊢` y) → subst-∈→∈ _ Γ ¬p (_ , y)
+  ... | yes (A , x∈) = yes (_ , id , A , ⊢` (sub-∈ (toSub σ ⨟ id) x∈))
+  synthetise⁺ Γ (t ⦂ A) σ with inherit⁺ Γ t σ A
+  ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
+  ... | yes (n , ρ , ⊢t) = yes (_ , ρ , A , ⊢⦂ ⊢t refl)
+  synthetise⁺ Γ (op x)  σ = {!!}
 
---   inherit⁺ Γ (t ↑)  σ A with synthetise⁺ Γ t σ
---   ... | no ¬p = no λ where (n , σ′ , ⊢⇉ ⊢t refl) → ¬p (n , σ′ , A , ⊢t)
---   ... | yes (l , σ , B , ⊢t)  = {!!} -- we need to compare A and B, if A and B are not unifiable, then amgu needs to provide a proof of A ≢ B
--- --  ... | yes (l , σ , B , ⊢t)  with amgu A B (_ , σ)
--- --  ... | nothing       = no  λ where (_ , σ′ , ⊢t′) → ¬switch ⊢t {!!} {!⊢t′!}
--- --  ... | just (l , σ′) = yes (l , σ′ , ⊢⇉ {!!} {!!})
---   inherit⁺ Γ (op x) σ A = {!!}
+  inherit⁺ Γ (t ↑)  σ A with synthetise⁺ Γ t σ
+  ... | no ¬p = no λ where (n , σ′ , ⊢⇉ refl ⊢t) → ¬p (n , σ′ , A , ⊢t)
+  ... | yes (l , ρ , B , ⊢t)  with amgu⁺ A B (σ ⨟ ρ)
+  ... | inr A≉B                 = no λ where
+    (_ , γ , ⊢⇉ refl ⊢t′) → {!!} -- ¬switch {_} {Γ ⟨ {!!} ⟩} {B ⟨ {!!} ⟩} {A ⟨ {!!} ⟩} {!!} {!!} {!!}
+  ... | inl (_ , γ , A≈B , min) rewrite ⨟-assoc (toSub σ) (toSub ρ) (toSub γ) =
+    yes (_ , ρ ⨟ γ , ⊢⇉ A≈B
+      (⊢⟨σ⟩↑ B Γ t (toSub $ σ ⨟ ρ) (toSub σ ⨟ toSub (ρ ⨟ γ))
+        (toSub γ , ⨟-assoc (toSub σ) (toSub ρ) (toSub γ)) ⊢t))
+
+  inherit⁺ Γ (op x) σ A = {!!}
+

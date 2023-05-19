@@ -50,7 +50,7 @@ mutual
       : (t : Λ⇇ B (A ∷ Γ))
       → Λ⇇ (A ↣ B) Γ
     ⇉_by_
-      : (t : Λ⇉ A Γ) (eq : A ≡ B)
+      : (t : Λ⇉ A Γ) (eq : B ≡ A)
       → Λ⇇ B Γ
 
 Λ : Mode → Λₜ m → Cxt m → Set

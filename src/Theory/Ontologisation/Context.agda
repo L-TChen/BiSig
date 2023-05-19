@@ -13,10 +13,10 @@ private variable
   x y   : Id
   Γ     : Named.Context T
 
-∥_∥ctx : Named.Context T → Nameless.Context T
-∥ []        ∥ctx = []
-∥ x ⦂ A , Γ ∥ctx = A ∷ ∥ Γ ∥ctx
+∥_∥cxt : Named.Context T → Nameless.Context T
+∥ []        ∥cxt = []
+∥ x ⦂ A , Γ ∥cxt = A ∷ ∥ Γ ∥cxt
 
-∥_∥∈ : x ⦂ A ∈ Γ → A ∈ ∥ Γ ∥ctx
+∥_∥∈ : x ⦂ A ∈ Γ → A ∈ ∥ Γ ∥cxt
 ∥ zero     ∥∈ = here refl
 ∥ suc ¬p x ∥∈ = there ∥ x ∥∈

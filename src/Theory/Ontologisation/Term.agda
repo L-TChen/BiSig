@@ -17,8 +17,8 @@ open import Syntax.BiTyped.Raw.Term       Id D
 open import Syntax.BiTyped.Extrinsic.Functor SD Id   as E
 open import Syntax.BiTyped.Extrinsic.Term       Id D
 
-open import Syntax.BiTyped.Intrinsic.Functor {SD}      as I
-open import Syntax.BiTyped.Intrinsic.Term            D
+open import Syntax.BiTyped.Intrinsic.Functor {SD} as I
+open import Syntax.BiTyped.Intrinsic.Term         D
 
 open import Theory.Ontologisation.Context          Id
 
@@ -36,7 +36,7 @@ private variable
 mutual
   ∥_∥⇉
     : Γ ⊢ t ⇉ A
-    → Tm⇉ m A ∥ Γ ∥ctx
+    → Tm⇉ m A ∥ Γ ∥cxt
   ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇉ =
@@ -44,22 +44,22 @@ mutual
 
   ∥_∥⇇
     : Γ ⊢ t ⇇ A
-    → Tm⇇ m A ∥ Γ ∥ctx
-  ∥ ⊢⇉ t  p ∥⇇ = ⇉ ∥ t ∥⇉ by p
+    → Tm⇇ m A ∥ Γ ∥cxt
+  ∥ ⊢⇉ p t ∥⇇ = ⇉ ∥ t ∥⇉ by p
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇇ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 
   ∥-∥map : (D : ArgsD n)
     → {t : R.⟦ D ⟧ᵃˢ (Raw m)}
     → E.⟦ D ⟧ᵃˢ (Raw m) ⊢⇄ σ Γ t
-    → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥ctx
+    → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥cxt
   ∥-∥map []                 _        = tt
   ∥-∥map (Θ ⊢[ m ] B ∷ Ds) (p , ps) = ∥-∥mapᵃ Θ p , ∥-∥map Ds ps
 
   ∥-∥mapᵃ : (Θ : TExps n)
     → {t : R.⟦ Θ ⟧ᵃ (Raw m mod)}
     → E.⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ mod A) σ Γ t
-    → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥ctx
+    → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥cxt
   ∥-∥mapᵃ {mod = Check} []       p = ∥ p ∥⇇
   ∥-∥mapᵃ {mod = Infer} []       p = ∥ p ∥⇉
   ∥-∥mapᵃ               (A ∷ Θ) p = ∥-∥mapᵃ Θ p

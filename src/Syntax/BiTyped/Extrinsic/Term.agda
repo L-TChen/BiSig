@@ -30,12 +30,12 @@ data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
     → ⊢⇄ Infer A Γ (` x)
   ⊢⦂
     : ⊢⇄ Check B Γ t
-    → A ≡ B
+    → (eq : A ≡ B)
     → ⊢⇄ Infer A Γ (t ⦂ B)
   ⊢⇉
-    : ⊢⇄ Infer A Γ t
-    → A ≡ B
-    → ⊢⇄ Check B Γ (t ↑)
+    : (eq : A ≡ B)
+    → ⊢⇄ Infer B Γ t
+    → ⊢⇄ Check A Γ (t ↑)
   ⊢op
     : (t : R.⟦ D ⟧ (Raw m) mod)
     → (⊢t : ⟦ D ⟧ ⊢⇄ mod A Γ t)

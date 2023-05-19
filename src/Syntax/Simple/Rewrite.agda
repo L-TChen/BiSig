@@ -24,4 +24,16 @@ lem1 σ ρ = toSub-++ σ ρ
 lem2 : (i : Fin n) → lookup (tabulate `_) i ≡ ` i
 lem2 = lookup∘tabulate `_
 
+-- The following leads to unsolved meta variables
+-- lem3 : (σ : AList m n) (ρ : AList n l) (t : Tm m)
+--   → sub (tabulate (λ i → sub (toSub ρ) (lookup (toSub σ) i))) t ≡ t ⟨ σ ⟩ ⟨ ρ ⟩
+-- lem3 σ ρ t = begin
+--   sub (tabulate (λ i → sub (toSub ρ) (lookup (toSub σ) i))) t
+--     ≡⟨ sym (cong (t ⟨_⟩) (lem1 σ ρ)) ⟩
+--   t ⟨ σ ⨟ ρ ⟩
+--     ≡⟨ ⟨⟩-⨟ σ ρ t ⟩
+--   t ⟨ σ ⟩ ⟨ ρ ⟩
+--     ∎
+--   where open ≡-Reasoning
+
 {-# REWRITE lem1 lem2 #-}

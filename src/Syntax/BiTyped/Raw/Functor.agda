@@ -8,7 +8,7 @@ import Syntax.BiTyped.Description as B
 module Syntax.BiTyped.Raw.Functor (SD : S.Desc) (Id : Set) where
 
 open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+  renaming (Tm to TExp; Tm₀ to T; Tms to TExps)
 open B SD
 
 private variable
@@ -22,7 +22,7 @@ Fam ℓ = Mode → Set ℓ
 Fam₀ : Set₁
 Fam₀ = Fam lzero
 
-⟦_⟧ᵃ : (D : List (TExp n)) → Set ℓ → Set ℓ
+⟦_⟧ᵃ : (D : TExps n) → Set ℓ → Set ℓ
 ⟦ []    ⟧ᵃ X = X
 ⟦ A ∷ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
 

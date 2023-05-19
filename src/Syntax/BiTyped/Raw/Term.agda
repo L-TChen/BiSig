@@ -8,7 +8,7 @@ import Syntax.BiTyped.Description as B
 module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc SD) where
 
 open import Syntax.Simple.Term         SD
-  renaming (Tm to TExp)
+  renaming (Tm to TExp; Tms to TExps)
 open import Syntax.Simple.Association  SD
 
 open import Syntax.BiTyped.Raw.Functor SD Id
@@ -43,7 +43,7 @@ module _ (ρ : Ren m n) where mutual
   trenameⁿ {D = []}     _        = _
   trenameⁿ {D = A ∷ D} (t , ts) = trenameᵃ t , trenameⁿ ts
 
-  trenameᵃ : {D : List (TExp k)}
+  trenameᵃ : {D : TExps k}
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
   trenameᵃ {D = []}     t       = trename t
   trenameᵃ {D = A ∷ D} (x , t) = x , trenameᵃ t
@@ -51,7 +51,7 @@ module _ (ρ : Ren m n) where mutual
 twkˡ : m ≤ n → Raw m mod → Raw n mod
 twkˡⁿ : {D : ArgsD k} → m ≤ n
   → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
-twkˡᵃ : {D : List (TExp k)} → m ≤ n
+twkˡᵃ : {D : TExps k} → m ≤ n
   → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
 
 twkˡ  (less-than-or-equal refl) = trename  injectˡ
@@ -61,7 +61,7 @@ twkˡᵃ (less-than-or-equal refl) = trenameᵃ injectˡ
 twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
 twkᵐⁿ : {D : ArgsD k} (m n {l} : ℕ)
   → ⟦ D ⟧ᵃˢ (Raw (m + l)) → ⟦ D ⟧ᵃˢ (Raw (m + n + l))
-twkᵐᵃ : {D : List (TExp k)} (m n {l} : ℕ)
+twkᵐᵃ : {D : TExps k} (m n {l} : ℕ)
   → ⟦ D ⟧ᵃ (Raw (m + l) mod) → ⟦ D ⟧ᵃ (Raw (m + n + l) mod)
 
 twkᵐ  m n = trename  (insert-mid m n)
@@ -80,7 +80,7 @@ module _ (σ : Sub m n) where mutual
   tsubⁿ {D = []}     _        = _
   tsubⁿ {D = A ∷ D} (t , ts) = tsubᵃ t , tsubⁿ ts
 
-  tsubᵃ : {D : List (TExp k)}
+  tsubᵃ : {D : TExps k}
     → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
   tsubᵃ {D = []}     t      = tsub t
   tsubᵃ {D = A ∷ D} (x , t) = x , tsubᵃ t
@@ -100,7 +100,7 @@ module _ {m : ℕ} where mutual
   tsubⁿ-id {D = []}     ts       = refl
   tsubⁿ-id {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-id t) (tsubⁿ-id ts)
 
-  tsubᵃ-id : {D : List (TExp k)}
+  tsubᵃ-id : {D : TExps k}
     → (t : ⟦ D ⟧ᵃ (Raw m mod))
     → tsubᵃ id t ≡ t
   tsubᵃ-id {D = []}             = tsub-id
@@ -121,7 +121,7 @@ module _ (σ : Sub m n) (ρ : Sub n l) where mutual
   tsubⁿ-⨟ {D = []}     ts       = refl
   tsubⁿ-⨟ {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-⨟ t) (tsubⁿ-⨟ ts)
 
-  tsubᵃ-⨟ : {D : List (TExp k)}
+  tsubᵃ-⨟ : {D : TExps k}
     → (t : ⟦ D ⟧ᵃ (Raw m mod))
     → tsubᵃ (σ ⨟ ρ) t ≡ tsubᵃ ρ (tsubᵃ σ t)
   tsubᵃ-⨟ {D = []}             = tsub-⨟
@@ -144,6 +144,16 @@ instance
   RawSubIsPresheaf .⟨⟩-id      = tsub-id
   RawSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsub-⨟ σ ρ t
  
+  RawⁿSubIsPresheaf : {AD : ArgsD k} → IsPresheaf λ m → ⟦ AD ⟧ᵃˢ (Raw m)
+  RawⁿSubIsPresheaf ._⟨_⟩ t σ   = tsubⁿ σ t
+  RawⁿSubIsPresheaf .⟨⟩-id      = tsubⁿ-id
+  RawⁿSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubⁿ-⨟ σ ρ t
+
+--  RawᵃSubIsPresheaf : {Θ : TExps k} → IsPresheaf λ m → ⟦ Θ ⟧ᵃ (Raw m mod)
+--  RawᵃSubIsPresheaf ._⟨_⟩ t σ   = tsubᵃ σ t
+--  RawᵃSubIsPresheaf .⟨⟩-id      = tsubᵃ-id
+--  RawᵃSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubᵃ-⨟ σ ρ t
+
   RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
   RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
   RawAListIsPresheaf .⟨⟩-id      = tsub-id

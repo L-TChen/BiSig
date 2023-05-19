@@ -1,115 +1,224 @@
 
 
-@article{Ahrens2018,
-  author =        {Ahrens, Benedikt and Matthes, Ralph and
-                   M{\"{o}}rtberg, Anders},
-  journal =       {Journal of Automated Reasoning},
-  pages =         {1--34},
-  publisher =     {Springer Netherlands},
-  title =         {From Signatures to Monads in {UniMath}},
-  year =          {2018},
-  doi =           {10.1007/s10817-018-9474-4},
-  issn =          {0168-7433},
-}
-
-@inproceedings{Ahrens2022,
+@article{Dunfield2021,
   address =       {New York, NY, USA},
-  author =        {Ahrens, Benedikt and Matthes, Ralph and
-                   M{\"{o}}rtberg, Anders},
-  booktitle =     {Proceedings of the 11th ACM SIGPLAN International
-                   Conference on Certified Programs and Proofs},
-  pages =         {307--323},
-  publisher =     {ACM},
-  title =         {Implementing a category-theoretic framework for
-                   typed abstract syntax},
-  year =          {2022},
-  doi =           {10.1145/3497775.3503678},
-  isbn =          {9781450391825},
-}
-
-@article{Allais2021,
-  author =        {Allais, Guillaume and Atkey, Robert and
-                   Chapman, James and McBride, Conor and McKinna, James},
-  journal =       {Journal of Functional Programming},
-  number =        {1996},
-  pages =         {e22},
-  title =         {A type- and scope-safe universe of syntaxes with
-                   binding: their semantics and proofs},
-  volume =        {31},
+  author =        {Dunfield, Jana and Krishnaswami, Neel},
+  journal =       {ACM Computing Surveys},
+  month =         may,
+  number =        {5},
+  pages =         {98:1--98:38},
+  publisher =     {Association for Computing Machinery},
+  title =         {Bidirectional typing},
+  volume =        {54},
   year =          {2021},
-  doi =           {10.1017/S0956796820000076},
-  issn =          {0956-7968},
+  abstract =      {Bidirectional typing combines two modes of typing:
+                   type checking, which checks that a program satisfies
+                   a known type, and type synthesis, which determines a
+                   type from the program. Using checking enables
+                   bidirectional typing to support features for which
+                   inference is undecidable; using synthesis enables
+                   bidirectional typing to avoid the large annotation
+                   burden of explicitly typed languages. In addition,
+                   bidirectional typing improves error locality. We
+                   highlight the design principles that underlie
+                   bidirectional type systems, survey the development of
+                   bidirectional typing from the prehistoric period
+                   before Pierce and Turner's local type inference to
+                   the present day, and provide guidance for future
+                   investigations.},
+  doi =           {10.1145/3450952},
+  issn =          {0360-0300},
+  url =           {https://doi.org/10.1145/3450952},
 }
 
-@article{Fiore2022,
-  author =        {Fiore, Marcelo and Szamozvancev, Dmitrij},
-  journal =       {Proceedings of the ACM on Programming Languages},
-  number =        {POPL},
-  pages =         {1--29},
-  title =         {Formal metatheory of second-order abstract syntax},
-  volume =        {6},
+@book{Wadler2022,
+  author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
+  month =         aug,
+  title =         {Programming Language Foundations in {A}gda},
   year =          {2022},
-  doi =           {10.1145/3498715},
-  issn =          {2475-1421},
+  url =           {https://plfa.inf.ed.ac.uk/22.08/},
+}
+
+@phdthesis{Gast2004,
+  author =        {Gast, Holger},
+  school =        {Universit{\"a}t T{\"u}bingen},
+  title =         {A generator for type checkers},
+  year =          {2004},
+  url =           {http://hdl.handle.net/10900/48845},
+}
+
+@inproceedings{Grewe2015,
+  address =       {New York, NY, USA},
+  author =        {Grewe, Sylvia and Erdweg, Sebastian and
+                   Wittmann, Pascal and Mezini, Mira},
+  booktitle =     {2015 ACM International Symposium on New Ideas, New
+                   Paradigms, and Reflections on Programming and
+                   Software (Onward!)},
+  pages =         {137--150},
+  publisher =     {Association for Computing Machinery},
+  series =        {Onward! 2015},
+  title =         {Type systems for the masses: {Deriving} soundness
+                   proofs and efficient checkers},
+  year =          {2015},
+  abstract =      {The correct definition and implementation of
+                   non-trivial type systems is difficult and requires
+                   expert knowledge, which is not available to
+                   developers of domain-specific languages (DSLs) in
+                   practice. We propose Veritas, a workbench that
+                   simplifies the development of sound type systems.
+                   Veritas provides a single, high-level specification
+                   language for type systems, from which it
+                   automatically tries to derive soundness proofs and
+                   efficient and correct type-checking algorithms. For
+                   verification, Veritas combines off-the-shelf
+                   automated first-order theorem provers with automated
+                   proof strategies specific to type systems. For
+                   deriving efficient type checkers, Veritas provides a
+                   collection of optimization strategies whose
+                   applicability to a given type system is checked
+                   through verification on a case-by-case basis. We have
+                   developed a prototypical implementation of Veritas
+                   and used it to verify type soundness of the
+                   simply-typed lambda calculus and of parts of typed
+                   SQL. Our experience suggests that many of the
+                   individual verification steps can be automated and,
+                   in particular, that a high degree of automation is
+                   possible for type systems of DSLs.},
+  doi =           {10.1145/2814228.2814239},
+  isbn =          {9781450336888},
+  url =           {https://doi.org/10.1145/2814228.2814239},
+}
+
+@article{Pacak2020,
+  address =       {New York, NY, USA},
+  author =        {Pacak, Andr\'{e} and Erdweg, Sebastian and
+                   Szab\'{o}, Tam\'{a}s},
+  journal =       {Proc. ACM Program. Lang.},
+  month =         {nov},
+  number =        {OOPSLA},
+  publisher =     {Association for Computing Machinery},
+  title =         {A systematic approach to deriving incremental type
+                   checkers},
+  volume =        {4},
+  year =          {2020},
+  abstract =      {Static typing can guide programmers if feedback is
+                   immediate. Therefore, all major IDEs incrementalize
+                   type checking in some way. However, prior approaches
+                   to incremental type checking are often specialized
+                   and hard to transfer to new type systems. In this
+                   paper, we propose a systematic approach for deriving
+                   incremental type checkers from textbook-style type
+                   system specifications. Our approach is based on
+                   compiling inference rules to Datalog, a carefully
+                   limited logic programming language for which
+                   incremental solvers exist. The key contribution of
+                   this paper is to discover an encoding of the infinite
+                   typing relation as a finite Datalog relation in a way
+                   that yields efficient incremental updates. We
+                   implemented the compiler as part of a type system DSL
+                   and show that it supports simple types, some local
+                   type inference, operator overloading, universal
+                   types, and iso-recursive types.},
+  doi =           {10.1145/3428195},
+  url =           {https://doi.org/10.1145/3428195},
+}
+
+@inproceedings{Cimini2020,
+  address =       {New York, NY, USA},
+  author =        {Cimini, Matteo and Miller, Dale and Siek, Jeremy G.},
+  booktitle =     {Proceedings of the 13th ACM SIGPLAN International
+                   Conference on Software Language Engineering},
+  pages =         {108--125},
+  publisher =     {Association for Computing Machinery},
+  series =        {SLE 2020},
+  title =         {Extrinsically typed operational semantics for
+                   functional languages},
+  year =          {2020},
+  abstract =      {We present a type system over language definitions
+                   that classifies parts of the operational semantics of
+                   a language in input, and models a common language
+                   design organization. The resulting typing discipline
+                   guarantees that the language at hand is automatically
+                   type sound. Thanks to the use of types to model
+                   language design, our type checker has a high-level
+                   view on the language being analyzed and can report
+                   messages using the same jargon of language designers.
+                   We have implemented our type system in the
+                   lang-n-check tool, and we have applied it to derive
+                   the type soundness of several functional languages,
+                   including those with recursive types, polymorphism,
+                   exceptions, lists, sums, and several common types and
+                   operators.},
+  doi =           {10.1145/3426425.3426936},
+  isbn =          {9781450381765},
+  url =           {https://doi.org/10.1145/3426425.3426936},
 }
 
 @inproceedings{Fiore1999,
-  address =       {Trento},
   author =        {Fiore, Marcelo P. and Plotkin, Gordon D. and
                    Turi, Daniele},
   booktitle =     {Proceedings. 14th Symposium on Logic in Computer
                    Science},
   pages =         {193--202},
-  publisher =     {IEEE Comput. Soc},
+  publisher =     {IEEE},
   title =         {Abstract syntax and variable binding},
   year =          {1999},
   doi =           {10.1109/LICS.1999.782615},
   isbn =          {0-7695-0158-3},
+  url =           {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?
+                  arnumber=782615},
 }
 
-@article{Matthes2004,
-  author =        {Matthes, Ralph and Uustalu, Tarmo},
-  journal =       {Theoretical Computer Science},
-  number =        {1-2},
-  pages =         {155--174},
-  title =         {Substitution in non-wellfounded syntax with variable
-                   binding},
-  volume =        {327},
-  year =          {2004},
-  doi =           {10.1016/j.tcs.2004.07.025},
-  issn =          {03043975},
+@article{Fiore2022,
+  author =        {Fiore, Marcelo and Szamozvancev, Dmitrij},
+  journal =       {Proceedings of the ACM on Programming Languages},
+  month =         jan,
+  number =        {POPL},
+  pages =         {1--29},
+  title =         {Formal metatheory of second-order abstract syntax},
+  volume =        {6},
+  year =          {2022},
+  abstract =      {Despite extensive research both on the theoretical
+                   and practical fronts, formalising, reasoning about,
+                   and implementing languages with variable binding is
+                   still a daunting endeavour -- repetitive boilerplate
+                   and the overly complicated metatheory of
+                   capture-avoiding substitution often get in the way of
+                   progressing on to the actually interesting properties
+                   of a language. Existing developments offer some
+                   relief, however at the expense of inconvenient and
+                   error-prone term encodings and lack of formal
+                   foundations.},
+  doi =           {10.1145/3498715},
+  issn =          {2475-1421},
+  url =           {https://dl.acm.org/doi/10.1145/3498715},
 }
 
-@article{Hirschowitz2010,
-  author =        {Hirschowitz, Andr{\'{e}} and Maggesi, Marco},
-  journal =       {Information and Computation},
-  number =        {5},
-  pages =         {545--564},
-  publisher =     {Elsevier Inc.},
-  title =         {Modules over monads and initial semantics},
-  volume =        {208},
-  year =          {2010},
-  doi =           {10.1016/j.ic.2009.07.003},
-  issn =          {08905401},
+@article{Hamana2022,
+  author =        {Hamana, Makoto},
+  journal =       {Mathematical Structures in Computer Science},
+  number =        {4},
+  pages =         {542--573},
+  publisher =     {Cambridge University Press},
+  title =         {Complete algebraic semantics for second-order
+                   rewriting systems based on abstract syntax with
+                   variable binding},
+  volume =        {32},
+  year =          {2022},
+  doi =           {10.1017/S0960129522000287},
 }
 
-@inproceedings{Ahrens2018b,
-  address =       {Dagstuhl, Germany},
-  author =        {Ahrens, Benedikt and Matthes, Ralph},
-  booktitle =     {21st International Conference on Types for Proofs and
-                   Programs (TYPES 2015)},
-  editor =        {Uustalu, Tarmo},
+@article{Ahrens2021,
+  author =        {Ahrens, Benedikt and Hirschowitz, Andr{\'e} and
+                   Lafont, Ambroise and Maggesi, Marco},
+  journal =       {Logical Methods in Computer Science},
+  month =         may,
   number =        {2},
-  pages =         {2:1---2:23},
-  publisher =     {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
-  series =        {Leibniz International Proceedings in Informatics
-                   (LIPIcs)},
-  title =         {Heterogeneous Substitution Systems Revisited},
-  volume =        {69},
-  year =          {2018},
-  doi =           {10.4230/LIPIcs.TYPES.2015.2},
-  isbn =          {978-3-95977-030-9},
-  issn =          {1868-8969},
+  title =         {Presentable signatures and initial semantics},
+  volume =        {17},
+  year =          {2021},
+  doi =           {10.23638/LMCS-17(2:17)2021},
+  url =           {https://lmcs.episciences.org/7511},
 }
 
 @inproceedings{Arkor2020,
@@ -118,121 +227,209 @@
   booktitle =     {Proceedings of the 35th Annual ACM/IEEE Symposium on
                    Logic in Computer Science},
   pages =         {88--101},
-  publisher =     {ACM},
-  title =         {Algebraic models of simple type theories},
+  publisher =     {Association for Computing Machinery},
+  series =        {LICS '20},
+  title =         {Algebraic models of simple type theories: A
+                   polynomial approach},
   year =          {2020},
+  abstract =      {We develop algebraic models of simple type theories,
+                   laying out a framework that extends universal algebra
+                   to incorporate both algebraic sorting and variable
+                   binding. Examples of simple type theories include the
+                   unityped and simply-typed λ-calculi, the
+                   computational λ-calculus, and predicate logic.Simple
+                   type theories are given models in presheaf
+                   categories, with structure specified by algebras of
+                   polynomial endofunctors that correspond to natural
+                   deduction rules. Initial models, which we construct,
+                   abstractly describe the syntax of simple type
+                   theories. Taking substitution structure into
+                   consideration, we further provide sound and complete
+                   semantics in structured cartesian multicategories.
+                   This development generalises Lambek's correspondence
+                   between the simply-typed λ-calculus and
+                   cartesian-closed categories, to arbitrary simple type
+                   theories.},
   doi =           {10.1145/3373718.3394771},
   isbn =          {9781450371049},
+  url =           {https://doi.org/10.1145/3373718.3394771},
 }
 
-@inproceedings{Hirschowitz2022,
-  author =        {Hirschowitz, Andr{\'{e}} and Hirschowitz, Tom and
-                   Lafont, Ambroise and Maggesi, Marco},
-  booktitle =     {Foundations of Software Science and Computation
-                   Structures. FoSSaCS 2022},
-  editor =        {Bouyer, Patricia and Schr{\"{o}}der, Lutz},
-  pages =         {389--408},
-  publisher =     {Springer, Cham},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Variable binding and substitution for (nameless)
-                   dummies},
-  volume =        {13242},
+@inproceedings{Cimini2022,
+  address =       {New York, NY, USA},
+  author =        {Cimini, Matteo},
+  booktitle =     {Proceedings of the 15th ACM SIGPLAN International
+                   Conference on Software Language Engineering},
+  pages =         {16--29},
+  publisher =     {Association for Computing Machinery},
+  series =        {SLE 2022},
+  title =         {{Lang-n-Prove}: {A} {DSL} for language proofs},
   year =          {2022},
-  doi =           {10.1007/978-3-030-99253-8_20},
-  isbn =          {9783030992521},
-  issn =          {16113349},
+  abstract =      {Proofs of language properties often follow a schema
+                   that does not apply just to one language but, rather,
+                   applies to many languages of a certain class. In this
+                   paper, we present Lang-n-Prove, a domain-specific
+                   language for expressing theorems and proofs in such a
+                   way that they apply to many languages. The main
+                   characteristic of Lang-n-Prove is that it contains
+                   linguistic features that are specific to the domain
+                   of language design. We have used Lang-n-Prove to
+                   express the theorems and proofs of canonical forms
+                   lemmas, the progress theorem, and the type
+                   preservation theorem for a restricted class of
+                   functional languages. We have applied our
+                   Lang-n-Prove proofs to several functional languages,
+                   including languages with polymorphism, exceptions,
+                   recursive types, list operations, and other common
+                   types and operators. Our tool has generated the proof
+                   code in Abella that machine-checks the type safety of
+                   all these languages, when the correct code for
+                   substitution lemmas is provided.},
+  doi =           {10.1145/3567512.3567514},
+  isbn =          {9781450399197},
+  url =           {https://doi.org/10.1145/3567512.3567514},
 }
 
-@inproceedings{Fiore2013a,
-  author =        {Fiore, Marcelo and Hamana, Makoto},
-  booktitle =     {2013 28th Annual ACM/IEEE Symposium on Logic in
-                   Computer Science},
-  pages =         {520--529},
-  publisher =     {IEEE},
-  title =         {Multiversal Polymorphic Algebraic Theories: Syntax,
-                   Semantics, Translations, and Equational Logic},
-  year =          {2013},
-  doi =           {10.1109/LICS.2013.59},
-  isbn =          {978-1-4799-0413-6},
-  issn =          {10436871},
-}
-
-@article{Pierce2000a,
-  author =        {Pierce, Benjamin C. and Turner, David N.},
-  journal =       {ACM Transactions on Programming Languages and
-                   Systems},
-  number =        {1},
-  pages =         {1--44},
-  title =         {Local type inference},
-  volume =        {22},
-  year =          {2000},
-  doi =           {10.1145/345099.345100},
-  issn =          {01640925},
-}
-
-@article{Dunfield2021,
-  author =        {Dunfield, Jana and Krishnaswami, Neel},
-  journal =       {ACM Computing Surveys},
-  number =        {5},
-  pages =         {1--38},
-  title =         {Bidirectional Typing},
-  volume =        {54},
-  year =          {2022},
-  doi =           {10.1145/3450952},
-  issn =          {0360-0300},
+@article{Allais2021,
+  author =        {Allais, Guillaume and Atkey, Robert and
+                   Chapman, James and McBride, Conor and McKinna, James},
+  journal =       {Journal of Functional Programming},
+  month =         oct,
+  number =        {1996},
+  pages =         {e22},
+  title =         {A type- and scope-safe universe of syntaxes with
+                   binding: their semantics and proofs},
+  volume =        {31},
+  year =          {2021},
+  abstract =      {The syntax of almost every programming language
+                   includes a notion of binder and corresponding bound
+                   occurrences, along with the accompanying notions of
+                   α-equivalence, capture-avoiding substitution, typing
+                   contexts, runtime environments, and so on. In the
+                   past, implementing and reasoning about programming
+                   languages required careful handling to maintain the
+                   correct behaviour of bound variables. Modern
+                   programming languages include features that enable
+                   constraints like scope safety to be expressed in
+                   types. Nevertheless, the programmer is still forced
+                   to write the same boilerplate over again for each new
+                   implementation of a scope-safe operation (e.g.,
+                   renaming, substitution, desugaring, printing), and
+                   then again for correctness proofs. We present an
+                   expressive universe of syntaxes with binding and
+                   demonstrate how to (1) implement scope-safe
+                   traversals once and for all by generic programming;
+                   and (2) how to derive properties of these traversals
+                   by generic proving. Our universe description, generic
+                   traversals and proofs, and our examples have all been
+                   formalised in Agda and are available in the
+                   accompanying material available online at
+                   https://github.com/gallais/generic-syntax .},
+  doi =           {10.1017/S0956796820000076},
+  issn =          {0956-7968},
+  url =           {https://www.cambridge.org/core/product/identifier/
+                  S0956796820000076/type/journal_article},
 }
 
 @article{Gheri2020,
-author = {Gheri, Lorenzo and Popescu, Andrei},
-doi = {10.1007/s10817-019-09522-2},
-issn = {0168-7433},
-journal = {Journal of Automated Reasoning},
-number = {4},
-pages = {641--675},
-publisher = {Springer Netherlands},
-title = {A Formalized General Theory of Syntax with Bindings: Extended Version},
-volume = {64},
-year = {2020}
+  author =        {Gheri, Lorenzo and Popescu, Andrei},
+  journal =       {Journal of Automated Reasoning},
+  month =         apr,
+  number =        {4},
+  pages =         {641--675},
+  title =         {A formalized general theory of syntax with bindings:
+                   Extended version},
+  volume =        {64},
+  year =          {2020},
+  abstract =      {We present the formalization of a theory of syntax
+                   with bindings that has been developed and refined
+                   over the last decade to support several large
+                   formalization efforts. Terms are defined for an
+                   arbitrary number of constructors of varying numbers
+                   of inputs, quotiented to alpha-equivalence and sorted
+                   according to a binding signature. The theory contains
+                   a rich collection of properties of the standard
+                   operators on terms, including substitution, swapping
+                   and freshness---namely, there are lemmas showing how
+                   each of the operators interacts with all the others
+                   and with the syntactic constructors. The theory also
+                   features induction and recursion principles and
+                   support for semantic interpretation, all tailored for
+                   smooth interaction with the bindings and the standard
+                   operators.},
+  doi =           {10.1007/s10817-019-09522-2},
+  issn =          {0168-7433},
+  url =           {https://doi.org/10.1007/s10817-019-09522-2},
 }
 
-@inproceedings{Fiore2008,
-author = {Fiore, Marcelo},
-booktitle = {2008 23rd Annual IEEE Symposium on Logic in Computer Science},
-doi = {10.1109/LICS.2008.38},
-isbn = {978-0-7695-3183-0},
-issn = {1043-6871},
-pages = {57--68},
-publisher = {IEEE},
-title = {Second-Order and Dependently-Sorted Abstract Syntax},
-year = {2008}
+@inproceedings{Ahrens2022,
+  address =       {New York, NY, USA},
+  author =        {Ahrens, Benedikt and Matthes, Ralph and
+                   M\"{o}rtberg, Anders},
+  booktitle =     {Proceedings of the 11th ACM SIGPLAN International
+                   Conference on Certified Programs and Proofs},
+  pages =         {307--323},
+  publisher =     {Association for Computing Machinery},
+  series =        {CPP 2022},
+  title =         {Implementing a category-theoretic framework for typed
+                   abstract syntax},
+  year =          {2022},
+  abstract =      {In previous work ("From signatures to monads in
+                   UniMath"),we described a category-theoretic
+                   construction of abstract syntax from a signature,
+                   mechanized in the UniMath library based on the Coq
+                   proof assistant. In the present work, we describe
+                   what was necessary to generalize that work to account
+                   for simply-typed languages. First, some definitions
+                   had to be generalized to account for the natural
+                   appearance of non-endofunctors in the simply-typed
+                   case. As it turns out, in many cases our mechanized
+                   results carried over to the generalized definitions
+                   without any code change. Second, an existing
+                   mechanized library on 𝜔-cocontinuous functors had
+                   to be extended by constructions and theorems
+                   necessary for constructing multi-sorted syntax.
+                   Third, the theoretical framework for the semantical
+                   signatures had to be generalized from a monoidal to a
+                   bicategorical setting, again to account for
+                   non-endofunctors arising in the typed case. This uses
+                   actions of endofunctors on functors with given
+                   source, and the corresponding notion of strong
+                   functors between actions, all formalized in UniMath
+                   using a recently developed library of bicategory
+                   theory. We explain what needed to be done to plug all
+                   of these ingredients together, modularly. The main
+                   result of our work is a general construction that,
+                   when fed with a signature for a simply-typed
+                   language, returns an implementation of that language
+                   together with suitable boilerplate code, in
+                   particular, a certified monadic substitution
+                   operation.},
+  doi =           {10.1145/3497775.3503678},
+  isbn =          {9781450391825},
+  url =           {https://doi.org/10.1145/3497775.3503678},
 }
 
-@inproceedings{Hamana2011a,
-abstract = {Abstract syntax with variable binding is known to be characterised as an initial algebra in a presheaf category. This paper extends it to the case of polymorphic typed abstract syntax with binding. We consider two variations, second-order and higher-order polymorphic syntax. The central idea is to apply Fiore's initial algebra characterisation of typed abstract syntax with binding repeatedly, i.e. first to the type structure and secondly to the term structure of polymorphic system. In this process, we use the Grothendieck construction to combine differently staged categories of polymorphic contexts. {\textcopyright} 2011 Springer-Verlag.},
-author = {Hamana, Makoto},
-booktitle = {Foundations of Software Science and Computational Structures. FoSSaCS 2011},
-doi = {10.1007/978-3-642-19805-2_26},
-editor = {Hofmann, Martin},
-isbn = {9783642198045},
-issn = {03029743},
-pages = {381--395},
-publisher = {Springer, Berlin, Heidelberg},
-series = {Lecture Notes in Computer Science},
-title = {Polymorphic Abstract Syntax via Grothendieck Construction},
-volume = {6604},
-year = {2011}
-}
-
-@article{Mitchell1991a,
-author = {Mitchell, John C and Moggi, Eugenio},
-doi = {10.1016/0168-0072(91)90067-V},
-issn = {01680072},
-journal = {Annals of Pure and Applied Logic},
-month = {mar},
-number = {1-2},
-pages = {99--124},
-title = {{Kripke-style models for typed lambda calculus}},
-volume = {51},
-year = {1991}
+@inproceedings{Aydemir2005,
+  address =       {Berlin, Heidelberg},
+  author =        {Aydemir, Brian E. and Bohannon, Aaron and
+                   Fairbairn, Matthew and Foster, J. Nathan and
+                   Pierce, Benjamin C. and Sewell, Peter and
+                   Vytiniotis, Dimitrios and Washburn, Geoffrey and
+                   Weirich, Stephanie and Zdancewic, Steve},
+  booktitle =     {Theorem Proving in Higher Order Logics},
+  editor =        {Hurd, Joe and Melham, Tom},
+  pages =         {50--65},
+  publisher =     {Springer Berlin Heidelberg},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Mechanized metatheory for the masses: {The}
+                   {PoplMark} {Challenge}},
+  volume =        {3603},
+  year =          {2005},
+  abstract =      {How close are we to a world where every paper on
+                   programming languages is accompanied by an electronic
+                   appendix with machine-checked proofs?},
+  doi =           {10.1007/11541868_4},
+  isbn =          {978-3-540-31820-0},
 }
 

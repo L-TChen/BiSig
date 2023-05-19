@@ -1,0 +1,4 @@
+[submodule "agda-stdlib"]
+	path = agda-stdlib
+	url = https://github.com/agda/agda-stdlib
+	shallow = true

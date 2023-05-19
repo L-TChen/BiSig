@@ -1,1 +1,7 @@
 .vscode
+tex/aux
+comment.cut
+*.upa
+*.upb
+*.bib
+*.pdf

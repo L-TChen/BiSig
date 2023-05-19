@@ -24,20 +24,24 @@ flex {suc m} x (op _) | yes _          = nothing
 ... | no x∉ = just (_ , flex∉ x∉)
 
 mutual
-  amgu : (t u : Tm m) (ac : ∃ (AList m))
-    → Maybe (∃ (AList m))
-  amgu (op (_ , i , ts)) (op (_ , j , us)) ac with i ≟∈ j
+  amgu : (t u : Tm m) → ∃ (AList m) → Maybe (∃ $ AList m)
+
+  amgu (op (_ , i , ts)) (op (_ , j , us)) σ with i ≟∈ j
   ... | no ¬p    = nothing
-  ... | yes refl = amguⁿ ts us ac
+  ... | yes refl = amguⁿ ts us σ
+
   amgu (` x)  u        (_ , []) = flex x u
   amgu t      (` y)    (_ , []) = flex y t
+
   amgu t      u        (n , r / z ∷ σ) with amgu (t ⟨ r for z ⟩) (u ⟨ r for z ⟩) (n , σ)
-  ... | just (l , σ′) = just (l , r / z ∷ σ′)
+  ... | just (l , ρ) = just (l , r / z ∷ ρ)
   ... | nothing = nothing
 
-  amguⁿ : (ts us : Tm m ^ l) (ac : ∃ (AList m))
-    → Maybe (∃ (AList m))
-  amguⁿ {l = zero}  _        _        ac = just ac
-  amguⁿ {l = suc l} (t ∷ ts) (u ∷ us) ac with amgu t u ac
-  ... | just ac′ = amguⁿ ts us ac′
-  ... | nothing   = nothing
+  amguⁿ : (ts us : Tm m ^ l) → ∃ $ AList m → Maybe (∃ $ AList m)
+  amguⁿ {_} {zero}  _        _        σ = just σ
+  amguⁿ {_} {suc l} (t ∷ ts) (u ∷ us) σ with amgu t u σ
+  ... | just ρ  = amguⁿ ts us ρ
+  ... | nothing = nothing
+
+mgu : (t u : Tm m) → Maybe (∃ $ AList m)
+mgu t u = amgu t u (_ , [])

@@ -3,15 +3,17 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-open import Syntax.BiTyped.Description
+import Syntax.BiTyped.Description as B
 
-module Syntax.BiTyped.Extrinsic.Functor {SD : S.Desc} (Id : Set) (D : Desc {SD}) where
+module Syntax.BiTyped.Extrinsic.Functor (SD : S.Desc) (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Sub to TSub)
 
-open import Syntax.NamedContext   SD   Id
-import Syntax.BiTyped.Raw.Functor {SD} Id as R
+open import Syntax.NamedContext   SD Id
+import Syntax.BiTyped.Raw.Functor SD Id as R
+
+open B SD
 
 Pred :  (ℓ′ : Level) → (n : ℕ) → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
 Pred ℓ′ n X = (mod : Mode) → TExp n → Cxt n → X mod → Set ℓ′

@@ -1,17 +1,18 @@
-{-# OPTIONS --with-K #-}
+{-# OPTIONS --with-K --rewriting #-}
 open import Prelude
   hiding (lookup)
 
 import Syntax.Simple.Description as S
-open import Syntax.BiTyped.Description
+import Syntax.BiTyped.Description as B
 
-import Theory.ModeCorrectness.Description as B
+import Theory.ModeCorrectness.Description as M
 
 module Theory.ModeCorrectness.Term {SD : S.Desc}
   (Id : Set) (_≟Id_ : (x y : Id) → Dec (x ≡ y))
-  (D : Desc {SD}) (mc : B.ModeCorrect Id D) where
+  (D : B.Desc SD) (mc : M.ModeCorrect SD Id D) where
 
-open B {SD} Id
+open M SD Id
+open B SD
 
 import      Data.List.Relation.Unary.All as A
 
@@ -20,24 +21,32 @@ open import Syntax.NamedContext.Decidable _≟Id_
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
-open import Syntax.Simple.Association        SD
-open import Syntax.Simple.Properties         SD
-open import Syntax.Simple.Unification        SD
+open import Syntax.Simple.Association            SD
+open import Syntax.Simple.Properties             SD
+open import Syntax.Simple.Unification            SD
+open import Syntax.Simple.Unification.Properties SD
 
-import      Syntax.BiTyped.Raw.Functor       {SD} Id as R
-open import Syntax.BiTyped.Raw.Term               Id D
-open import Syntax.BiTyped.Extrinsic.Functor      Id D
-open import Syntax.BiTyped.Extrinsic.Term         Id D
+import      Syntax.BiTyped.Raw.Functor           SD Id as R
+open import Syntax.BiTyped.Raw.Term                 Id D
+open import Syntax.BiTyped.Extrinsic.Functor     SD Id
+open import Syntax.BiTyped.Extrinsic.Term           Id D
+open import Syntax.BiTyped.Extrinsic.Properties     Id D
+
+import Syntax.BiTyped.Intrinsic.Functor  {SD}       as I
+open import Syntax.BiTyped.Intrinsic.Term            D
+
+open import Theory.Ontologisation.Context         Id
 
 private variable
   n m l : ℕ
   A B   : TExp n
   xs    : List (Fin n)
-  Γ     : Cxt n
+  Γ     : Cxt   n
   Ds    : ArgsD n
-  AD    : ArgD n
-  σ σ₁ σ₂ : TSub n m
+  AD    : ArgD  n
+  σ σ₁ σ₂ ρ γ : TSub n m
   mod     : Mode
+  t u     : Raw m mod
 
 -- MC : {CD : ConD} → (CD ∈ D) → _
 -- MC i = A.lookup mc i
@@ -100,43 +109,63 @@ mutual
   → ¬ (Γ ⊢ (t ↑) ⇇ B)
 ¬switch ⊢t A≠B (⊢⇉ ⊢t′ A=B) rewrite uniq-⇉ ⊢t ⊢t′ = A≠B A=B
 
-sub-∈ : ∀ {x} (σ : TSub m n)
-  → x ⦂ A         ∈ Γ
-  → x ⦂ A ⟨ σ ⟩ ∈ Γ ⟨ σ ⟩
-sub-∈ σ zero        = zero
-sub-∈ σ (suc ¬p x∈) = suc ¬p (sub-∈ σ x∈)
+------------------------------------------------------------------------------
+-- A type checker
 
-subst-∈→∈
-  : ∀ (Γ : Cxt m) x
-  → ¬ (∃[ A ] (x ⦂ A ∈ Γ))
-  → (σ : TSub m n)
-  → ¬ (Σ[ B ∈ TExp _ ] (x ⦂ B ∈ Γ ⟨ σ ⟩))
-subst-∈→∈ (_ ∷ _)       _ ¬∃ σ (D , zero)      = ¬∃ (_ , zero)
-subst-∈→∈ ((y , C) ∷ Γ) x ¬∃ σ (D , suc ¬p x∈) =
-  subst-∈→∈ Γ x (λ where (_ , x∈) → ¬∃ (_ , suc ¬p x∈)) σ (_ , x∈)
-
-mutual
-  synthetise
+module _ {m : ℕ} where mutual
+  synthesise
     : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
-    → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
-        Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
+    → Maybe (∃₂ λ k (σ : AList m k) → Σ[ A ∈ TExp m ] {!? ⊢ ?!}) -- Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
+
   inherit
     : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
-    → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
-        Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
+    → Maybe (∃₂ λ k (σ : AList m k) → {!!} ) -- Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
 
-  synthetise Γ (` x)   σ with lookup Γ x
-  ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)
-  ... | yes (A , x) = yes (_ , σ , A , ⊢` (sub-∈ (toSub σ) x))
-  synthetise Γ (t ⦂ A) σ with inherit Γ t σ A
-  ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
-  ... | yes (n , σ , ⊢t) = yes (_ , σ , A , ⊢⦂ ⊢t refl)
-  synthetise Γ (op x)  σ = {!!}
+  synthesise = {!!}
+  inherit    = {!!}
+--   synthetise Γ (` x)   σ with lookup Γ x
+--   ... | no _         = nothing
+--   ... | yes (A , x∈) = just ((_ , σ , A , ⊢` (sub-∈ (toSub σ) x∈)))
 
-  inherit Γ (t ↑)  σ A with synthetise Γ t σ
-  ... | no ¬p = no λ where (n , σ′ , ⊢⇉ ⊢t refl) → ¬p (n , σ′ , A , ⊢t)
-  ... | yes (l , σ , B , ⊢t)  = {!!} -- we need to compare A and B, if A and B are not unifiable, then amgu needs to provide a proof of A ≢ B
---  ... | yes (l , σ , B , ⊢t)  with amgu A B (_ , σ)
---  ... | nothing       = no  λ where (_ , σ′ , ⊢t′) → ¬switch ⊢t {!!} {!⊢t′!} -- [TODO] A proof-releant unification is needed
---  ... | just (l , σ′) = yes (l , σ′ , ⊢⇉ {!!} {!!})
-  inherit Γ (op x) σ A = {!!}
+--   synthetise Γ (t ⦂ A) σ with inherit Γ t σ A
+--   ... | nothing = nothing
+--   ... | just (n , σ , ⊢t) = just (_ , σ , A , ⊢⦂ ⊢t refl)
+
+--   synthetise Γ (op (i , eq , ts)) σ = {!!}
+
+--   inherit Γ (t ↑) σ A  with synthetise Γ t σ
+--   ... | nothing = nothing
+--   ... | just (_ , ρ , B , ⊢t) with amgu⁺ A B ρ
+--   ... | inr _ = nothing
+--   ... | inl (_ , γ , A≈B , min) = just (_ , ρ ⨟ γ , ⊢⇉ {!!} (sym A≈B))
+
+--   inherit Γ (op (i , eq , ts)) σ A = {!!}
+
+-- ------------------------------------------------------------------------------
+-- -- A proof-relevant type checker
+
+-- module _ {m : ℕ} where mutual
+--   synthetise⁺
+--     : (Γ : Cxt m) (t : Raw⇉ m) (σ : AList m n)
+--     → Dec (∃[ k ] Σ[ σ ∈ AList m k ] Σ[ A ∈ TExp m ]
+--         Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇉ A ⟨ σ ⟩)
+--   inherit⁺
+--     : (Γ : Cxt m) (t : Raw⇇ m) (σ : AList m n) (A : TExp m)
+--     → Dec (∃[ k ] Σ[ σ ∈ AList m k ]
+--         Γ ⟨ σ ⟩ ⊢ t ⟨ σ ⟩ ⇇ A ⟨ σ ⟩)
+
+--   synthetise⁺ Γ (` x)   σ with lookup Γ x
+--   ... | no ¬p = no λ where (l , σ′ , A , ⊢` y) → subst-∈→∈ Γ x ¬p (toSub σ′) (_ , y)
+--   ... | yes (A , x) = yes (_ , σ , A , ⊢` (sub-∈ (toSub σ) x))
+--   synthetise⁺ Γ (t ⦂ A) σ with inherit⁺ Γ t σ A
+--   ... | no ¬p = no λ where (n , σ , B , ⊢⦂ ⊢t _) → ¬p (_ , σ , ⊢t)
+--   ... | yes (n , σ , ⊢t) = yes (_ , σ , A , ⊢⦂ ⊢t refl)
+--   synthetise⁺ Γ (op x)  σ = {!!}
+
+--   inherit⁺ Γ (t ↑)  σ A with synthetise⁺ Γ t σ
+--   ... | no ¬p = no λ where (n , σ′ , ⊢⇉ ⊢t refl) → ¬p (n , σ′ , A , ⊢t)
+--   ... | yes (l , σ , B , ⊢t)  = {!!} -- we need to compare A and B, if A and B are not unifiable, then amgu needs to provide a proof of A ≢ B
+-- --  ... | yes (l , σ , B , ⊢t)  with amgu A B (_ , σ)
+-- --  ... | nothing       = no  λ where (_ , σ′ , ⊢t′) → ¬switch ⊢t {!!} {!⊢t′!}
+-- --  ... | just (l , σ′) = yes (l , σ′ , ⊢⇉ {!!} {!!})
+--   inherit⁺ Γ (op x) σ A = {!!}

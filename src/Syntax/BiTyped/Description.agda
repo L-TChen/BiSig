@@ -4,7 +4,7 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.BiTyped.Description {SD : S.Desc} where
+module Syntax.BiTyped.Description (SD : S.Desc) where
 
 open import Syntax.Context
 open import Syntax.Simple.Term SD as Ty

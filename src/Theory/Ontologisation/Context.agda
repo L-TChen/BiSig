@@ -2,7 +2,7 @@
 
 open import Prelude
 
-module Theory.Dichotomy.Context (Id : Set) where
+module Theory.Ontologisation.Context (Id : Set) where
 
 open import Syntax.Context.Base         as Nameless
 open import Syntax.NamedContext.Base Id as Named

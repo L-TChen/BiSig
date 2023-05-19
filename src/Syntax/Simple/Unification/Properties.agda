@@ -112,15 +112,6 @@ module _ (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m) (σ : Sub m n) where
 -------------------------------------------------------------------------
 -- Definitions of Most General Unifier and its variant with an accumulator
 -------------------------------------------------------------------------
-DecMinₐ : (P : 𝐘 {_} {Sub} m) → Set
-DecMinₐ P = (∃₂ λ n σ → Min P n (toSub σ)) ⊎ ¬′ P
-
-DecMin⇔ : {P Q : 𝐘 {_} {Sub} m}
-  → P ≗ Q → DecMinₐ P
-  → DecMinₐ Q
-DecMin⇔ P=Q (inl (_ , σ , Pσ , minPσ)) = inl (_ , σ , P=Q (toSub σ) .to Pσ ,
-  λ ρ Qρ → minPσ ρ (P=Q _ .from Qρ))
-DecMin⇔ P=Q (inr ¬P) = inr λ Qσ → ¬P (P=Q _ .from Qσ) 
 
 MGU : (t u : Tm m) →  𝐘 {_} {Sub} m
 MGU t u = Min (t ≈ u)

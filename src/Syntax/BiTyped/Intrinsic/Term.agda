@@ -5,12 +5,14 @@ open import Prelude
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as T
 
-module Syntax.BiTyped.Intrinsic.Term {SD : S.Desc} (D : T.Desc {SD}) where
+module Syntax.BiTyped.Intrinsic.Term {SD : S.Desc} (D : T.Desc SD) where
+
+open T SD
 
 open import Syntax.Simple.Term SD
   using () renaming (Tm to TExp; Sub to TSub)
 open import Syntax.Context SD
-open T {SD}
+
 open import Syntax.BiTyped.Intrinsic.Functor {SD}
 
 private

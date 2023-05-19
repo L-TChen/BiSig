@@ -12,7 +12,7 @@ open import Syntax.Simple.Term        SD as Ty
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Simple.Association SD
 
-open import Syntax.Typed.Description {SD}
+open import Syntax.Typed.Description  SD
 
 Fam : (ℓ : Level) (m : ℕ) → Set (lsuc ℓ)
 Fam ℓ m = TExp m → Cxt m → Set ℓ

@@ -7,6 +7,7 @@ open import Syntax.Simple.Description
 module Syntax.Simple.Association (D : Desc) where
 
 open import Syntax.Simple.Term       D
+open Equivalence
 
 private variable
   n m l k : ℕ
@@ -22,6 +23,20 @@ infixr 5 _++_
 _++_ : AList m n → AList n l → AList m l
 []           ++ σ₂ = σ₂
 (t / x ∷ σ₁) ++ σ₂ = t / x ∷ (σ₁ ++ σ₂)
+
+toSub : AList m n → Sub m n
+toSub []          = id
+toSub (t / x ∷ ρ) = t for x ⨟ toSub ρ
+
+DecMinₐ : (P : 𝐘 {_} {Sub} m) → Set
+DecMinₐ P = (∃₂ λ n σ → Min P n (toSub σ)) ⊎ ¬′ P
+
+DecMin⇔ : {P Q : 𝐘 {_} {Sub} m}
+  → P ≗ Q → DecMinₐ P
+  → DecMinₐ Q
+DecMin⇔ P=Q (inl (_ , σ , Pσ , minPσ)) = inl (_ , σ , P=Q (toSub σ) .to Pσ ,
+  λ ρ Qρ → minPσ ρ (P=Q _ .from Qρ))
+DecMin⇔ P=Q (inr ¬P) = inr λ Qσ → ¬P (P=Q _ .from Qσ) 
 
 /∷-inv
   : {t u : Tm m} {x y : Fin (suc m)} {σ ρ : AList m n}
@@ -66,10 +81,6 @@ instance
   AListIsCategory .⨟-assoc σ₁ _ _ = ++-assoc σ₁
   AListIsCategory .⨟-idᵣ          = ++-idᵣ
   AListIsCategory .⨟-idₗ σ        = refl
-
-toSub : AList m n → Sub m n
-toSub []          = id
-toSub (t / x ∷ ρ) = t for x ⨟ toSub ρ
 
 ------------------------------------------------------------------------------
 -- toSub is a functor

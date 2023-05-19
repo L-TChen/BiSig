@@ -3,9 +3,11 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-open import Syntax.BiTyped.Description as B
+import Syntax.BiTyped.Description as B
 
-module Theory.Erasure.Term {SD : S.Desc} {D : B.Desc {SD}} where
+module Theory.Erasure.Term {SD : S.Desc} {D : B.Desc SD} where
+
+open B SD
 
 open import Syntax.Context     SD
 open import Syntax.Simple.Term SD
@@ -36,7 +38,7 @@ mutual
   forget (op (i , p , σ , q , ts)) =
     op (i , σ , q , forgetMap _ ts)
 
-  forgetMap : (D : B.ArgsD n)
+  forgetMap : (D : ArgsD n)
     → B.⟦ D         ⟧ᵃˢ (BTm Ξ) σ Γ
     → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm  Ξ) σ Γ
   forgetMap []        _                   = _

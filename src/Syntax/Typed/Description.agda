@@ -4,7 +4,7 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.Typed.Description {SD : S.Desc}  where
+module Syntax.Typed.Description (SD : S.Desc)  where
 
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm to TExp)

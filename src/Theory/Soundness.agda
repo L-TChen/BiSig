@@ -10,8 +10,8 @@ open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Context     SD
 
-open import Syntax.Typed.Description    {SD} as T
-open import Syntax.BiTyped.Description  {SD} as B
+open import Syntax.Typed.Description    SD as T
+open import Syntax.BiTyped.Description  SD as B
 
 open import Syntax.Typed.Intrinsic.Functor    as T
 open import Syntax.BiTyped.Intrinsic.Functor  as B

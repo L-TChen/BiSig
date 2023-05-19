@@ -9,7 +9,8 @@ module Syntax.BiTyped.RawNoMode.Functor {SD : S.Desc} (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp)
-open B {SD}
+
+open B SD
 
 private variable
   Ξ   : ℕ

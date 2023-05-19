@@ -6,8 +6,8 @@ import Syntax.Simple.Description  as S
 
 module Theory.Erasure.Description {SD : S.Desc} where
 
-open import Syntax.Typed.Description   {SD} as T
-open import Syntax.BiTyped.Description {SD} as B
+open import Syntax.Typed.Description   SD as T
+open import Syntax.BiTyped.Description SD as B
 
 private variable
   Ξ     : ℕ

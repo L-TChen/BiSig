@@ -4,19 +4,21 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Theory.Annotatability {SD : S.Desc} where
+module Theory.Annotatability.Term {SD : S.Desc} where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.Context SD
 
-open import Syntax.Typed.Description    {SD} as T
-open import Syntax.BiTyped.Description  {SD} as B
+open import Syntax.Typed.Description    SD as T
+open import Syntax.BiTyped.Description  SD as B
 
-open import Syntax.Typed.Intrinsic.Functor    as T
-open import Syntax.BiTyped.Intrinsic.Functor  as B
+open import Syntax.Typed.Intrinsic.Functor   as T
+open import Syntax.BiTyped.Intrinsic.Functor as B
 
 open import Theory.Erasure.Description
+
+open import Theory.Annotatability.Description SD
 
 private variable
   mod : Mode
@@ -24,11 +26,6 @@ private variable
   σ     : TSub n m
   A B C : TExp n
   Γ Δ   : Cxt n
-
--- A bidirectional typing annotates a base typing if every typing rule in the base typing
--- has a corresponding typing rule.
-Annotatability : B.Desc → T.Desc → Set
-Annotatability BD TD = (i : TD .Op) → Σ[ j ∈ BD .Op ] eraseᶜ (BD .rules j) ≡ TD .rules i
 
 module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
   open import Syntax.Typed.Intrinsic.Term   TD

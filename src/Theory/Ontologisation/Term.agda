@@ -3,24 +3,26 @@
 open import Prelude
 
 import Syntax.Simple.Description  as S
-open import Syntax.BiTyped.Description
+import Syntax.BiTyped.Description as B
 
-module Theory.Dichotomy.Term {SD : S.Desc} (D : Desc {SD}) (Id : Set) where
+module Theory.Ontologisation.Term {SD : S.Desc} (D : B.Desc SD) (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps; Sub to TSub)
 open import Syntax.NamedContext SD Id
 
-open import Syntax.BiTyped.Raw.Functor {SD} Id   as R
-open import Syntax.BiTyped.Raw.Term         Id D
+open import Syntax.BiTyped.Raw.Functor SD Id   as R
+open import Syntax.BiTyped.Raw.Term       Id D
 
-open import Syntax.BiTyped.Extrinsic.Functor {SD} Id D as E
-open import Syntax.BiTyped.Extrinsic.Term         Id D
+open import Syntax.BiTyped.Extrinsic.Functor SD Id   as E
+open import Syntax.BiTyped.Extrinsic.Term       Id D
 
 open import Syntax.BiTyped.Intrinsic.Functor {SD}      as I
 open import Syntax.BiTyped.Intrinsic.Term            D
 
-open import Theory.Dichotomy.Context              Id
+open import Theory.Ontologisation.Context          Id
+
+open B SD
 
 private variable
   mod   : Mode

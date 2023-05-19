@@ -10,7 +10,7 @@ open import Syntax.Context     SD
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm to TExp)
 
-open import Syntax.BiTyped.Description {SD}
+open import Syntax.BiTyped.Description SD
 
 Fam : (m : ℕ) (ℓ : Level) → Set (lsuc ℓ)
 Fam m ℓ = Mode → TExp m → Cxt m → Set ℓ

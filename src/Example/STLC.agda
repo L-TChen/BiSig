@@ -7,7 +7,7 @@ open import Prelude
 
 open import Example.Implicational
 
-open import Syntax.Typed.Description {ΛₜD}
+open import Syntax.Typed.Description ΛₜD
   renaming (_⊢_ to infix 4 _⊢_)
 
 data ΛOp : Set where

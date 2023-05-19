@@ -2,10 +2,10 @@
 
 open import Prelude
 
-import Syntax.Simple.Description     as S
-open import Syntax.Typed.Description as T
+import Syntax.Simple.Description as S
+import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : Desc {SD}) where
+module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : T.Desc SD) where
 
 open import Syntax.Simple.Term        SD
   using () renaming (Tm to TExp; Tms to TExps; Sub to TSub)
@@ -13,6 +13,8 @@ open import Syntax.Simple.Association SD
 
 open import Syntax.Context            SD
 open import Syntax.Typed.Intrinsic.Functor {SD}
+
+open T SD
 
 private variable
     n m   : ℕ

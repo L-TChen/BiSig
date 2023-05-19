@@ -5,15 +5,15 @@ open import Prelude
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
-module Theory.RawAnnotatability {SD : S.Desc} (Id : Set) (D : B.Desc {SD}) where
+module Theory.RawAnnotatability {SD : S.Desc} (Id : Set) (D : B.Desc SD) where
 
-open B {SD}
+open B SD
 
 open import Syntax.Context     SD
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tms to TExps)
 
-open import Syntax.BiTyped.Raw.Functor       {SD} Id as M
+open import Syntax.BiTyped.Raw.Functor       SD Id as M
 open import Syntax.BiTyped.RawNoMode.Functor {SD} Id as R
 open import Syntax.BiTyped.Raw.Term          {SD} Id D
   renaming (Raw to MRaw)

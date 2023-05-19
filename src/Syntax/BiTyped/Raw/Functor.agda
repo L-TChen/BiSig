@@ -5,11 +5,11 @@ open import Prelude
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
-module Syntax.BiTyped.Raw.Functor {SD : S.Desc} (Id : Set) where
+module Syntax.BiTyped.Raw.Functor (SD : S.Desc) (Id : Set) where
 
 open import Syntax.Simple.Term SD
   renaming (Tm to TExp; Tm₀ to T)
-open B {SD}
+open B SD
 
 private variable
   n m : ℕ

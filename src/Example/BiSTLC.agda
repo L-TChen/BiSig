@@ -15,7 +15,7 @@ private variable
   A B C : Λₜ  n
   Γ Δ   : Cxt n
 
-open import Syntax.BiTyped.Description {ΛₜD}
+open import Syntax.BiTyped.Description ΛₜD
 
 Λ⇆D : Desc
 Λ⇆D = record

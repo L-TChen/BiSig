@@ -2,9 +2,9 @@
 
 open import Prelude
 import Syntax.Simple.Description as S
-open import Syntax.Typed.Description  as T
+import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc {SD}} where
+module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc SD} where
 open import Syntax.Simple.Term        SD
   using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps)
 open import Syntax.Simple.Association SD

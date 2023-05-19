@@ -34,7 +34,7 @@ open F public
         ; punchIn-punchOut; punchOut-punchIn; punchInᵢ≢i)
 
 module L where
-  open import Data.List                          public 
+  open import Data.List                          public
   open import Data.List.Properties               public
 
   open import Data.List.Relation.Unary.Any       public
@@ -55,7 +55,7 @@ module V where
   open import Data.Vec            public
   open import Data.Vec.Properties public
   open import Data.Vec.Relation.Unary.Any       public
-    using (Any; here; there)
+    using (Any; here; there; index)
   open import Data.Vec.Membership.Propositional public
     using (_∈_)
 open V public using
@@ -78,7 +78,8 @@ open import Relation.Nullary.Decidable            public
 open import Relation.Binary                       public
   using (Decidable; Rel)
 open import Relation.Binary.PropositionalEquality public
-  using (_≡_; refl; sym; trans; cong; cong₂; subst; _≢_; module ≡-Reasoning)
+  using (_≡_; refl; sym; trans; cong; cong₂; subst; subst₂; _≢_; module ≡-Reasoning)
+  renaming (_≗_ to _≐_)
 
 module WF where
   open import Induction.WellFounded  public
@@ -149,7 +150,7 @@ splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , r
   → xs ≡ xs′ × ys ≡ ys′
 ʳ++-≡ []       []         {ys} {ys′} p = refl , p
 ʳ++-≡ (x ∷ xs) (x′ ∷ xs′) {ys} {ys′} eq with ʳ++-≡ xs xs′ {x ∷ ys} {x′ ∷ ys′} eq
-... | refl , refl = refl , refl 
+... | refl , refl = refl , refl
 
 [xs]≢[] : {A : Set}
   → (xs : List A) {x : A}
@@ -173,7 +174,7 @@ splitAt (suc m) .(ys ʳ++ (z ∷ zs)) | ys , z ∷ zs , refl = z ∷ ys , zs , r
   suc n
     ∎)
   where open ≡-Reasoning
-    
+
 ≤-refl : ∀ {m} → m ≤ m
 ≤-refl = less-than-or-equal (N.+-identityʳ _)
 
@@ -220,7 +221,7 @@ m >′ n = n <′ m
 <-wf : WellFounded _<_
 <-wf = Subrelation.wellFounded  ≤⇒≤′ <′-wf
 
--- Fin 
+-- Fin
 insert-mid : (m n : ℕ) → Fin (m + l) → Fin (m + n + l)
 insert-mid m n i with F.splitAt m i
 ... | inl j = (j ↑ˡ _) ↑ˡ _
@@ -247,4 +248,3 @@ instance
 
   EqFin : DecEq (Fin n)
   _≟_ ⦃ EqFin ⦄ = F._≟_
-

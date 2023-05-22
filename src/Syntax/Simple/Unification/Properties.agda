@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K --rewriting #-}
+{-# OPTIONS --with-K --safe #-}
 
 open import Prelude
   hiding (_++_; _+_)
@@ -187,7 +187,7 @@ flex-amgu x t =  DecMin⇔ (P=Pid⨟- (` x ≈ t)) $ flex-mgu x t
 ----------------------------------------------------------------------
 
 mutual
-  open import Syntax.Simple.Rewrite
+--  open import Syntax.Simple.Rewrite
 
   amgu⁺ : (t u : Tm m) (σ : AList m n) → DecAMGU t u σ
 
@@ -210,8 +210,8 @@ mutual
   -- Liang-Ting (2023-05-16): Is there any better way to treat the following conversion
   -- between toSub (σ ⨟ ρ) = toSub σ ⨟ toSub ρ? 
 
-    failure-propagate {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) t≈u (λ {_} {γ} eq → ts≉us eq)
-        {- (begin
+    failure-propagate {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) t≈u (λ {_} {γ} eq → ts≉us
+        (begin
       ts ⟨ toSub (σ ⨟ ρ) ⨟ γ ⟩
         ≡⟨ cong (λ ρ → ts ⟨ ρ ⨟ γ ⟩) (toSub-++ σ ρ) ⟩
       ts ⟨ toSub σ ⨟ toSub ρ ⨟ γ ⟩
@@ -219,19 +219,17 @@ mutual
       us ⟨ toSub σ ⨟ toSub ρ ⨟ γ ⟩
         ≡⟨ cong (λ ρ → us ⟨ ρ ⨟ γ ⟩) (sym (toSub-++ σ ρ)) ⟩
       us ⟨ toSub (σ ⨟ ρ) ⨟ γ ⟩
-        ∎))-}
+        ∎))
       (V.∷-injective ts≈us)
   ... | inl (_ , γ , ts≈us) = inl (_ , ρ ⨟ γ , (MinTms≈ t u ts us (toSub σ) (toSub $ ρ ⨟ γ) .from goal))
     where
-      goal = optimist (t ≈ u) (ts ≈ us) (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u ts≈us
-      {-
+      -- goal = optimist (t ≈ u) (ts ≈ us) (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u ts≈us
       goal′ : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ ((toSub ρ) ⨟ (toSub γ))
-      goal′ = optimist {P = t ≈ u} {ts ≈ us} (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u
+      goal′ = optimist (t ≈ u) (ts ≈ us) (toSub σ) (toSub ρ) (toSub γ) (≈-↑ t u) t≈u
         (subst (λ σ → Min (ts ≈ us [ σ ⨟]) _ (toSub γ)) (toSub-++ σ ρ) ts≈us)
 
       goal : Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ (toSub (ρ ⨟ γ))
       goal = subst (λ γ → Min ((t ≈ u) ∧ (ts ≈ us) [ toSub σ ⨟]) _ γ) (sym $ toSub-++ ρ γ) goal′
-      -}
 
 mgu⁺ : (t u : Tm m) → DecMGU t u
 mgu⁺ t u = DecMin⇔ (⇔-sym ∘ P=Pid⨟- (t ≈ u)) (amgu⁺ t u [])

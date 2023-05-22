@@ -51,14 +51,14 @@ mutual
 
   ∥-∥map : (D : ArgsD n)
     → {t : R.⟦ D ⟧ᵃˢ (Raw m)}
-    → E.⟦ D ⟧ᵃˢ (Raw m) ⊢⇄ σ Γ t
+    → E.⟦ D ⟧ᵃˢ (Raw m) ⊢⇆ σ Γ t
     → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥cxt
   ∥-∥map []                 _        = tt
   ∥-∥map (Θ ⊢[ m ] B ∷ Ds) (p , ps) = ∥-∥mapᵃ Θ p , ∥-∥map Ds ps
 
   ∥-∥mapᵃ : (Θ : TExps n)
     → {t : R.⟦ Θ ⟧ᵃ (Raw m mod)}
-    → E.⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ mod A) σ Γ t
+    → E.⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ mod A) σ Γ t
     → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥cxt
   ∥-∥mapᵃ {mod = Check} []       p = ∥ p ∥⇇
   ∥-∥mapᵃ {mod = Infer} []       p = ∥ p ∥⇉

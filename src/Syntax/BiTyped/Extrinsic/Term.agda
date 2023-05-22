@@ -24,27 +24,27 @@ private variable
   A B : TExp m
   t   : Raw m mod
 
-data ⊢⇄ {m : ℕ} : Pred₀ m (Raw m) where
+data ⊢⇆ {m : ℕ} : Pred₀ m (Raw m) where
   ⊢`
     : x ⦂ A ∈ Γ
-    → ⊢⇄ Infer A Γ (` x)
+    → ⊢⇆ Infer A Γ (` x)
   ⊢⦂
-    : ⊢⇄ Check B Γ t
+    : ⊢⇆ Check B Γ t
     → (eq : A ≡ B)
-    → ⊢⇄ Infer A Γ (t ⦂ B)
+    → ⊢⇆ Infer A Γ (t ⦂ B)
   ⊢⇉
     : (eq : A ≡ B)
-    → ⊢⇄ Infer B Γ t
-    → ⊢⇄ Check A Γ (t ↑)
+    → ⊢⇆ Infer B Γ t
+    → ⊢⇆ Check A Γ (t ↑)
   ⊢op
     : (t : R.⟦ D ⟧ (Raw m) mod)
-    → (⊢t : ⟦ D ⟧ ⊢⇄ mod A Γ t)
-    → ⊢⇄ mod A Γ (op t)
+    → (⊢t : ⟦ D ⟧ ⊢⇆ mod A Γ t)
+    → ⊢⇆ mod A Γ (op t)
 
 infix 6 _⊢_⇉_ _⊢_⇇_
 
 _⊢_⇉_ : Cxt m → Raw m Infer → TExp m → Set
-Γ ⊢ t ⇉ A = ⊢⇄ Infer A Γ t
+Γ ⊢ t ⇉ A = ⊢⇆ Infer A Γ t
 
 _⊢_⇇_ : Cxt m → Raw m Check → TExp m → Set
-Γ ⊢ t ⇇ A = ⊢⇄ Check A Γ t
+Γ ⊢ t ⇇ A = ⊢⇆ Check A Γ t

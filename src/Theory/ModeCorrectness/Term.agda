@@ -3,7 +3,7 @@
 open import Prelude
   hiding (lookup)
 
-import Syntax.Simple.Description as S
+import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
 import Theory.ModeCorrectness.Description as M
@@ -15,19 +15,12 @@ module Theory.ModeCorrectness.Term {SD : S.Desc}
 open M SD Id
 open B SD
 
--- import      Data.List.Relation.Unary.All as A
-
 open import Syntax.Context                SD
   renaming (Cxt to UCxt)
 open import Syntax.NamedContext           SD Id
 open import Syntax.NamedContext.Decidable _≟Id_
 
-open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tms to TExps; Sub to TSub)
-open import Syntax.Simple.Association            SD
-open import Syntax.Simple.Properties             SD
-open import Syntax.Simple.Unification            SD
-open import Syntax.Simple.Unification.Properties SD
+open import Syntax.Simple SD
 
 import      Syntax.BiTyped.Raw.Functor           SD Id as R
 open import Syntax.BiTyped.Raw.Term                 Id D
@@ -65,8 +58,8 @@ mutual
 
   uniq-⇉ᶜ : ∀ {D} → ModeCorrectᶜ D → ConD.mode D ≡ Infer
           → ∀ {rs ts us}
-          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ ts Γ rs
-          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇄ us Γ rs
+          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇆ ts Γ rs
+          → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇆ us Γ rs
           → ConD.type D ⟨ ts ⟩ ≡ ConD.type D ⟨ us ⟩
   uniq-⇉ᶜ {D = D} (C⊆xs , _ , SDs) refl ⊢ts ⊢us =
     ≡-fv _ _ (ConD.type D) λ x → uniq-⇉Map _ SDs ⊢ts ⊢us (C⊆xs x)
@@ -75,11 +68,11 @@ mutual
     : (Ds : ArgsD n)
     → ModeCorrectᵃˢ [] Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw m)}
-    → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₁ Γ ts)
-    → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇄ σ₂ Γ ts)
+    → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇆ σ₁ Γ ts)
+    → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw m) ⊢⇆ σ₂ Γ ts)
     → ∀ {x} → x ∈ Known [] Ds
     → V.lookup σ₁ x ≡ V.lookup σ₂ x -- σ₁ x ≡ σ₂ x
-  uniq-⇉Map []                    _             _          _          ()
+  uniq-⇉Map []                    _             _          _         ()
   uniq-⇉Map (_ ⊢[ Check ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
   uniq-⇉Map (Θ ⊢[ Infer ] C ∷ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ∈-++⁻ (fv C) i
@@ -90,8 +83,8 @@ mutual
     : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
     → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
-    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₁ ⟩)) σ₁ Γ t)
-    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ Infer (C ⟨ σ₂ ⟩)) σ₂ Γ t)
+    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Infer (C ⟨ σ₁ ⟩)) σ₁ Γ t)
+    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Infer (C ⟨ σ₂ ⟩)) σ₂ Γ t)
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
@@ -109,6 +102,8 @@ mutual
 
 ------------------------------------------------------------------------------
 -- A type checker
+
+open import Syntax.Simple.Rewrite SD
 
 module _ {m : ℕ} where mutual
   synthesise

@@ -10,12 +10,7 @@ module Syntax.BiTyped.Extrinsic.Properties
 
 open import Syntax.NamedContext SD Id
 
-open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tms to TExps; Sub to TSub)
-open import Syntax.Simple.Association            SD
-open import Syntax.Simple.Properties             SD
-open import Syntax.Simple.Unification            SD
-open import Syntax.Simple.Unification.Properties SD
+open import Syntax.Simple SD
 
 open import Syntax.BiTyped.Extrinsic.Functor     SD  Id
 open import Syntax.BiTyped.Extrinsic.Term            Id D
@@ -39,17 +34,20 @@ module _ {m : ℕ} where
   Membership A Γ x _ σ = x ⦂ A ⟨ σ ⟩ ∈ Γ ⟨ σ ⟩
 
   Typability : TExp m → Cxt m → Raw m mod → 𝐘 {ℕ} {TSub} m
-  Typability A Γ t _ σ = ⊢⇄ _ (A ⟨ σ ⟩) (Γ ⟨ σ ⟩) (t ⟨ σ ⟩)
+  Typability A Γ t _ σ = ⊢⇆ _ (A ⟨ σ ⟩) (Γ ⟨ σ ⟩) (t ⟨ σ ⟩)
 
   Typabilityⁿ : (D : B.ArgsD SD k)
     → TSub k m → Cxt m → R.⟦ D ⟧ᵃˢ (Raw m) → 𝐘 {ℕ} {TSub} m
   Typabilityⁿ D ρ Γ ts n σ =
-    ⟦ D ⟧ᵃˢ (Raw n) ⊢⇄ (ρ ⨟ σ) (Γ ⟨ σ ⟩) (ts ⟨ σ ⟩)
+    ⟦ D ⟧ᵃˢ (Raw n) ⊢⇆ (ρ ⨟ σ) (Γ ⟨ σ ⟩) (ts ⟨ σ ⟩)
 
   Typabilityᵃ : (Θ : TExps k)
     → TSub k m → TExp m → Cxt m → R.⟦ Θ ⟧ᵃ (Raw m mod) → 𝐘 {ℕ} {TSub} m
   Typabilityᵃ Θ ρ A Γ t n σ = ⟦ Θ ⟧ᵃ (Raw n)
-    (⊢⇄ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ t)
+    (⊢⇆ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ t)
+
+  DecAccTypability : TExp m → Cxt m → Raw m mod → Set
+  DecAccTypability A Γ t = DecMinₐ λ n σ → {!⇆!} 
 
 module _ {m : ℕ} (σ : TSub m n) where
   sub-∈
@@ -60,7 +58,7 @@ module _ {m : ℕ} (σ : TSub m n) where
 
 module _ {m : ℕ} (σ : TSub m n) where mutual
   sub-⊢
-    : ⊢⇄ mod     A Γ t 
+    : ⊢⇆ mod     A Γ t 
     → Typability A Γ t _ σ
   sub-⊢ (⊢` x∈)    = ⊢` (sub-∈ σ x∈)
   sub-⊢ (⊢⦂ ⊢t eq) = ⊢⦂ (sub-⊢ ⊢t) (cong (sub σ) eq)
@@ -79,7 +77,7 @@ module _ {m : ℕ} (σ : TSub m n) where mutual
 
   sub-⊢ᵃˢ 
     : (D : B.ArgsD SD k) (ρ : TSub k m) {ts : R.⟦ D ⟧ᵃˢ (Raw m)}
-    → ⟦ D ⟧ᵃˢ (Raw m) ⊢⇄ ρ Γ ts
+    → ⟦ D ⟧ᵃˢ (Raw m) ⊢⇆ ρ Γ ts
     → Typabilityⁿ D ρ Γ ts _ σ
   sub-⊢ᵃˢ []                 ρ _          = tt
   sub-⊢ᵃˢ (Θ B.⊢[ _ ] A ∷ D) ρ (⊢t , ⊢ts) rewrite ⟨⟩-⨟ ρ σ A =
@@ -87,21 +85,23 @@ module _ {m : ℕ} (σ : TSub m n) where mutual
 
   sub-⊢ᵃ
     : (Θ : TExps k) (ρ : TSub k m) {t : R.⟦ Θ ⟧ᵃ (Raw m mod)}
-    → ⟦ Θ ⟧ᵃ (Raw m) (⊢⇄ _ A) ρ Γ t -- ⟦ Θ ⟧ᵃ (Raw m) ρ
+    → ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ _ A) ρ Γ t -- ⟦ Θ ⟧ᵃ (Raw m) ρ
     → Typabilityᵃ Θ ρ A Γ t _ σ 
   sub-⊢ᵃ []      ρ ⊢t = sub-⊢ ⊢t
   sub-⊢ᵃ (A ∷ Θ) ρ ⊢t rewrite ⟨⟩-⨟ ρ σ A = sub-⊢ᵃ Θ ρ ⊢t
       
 module _ {m : ℕ} (σ : TSub m n) where
+
+module _ {m : ℕ} (σ : TSub m n) where
   Typability-ext
     : (t : Raw m mod) (A : TExp m) (Γ : Cxt m)
     → Typability A Γ t [ σ ⨟] ≗ Typability (A ⟨ σ ⟩) (Γ ⟨ σ ⟩) (t ⟨ σ ⟩) 
   Typability-ext t A Γ ρ = ≡to⟺ $ begin
-    ⊢⇄ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩) (t ⟨ σ ⨟ ρ ⟩)
-      ≡⟨ cong (⊢⇄ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩)) (⟨⟩-⨟ σ ρ t) ⟩
-    ⊢⇄ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩) (t ⟨ σ ⟩ ⟨ ρ ⟩)
-      ≡⟨ cong₂ (λ A Γ → ⊢⇄ _ A Γ (t ⟨ σ ⟩ ⟨ ρ ⟩)) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ) ⟩
-    ⊢⇄ _ (A ⟨ σ ⟩ ⟨ ρ ⟩) (Γ ⟨ σ ⟩ ⟨ ρ ⟩) (t ⟨ σ ⟩ ⟨ ρ ⟩)
+    ⊢⇆ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩) (t ⟨ σ ⨟ ρ ⟩)
+      ≡⟨ cong (⊢⇆ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩)) (⟨⟩-⨟ σ ρ t) ⟩
+    ⊢⇆ _ (A ⟨ σ ⨟ ρ ⟩) (Γ ⟨ σ ⨟ ρ ⟩) (t ⟨ σ ⟩ ⟨ ρ ⟩)
+      ≡⟨ cong₂ (λ A Γ → ⊢⇆ _ A Γ (t ⟨ σ ⟩ ⟨ ρ ⟩)) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ) ⟩
+    ⊢⇆ _ (A ⟨ σ ⟩ ⟨ ρ ⟩) (Γ ⟨ σ ⟩ ⟨ ρ ⟩) (t ⟨ σ ⟩ ⟨ ρ ⟩)
       ∎
 
   subst-∈→∈

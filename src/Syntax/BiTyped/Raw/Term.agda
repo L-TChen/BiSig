@@ -9,7 +9,6 @@ module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc SD) where
 
 open import Syntax.Simple.Term         SD
   renaming (Tm to TExp; Tms to TExps)
-open import Syntax.Simple.Association  SD
 
 open import Syntax.BiTyped.Raw.Functor SD Id
 
@@ -127,16 +126,16 @@ module _ (σ : Sub m n) (ρ : Sub n l) where mutual
   tsubᵃ-⨟ {D = []}             = tsub-⨟
   tsubᵃ-⨟ {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
 
-module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
-  tsubₐ-⨟ : (t : Raw m mod)
-    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
-  tsubₐ-⨟ t = begin
-    tsub (toSub (σ ⨟ ρ)) t
-      ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
-    tsub (toSub σ ⨟ toSub ρ) t
-      ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
-    _ ∎ 
-    where open ≡-Reasoning
+--module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
+--  tsubₐ-⨟ : (t : Raw m mod)
+--    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
+--  tsubₐ-⨟ t = begin
+--    tsub (toSub (σ ⨟ ρ)) t
+--      ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
+--    tsub (toSub σ ⨟ toSub ρ) t
+--      ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
+--    _ ∎ 
+--    where open ≡-Reasoning
 
 instance
   RawSubIsPresheaf : IsPresheaf λ m → Raw m mod
@@ -154,9 +153,9 @@ instance
 --  RawᵃSubIsPresheaf .⟨⟩-id      = tsubᵃ-id
 --  RawᵃSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubᵃ-⨟ σ ρ t
 
-  RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
-  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
-  RawAListIsPresheaf .⟨⟩-id      = tsub-id
-  RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟
+--  RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
+--  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
+--  RawAListIsPresheaf .⟨⟩-id      = tsub-id
+--  RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟
 
 

@@ -169,7 +169,7 @@ PoplMark Challenge~\citep{Aydemir2005}
     \text{where $\Theta \vdash \Gamma$ and $\Theta \vdash A$}\\
     \inferrule{\Gamma \ni (\term{x} : A)}{\Theta \mid \Gamma \vdash \term{x} \mathrel{\color{red}\Rightarrow} A}\;(\text{var}{\Rightarrow})
     \and
-    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash (\term{t} : B) \Rightarrow A}\;(\textcolor{red}{anno})
+    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Leftarrow B \\ A = B}{\Theta \mid \Gamma \vdash (\term{t} : B) \Rightarrow A}\;(\textcolor{red}{anno})
     \and
     \inferrule{\Theta\mid \Gamma \vdash \term{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash \term{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
     \and

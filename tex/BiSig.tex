@@ -1,87 +1,211 @@
-\documentclass[envcountsect,runningheads,a4paper]{llncs}
-
+\documentclass[acmsmall]{acmart}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
-\usepackage{cite}
-\usepackage{amsmath}
-\usepackage{xifthen,xspace,xcolor}
-\usepackage[colorlinks=true,allcolors=black]{hyperref}
-%\usepackage[hyperpageref]{backref}
-\usepackage[capitalise,noabbrev]{cleveref}
-\usepackage[color=yellow,textsize=footnotesize,prependcaption,obeyFinal]{todonotes}
-\usepackage[inline]{enumitem} % for environment enumerate*
+
+\usepackage{mathtools}
+\usepackage{mathpartir}
+\usepackage[all,cmtip]{xy}
 \usepackage{bussproofs}
 \EnableBpAbbreviations
-\usepackage[all,cmtip]{xy}
-\usepackage{mathtools}
+
+\usepackage{xfrac,xspace}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[inline]{enumitem} % for environment enumerate*
+
+\usepackage[draft]{fixme}
+\usepackage{subfiles}
+
 \usepackage{microtype}
 
 \input{macros}
 
-\title{From Binding Signatures to Bidirectional Typing}
-\author{Liang-Ting Chen\orcidID{0000-0002-3250-1331} \and Hsiang-Shang Ko\orcidID{0000-0002-2439-1048}}
-\authorrunning{L.-T.\ Chen and H.-S.\ Ko}
-\institute{Institute of Information Science, Academia Sinica, Taiwan}
+\FXRegisterAuthor{LT}{LTan}{L-T}
+\FXRegisterAuthor{Josh}{Joshan}{Josh}
+
+\citestyle{acmauthoryear}
 
 \begin{document}
 
-\maketitle
+\author{Liang-Ting Chen}
+\email{liang.ting.chen.tw@gmail.com}
+\orcid{0000-0002-3250-1331}
+\author{Hsiang-Shang Ko}
+\orcid{0000-0002-2439-1048}
+\email{joshko@iis.sinica.edu.tw}
+
+\affiliation{%
+  \institution{Academia Sinica}
+  \streetaddress{128 Academia Road}
+  \city{Taipei}
+  \country{Taiwan}
+  \postcode{115}
+}
+
+\title{A Formal Theory of Bidirectional Typing for Simple Types}
 
 \begin{abstract}
-  Formalising an abstract (typed) syntax with variable binding to reason about typically starts from the boilerplate of definitions for substitution along with its metatheory, stimulating a number of language-formalisation frameworks:
-  Given the presentation of a syntax in such a framework, a type of terms with recursion principle(s) and its metatheory will be instantiated, removing the burden of repeating the boilerplate.
-  However, the metatheory of substitution is only the tip of the iceberg.
-
-  In this paper, we extend the scope to bidirectional typing which is used for designing type checking algorithms.
-  First, we adopt the notion of binding signatures to bidirectional type systems which allows us to formally specify and reason about criteria such as soundness, annotatability, and mode-correctness.
-  Contrast to many frameworks, we emphasise the use of the extrinsic representation and implement a proof-relevant type checker for mode-correct bidirectional type systems in \Agda.
-  This extension amounts to a type checker generator for simple type systems, 
-  filling the gap between parser generator and language formalisation.
-  \keywords{binding signature \and bidirectional typing \and initial semantics \and abstract syntax \and type checking \and language formalisation \and \Agda}
+  This paper proposes a formal theory of bidirectional typing.
 \end{abstract}
 
+\maketitle
 \section{Introduction}
-\todo{abbreviate \emph{abstract (typed) syntax with variable binding} to \emph{(typed) language})}
-\section{Initial Semantics of Syntax with Variable Binding}
-\section{Extrinsically-Typed Representation}
-\section{Binding Signature for Bidirectional Typing}
-\section{Bidirectional Type Checking}
-\section{Discussion}
 
-\paragraph{Bidirectional typing}
-\cite{Pierce2000a,Dunfield2021}
+\subsection{Related work}
 
-\paragraph{Universal theories of abstract syntax with variable binding} have been studied and proposed via various approaches over a few decades.
-Herein we are interested in the category-theoretic approaches---particuarly \emph{the initisl semantics}---since they appear to be the most flexible and free from design choices if implemented properly (see below).
-The initial semantics~\cite{Fiore1999} initiates from the observation that the family of scoped terms as an indexed set equipped with renaming has a $\Sigma$-monoid structure: substitution is monoidal and syntax constructs form an algebra for an endo-functor $\Sigma$ in the category of presheaves on contexts.
+\subsubsection{Language formalization and its frameworks}
+\cite{Wadler2022}
+PoplMark Challenge~\citep{Aydemir2005}
 
-\todo{Heterogeneous substitution systems\cite{Matthes2004,Ahrens2018b}}
-\todo{Modules over monads \cite{Hirschowitz2010}}
-\todo{\cite{Hirschowitz2022}}
+\cite{Cimini2020,Cimini2022}
+\citep{Fiore2022}
+\cite{Allais2021,Gheri2020,Ahrens2022}
 
-The idea of including the presentation of types as well as the language itself appeared earlier~\cite{Hamana2011a,Fiore2013a,Arkor2020} and is essential for our development, since we need to recognise type variables in the binding signature for defining mode-correctness.
+\subsubsection{Algebraic theory of type theories}
+\cite{Fiore1999,Fiore2022,Hamana2022,Ahrens2021,Arkor2020}
 
 
-\paragraph{Language-formalisation frameworks} have been implemented in proof assistants and vary in design choices including binding representation paradigms, language presentations, the instantiation of formal syntax, and more.
-Due to the limited space the interested reader is referred to the discussion by Gheri and Popescu~\cite[Section 8]{Gheri2020} for a more comprehensive list of frameworks.
+\subsubsection{Type checker generation}
+\cite{Gast2004,Grewe2015,Pacak2020,Cimini2020}
 
-Among the plethora of choices, the formalisation of the category-theoretic approach based on (coalgebraic) $\Sigma$-monoids with metavariable~\cite{Fiore2008} by Fiore and Szamozvancev~\cite{Fiore2022} provides a metatheory independent of the aforementioned design choices whereas, instead of having the formal metatheory bolted on to a set of chosen paradigms, they only presume the property of a language to satisfy, i.e.\ the \emph{initiality}, offering a greater flexibility.
-Another frameworks based on the category-theoretic notion of heterogeneous substitution systems are implemented by Ahrens et al.~\cite{Ahrens2018,Ahrens2022}
-As we focus on the presentation of bidirectional typing, the category-theoretic approach is orthogonal to our interest.
-Having said that, we have organised the underlying theory using category theory, hoping to integrate our development with the category-theoretic frameworks in future.
+\subsubsection{Bidirectional typing}
+\cite{Dunfield2021}
 
-Our work is especially inspired by Allais et al.~\cite{Allais2021}
-They demonstrated a number of generic programs and `meta-meta-properties' including term printing, scope checking, simulation lemma (strong normaliation via logical relation as an instance), and fusion lemma (Substitution Lemma~\cite{Mitchell1991a} as an instance) for languages expressible in their framework.
-They also implemented a bidirectional type checker but for simply typed lambda calculus only.
+\subsection{Plan and Contributions of this paper}
+
+\section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}
+\subsection{Type Checking via Bidirectional Typing}
+
+\section{A Definition of Simple Type Theories}
+\subsection{Simple Types}
+\begin{definition}
+  A \emph{(simple) type signature} is a set $I$ with an \emph{arity} $\mathit{ar}_i : \mathbb{N}$ associated to each $i : I$.
+  An element $i : I$ is meant to be the \emph{$i$-th operation} $\tyop{i}$ and $\mathit{ar}(i)$ the \emph{number} of arguments of $\tyop{i}$.
+\end{definition}
+\LTnote{Define $\mathsf{Type}$}
+\begin{figure}
+  \begin{subfigure}{.5\textwidth}
+    \begin{mathpar}
+      \boxed{\Theta\vdash A} \\
+      \inferrule{\Theta \ni X_i}{\Theta \vdash X_i} \and
+      \inferrule{\Theta \vdash A_1 \\ \cdots \\ \Theta \vdash A_n}{\Theta \vdash \tyop{i}(A_1, \ldots, A_n)}
+    \end{mathpar}
+  \end{subfigure}
+  \begin{subfigure}{.4\textwidth}
+    \begin{mathpar}
+      \boxed{\Theta \vdash \Gamma} \\
+      \inferrule{ }{\Theta \vdash \emptyset}\and
+      \inferrule{\Theta \vdash A \\ \Theta\vdash \Gamma}{\Theta \vdash \Gamma, A}
+    \end{mathpar}
+  \end{subfigure}
+  \caption{Simple types and contexts}
+\end{figure}
+
+\begin{example}[STLC]
+  
+\end{example}
 
 
+\subsection{Binding Signatures and Typed Terms}
+\begin{definition}
+  For a type signature, a \emph{term signature} consists of a set $J$ meant to be the set of term constructs $\op{j}$ with a triple $\left(\Xi_j, A_{0, j}, \left[\left(\Delta_{1, j}, A_{1, j}\right), \ldots, \left(\Delta_{n_j, j}, A_{n_j, j}\right) \right]\right)$ for each $j:J$ where
+  \begin{enumerate}
+    \item $A_{0, j} : \mathsf{Type}(\Xi_j)$ is the type of its target and
+    \item $\left[\left(\Delta_{1, j}, A_{1, j}\right), \ldots, \left(\Delta_{n_j, j}, A_{n_j, j}\right) \right]$ is a finite sequence of pairs of a context $\Delta_{k, j} : \mathsf{Cxt}(\Xi_j)$ for types of its binding variables and its type $A_{k, j} : \mathsf{Type}(\Xi_j)$.
+  \end{enumerate}
+\end{definition}
+\begin{figure}
+  \centering
+  \begin{mathpar}
+    \boxed{\Theta \mid \Gamma \vdash t : A} \\
+    \inferrule{\Gamma \ni (x : A)}{\Theta \mid \Gamma \vdash \term{x} : A}\;(\text{var})
+    \and
+    \inferrule{\Theta \mid \Gamma, \simsub{\Delta_{1,j}}{\rho} \vdash \term{t_1} : \simsub{A_{1,j}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n_j, j}}{\rho} \vdash \term{t_{n}} : \simsub{A_{n, j}}{\rho}} {\Theta \mid \Gamma \vdash \term{\op{j, \rho}(t_1, \ldots, t_{n_j})} : \simsub{A_{0,j}}{\rho}}\;(\text{op})
+    \quad \text{where $\rho \colon \Xi_j \to \Theta$}
+  \end{mathpar}
+  
+  \caption{Typing rules}
+\end{figure}
 
-\subsubsection*{Acknowledgements}
-We thank Nathanael Arkor for the useful conversion over Twitter and to thank the Programming Languages and Formal Methods Laboratory at Academia Sinica for the opportunity of sharing earlier ideas.
+\begin{example}[STLC]
+  
+\end{example}
+
+\section{Definitions of Bidirectional Simple Type Systems} 
+
+\subsection{Bidirectional Binding Signatures}
+
+\begin{definition}
+  
+\end{definition}
+
+\begin{figure}
+  \centering
+  \begin{mathpar}
+    \boxed{\Theta \mid \Gamma \vdash \term{t} \Rightarrow A} \quad\text{and}\quad\boxed{\Theta \mid \Gamma \vdash \term{t} \Leftarrow A} \\
+    \inferrule{\Gamma \ni (\term{x} : A)}{\Theta \mid \Gamma \vdash \term{x} \mathrel{\color{red}\Rightarrow} A}\;(\text{var}{\Rightarrow})
+    \and
+    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash (\term{t} : B) \Rightarrow A}\;(\textcolor{red}{anno})
+    \and
+    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash \term{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
+    \and
+    \inferrule{\Theta \mid \Gamma, \simsub{\vec{x}_{1,j} : \Delta_{1, j}}{\rho} \vdash \term{t_{1, j}} \mathrel{\color{red}\leftrightarrows_{1, j}} \simsub{A_{1, j}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\vec{x}_{n_j} : \Delta_{n_j, j}}{\rho} \vdash \term{t_{n_j, j}} \mathrel{\color{red}\leftrightarrows_{n_j}} \simsub{A_{n_j ,j}}{\rho}}
+    {\Theta \mid \Gamma \vdash \term{\op{j, \rho}(\vec{x}_1 .\, t_1, \ldots, \vec{x}_{n_j}.\, t_{n_j})} \mathrel{\color{red}\leftrightarrows_{0, j}} \simsub{A_{0, j}}{\rho}} \; (\text{op}{\leftrightarrows})
+    \quad \text{where $\rho \colon \Xi_i \to \Theta$}
+  \end{mathpar}
+  \caption{Bidirectional typing rules}
+\end{figure}
+
+\begin{example}
+  
+\end{example}
+
+\subsection{Bidirectionally Typed Terms: Intrinsic Typing vs.\ Extrinsic Typing}
+\subsubsection{Intrinsically Typed Terms}
+
+\subsubsection{Raw Terms}
+
+\begin{figure}
+  \caption{Bidirectional raw terms}
+\end{figure}
+\subsubsection{Extrinsically Typed Terms}
+
+\begin{example}
+  
+\end{example}
+
+
+\subsection{Binding Signatures vs.\ their Bidirectional Variants}
+\subsubsection{Soundness}
+\subsubsection{Completeness (Annotatability)}
+\subsection{Mode Correctness}
+
+\section{Bidirectional Type Synthesis and Checking}
+\subsection{Substitution Properties}
+\subsection{Generic First-Order Unification}
+\cite{McBride2003,McBride2003a}
+\subsection{Uniqueness of Synthesis}
+
+\subsection{Type Synthesis and Checking with Unification}
+
+\section{Formal Implementation and Examples}
+
+\citep{Xie2018}
+
+\section{Concluding Remarks and Future Work}
+\begin{acks}
+We thank Nathanael Arkor for the useful conversation and to thank the Programming Languages and Formal Methods Laboratory at Academia Sinica for the opportunity of sharing earlier ideas.
 
 The work is supported by the Ministry of Science and Technology of Taiwan under grant MOST 109-2222-E-001-002-MY3.
- 
-\bibliographystyle{splncs04}
-\bibliography{ref}
-%\bibliography{library}
+\end{acks}
+
+\bibliographystyle{ACM-Reference-Format}
+
+\IfFileExists{reference.bib}{%
+  \bibliography{reference}
+}{\bibliography{ref}}
+
 \end{document}

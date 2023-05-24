@@ -87,20 +87,21 @@ PoplMark Challenge~\citep{Aydemir2005}
 \section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}\label{sec:bi-stlc}
 \begin{figure}
   \begin{mathpar}
-    \boxed{\Gamma \vdash \isTerm{t} \Rightarrow A}
-    \quad\text{and}\quad \boxed{\Gamma \vdash \isTerm{t} \Leftarrow A}
+    \boxed{\Theta \mid \Gamma \vdash \isTerm{t} \Rightarrow A}
+    \quad\text{and}\quad \boxed{\Theta \mid \Gamma \vdash \isTerm{t} \Leftarrow A}
+    \quad\text{where $\Theta \vdash \Gamma$ and $\Theta \vdash A$} 
     \\
-    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \Rightarrow A}\;(\text{var}^\Rightarrow)
+    \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash \isTerm{x} \Rightarrow A}\;(\text{var}^\Rightarrow)
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \Leftarrow B \\ A = B}{\Gamma \vdash \isTerm{t : B}\Rightarrow A}\;(\text{anno})
+    \inferrule{\Theta \mid \Gamma \vdash \isTerm{t} \Leftarrow B \\ A = B}{\Theta \mid \Gamma \vdash \isTerm{t : B}\Rightarrow A}\;(\text{anno})
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Gamma \vdash \isTerm{t\uparrow} \Leftarrow A}\;(\text{sub})
+    \inferrule{\Theta \mid \Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash \isTerm{t\uparrow} \Leftarrow A}\;(\text{sub})
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Gamma \vdash \isTerm{u} \Leftarrow A}{\Gamma \vdash \isTerm{t\;u} \Rightarrow B}
+    \inferrule{\Theta \mid \Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Theta \mid \Gamma \vdash \isTerm{u} \Leftarrow A}{\Theta \mid \Gamma \vdash \isTerm{t\;u} \Rightarrow B}
     \and
-    \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \Rightarrow B}{\Gamma \vdash \isTerm{\lam{x}t} \Rightarrow A \bto B}
+    \inferrule{\Theta \mid \Gamma, \isTerm{x} : A \vdash \isTerm{t} \Rightarrow B}{\Theta \mid \Gamma \vdash \isTerm{\lam{x}t} \Rightarrow A \bto B}
   \end{mathpar}
-  \caption{The extrinsic style of bidirectional simply typed $\lambda$-calculus}
+  \caption{The extrinsic style of bidirectional simply typed $\lambda$-calculus with type variables}
   \label{fig:bi-stlc}
 \end{figure}
 \begin{remark}
@@ -147,18 +148,16 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
 \end{figure}
 
 \begin{example}\label{ex:implication}
-  Simply typed $\lambda$-calculus typically has a binary implication type $\bto$ and some base types so that the set of all types is at least inhabited.
-  In our setting, the set of $\Sigma$-types over $\Theta$ may have variables from $\Theta$, so $\Type_{\Sigma}(\Theta)$ is inhabited if $\Theta$ is.
-  Hence, there is no need to introduce base types which are not introduced by any term construct.
-  The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus is thus given solely by an operation $\bto$ with $\arity(\bto) = 2$, i.e.\ a binary operation.
-  For simply typed $\lambda$-calculus with binary products, we can augment
-  $\Sigma_{\bto}$ by adding a binary operation $\btimes$ for the binary product type.
-  We denote this augmented signature by $\Sigma_{\bto, \btimes}$.
-  
+  Simply typed $\lambda$-calculus typically includes a binary implication type denoted by $\bto$ and some base types to ensure that the set of all types is non-empty.
+  In our setting, the set of $\Sigma$-types over $\Theta$ may contain variables from $\Theta$, so $\Type_{\Sigma}(\Theta)$ is non-empty if $\Theta$ is.
+  Therefore, there is no need to introduce base types that are not used by any term construct.
+  The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus consists solely of a binary operation $\bto$, where $\arity(\bto) = 2$.
+  In the case of simply typed $\lambda$-calculus with binary products, we can extend $\Sigma_{\bto}$ by adding a binary operation $\btimes$ to represent the binary product type.
+  This extended signature is denoted as $\Sigma_{\bto, \btimes}$.
 \end{example}
 
 
-\subsection{Binding Signatures and Intrinsically Typed Terms}
+\subsection{Binding Signatures}
 \begin{definition}\label{def:binding-signature}
   For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
   \[
@@ -189,9 +188,6 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
     && 
     \arity(\abs) = (\{A, B\}, [(\cdot, A; B)], A \bto B)
   \end{align*}
-\end{example}
-
-\begin{example}\label{ex:STLCx-sig}
   For the type signature $\Sigma_{\bto, \btimes}$, the term signature $\Omega_{\bto, \btimes}$ for simply typed $\lambda$-calculus with finite products has three additional operations
 to $\Omega_{\bto}$:
   \begin{align*}
@@ -201,20 +197,36 @@ to $\Omega_{\bto}$:
   \end{align*}
 \end{example}
 
+First, it is noteworthy that the set of term constructs in a type theory need not be finite.
+For instance, a type theory that includes ground types like arbitrary-bit integers can be specified by a nullary operation, i.e.\ a constant, for each integer.
+
+More importantly, the inclusion of the set of variables used in an operation is a salient feature of our binding signatures.
+Instead of treating the application construct $\app_{A, B}$ as indexed by all types $A$ and $B$, as done by \citet{Fiore2022}, we are able to identify them as a single construct $\app$.
+This is not only for brevity but also necessary to incorporate the global context of type variables available, which is crucial for unification to solve constraints during type synthesis.
+
+In contrast to the set $\Theta$ representing the context of global type variables for a derivation of a typing judgement $\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A$ introduced below, the set $\Xi$ associated with an operation can be referred to as the \emph{local context} for that operation.
+
+\subsection{Intrinsically Typed Terms}
+
+Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\termOp_o)$ for every operation $o$ in $\Omega$ displayed in \Cref{fig:intrinsic-typing}.
+
+The substitution $\rho\colon \Xi \to \Theta$ is used to instantiate explicitly variables in the local context $\Xi$ with global type variables in $\Theta$.
+Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp_o$ to ensure that all types are will-formed under $\Theta$.
+
 \begin{figure}
   \centering
   \small
   \begin{mathpar}
-    \boxed{\Theta \mid \Gamma_{\Sigma, \Omega} \vdash A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$ and $\Theta \vdash_{\Sigma} A$} \\
+    \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$ and $\Theta \vdash_{\Sigma} A$} \\
     \inferrule{A \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
     \and
-    \inferrule{\rho : \Xi \to \Theta \\\Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+    \inferrule*{\rho : \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
     {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp_o)
   \end{mathpar}
   for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
   \caption{Intrinsic typing rules}
+  \label{fig:intrinsic-typing}
 \end{figure}
-
 \subsection{Raw Terms and Extrinsically Typed Terms?}
 \begin{LTannote}{no extrinsic typing}
 Argue that we don't need extrinsically typed terms but raw terms only as the output of some parser.
@@ -288,7 +300,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
     \and
     \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
     \and
-    \inferrule{\rho\colon \Xi \to \Theta \\
+    \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\
       \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} \mathrel{\color{red}\leftrightarrows_{1}} \simsub{A_{1}}{\rho} \\
       \cdots \\
     \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} \mathrel{\color{red}\leftrightarrows_{n}} \simsub{A_{n}}{\rho}}

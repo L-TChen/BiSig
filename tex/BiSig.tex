@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
 
+\usepackage{bm}
+\usepackage{braket}
 \usepackage{mathtools}
 \usepackage{mathpartir}
 \usepackage[all,cmtip]{xy}
@@ -21,12 +23,18 @@
 
 \usepackage{microtype}
 
-\input{macros}
 
 \FXRegisterAuthor{LT}{LTan}{L-T}
 \FXRegisterAuthor{Josh}{Joshan}{Josh}
 
 \citestyle{acmauthoryear}
+
+\AtEndPreamble{%
+\theoremstyle{acmdefinition}
+\newtheorem{remark}[theorem]{Remark}}
+
+\input{type-notation} %% for type theory notation copied from HoTT Book
+\input{macros}
 
 \begin{document}
 
@@ -52,7 +60,7 @@
 \end{abstract}
 
 \maketitle
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 
 \subsection{Related work}
 
@@ -76,87 +84,192 @@ PoplMark Challenge~\citep{Aydemir2005}
 
 \subsection{Plan and Contributions of this paper}
 
-\section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}
-\subsection{Type Checking via Bidirectional Typing}
+\section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}\label{sec:bi-stlc}
+\begin{figure}
+  \begin{mathpar}
+    \boxed{\Gamma \vdash \isTerm{t} \Rightarrow A}
+    \quad\text{and}\quad \boxed{\Gamma \vdash \isTerm{t} \Leftarrow A}
+    \\
+    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \Rightarrow A}\;(\text{var}^\Rightarrow)
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Leftarrow B \\ A = B}{\Gamma \vdash \isTerm{t : B}\Rightarrow A}\;(\text{anno})
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Gamma \vdash \isTerm{t\uparrow} \Leftarrow A}\;(\text{sub})
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Gamma \vdash \isTerm{u} \Leftarrow A}{\Gamma \vdash \isTerm{t\;u} \Rightarrow B}
+    \and
+    \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \Rightarrow B}{\Gamma \vdash \isTerm{\lam{x}t} \Rightarrow A \bto B}
+  \end{mathpar}
+  \caption{The extrinsic style of bidirectional simply typed $\lambda$-calculus}
+  \label{fig:bi-stlc}
+\end{figure}
+\begin{remark}
+  We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.
+\end{remark}
+
+\subsection{Type Synthesis and Checking via Bidirectional Typing}
 \subsection{Formalisation in \Agda}
 
-\section{A Definition of Simple Type Theories}
+\section{A Definition of Simple Type Theories}\label{sec:simple-type-theories}
 \subsection{Simple Types}
 \begin{definition}
-  A \emph{(simple type) signature} is a set $I$ with an \emph{arity} $\mathit{ar}_i : \mathbb{N}$ associated to each $i : I$.
-  An element $i : I$ is meant to be the \emph{$i$-th operation} $\tyop{i}$ and $\mathit{ar}(i)$ the \emph{number} of arguments of $\tyop{i}$.
+  A \emph{(simple type) signature} $\Sigma$ consists of a set $I$ and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
+  An inhabitant $i : I$ is meant to represent the \emph{$i$-th operation} $\tyOp_i$ and its \emph{number} $ \arity(i)$ of arguments.
+
+  The judgements of \emph{$\Sigma$-types} and \emph{$\Sigma$-contexts} over a variable set $\Theta$ are defined inductively by \Cref{fig:simple-type,fig:simple-context} respectively.
+We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma \colon \Cxt_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} \Gamma$ to disambiguate $\Sigma$-types and $\Sigma$-contexts in the case of any confusion.
 \end{definition}
-\LTnote{Define $\mathsf{Type}$}
+
 \begin{figure}
-  \begin{subfigure}{.5\textwidth}
+  \begin{minipage}[b]{.55\textwidth}
+    \centering
+    \small
     \begin{mathpar}
-      \boxed{\Theta\vdash A} \\
-      \inferrule{\Theta \ni X_i}{\Theta \vdash X_i} \and
-      \inferrule{\Theta \vdash A_1 \\ \cdots \\ \Theta \vdash A_n}{\Theta \vdash \tyop{i}(A_1, \ldots, A_n)}
+      \boxed{\Theta\vdash_{\Sigma} A} \\
+      \inferrule{\Theta \ni X_i}{\Theta \vdash_\Sigma X_i} \and
+      \inferrule{\Theta \vdash_{\Sigma} A_1 \\ \cdots \\ \Theta \vdash_{\Sigma} A_n}{\Theta \vdash_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}
     \end{mathpar}
-  \end{subfigure}
-  \begin{subfigure}{.4\textwidth}
+    where $n = \arity_i$
+    \caption{Type formation}
+    \label{fig:simple-type}
+  \end{minipage}
+  \begin{minipage}[b]{.4\textwidth}
+    \centering
+    \small
     \begin{mathpar}
-      \boxed{\Theta \vdash \Gamma} \\
-      \inferrule{ }{\Theta \vdash \emptyset}\and
-      \inferrule{\Theta \vdash A \\ \Theta\vdash \Gamma}{\Theta \vdash \Gamma, A}
+      \boxed{\Theta \vdash_{\Sigma} \Gamma} \\
+      \inferrule{ }{\Theta \vdash_{\Sigma} \cdot }\and
+      \inferrule{\Theta \vdash_{\Sigma} A \\ \Theta\vdash_{\Sigma} \Gamma}{\Theta \vdash_{\Sigma} \Gamma, A}
     \end{mathpar}
-  \end{subfigure}
-  \caption{Simple types and contexts}
+    \caption{Context formation}
+  \label{fig:simple-context}
+  \end{minipage}
 \end{figure}
 
-\begin{example}[STLC]
+\begin{example}\label{ex:implication}
+  Simply typed $\lambda$-calculus typically has a binary implication type $\bto$ and some base types so that the set of all types is at least inhabited.
+  In our setting, the set of $\Sigma$-types over $\Theta$ may have variables from $\Theta$, so $\Type_{\Sigma}(\Theta)$ is inhabited if $\Theta$ is.
+  Hence, there is no need to introduce base types which are not introduced by any term construct.
+  The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus is thus given solely by an operation $\bto$ with $\arity(\bto) = 2$, i.e.\ a binary operation.
+  For simply typed $\lambda$-calculus with binary products, we can augment
+  $\Sigma_{\bto}$ by adding a binary operation $\btimes$ for the binary product type.
+  We denote this augmented signature by $\Sigma_{\bto, \btimes}$.
   
 \end{example}
 
 
 \subsection{Binding Signatures and Intrinsically Typed Terms}
-\begin{definition}
-  For a type signature, a \emph{binding signature} consists of a set $J$ meant to be the set of term constructs $\op{j}$ with a triple $\left(\Xi_j, A_{0, j}, \left[\left(\Delta_{1, j}, A_{1, j}\right), \ldots, \left(\Delta_{n_j, j}, A_{n_j, j}\right) \right]\right)$ for each $j:J$ where
+\begin{definition}\label{def:binding-signature}
+  For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
+  \[
+    \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Cxt_\Sigma(\Xi) \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
+  \]
+  Each inhabitant $o: O$ is meant to represent a term construct $\termOp_o$ in a simple type theory with a triple $\left(\Xi, \left[\left(\Delta_1; A_1\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right], A\right)$
+  instead of a number as its arity $\arity_o$ where
   \begin{enumerate}
-    \item $\Xi_j : \mathbb{N}$ is the number of variables, 
-    \item $A_{0, j} : \mathsf{Type}(\Xi_j)$ is the type of its target,  and
-    \item $\left[\left(\Delta_{1, j}, A_{1, j}\right), \ldots, \left(\Delta_{n_j, j}, A_{n_j, j}\right) \right]$ is a finite sequence of pairs of a context $\Delta_{k, j} : \mathsf{Cxt}(\Xi_j)$ for types of its binding variables and its type $A_{k, j} : \mathsf{Type}(\Xi_j)$.
+    \item $A : \Type_\Sigma(\Xi)$ is the target type of $\termOp_o$ and
+    \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs where
+    \item the $i$-th pair $(\Delta_i, A_i) :\Cxt_{\Sigma}(\Xi) \times \Term_{\Sigma}(\Xi)$ are types of the binding variables and the type of the $i$-th argument of $\termOp_{o}$.
   \end{enumerate}
+  For brevity, we write $o \colon \Xi \vdash (\Delta_1)A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation $o$ with its arity. 
 \end{definition}
+\begin{remark}[Terminology on binding signature]
+  \cite{Aczel1978,Fiore2010}
+\end{remark}
+
+
+\begin{example} \label{ex:STLC-sig}
+  Given the type signature $\Sigma_{\bto}$ for the implication type, the term signature $\Lambda_{\bto}$ for simply typed $\lambda$-calculus can be described by operations
+  \begin{align*}
+    \mathsf{app}\colon A, B \vdash (A \bto B), A \to B && \mathsf{abs}\colon A , B \vdash [A]B \to (A \bto B)
+  \end{align*}
+    or, verbosely, the signature $\Lambda_{\bto}$ consists of the type $O_\Lambda = \{\app, \abs\}$ with arities
+  \begin{align*}
+    \arity(\app) = (\{A, B\}, [(\cdot; A \bto B), (\cdot; A)], B)
+    && 
+    \arity(\abs) = (\{A, B\}, [(\cdot, A; B)], A \bto B)
+  \end{align*}
+\end{example}
+
+\begin{example}\label{ex:STLCx-sig}
+  For the type signature $\Sigma_{\bto, \btimes}$, the term signature $\Omega_{\bto, \btimes}$ for simply typed $\lambda$-calculus with finite products has three additional operations
+to $\Omega_{\bto}$:
+  \begin{align*}
+    \mathsf{pair}\colon A, B \vdash A, B \to A \btimes B
+    && \fst \colon A, B \vdash A \btimes B \to A
+    && \snd \colon A, B \vdash A \btimes B \to B
+  \end{align*}
+\end{example}
+
+\begin{figure}
+  \centering
+  \small
+  \begin{mathpar}
+    \boxed{\Theta \mid \Gamma_{\Sigma, \Omega} \vdash A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$ and $\Theta \vdash_{\Sigma} A$} \\
+    \inferrule{A \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
+    \and
+    \inferrule{\rho : \Xi \to \Theta \\\Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp_o)
+  \end{mathpar}
+  for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
+  \caption{Intrinsic typing rules}
+\end{figure}
+
+\subsection{Raw Terms and Extrinsically Typed Terms?}
+\begin{LTannote}{no extrinsic typing}
+Argue that we don't need extrinsically typed terms but raw terms only as the output of some parser.
+\end{LTannote}
+
 \begin{figure}
   \centering
   \begin{mathpar}
-    \boxed{\Theta \mid \Gamma \vdash t : A} 
-    \quad\text{where $\Theta \vdash \Gamma$ and $\Theta \vdash A$} \\
-    \inferrule{\Gamma \ni (x : A)}{\Theta \mid \Gamma \vdash \term{x} : A}\;(\text{var})
-    \and
-    \inferrule{\Theta \mid \Gamma, \simsub{\Delta_{1,j}}{\rho} \vdash \term{t_1} : \simsub{A_{1,j}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n_j, j}}{\rho} \vdash \term{t_{n}} : \simsub{A_{n, j}}{\rho}} {\Theta \mid \Gamma \vdash \term{\op{j}(\rho; t_1, \ldots, t_{n_j})} : \simsub{A_{0,j}}{\rho}}\;(\text{op})
-    \quad \text{where $\rho \colon \Xi_j \to \Theta$}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} t}
   \end{mathpar}
   
-  \caption{Typing rules}
+  \caption{Raw terms}
 \end{figure}
-
-\begin{example}[STLC]
-  
-\end{example}
 
 \section{Definitions of Bidirectional Simple Type Systems} 
 
 \subsection{Bidirectional Binding Signatures}
 
 \begin{definition}
-  
+  For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
+  \[
+    \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Cxt_{\Sigma}(\Xi) \times \Mode \times \Type_{\Sigma}(\Xi)\right)^* \times \Mode \times \Type_{\Sigma}(\Xi).
+  \]
+  Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\termOp_o$ in a bidirectional system, i.e.
+  an arity is a $4$-tuple
+  \[
+    \left(\Xi, \left[\left(\Delta_1, \leftrightarrows_1, A_1\right), \ldots, \left(\Delta_{n}, \leftrightarrows_n, A_{n}\right) \right], \leftrightarrows, A\right)
+  \]
+  where ${\leftrightarrows_i}$ and ${\leftrightarrows}$ are of type $\Mode$ indicating the modes of a construct and its arguments respectively.
+  For brevity, we write $o \colon \Xi \vdash [\Delta_1]A_{1}^{\leftrightarrows_1}, \ldots, [\Delta_{n}] A^{\leftrightarrows_n}_{n} \to A^{\leftrightarrows}$ to indicate an operation $o$ with its arity. 
 \end{definition}
 
-
 \begin{example}
-  
+  With the type signature $\Sigma_{\bto}$, the term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{sec:bi-stlc} can be specified by operations 
+  \begin{align*}
+    \mathsf{app}\colon A, B \vdash (A \bto B)^{\Rightarrow}, A^{\Leftarrow} \to B^{\Rightarrow} &&
+    \mathsf{abs}\colon A , B \vdash [A]B^{\Leftarrow} \to (A \bto B)^{\Leftarrow}
+  \end{align*}
+  like those in \Cref{ex:STLC-sig} but augmented with the mode information.
 \end{example}
 
 \subsection{Bidirectionally Typed Terms: Intrinsic Typing vs.\ Extrinsic Typing}
 
 \subsubsection{Intrinsically Typed Terms}
 
-\subsubsection{Raw Terms}
+\subsubsection{Bidirectional Raw Terms}
 
 \begin{figure}
+  \centering
+  \begin{mathpar}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} t \Rightarrow}
+    \quad\text{and}\quad
+    \boxed{\Theta \vdash_{\Sigma, \Omega} t \Leftarrow}
+  \end{mathpar}
+  
   \caption{Bidirectional raw terms}
 \end{figure}
 
@@ -164,20 +277,25 @@ PoplMark Challenge~\citep{Aydemir2005}
 
 \begin{figure}
   \centering
+  \small
   \begin{mathpar}
-    \boxed{\Theta \mid \Gamma \vdash \term{t} \Rightarrow A} \quad\text{and}\quad\boxed{\Theta \mid \Gamma \vdash \term{t} \Leftarrow A} \quad
-    \text{where $\Theta \vdash \Gamma$ and $\Theta \vdash A$}\\
-    \inferrule{\Gamma \ni (\term{x} : A)}{\Theta \mid \Gamma \vdash \term{x} \mathrel{\color{red}\Rightarrow} A}\;(\text{var}{\Rightarrow})
+    \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A}\quad\text{and}\quad\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} 
+    \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t \leftrightarrows$} 
+    \\
+    \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} \mathrel{\color{red}\Rightarrow} A}\;(\var^{\Rightarrow})
     \and
-    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Leftarrow B \\ A = B}{\Theta \mid \Gamma \vdash (\term{t} : B) \Rightarrow A}\;(\textcolor{red}{anno})
+    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow B \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t : B}\Rightarrow A}\;(\textcolor{red}{anno})
     \and
-    \inferrule{\Theta\mid \Gamma \vdash \term{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash \term{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
+    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
     \and
-    \inferrule{\Theta \mid \Gamma, \simsub{\vec{x}_{1,j} : \Delta_{1, j}}{\rho} \vdash \term{t_{1, j}} \mathrel{\color{red}\leftrightarrows_{1, j}} \simsub{A_{1, j}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\vec{x}_{n_j, j} : \Delta_{n_j, j}}{\rho} \vdash \term{t_{n_j, j}} \mathrel{\color{red}\leftrightarrows_{n_j, j}} \simsub{A_{n_j ,j}}{\rho}}
-    {\Theta \mid \Gamma \vdash \term{\op{j}(\rho; \vec{x}_{1, j} .\, t_{1, j}, \ldots, \vec{x}_{n_j, j}.\, t_{n_j, j})} \mathrel{\color{red}\leftrightarrows_{0, j}} \simsub{A_{0, j}}{\rho}} \; (\text{op}{\leftrightarrows})
-    \quad \text{where $\rho \colon \Xi_i \to \Theta$}
+    \inferrule{\rho\colon \Xi \to \Theta \\
+      \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} \mathrel{\color{red}\leftrightarrows_{1}} \simsub{A_{1}}{\rho} \\
+      \cdots \\
+    \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} \mathrel{\color{red}\leftrightarrows_{n}} \simsub{A_{n}}{\rho}}
+    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\termOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} \mathrel{\color{red}\leftrightarrows} \simsub{A}{\rho}} \; (\termOp^{\leftrightarrows}_o)
   \end{mathpar}
-  \caption{Bidirectional typing rules}
+  for $o \colon \Xi \vdash [\Delta_1]A_{1}^{\leftrightarrows_1}, \ldots, [\Delta_{n}] A^{\leftrightarrows_n}_{n} \to A^{\leftrightarrows}$ in $\Omega$
+  \caption{Bidirectional extrinsic typing rules}
 \end{figure}
 
 \begin{example}
@@ -191,14 +309,19 @@ PoplMark Challenge~\citep{Aydemir2005}
 \subsection{Mode Correctness}
 
 \section{Bidirectional Type Synthesis and Checking}
+
 \subsection{Substitution Properties}
 \subsection{Generic First-Order Unification}
 \cite{McBride2003,McBride2003a}
+\begin{definition}
+A \emph{decidable equality} for a type $X$ is a dependent function $\prod_{x, y : X} \left(\id{x}{y}\right) + \neg \left(\id{x}{y}\right)$.
+\end{definition}
+ 
 \subsection{Uniqueness of Synthesis}
 
 \subsection{Type Synthesis and Checking with Unification}
 
-\section{Formal Implementation with Examples}
+\section{Formal Implementation and Examples}
 
 \citep{Xie2018}
 

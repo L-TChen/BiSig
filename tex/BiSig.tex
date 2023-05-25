@@ -1,4 +1,4 @@
-\documentclass[acmsmall]{acmart}
+\documentclass[acmsmall,screen]{acmart}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
@@ -73,7 +73,7 @@ PoplMark Challenge~\citep{Aydemir2005}
 \cite{Allais2021,Gheri2020,Ahrens2022}
 
 \subsubsection{Algebraic theory of type theories}
-\cite{Fiore1999,Fiore2022,Hamana2022,Ahrens2021,Arkor2020}
+\cite{Fiore1999,Fiore2022,Ahrens2021,Arkor2020,Hamana2011}
 
 
 \subsubsection{Type checker generation}
@@ -203,17 +203,15 @@ First, it is noteworthy that the set of term constructs in a type theory need no
 For instance, a type theory that includes ground types like arbitrary-bit integers can be specified by a nullary operation, i.e.\ a constant, for each integer.
 
 More importantly, the inclusion of the set of variables used in an operation is a salient feature of our binding signatures.
-Instead of treating the application construct $\app_{A, B}$ as indexed by all types $A$ and $B$, as done by \citet{Fiore2022}, we are able to identify them as a single construct $\app$.
-This is not only for brevity but also necessary to incorporate the global context of type variables available, which is crucial for unification to solve constraints during type synthesis.
-
-In contrast to the set $\Theta$ representing the context of global type variables for a derivation of a typing judgement $\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A$ introduced below, the set $\Xi$ associated with an operation can be referred to as the \emph{local context} for that operation.
+Instead of treating application as a family of constructs $\app_{A, B}$ indexed by all types $A$ and $B$, as done by \citet{Fiore2022}, we are able to identify them as a single construct $\app$.
+This is not only for brevity but also necessary to compare the type equality during type synthesis and checking.
 
 \subsection{Intrinsically Typed Terms}
 
 Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\termOp)$ displayed in \Cref{fig:intrinsic-typing}.
 
-The substitution $\rho\colon \Sub{\Xi}{\Theta}$ is used to instantiate variables in the local context $\Xi$ with global type variables in $\Theta$.
-Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp_o$ to ensure all types are will-formed under $\Theta$.
+The substitution $\rho\colon \Sub{\Xi}{\Theta}$ is used to instantiate variables in the local context $\Xi$ with types within the context of type variables in $\Theta$.
+Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp$ to ensure all types are well-formed under $\Theta$.
 
 \begin{figure}
   \centering
@@ -222,10 +220,10 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$ and $\Theta \vdash_{\Sigma} A$} \\
     \inferrule{A \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
     \and
-    \inferrule*{\rho : \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+    \inferrule{\rho : \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
     {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp)
+    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
   \caption{Intrinsic typing rules}
   \label{fig:intrinsic-typing}
 \end{figure}
@@ -260,6 +258,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
     \left(\Xi, \left[\left(\Delta_1, d_1, A_1\right), \ldots, \left(\Delta_{n}, d_n, A_{n}\right) \right], d, A\right)
   \]
   where $d$ and $d_i$'s indicate the modes of a construct and its arguments respectively.
+
   For brevity, we write $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation $o$ with its arity. 
 \end{definition}
 
@@ -282,7 +281,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
   \centering
   \small
   \begin{mathpar}
-    \boxed{\Theta \vdash_{\Sigma, \Omega} t^d}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}}
   \end{mathpar}
   
   \caption{Bidirectional raw terms}
@@ -296,13 +295,12 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
   \begin{mathpar}
     \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{d}}
     \quad \text{where $d$ is either $\chk$ or $\syn$, $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t^d$} 
-     \\
+    \\
     \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\syn}\;(\var)
     \and
     \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^\chk \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t : B}:  A^\syn}\;(\text{anno})
     \and
     \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\syn} \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} : A^\chk}\;(\text{sub})
-    \and
   \end{mathpar}
   \begin{mathpar}
     \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\
@@ -310,9 +308,10 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
       \cdots \\
     \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}^{\isDir{d_n}}}
   {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\termOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\termOp)
-    \\ \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \\
+    \text{Abbreviations: $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$}
   \end{mathpar}
-  Abbreviations: $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$
   \caption{Bidirectional extrinsic typing rules}
 \end{figure}
 

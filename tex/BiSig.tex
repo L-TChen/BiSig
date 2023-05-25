@@ -86,6 +86,8 @@ PoplMark Challenge~\citep{Aydemir2005}
 
 \section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}\label{sec:bi-stlc}
 \begin{figure}
+  \centering
+  \small
   \begin{mathpar}
     \boxed{\Theta \mid \Gamma \vdash \isTerm{t} \Rightarrow A}
     \quad\text{and}\quad \boxed{\Theta \mid \Gamma \vdash \isTerm{t} \Leftarrow A}
@@ -111,7 +113,7 @@ PoplMark Challenge~\citep{Aydemir2005}
 \subsection{Type Synthesis and Checking via Bidirectional Typing}
 \subsection{Formalisation in \Agda}
 
-\section{A Definition of Simple Type Theories}\label{sec:simple-type-theories}
+\section{Definitions of Simple Type Theories}\label{sec:simple-type-theories}
 \subsection{Simple Types}
 \begin{definition}
   A \emph{(simple type) signature} $\Sigma$ consists of a set $I$ and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
@@ -208,10 +210,10 @@ In contrast to the set $\Theta$ representing the context of global type variable
 
 \subsection{Intrinsically Typed Terms}
 
-Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\termOp_o)$ for every operation $o$ in $\Omega$ displayed in \Cref{fig:intrinsic-typing}.
+Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\termOp)$ displayed in \Cref{fig:intrinsic-typing}.
 
-The substitution $\rho\colon \Xi \to \Theta$ is used to instantiate explicitly variables in the local context $\Xi$ with global type variables in $\Theta$.
-Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp_o$ to ensure that all types are will-formed under $\Theta$.
+The substitution $\rho\colon \Sub{\Xi}{\Theta}$ is used to instantiate variables in the local context $\Xi$ with global type variables in $\Theta$.
+Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp_o$ to ensure all types are will-formed under $\Theta$.
 
 \begin{figure}
   \centering
@@ -221,7 +223,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \inferrule{A \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
     \and
     \inferrule*{\rho : \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \\ \cdots \\ \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
-    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp_o)
+    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp)
   \end{mathpar}
   for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
   \caption{Intrinsic typing rules}
@@ -234,6 +236,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
 
 \begin{figure}
   \centering
+  \small
   \begin{mathpar}
     \boxed{\Theta \vdash_{\Sigma, \Omega} t}
   \end{mathpar}
@@ -250,22 +253,23 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
   \[
     \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Cxt_{\Sigma}(\Xi) \times \Mode \times \Type_{\Sigma}(\Xi)\right)^* \times \Mode \times \Type_{\Sigma}(\Xi).
   \]
+  where $\Mode$ consists of $\chk$ for checking and $\syn$ for synthesis.
   Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\termOp_o$ in a bidirectional system, i.e.
   an arity is a $4$-tuple
   \[
-    \left(\Xi, \left[\left(\Delta_1, \leftrightarrows_1, A_1\right), \ldots, \left(\Delta_{n}, \leftrightarrows_n, A_{n}\right) \right], \leftrightarrows, A\right)
+    \left(\Xi, \left[\left(\Delta_1, d_1, A_1\right), \ldots, \left(\Delta_{n}, d_n, A_{n}\right) \right], d, A\right)
   \]
-  where ${\leftrightarrows_i}$ and ${\leftrightarrows}$ are of type $\Mode$ indicating the modes of a construct and its arguments respectively.
-  For brevity, we write $o \colon \Xi \vdash [\Delta_1]A_{1}^{\leftrightarrows_1}, \ldots, [\Delta_{n}] A^{\leftrightarrows_n}_{n} \to A^{\leftrightarrows}$ to indicate an operation $o$ with its arity. 
+  where $d$ and $d_i$'s indicate the modes of a construct and its arguments respectively.
+  For brevity, we write $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation $o$ with its arity. 
 \end{definition}
 
 \begin{example}
-  With the type signature $\Sigma_{\bto}$, the term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{sec:bi-stlc} can be specified by operations 
+  The term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{sec:bi-stlc} can be specified by operations 
   \begin{align*}
     \mathsf{app}\colon A, B \vdash (A \bto B)^{\Rightarrow}, A^{\Leftarrow} \to B^{\Rightarrow} &&
     \mathsf{abs}\colon A , B \vdash [A]B^{\Leftarrow} \to (A \bto B)^{\Leftarrow}
   \end{align*}
-  like those in \Cref{ex:STLC-sig} but augmented with the mode information.
+  extending $\Lambda_{\bto}$ (\Cref{ex:STLC-sig}) with the mode information.
 \end{example}
 
 \subsection{Bidirectionally Typed Terms: Intrinsic Typing vs.\ Extrinsic Typing}
@@ -276,10 +280,9 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
 
 \begin{figure}
   \centering
+  \small
   \begin{mathpar}
-    \boxed{\Theta \vdash_{\Sigma, \Omega} t \Rightarrow}
-    \quad\text{and}\quad
-    \boxed{\Theta \vdash_{\Sigma, \Omega} t \Leftarrow}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} t^d}
   \end{mathpar}
   
   \caption{Bidirectional raw terms}
@@ -291,22 +294,25 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
   \centering
   \small
   \begin{mathpar}
-    \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A}\quad\text{and}\quad\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} 
-    \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t \leftrightarrows$} 
-    \\
-    \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} \mathrel{\color{red}\Rightarrow} A}\;(\var^{\Rightarrow})
+    \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{d}}
+    \quad \text{where $d$ is either $\chk$ or $\syn$, $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t^d$} 
+     \\
+    \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\syn}\;(\var)
     \and
-    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow B \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t : B}\Rightarrow A}\;(\textcolor{red}{anno})
+    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^\chk \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t : B}:  A^\syn}\;(\text{anno})
     \and
-    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow B \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} \Leftarrow A}\;(\textcolor{red}{sub})
+    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\syn} \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} : A^\chk}\;(\text{sub})
     \and
-    \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\
-      \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} \mathrel{\color{red}\leftrightarrows_{1}} \simsub{A_{1}}{\rho} \\
-      \cdots \\
-    \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} \mathrel{\color{red}\leftrightarrows_{n}} \simsub{A_{n}}{\rho}}
-    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\termOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} \mathrel{\color{red}\leftrightarrows} \simsub{A}{\rho}} \; (\termOp^{\leftrightarrows}_o)
   \end{mathpar}
-  for $o \colon \Xi \vdash [\Delta_1]A_{1}^{\leftrightarrows_1}, \ldots, [\Delta_{n}] A^{\leftrightarrows_n}_{n} \to A^{\leftrightarrows}$ in $\Omega$
+  \begin{mathpar}
+    \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\
+      \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} : \simsub{A_{1}}{\rho}^{\isDir{d_1}} \\
+      \cdots \\
+    \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}^{\isDir{d_n}}}
+  {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\termOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\termOp)
+    \\ \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+  \end{mathpar}
+  Abbreviations: $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$
   \caption{Bidirectional extrinsic typing rules}
 \end{figure}
 
@@ -315,7 +321,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
 \end{example}
 
 
-\subsection{Binding Signatures vs.\ their Bidirectional Variants}
+\subsection{Between Binding Signatures and their Bidirectional Variants}
 \subsubsection{Soundness}
 \subsubsection{Completeness (Annotatability)}
 \subsection{Mode Correctness}
@@ -334,6 +340,9 @@ A \emph{decidable equality} for a type $X$ is a dependent function $\prod_{x, y 
 \subsection{Type Synthesis and Checking with Unification}
 
 \section{Formal Implementation and Examples}
+\begin{LTannote}{de Bruijn}
+  In our Agda formalisation, we use de Bruijn indices to represent variables, so we don't use an arbitrary type $\Theta$ but the number of variables as the index of typing judgements.
+\end{LTannote}
 
 \citep{Xie2018}
 

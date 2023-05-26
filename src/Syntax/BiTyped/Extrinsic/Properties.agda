@@ -1,4 +1,4 @@
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS  #-}
 
 open import Prelude
 
@@ -21,7 +21,7 @@ open ≡-Reasoning
 open Equivalence
 
 private variable
-  n m l k : ℕ
+  n m l k Ξ : ℕ
   mod : Mode
   Γ Δ : Cxt m
   x   : Id
@@ -29,25 +29,53 @@ private variable
   σ ρ : TSub m n
   t u : Raw m mod
 
-module _ {m : ℕ} where
-  Membership : TExp m → Cxt m → Id → 𝐘 {ℕ} {TSub} m
-  Membership A Γ x _ σ = x ⦂ A ⟨ σ ⟩ ∈ Γ ⟨ σ ⟩
+Membership : TExp m → Cxt m → Id → 𝐘 {ℕ} {TSub} m
+Membership A Γ x _ σ = x ⦂ A ⟨ σ ⟩ ∈ Γ ⟨ σ ⟩
 
-  Typability : TExp m → Cxt m → Raw m mod → 𝐘 {ℕ} {TSub} m
-  Typability A Γ t _ σ = ⊢⇆ _ (A ⟨ σ ⟩) (Γ ⟨ σ ⟩) (t ⟨ σ ⟩)
+Typability : TExp m → Cxt m → Raw m mod → 𝐘 {ℕ} {TSub} m
+Typability A Γ t _ σ = ⊢⇆ _ (A ⟨ σ ⟩) (Γ ⟨ σ ⟩) (t ⟨ σ ⟩)
 
-  Typabilityⁿ : (D : B.ArgsD SD k)
-    → TSub k m → Cxt m → R.⟦ D ⟧ᵃˢ (Raw m) → 𝐘 {ℕ} {TSub} m
-  Typabilityⁿ D ρ Γ ts n σ =
-    ⟦ D ⟧ᵃˢ (Raw n) ⊢⇆ (ρ ⨟ σ) (Γ ⟨ σ ⟩) (ts ⟨ σ ⟩)
+Typabilityⁿ : (D : B.ArgsD SD k)
+  → TSub k m → Cxt m → R.⟦ D ⟧ᵃˢ (Raw m) → 𝐘 {ℕ} {TSub} m
+Typabilityⁿ D ρ Γ ts n σ =
+  ⟦ D ⟧ᵃˢ (Raw n) ⊢⇆ (ρ ⨟ σ) (Γ ⟨ σ ⟩) (ts ⟨ σ ⟩)
 
-  Typabilityᵃ : (Θ : TExps k)
-    → TSub k m → TExp m → Cxt m → R.⟦ Θ ⟧ᵃ (Raw m mod) → 𝐘 {ℕ} {TSub} m
-  Typabilityᵃ Θ ρ A Γ t n σ = ⟦ Θ ⟧ᵃ (Raw n)
-    (⊢⇆ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ t)
+Typabilityᵃ : (Θ : TExps k)
+  → TSub k m → TExp m → Cxt m → R.⟦ Θ ⟧ᵃ (Raw m mod) → 𝐘 m
+Typabilityᵃ Θ ρ A Γ t n σ = ⟦ Θ ⟧ᵃ (Raw n)
+  (⊢⇆ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ t)
 
-  DecAccTypability : TExp m → Cxt m → Raw m mod → Set
-  DecAccTypability A Γ t = DecMinₐ λ n σ → {!⇆!} 
+Synthesis : Cxt m → Raw m mod → 𝐘 {ℕ} {TSub} m
+Synthesis Γ t _ σ = ∃[ A ] Typability A Γ t _ σ
+
+Synthesisᵃ : (Δ : TExps k)
+  → TSub k m → Cxt m → R.⟦ Δ ⟧ᵃ (Raw m mod) → 𝐘 {ℕ} {TSub} m
+Synthesisᵃ Δ ρ Γ t n σ = ∃[ A ] Typabilityᵃ Δ ρ A Γ t n σ
+
+AccTypability : TExp m → Cxt m → Raw m mod → AList m n → 𝐘 n
+AccTypability A Γ t σ = Typability A Γ t [ toSub σ ⨟]
+
+AccTypabilityⁿ : (D : B.ArgsD SD k)
+  → TSub k m → Cxt m → R.⟦ D ⟧ᵃˢ (Raw m) → AList m n → 𝐘 n
+AccTypabilityⁿ D ρ Γ ts σ = Typabilityⁿ D ρ Γ ts [ toSub σ ⨟]
+
+AccTypabilityᵃ : (Θ : TExps k)
+  → TSub k m → TExp m → Cxt m → R.⟦ Θ ⟧ᵃ (Raw m mod) → AList m n → 𝐘 n
+AccTypabilityᵃ Θ ρ A Γ t σ = Typabilityᵃ Θ ρ A Γ t [ toSub σ ⨟]
+
+AccSynthesis : Cxt m → Raw m mod → AList m n → 𝐘 n
+AccSynthesis Γ t σ = Synthesis Γ t [ toSub σ ⨟]
+
+AccSynthesisᵃ : (Δ : TExps k)
+  → TSub k m → Cxt m → R.⟦ Δ ⟧ᵃ (Raw m mod) → AList m n → 𝐘 n
+AccSynthesisᵃ Δ ρ Γ t σ = Synthesisᵃ Δ ρ Γ t [ toSub σ ⨟]
+
+module _ {m n : ℕ} (Γ : Cxt m) (σ : AList m n) where
+  DecAccSynthesis : Raw⇉ m → Set
+  DecAccSynthesis t = DecMinₐ (AccSynthesis Γ t σ)
+
+  DecAccInheritance : Raw⇇ m → TExp m → Set
+  DecAccInheritance t A = DecMinₐ (AccTypability A Γ t σ)
 
 module _ {m : ℕ} (σ : TSub m n) where
   sub-∈
@@ -90,7 +118,6 @@ module _ {m : ℕ} (σ : TSub m n) where mutual
   sub-⊢ᵃ []      ρ ⊢t = sub-⊢ ⊢t
   sub-⊢ᵃ (A ∷ Θ) ρ ⊢t rewrite ⟨⟩-⨟ ρ σ A = sub-⊢ᵃ Θ ρ ⊢t
       
-module _ {m : ℕ} (σ : TSub m n) where
 
 module _ {m : ℕ} (σ : TSub m n) where
   Typability-ext

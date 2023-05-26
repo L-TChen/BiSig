@@ -4,4 +4,4 @@ include:
   agda-stdlib/src
 
 flags:
-  --auto-inline --guardedness --with-K
+  --auto-inline --guardedness --with-K --erasure

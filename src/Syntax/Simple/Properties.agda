@@ -17,7 +17,7 @@ private variable
   ts us   : Tm Ξ ^ n
   σ₁ σ₂   : Sub Γ Δ
   x y     : Fin Ξ
-  t u v : Tm m
+  t u v   : Tm Ξ
 
 ------------------------------------------------------------------------------
 -- Trivial proofs
@@ -178,39 +178,42 @@ module _ {ρ : Fin m → Fin n} where mutual
 ------------------------------------------------------------------------------
 -- Proofs about ⟨ t for x ⟩
 
-sub-t-for-x-x
-  : sub-for t x x ≡ t
-sub-t-for-x-x {x = x} with x ≟ x
-... | yes p = refl
-... | no ¬p = ⊥-elim₀ (¬p refl)
+opaque
+  unfolding sub-for
+  
+  sub-t-for-x-x
+    : sub-for t x x ≡ t
+  sub-t-for-x-x {Ξ} {t} {x = x} with x ≟ x
+  ... | yes p = refl
+  ... | no ¬p = ⊥-elim₀ (¬p refl)
 
-x⟨t/x⟩=t : (x : Fin (suc m))
-  → ` x ⟨ t for x ⟩ ≡ t
-x⟨t/x⟩=t {_} {t} x = begin
-  ` x ⟨ t for x ⟩
-    ≡⟨ lookup∘tabulate (sub-for t x) x ⟩
-  sub-for t x x
-    ≡⟨ sub-t-for-x-x ⟩
-  t
-    ∎
+  x⟨t/x⟩=t : (x : Fin (suc m))
+    → ` x ⟨ t for x ⟩ ≡ t
+  x⟨t/x⟩=t {_} {t} x = begin
+    ` x ⟨ t for x ⟩
+      ≡⟨ lookup∘tabulate (sub-for t x) x ⟩
+    sub-for t x x
+      ≡⟨ sub-t-for-x-x ⟩
+    t
+      ∎
 
-sub-t-for-x-y
-  : (¬p : x ≢ y)
-  → sub-for t x y ≡ ` punchOut ¬p 
-sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
-... | yes p = ⊥-elim₀ (¬p p)
-... | no ¬p = refl
+  sub-t-for-x-y
+    : (¬p : x ≢ y)
+    → sub-for t x y ≡ ` punchOut ¬p 
+  sub-t-for-x-y {x = x} {y} ¬p with x ≟ y
+  ... | yes p = ⊥-elim₀ (¬p p)
+  ... | no ¬p = refl
 
-y⟨t/x⟩=y : {t : Tm m} {x y : Fin (suc m)}
-  → (¬p : x ≢ y)
-  → ` y ⟨ t for x ⟩ ≡ ` punchOut ¬p
-y⟨t/x⟩=y {m} {t} {x} {y} ¬p = begin
-  ` y ⟨ t for x ⟩
-    ≡⟨ lookup∘tabulate (sub-for t x) y ⟩
-  sub-for t x y
-    ≡⟨ sub-t-for-x-y ¬p ⟩
-  ` F.punchOut ¬p
-    ∎
+  y⟨t/x⟩=y : {t : Tm m} {x y : Fin (suc m)}
+    → (¬p : x ≢ y)
+    → ` y ⟨ t for x ⟩ ≡ ` punchOut ¬p
+  y⟨t/x⟩=y {m} {t} {x} {y} ¬p = begin
+    ` y ⟨ t for x ⟩
+      ≡⟨ lookup∘tabulate (sub-for t x) y ⟩
+    sub-for t x y
+      ≡⟨ sub-t-for-x-y ¬p ⟩
+    ` F.punchOut ¬p
+      ∎
 
 module _ {m : ℕ} where
   punchOut-for-x≢y
@@ -267,7 +270,8 @@ module _ {m : ℕ} {x : Fin (suc m)} where
     x∉punchInTmⁿ (t ∷ ts) (head x∈) = x∉punchInTm t x∈
     x∉punchInTmⁿ (t ∷ ts) (tail x∈) = x∉punchInTmⁿ ts x∈
 
-module _ {u : Tm m} {x : Fin (suc m)} where
+module _ {u : Tm m} {x : Fin (suc m)} where opaque
+  unfolding sub-for
   mutual
     punchIn-t⟨u/x⟩=t : (t : Tm m)
       → punchInTm x t ⟨ u for x ⟩ ≡ t
@@ -282,6 +286,7 @@ module _ {u : Tm m} {x : Fin (suc m)} where
         ≡⟨ cong `_ (punchOut-punchIn x) ⟩
       ` y
         ∎
+
     {- begin
       punchInTm x (` y) ⟨ u for x ⟩
         ≡⟨⟩

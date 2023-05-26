@@ -34,7 +34,7 @@ record ConD : Set where
   field
     {vars} : ℕ
     mode   : Mode
-    type   : TExp vars
+    type   : TExp  vars
     args   : ArgsD vars
 
 record Desc : Set₁ where

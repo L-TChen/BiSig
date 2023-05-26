@@ -5,10 +5,10 @@ open import Prelude
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
-module Syntax.BiTyped.Raw.Term {SD : S.Desc} (Id : Set) (D : B.Desc SD) where
+module Syntax.BiTyped.Raw.Term {SD : S.Desc}
+  (Id : Set) (D : B.Desc SD) where
 
-open import Syntax.Simple.Term         SD
-  renaming (Tm to TExp; Tms to TExps)
+open import Syntax.Simple SD
 
 open import Syntax.BiTyped.Raw.Functor SD Id
 
@@ -67,7 +67,7 @@ twkᵐ  m n = trename  (insert-mid m n)
 twkᵐⁿ m n = trenameⁿ (insert-mid m n)
 twkᵐᵃ m n = trenameᵃ (insert-mid m n)
 
-module _ (σ : Sub m n) where mutual
+module _ (σ : TSub m n) where mutual
   tsub : Raw m mod → Raw n mod
   tsub (` x)   = ` x
   tsub (t ⦂ A) = tsub t ⦂ sub σ A
@@ -88,7 +88,8 @@ module _ {m : ℕ} where mutual
   tsub-id : (t : Raw m mod)
     → tsub id t ≡ t
   tsub-id (` x)              = refl
-  tsub-id (t ⦂ A)            = cong₂ _⦂_ (tsub-id t) (⟨⟩-id {ℕ} {Sub} A)
+  tsub-id (t ⦂ A)            =
+    cong₂ _⦂_ (tsub-id t) (⟨⟩-id {ℕ} {TSub} A)
   tsub-id (t ↑)              = cong _↑ (tsub-id t)
   tsub-id (op (i , eq , ts)) =
     cong (λ ts → op (i , eq , ts)) (tsubⁿ-id ts)
@@ -105,7 +106,7 @@ module _ {m : ℕ} where mutual
   tsubᵃ-id {D = []}             = tsub-id
   tsubᵃ-id {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-id t)
 
-module _ (σ : Sub m n) (ρ : Sub n l) where mutual
+module _ (σ : TSub m n) (ρ : TSub n l) where mutual
   tsub-⨟ : (t : Raw m mod)
     → tsub (σ ⨟ ρ) t ≡ tsub ρ (tsub σ t)
     
@@ -126,16 +127,16 @@ module _ (σ : Sub m n) (ρ : Sub n l) where mutual
   tsubᵃ-⨟ {D = []}             = tsub-⨟
   tsubᵃ-⨟ {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
 
---module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
---  tsubₐ-⨟ : (t : Raw m mod)
---    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
---  tsubₐ-⨟ t = begin
---    tsub (toSub (σ ⨟ ρ)) t
---      ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
---    tsub (toSub σ ⨟ toSub ρ) t
---      ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
---    _ ∎ 
---    where open ≡-Reasoning
+module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
+  tsubₐ-⨟ : (t : Raw m mod)
+    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
+  tsubₐ-⨟ t = begin
+    tsub (toSub (σ ⨟ ρ)) t
+      ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
+    tsub (toSub σ ⨟ toSub ρ) t
+      ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
+    _ ∎ 
+    where open ≡-Reasoning
 
 instance
   RawSubIsPresheaf : IsPresheaf λ m → Raw m mod
@@ -153,9 +154,7 @@ instance
 --  RawᵃSubIsPresheaf .⟨⟩-id      = tsubᵃ-id
 --  RawᵃSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubᵃ-⨟ σ ρ t
 
---  RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
---  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
---  RawAListIsPresheaf .⟨⟩-id      = tsub-id
---  RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟
-
-
+  RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
+  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
+  RawAListIsPresheaf .⟨⟩-id      = tsub-id
+  RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟

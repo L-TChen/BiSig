@@ -3,6 +3,7 @@
 open import Prelude
 open import Syntax.Simple.Description
 
+
 module Syntax.Simple.Term (D : Desc) where
 
 import Relation.Binary.Construct.On as On
@@ -166,21 +167,22 @@ Sub-id = tabulate `_
 RenToSub : Ren m n → Sub m n
 RenToSub σ = tabulate (`_ ∘ σ) -- V.map `_ σ
 
-Sub-⨟ : Sub m n → Sub n l → Sub m l
-Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
+opaque
+  Sub-⨟ : Sub m n → Sub n l → Sub m l
+  Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
-sub-for : (Tm m) → (x y : Fin (suc m)) → Tm m
-sub-for t x y with x ≟ y
-... | no ¬p = ` punchOut ¬p
-... | yes _ = t
+  sub-for : (Tm m) → (x y : Fin (suc m)) → Tm m
+  sub-for t x y with x ≟ y
+  ... | no ¬p = ` punchOut ¬p
+  ... | yes _ = t
 
-_for_
-  : Tm m → Fin (suc m)
-  → Sub (suc m) m
-t for x = tabulate (sub-for t x)
+  _for_
+    : Tm m → Fin (suc m)
+    → Sub (suc m) m
+  t for x = tabulate (sub-for t x)
 
-injectˡ : Ren m (m + n)
-injectˡ = λ i → _↑ˡ_ i _ -- tabulate λ i → _↑ˡ_ i _
+  injectˡ : Ren m (m + n)
+  injectˡ = λ i → _↑ˡ_ i _ -- tabulate λ i → _↑ˡ_ i _
 
 wkʳ : Tm m → Tm (n + m)
 wkʳ = rename (_↑ʳ_ _) -- rename $ tabulate (_↑ʳ_ _)
@@ -321,46 +323,51 @@ module _ {m : ℕ} where mutual
     cong₂ _∷_ (sub-id t) (subⁿ-id ts)
 
 
-module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where mutual
-  sub-⨟ : (t : Tm m)
-    → sub (Sub-⨟ σ ρ) t ≡ sub ρ (sub σ t)
-  sub-⨟ (` x)      = lookup∘tabulate (λ i → sub ρ (lookup σ i)) x
-  sub-⨟ (op′ i ts) = cong (λ ts → op′ i ts) (subⁿ-⨟ ts)
+module _ {m n l : ℕ} (σ : Sub m n) (ρ : Sub n l) where opaque
+  unfolding Sub-⨟
+  mutual
+    sub-⨟ : (t : Tm m)
+      → sub (Sub-⨟ σ ρ) t ≡ sub ρ (sub σ t)
+    sub-⨟ (` x)      = lookup∘tabulate (λ i → sub ρ (lookup σ i)) x
+    sub-⨟ (op′ i ts) = cong (λ ts → op′ i ts) (subⁿ-⨟ ts)
 
-  subⁿ-⨟ : (ts : Tm m ^ k)
-    → subⁿ (Sub-⨟ σ ρ) ts ≡ subⁿ ρ (subⁿ σ ts)
-  subⁿ-⨟ {zero}  []       = refl
-  subⁿ-⨟ {suc k} (t ∷ ts) = cong₂ _∷_ (sub-⨟ t) (subⁿ-⨟ ts)
+    subⁿ-⨟ : (ts : Tm m ^ k)
+      → subⁿ (Sub-⨟ σ ρ) ts ≡ subⁿ ρ (subⁿ σ ts)
+    subⁿ-⨟ {zero}  []       = refl
+    subⁿ-⨟ {suc k} (t ∷ ts) = cong₂ _∷_ (sub-⨟ t) (subⁿ-⨟ ts)
 
-Sub-assoc
-  : (σ : Sub m n) (ρ : Sub n l) (γ : Sub l k)
-  → Sub-⨟ (Sub-⨟ σ ρ) γ ≡ Sub-⨟ σ (Sub-⨟ ρ γ)
-Sub-assoc σ ρ γ = tabulate-cong (λ i → begin
-  sub γ (sub (Sub-⨟ σ ρ) (` i)) 
-    ≡⟨ cong (sub γ ) (sub-⨟ σ ρ (` i)) ⟩
-  sub γ (sub ρ (sub σ (` i)))
-    ≡⟨ sym $ sub-⨟ ρ γ (sub σ $ ` i) ⟩
-  sub (Sub-⨟ ρ γ) (sub σ (` i))
-    ∎)
+opaque
+  unfolding Sub-⨟
 
-Sub-⨟-idᵣ : (σ : Sub m n)
-  → Sub-⨟ σ Sub-id ≡ σ 
-Sub-⨟-idᵣ σ = begin
-  Sub-⨟ σ Sub-id
-    ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
-  tabulate (λ i → lookup σ i) 
-    ≡⟨ tabulate∘lookup σ ⟩
-  σ
-    ∎
+  Sub-assoc
+    : (σ : Sub m n) (ρ : Sub n l) (γ : Sub l k)
+    → Sub-⨟ (Sub-⨟ σ ρ) γ ≡ Sub-⨟ σ (Sub-⨟ ρ γ)
+  Sub-assoc σ ρ γ = tabulate-cong (λ i → begin
+    sub γ (sub (Sub-⨟ σ ρ) (` i)) 
+      ≡⟨ cong (sub γ ) (sub-⨟ σ ρ (` i)) ⟩
+    sub γ (sub ρ (sub σ (` i)))
+      ≡⟨ sym $ sub-⨟ ρ γ (sub σ $ ` i) ⟩
+    sub (Sub-⨟ ρ γ) (sub σ (` i))
+      ∎)
 
-Sub-⨟-idₗ : (σ : Sub m n) → Sub-⨟ Sub-id σ ≡ σ 
-Sub-⨟-idₗ σ = begin
-  Sub-⨟ Sub-id σ
-    ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
-  tabulate (λ i → sub σ (` i))
-    ≡⟨ tabulate∘lookup σ ⟩
-  σ
-    ∎
+  Sub-⨟-idᵣ : (σ : Sub m n)
+    → Sub-⨟ σ Sub-id ≡ σ 
+  Sub-⨟-idᵣ σ = begin
+    Sub-⨟ σ Sub-id
+      ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
+    tabulate (λ i → lookup σ i) 
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
+
+  Sub-⨟-idₗ : (σ : Sub m n) → Sub-⨟ Sub-id σ ≡ σ 
+  Sub-⨟-idₗ σ = begin
+    Sub-⨟ Sub-id σ
+      ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
+    tabulate (λ i → sub σ (` i))
+      ≡⟨ tabulate∘lookup σ ⟩
+    σ
+      ∎
 
 instance
   RenIsCategory : IsCategory ℕ Ren

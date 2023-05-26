@@ -24,7 +24,9 @@ private variable
 ---------------------------------------------------------------------------
 -- Variable Elimination Lemma
 
-module Variable-Elimination (σ : Sub (suc m) n) (x : Fin (suc m)) (t : Tm m) where
+module Variable-Elimination (σ : Sub (suc m) n) (x : Fin (suc m)) (t : Tm m) where opaque
+  unfolding sub-for
+
   helper
     : (y : Fin (suc m))
     → lookup (t for x ⨟ tabulate (lookup σ ∘ punchIn x)) y
@@ -116,20 +118,22 @@ module _ (t u : Tm (suc m)) (x : Fin (suc m)) (r : Tm m) (σ : Sub m n) where
 MGU : (t u : Tm m) →  𝐘 {_} {Sub} m
 MGU t u = Min (t ≈ u)
 
-AMGU : (t u : Tm m) (σ : Sub m n) → 𝐘 n
-AMGU t u σ = Min (t ≈ u [ σ ⨟])
-
-AMGUⁿ : (ts us : Tm m ^ k) (σ : Sub m n) → 𝐘 n
-AMGUⁿ ts us σ = Min (ts ≈ us [ σ ⨟])
-
 DecMGU : (t u : Tm m) → Set
 DecMGU t u = DecMinₐ (t ≈ u)
 
-DecAMGU : (t u : Tm m) (σ : AList m n) → Set
-DecAMGU t u σ = DecMinₐ $ t ≈ u [ toSub σ ⨟] 
+module _ {m : ℕ} (σ : Sub m n) where
+  AMGU : (t u : Tm m) → 𝐘 n
+  AMGU t u = Min (t ≈ u [ σ ⨟])
 
-DecAMGUⁿ : (ts us : Tm m ^ k) (σ : AList m n) → Set
-DecAMGUⁿ ts us σ = DecMinₐ $ ts ≈ us [ toSub σ ⨟] 
+  AMGUⁿ : (ts us : Tm m ^ k)  → 𝐘 n
+  AMGUⁿ ts us = Min (ts ≈ us [ σ ⨟])
+
+module _ {m : ℕ} (σ : AList m n) where
+  DecAMGU : (t u : Tm m) → Set
+  DecAMGU t u = DecMinₐ $ t ≈ u [ toSub σ ⨟] 
+
+  DecAMGUⁿ : (ts us : Tm m ^ k) → Set
+  DecAMGUⁿ ts us = DecMinₐ $ ts ≈ us [ toSub σ ⨟] 
 
 -------------------------------------------------------------------------
 -- A Trivial Equivalence
@@ -179,7 +183,7 @@ flex-mgu x (op′ _ _) | yes x∈ = inr λ where
   {j = σ} eq → op≢var (unify-occur σ x∈  eq)
 ... | no  x∉ = inl (_ , flex∉ x∉ , Min-⨟-id _ _ (flexRigid∉-mgu x∉))
 
-flex-amgu : (x : Fin m) (t : Tm m) → DecAMGU (` x) t id
+flex-amgu : (x : Fin m) (t : Tm m) → DecAMGU id (` x) t
 flex-amgu x t =  DecMin⇔ (P=Pid⨟- (` x ≈ t)) $ flex-mgu x t 
 
 ----------------------------------------------------------------------
@@ -189,7 +193,7 @@ flex-amgu x t =  DecMin⇔ (P=Pid⨟- (` x ≈ t)) $ flex-mgu x t
 mutual
 --  open import Syntax.Simple.Rewrite
 
-  amgu⁺ : (t u : Tm m) (σ : AList m n) → DecAMGU t u σ
+  amgu⁺ : (t u : Tm m) (σ : AList m n) → DecAMGU σ t u
 
   amgu⁺ (` x)      t     []          = flex-amgu x t
   amgu⁺ t          (` y) []          = DecMin⇔ (ext≗ id (≈-sym (` y) t)) $ flex-amgu y t
@@ -201,7 +205,7 @@ mutual
   ... | no ¬p    = inr λ {_} {ρ} eq → ¬p (op-inj₁₂ eq)
   ... | yes refl =  DecMin⇔ (λ _ → op-cong⇔) $ amguⁿ⁺ ts us σ 
 
-  amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n) → DecAMGUⁿ ts us σ
+  amguⁿ⁺ : (ts us : Tm m ^ l) (σ : AList m n) → DecAMGUⁿ σ ts us
   amguⁿ⁺ []       []       σ = inl (_ , id , refl , λ ρ _ → ρ , ⨟-idₗ ρ)
   amguⁿ⁺ (t ∷ ts) (u ∷ us) σ with amgu⁺ t u σ
   ... | inr t≉u = inr λ {_} {ρ} eq → t≉u (V.∷-injectiveˡ eq)

@@ -13,7 +13,7 @@ open import Syntax.Simple.Association D
 open import Agda.Builtin.Equality.Rewrite
 
 private variable
-  n m l : ℕ
+  n m l k : ℕ
   A   : Set
   t u : Tm n
   σ ρ : AList m n
@@ -23,6 +23,9 @@ lem1 σ ρ = toSub-++ σ ρ
 
 lem2 : (i : Fin n) → lookup (tabulate `_) i ≡ ` i
 lem2 = lookup∘tabulate `_
+
+lem3 : (ρ : Sub m n) (σ : Sub n l ) (γ : Sub l k) → Sub-⨟ ((SubIsCategory IsCategory.⨟ ρ) σ) γ ≡ ρ ⨟ (σ ⨟ γ)
+lem3 _ _ _ = ⨟-assoc _ _ _
 
 -- The following leads to unsolved meta variables
 -- lem3 : (σ : AList m n) (ρ : AList n l) (t : Tm m)
@@ -36,4 +39,4 @@ lem2 = lookup∘tabulate `_
 --     ∎
 --   where open ≡-Reasoning
 
-{-# REWRITE lem1 lem2 #-}
+{-# REWRITE lem1 lem2 lem3 #-}

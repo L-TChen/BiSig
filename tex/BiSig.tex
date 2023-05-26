@@ -3,17 +3,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
 
-\usepackage{bm}
-\usepackage{braket}
-\usepackage{mathtools}
-\usepackage{mathpartir}
-\usepackage[all,cmtip]{xy}
-\usepackage{bussproofs}
+\usepackage{bm,braket,mathtools,mathpartir,bussproofs}
 \EnableBpAbbreviations
+\usepackage[all,cmtip]{xy}
 
-\usepackage{xfrac,xspace}
-\usepackage{xcolor}
-\usepackage{subcaption}
+\usepackage{xfrac,xspace,xcolor,subcaption}
 \usepackage{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage[inline]{enumitem} % for environment enumerate*
@@ -101,7 +95,7 @@ PoplMark Challenge~\citep{Aydemir2005}
     \and
     \inferrule{\Theta \mid \Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Theta \mid \Gamma \vdash \isTerm{u} \Leftarrow A}{\Theta \mid \Gamma \vdash \isTerm{t\;u} \Rightarrow B}
     \and
-    \inferrule{\Theta \mid \Gamma, \isTerm{x} : A \vdash \isTerm{t} \Rightarrow B}{\Theta \mid \Gamma \vdash \isTerm{\lam{x}t} \Rightarrow A \bto B}
+    \inferrule{\Theta \mid \Gamma, \isTerm{x} : A \vdash \isTerm{t} \Leftarrow B}{\Theta \mid \Gamma \vdash \isTerm{\lam{x}t} \Leftarrow A \bto B}
   \end{mathpar}
   \caption{The extrinsic style of bidirectional simply typed $\lambda$-calculus with type variables}
   \label{fig:bi-stlc}
@@ -165,12 +159,12 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
   \[
     \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Cxt_\Sigma(\Xi) \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
   \]
-  Each inhabitant $o: O$ is meant to represent a term construct $\termOp_o$ in a simple type theory with a triple $\left(\Xi, \left[\left(\Delta_1; A_1\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right], A\right)$
+  Each inhabitant $o: O$ is meant to represent a term construct $\tmOp_o$ in a simple type theory with a triple $\left(\Xi, \left[\left(\Delta_1; A_1\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right], A\right)$
   instead of a number as its arity $\arity_o$ where
   \begin{enumerate}
-    \item $A : \Type_\Sigma(\Xi)$ is the target type of $\termOp_o$ and
+    \item $A : \Type_\Sigma(\Xi)$ is the target type of $\tmOp_o$ and
     \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs where
-    \item the $i$-th pair $(\Delta_i, A_i) :\Cxt_{\Sigma}(\Xi) \times \Term_{\Sigma}(\Xi)$ are types of the binding variables and the type of the $i$-th argument of $\termOp_{o}$.
+    \item the $i$-th pair $(\Delta_i, A_i) :\Cxt_{\Sigma}(\Xi) \times \Term_{\Sigma}(\Xi)$ are types of the binding variables and the type of the $i$-th argument of $\tmOp_{o}$.
   \end{enumerate}
   For brevity, we write $o \colon \Xi \vdash (\Delta_1)A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation $o$ with its arity. 
 \end{definition}
@@ -208,10 +202,10 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 \subsection{Intrinsically Typed Terms}
 
-Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\termOp)$ displayed in \Cref{fig:intrinsic-typing}.
+Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}$ constructed with only the rule $(\var)$ and the rule scheme $(\tmOp)$ displayed in \Cref{fig:intrinsic-typing}.
 
 The substitution $\rho\colon \Sub{\Xi}{\Theta}$ is used to instantiate variables in the local context $\Xi$ with types within the context of type variables in $\Theta$.
-Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\termOp$ to ensure all types are well-formed under $\Theta$.
+Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\tmOp$ to ensure all types are well-formed under $\Theta$.
 
 \begin{figure}
   \centering
@@ -220,26 +214,50 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$ and $\Theta \vdash_{\Sigma} A$} \\
     \inferrule{A \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
     \and
-    \inferrule{\rho : \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
-    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\termOp)
-    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
+    \inferrule{\Theta \mid \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Theta \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\tmOp)
+    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
+    and $\rho : \Sub{\Xi}{\Theta}$}
   \end{mathpar}
   \caption{Intrinsic typing rules}
   \label{fig:intrinsic-typing}
 \end{figure}
-\subsection{Raw Terms and Extrinsically Typed Terms?}
-\begin{LTannote}{no extrinsic typing}
-Argue that we don't need extrinsically typed terms but raw terms only as the output of some parser.
-\end{LTannote}
+
+\subsection{Raw Terms and Extrinsically Typed Terms}
 
 \begin{figure}
   \centering
   \small
   \begin{mathpar}
-    \boxed{\Theta \vdash_{\Sigma, \Omega} t}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} \isTerm{t}}
+    \\
+    \inferrule{x : \Identifier}{\Theta \vdash_{\Sigma, \Omega} \isTerm{x}}\;(\text{var})
+    \and
+    \inferrule{\Theta \vdash A \\ \Theta \vdash_{\Sigma, \Omega}\isTerm{t}}{\Theta \vdash_{\Sigma, \Theta} \isTerm{t \annote A}}\;(\text{anno})
+    \\
+    \inferrule{\Theta \vdash_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad \Theta \vdash_{\Sigma, \Omega} \isTerm{t_n}}
+    {\Theta \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\;(\text{op}) 
+    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
   \end{mathpar}
-  
-  \caption{Raw terms}
+  \caption{Annotatable raw terms}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \small
+  \begin{mathpar}
+    \boxed{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A} \quad \text{where $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t$} \\
+    \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A}\;(\var)
+    \and
+    \inferrule{\Theta \mid \Gamma \vdash \isTerm{t} : A}{\Theta \mid \Gamma \vdash (\isTerm{t \annote A}) : A}\;(\text{anno})
+    \and
+    \inferrule{\Theta \mid \Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Theta \mid \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
+    {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\;(\tmOp)
+    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
+    and $\rho : \Sub{\Xi}{\Theta}$}
+  \end{mathpar}
+  \caption{Extrinsic typing rules}
+  \label{fig:extrinsic-typing}
 \end{figure}
 
 \section{Definitions of Bidirectional Simple Type Systems} 
@@ -252,7 +270,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
     \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Cxt_{\Sigma}(\Xi) \times \Mode \times \Type_{\Sigma}(\Xi)\right)^* \times \Mode \times \Type_{\Sigma}(\Xi).
   \]
   where $\Mode$ consists of $\chk$ for checking and $\syn$ for synthesis.
-  Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\termOp_o$ in a bidirectional system, i.e.
+  Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\tmOp_o$ in a bidirectional system, i.e.
   an arity is a $4$-tuple
   \[
     \left(\Xi, \left[\left(\Delta_1, d_1, A_1\right), \ldots, \left(\Delta_{n}, d_n, A_{n}\right) \right], d, A\right)
@@ -275,17 +293,7 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
 
 \subsubsection{Intrinsically Typed Terms}
 
-\subsubsection{Bidirectional Raw Terms}
 
-\begin{figure}
-  \centering
-  \small
-  \begin{mathpar}
-    \boxed{\Theta \vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}}
-  \end{mathpar}
-  
-  \caption{Bidirectional raw terms}
-\end{figure}
 
 \subsubsection{Extrinsically Typed Terms}
 
@@ -293,21 +301,41 @@ Argue that we don't need extrinsically typed terms but raw terms only as the out
   \centering
   \small
   \begin{mathpar}
+    \boxed{\Theta \vdash_{\Sigma, \Omega} \isTerm{t}\;\isDir{d}}
+    \\
+    \inferrule{x : \Identifier}{\Theta \vdash_{\Sigma, \Omega} \isTerm{x}\;\isDir{\syn}}\;(\text{var})
+    \and
+    \inferrule{\Theta \vdash A \\ \Theta \vdash_{\Sigma, \Omega}\isTerm{t}\;\isDir{\chk}}{\Theta \vdash_{\Sigma, \Theta} \isTerm{t \annote A}\;\isDir{\syn}}\;(\text{anno})
+    \and
+%    \inferrule{\Theta \vdash_{\Sigma, \Omega}\isTerm{t}\;\isDir{\chk}}{\Theta, X \vdash_{\Sigma, \Theta} \isTerm{t \downarrow}\;\isDir{\syn}}\;(\text{anno}')
+%    \and
+    \inferrule{\Theta \vdash_{\Sigma, \Omega} \isTerm{t}\;\isDir{\syn}}{\Theta \vdash_{\Sigma, \Omega} (\isTerm{t \uparrow})\;\isDir{\chk}}
+  \end{mathpar}
+  \begin{mathpar}
+    \inferrule{\rho \colon \Sub{\Xi}{\Theta} \\ \Theta \vdash_{\Sigma, \Omega} \isTerm{t_1}\;\isDir{d_1} \quad \cdots \quad \Theta \vdash_{\Sigma, \Omega} \isTerm{t_n}\;\isDir{d_n}}
+    {\Theta \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\rho; \vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}\;\isDir{d}}\;(\text{op})
+    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+  \end{mathpar}
+  
+  \caption{Bidirectional pre-typed terms}
+\end{figure}
+\begin{figure}
+  \centering
+  \small
+  \begin{mathpar}
     \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{d}}
-    \quad \text{where $d$ is either $\chk$ or $\syn$, $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t^d$} 
+    \quad \text{where $d$ is either $\chk$ or $\syn$, $\Theta \vdash_{\Sigma} \Gamma$, $\Theta \vdash_{\Sigma} A$, and $\Theta \vdash_{\Sigma, \Omega} t\;d$} 
     \\
     \inferrule{(x : A) \in \Gamma}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\syn}\;(\var)
     \and
-    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^\chk \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t : B}:  A^\syn}\;(\text{anno})
+    \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^\chk \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} (\isTerm{t \annote B}):  A^\syn}\;(\text{anno})
     \and
     \inferrule{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\syn} \\ A = B}{\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} : A^\chk}\;(\text{sub})
-  \end{mathpar}
-  \begin{mathpar}
-    \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\
-      \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} : \simsub{A_{1}}{\rho}^{\isDir{d_1}} \\
+    \\
+    \inferrule{\rho\colon \Sub{\Xi}{\Theta} \\ \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} : \simsub{A_{1}}{\rho}^{\isDir{d_1}} \\
       \cdots \\
     \Theta \mid \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}^{\isDir{d_n}}}
-  {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\termOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\termOp)
+  {\Theta \mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\rho; \vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\tmOp)
     \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
     \\
     \text{Abbreviations: $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Theta\mid \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$}

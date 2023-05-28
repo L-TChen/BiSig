@@ -48,8 +48,9 @@ module L where
     using (_⊆_)
 open L public using
   ( List; []; _∷_; length; _++_; zip
-  ; _∈_; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
+  ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
   ; All; _⊆_)
+  renaming (_∈_ to infix 5 _∈_)
 
 module V where
   open import Data.Vec            public

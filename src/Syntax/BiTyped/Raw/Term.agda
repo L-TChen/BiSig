@@ -18,7 +18,7 @@ private variable
   n m k l : ℕ
   mod : Mode
 
-infix 4 _⦂_
+infix 5 _⦂_
 
 data Raw (m : ℕ) : Mode → Set where
   `_  : (x : Id)                       → Raw m Infer
@@ -26,9 +26,9 @@ data Raw (m : ℕ) : Mode → Set where
   _↑  : (t : Raw m Infer)              → Raw m Check
   op  : ⟦ D ⟧ (Raw m) mod              → Raw m mod
 
-Raw⇇ Raw⇉ : ℕ → Set
-Raw⇇ m = Raw m Check
-Raw⇉ m = Raw m Infer
+Raw⇐ Raw⇒ : ℕ → Set
+Raw⇐ m = Raw m Check
+Raw⇒ m = Raw m Infer
 
 module _ (ρ : Ren m n) where mutual
   trename : Raw m mod → Raw n mod

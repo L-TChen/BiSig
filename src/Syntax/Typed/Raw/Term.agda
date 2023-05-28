@@ -16,7 +16,7 @@ private variable
   n m k l : ℕ
   Θ Θ₁ Θ₂ : ℕ
 
-infix 4 _⦂_
+infix 5 _⦂_
 
 data Raw (Θ : ℕ) : Set where
   `_  : (x : Id)                 → Raw Θ

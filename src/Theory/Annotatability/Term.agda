@@ -13,50 +13,105 @@ open import Syntax.Context SD
 open import Syntax.Typed.Description    SD as T
 open import Syntax.BiTyped.Description  SD as B
 
-open import Syntax.Typed.Intrinsic.Functor   as T
-open import Syntax.BiTyped.Intrinsic.Functor as B
-
 open import Theory.Erasure.Description
+import Theory.Erasure.Term as E
 
 open import Theory.Annotatability.Description SD
 
 private variable
-  mod : Mode
-  n m : ℕ
-  σ     : TSub n m
-  A B C : TExp n
-  Γ Δ   : Cxt n
+  d   : Mode
+  Ξ Θ : ℕ
+  ρ   : TSub Ξ Θ
+  A B : TExp Ξ
+  Γ Δ : Cxt  Θ
+  
+module Raw (Id : Set) (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
+  open import Syntax.Typed.Raw.Functor   SD Id as TF
+  open import Syntax.BiTyped.Raw.Functor SD Id as BF
 
-module _ (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
+  open import Syntax.Typed.Raw.Term   Id TD
+  open import Syntax.BiTyped.Raw.Term Id BD
+    renaming (Raw to BiRaw)
+
+  annotate
+    : (t : Raw Θ)
+    → Maybe (∃[ d ] BiRaw Θ d)
+  annotate (` x)   = just (_ , ` x)
+  annotate (t ⦂ A) with annotate t
+  ... | nothing       = nothing
+  ... | just (Check , tᵇ) = just (_ , tᵇ ⦂ A)
+  ... | just (Infer , tᵇ) = just (_ , tᵇ ↑ ⦂ A)
+  annotate (op (i , ts))  with annotateᶜ {D′ = B.rules BD (s i .proj₁)} (s i .proj₂) ts
+  ... | nothing = nothing
+  ... | just (eq , ts)  = just (_ , op (s i .proj₁ , eq , ts))
+
+  annotateᶜ
+    : ∀ {D D′} → eraseᶜ D′ ≡ D
+    → TF.⟦ D ⟧ᶜ (Raw Θ)
+    → Maybe (BF.⟦ D′  ⟧ᶜ (BiRaw Θ) (D′ .ConD.mode))
+  annotateᶜ refl ts with annotateⁿ _ _ refl ts
+  ... | nothing  = nothing
+  ... | just tsᵇ = just (refl , tsᵇ)
+
+  annotateⁿ
+    : (D : T.ArgsD Ξ) (D′ : B.ArgsD Ξ) → eraseᵃˢ D′ ≡ D
+    → TF.⟦ D ⟧ᵃˢ (Raw Θ)
+    → Maybe (BF.⟦ D′ ⟧ᵃˢ (BiRaw Θ))
+  annotateⁿ []      []                refl _  = just tt 
+  annotateⁿ (_ ∷ _) (Δ ⊢[ d ] A ∷ Ds) refl (t , ts) with annotateᵃ Δ d t
+  ... | nothing = nothing 
+  ... | just tᵇ with annotateⁿ _ Ds refl ts
+  ... | nothing  = nothing
+  ... | just tsᵇ = just (tᵇ , tsᵇ)
+
+  annotateᵃ
+    : (Δ : TExps Ξ) (d : Mode)
+    → TF.⟦ Δ ⟧ᵃ (Raw Θ)
+    → Maybe (BF.⟦ Δ ⟧ᵃ (BiRaw Θ d))
+  annotateᵃ [] d     t with annotate t
+  ... | nothing = nothing
+  -- [TODO] What property does this clause refute? 
+  annotateᵃ [] Infer t | just (Check , tᵇ) = nothing
+  annotateᵃ [] Check t | just (Check , tᵇ) = just tᵇ
+  annotateᵃ [] Check t | just (Infer , tᵇ) = just (tᵇ ↑)
+  annotateᵃ [] Infer t | just (Infer , tᵇ) = just tᵇ
+  annotateᵃ (_ ∷ Δ) d (x , t) with annotateᵃ Δ d t
+  ... | nothing = nothing
+  ... | just tᵇ = just (x , tᵇ)
+
+module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mutual
+  open import Syntax.Typed.Intrinsic.Functor   as T
+  open import Syntax.BiTyped.Intrinsic.Functor as B
+
   open import Syntax.Typed.Intrinsic.Term   TD
   open import Syntax.BiTyped.Intrinsic.Term BD
     renaming (Tm to BTm)
 
   annotate
-    :          Tm  m     A Γ
-    → ∃[ mod ] BTm m mod A Γ
+    :        Tm  Θ   A Γ
+    → ∃[ d ] BTm Θ d A Γ
   annotate (` x)        = Infer , ` x
   annotate (op (i , r)) = _ , op (_ , annotateᶜ (proj₂ (s i)) r)
 
   annotateᶜ : ∀ {D D′} → eraseᶜ D′ ≡ D
-    → T.⟦ D ⟧ᶜ (Tm m) A Γ
-    → B.⟦ D′ ⟧ᶜ (BTm m) (D′ .ConD.mode) A Γ
+    → T.⟦ D  ⟧ᶜ (Tm Θ) A Γ
+    → B.⟦ D′ ⟧ᶜ (BTm Θ) (D′ .ConD.mode) A Γ
   annotateᶜ refl (σ , A=B , ts) = refl , σ , A=B , annotateMap _ _ refl ts
 
-  annotateMap : (D : T.ArgsD n) (D′ : B.ArgsD n) → eraseᵃˢ D′ ≡ D
-    → T.⟦ D  ⟧ᵃˢ (Tm  m) σ Γ
-    → B.⟦ D′ ⟧ᵃˢ (BTm m) σ Γ
+  annotateMap : (D : T.ArgsD Ξ) (D′ : B.ArgsD Ξ) → eraseᵃˢ D′ ≡ D
+    → T.⟦ D  ⟧ᵃˢ (Tm  Θ) ρ Γ
+    → B.⟦ D′ ⟧ᵃˢ (BTm Θ) ρ Γ
   annotateMap []      []                refl _        = _
-  annotateMap (_ ∷ _) (Θ ⊢[ m ] C ∷ Ds) refl (t , ts) =
-    annotateMapᵃ Θ m t , annotateMap _ Ds refl ts
+  annotateMap (_ ∷ _) (Δ ⊢[ d ] C ∷ Ds) refl (t , ts) =
+    annotateMapᵃ Δ d t , annotateMap _ Ds refl ts
 
-  annotateMapᵃ : (Θ : TExps n)
-    → (mod : Mode)
-    → T.⟦ Θ ⟧ᵃ (Tm m A)      σ Γ
-    → B.⟦ Θ ⟧ᵃ (BTm m mod A) σ Γ
-  annotateMapᵃ []       m t with annotate t
+  annotateMapᵃ : (Δ : TExps Ξ)
+    → (d : Mode)
+    → T.⟦ Δ ⟧ᵃ (Tm  Θ A)   ρ Γ
+    → B.⟦ Δ ⟧ᵃ (BTm Θ d A) ρ Γ
+  annotateMapᵃ [] d     t with annotate t
   annotateMapᵃ [] Check t | Check , t′ = t′
   annotateMapᵃ [] Infer t | Check , t′ = _ ∋ t′
   annotateMapᵃ [] Check t | Infer , t′ = ⇉ t′ by refl
   annotateMapᵃ [] Infer t | Infer , t′ = t′
-  annotateMapᵃ (_ ∷ Θ) m t = annotateMapᵃ Θ m t
+  annotateMapᵃ (_ ∷ Θ) d t = annotateMapᵃ Θ d t

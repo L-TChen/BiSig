@@ -35,16 +35,16 @@ private variable
 
 mutual
   ∥_∥⇉
-    : Γ ⊢ t ⇉ A
-    → Tm⇉ m A ∥ Γ ∥cxt
+    : Γ ⊢ t ⇒ A
+    → Tm⇒ m A ∥ Γ ∥cxt
   ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇉ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 
   ∥_∥⇇
-    : Γ ⊢ t ⇇ A
-    → Tm⇇ m A ∥ Γ ∥cxt
+    : Γ ⊢ t ⇐ A
+    → Tm⇐ m A ∥ Γ ∥cxt
   ∥ ⊢⇉ p t ∥⇇ = ⇉ ∥ t ∥⇉ by p
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇇ =
     op (i , q , σ , B=A , ∥-∥map _ p)

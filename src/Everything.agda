@@ -18,14 +18,16 @@ import Syntax.Typed.Intrinsic.Functor
 import Syntax.Typed.Intrinsic.Term
 import Syntax.Typed.Intrinsic.Operation
 import Syntax.Typed.Intrinsic.Properties
+import Syntax.Typed.Raw.Functor
+import Syntax.Typed.Raw.Term
+import Syntax.Typed.Extrinsic.Functor
+import Syntax.Typed.Extrinsic.Term
 
 import Syntax.BiTyped.Description
 import Syntax.BiTyped.Intrinsic.Functor
 import Syntax.BiTyped.Intrinsic.Term
 import Syntax.BiTyped.Raw.Functor
 import Syntax.BiTyped.Raw.Term
-import Syntax.BiTyped.RawNoMode.Functor
-import Syntax.BiTyped.RawNoMode.Term
 import Syntax.BiTyped.Extrinsic.Functor
 import Syntax.BiTyped.Extrinsic.Term
 import Syntax.BiTyped.Extrinsic.Properties
@@ -40,7 +42,6 @@ import Syntax.BiTyped.Extrinsic.Properties
 import Theory.Annotatability.Description
 import Theory.Annotatability.Term
 
-import Theory.RawAnnotatability  -- [TODO] metavariables needed for converting to bidirectional raw syntax
 import Theory.Soundness
 
 import Theory.Erasure.Description

@@ -4,8 +4,8 @@ open import Prelude
 
 module Syntax.NamedContext.Base (Id : Set) where
 
-infixl 5 _⦂_,_
-infix  4 _⦂_∈_
+infixl 6 _⦂_,_
+infix  5 _⦂_∈_
 
 Context : (T : Set) → Set
 Context T = List (Id × T)

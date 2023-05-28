@@ -190,6 +190,9 @@ wkʳ = rename (_↑ʳ_ _) -- rename $ tabulate (_↑ʳ_ _)
 wkˡ : Tm m → Tm (m + n)
 wkˡ = rename injectˡ
 
+wkˡⁿ : Tm m ^ l → Tm (m + n) ^ l
+wkˡⁿ = renameⁿ injectˡ
+
 wkᵐ : (m n : ℕ) → Tm (m + l) → Tm (m + n + l)
 wkᵐ m n = rename (insert-mid m n) -- rename $ tabulate (insert-mid m n)
 

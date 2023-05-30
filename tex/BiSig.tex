@@ -58,6 +58,7 @@
 
 \subsection{Related work}
 
+\citep{Xie2018}
 \subsubsection{Language formalization and its frameworks}
 \cite{Wadler2022}
 PoplMark Challenge~\citep{Aydemir2005}
@@ -79,7 +80,7 @@ PoplMark Challenge~\citep{Aydemir2005}
 
 \subsection{Plan and Contributions of this paper}
 
-\section{Bidirectional simply typed \texorpdfstring{$\lambda$}{lambda}-calculus}\label{sec:bi-stlc}
+\section{A Case Study: Bidirectional Simply Typed \texorpdfstring{$\lambda$}{lambda}-Calculus}\label{sec:bi-stlc}
 \begin{figure}
   \centering
   \small
@@ -103,9 +104,6 @@ PoplMark Challenge~\citep{Aydemir2005}
 \begin{remark}
   We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.
 \end{remark}
-
-\subsection{Type Synthesis and Checking via Bidirectional Typing}
-\subsection{Formalisation in \Agda}
 
 \section{Definitions of Simple Type Theories}\label{sec:simple-type-theories}
 \subsection{Simple Types}
@@ -145,9 +143,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
 
 \begin{example}\label{ex:implication}
   Simply typed $\lambda$-calculus typically includes a binary implication type denoted by $\bto$ and some base types to ensure that the set of all types is non-empty.
-  In our setting, the set of $\Sigma$-types over $\Theta$ may contain variables from $\Theta$, so $\Type_{\Sigma}(\Theta)$ is non-empty if $\Theta$ is.
-  Therefore, there is no need to introduce base types that are not used by any term construct.
-  The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus consists solely of a binary operation $\bto$, where $\arity(\bto) = 2$.
+  The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus consists of a binary operation $\bto$, where $\arity(\bto) = 2$ and an operation $N$ of arity $0$.
   In the case of simply typed $\lambda$-calculus with binary products, we can extend $\Sigma_{\bto}$ by adding a binary operation $\btimes$ to represent the binary product type.
   This extended signature is denoted as $\Sigma_{\bto, \btimes}$.
 \end{example}
@@ -175,7 +171,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
     \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs where
     \item the $i$-th pair $(\Delta_i, A_i) :\Cxt_{\Sigma}(\Xi) \times \Term_{\Sigma}(\Xi)$ are types of the binding variables and the type of the $i$-th argument of $\tmOp_{o}$.
   \end{enumerate}
-  For brevity, we write $o \colon \Xi \vdash (\Delta_1)A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation $o$ with its arity. 
+  For brevity, we write $o \colon \Xi \rhd (\Delta_1)A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation $o$ with its arity. 
 \end{definition}
 \begin{remark}[Terminology on binding signature]
   \cite{Aczel1978,Fiore2010}
@@ -185,7 +181,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
 \begin{example} \label{ex:STLC-sig}
   Given the type signature $\Sigma_{\bto}$ for the implication type, the term signature $\Lambda_{\bto}$ for simply typed $\lambda$-calculus can be described by operations
   \begin{align*}
-    \mathsf{app}\colon A, B \vdash (A \bto B), A \to B && \mathsf{abs}\colon A , B \vdash [A]B \to (A \bto B)
+    \mathsf{app}\colon A, B \rhd (A \bto B), A \to B && \mathsf{abs}\colon A , B \rhd [A]B \to (A \bto B)
   \end{align*}
     or, verbosely, the signature $\Lambda_{\bto}$ consists of the type $O_\Lambda = \{\app, \abs\}$ with arities
   \begin{align*}
@@ -196,9 +192,9 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
   For the type signature $\Sigma_{\bto, \btimes}$, the term signature $\Omega_{\bto, \btimes}$ for simply typed $\lambda$-calculus with finite products has three additional operations
 to $\Omega_{\bto}$:
   \begin{align*}
-    \mathsf{pair}\colon A, B \vdash A, B \to A \btimes B
-    && \fst \colon A, B \vdash A \btimes B \to A
-    && \snd \colon A, B \vdash A \btimes B \to B
+    \mathsf{pair}\colon A, B \rhd A, B \to A \btimes B
+    && \fst \colon A, B \rhd A \btimes B \to A
+    && \snd \colon A, B \rhd A \btimes B \to B
   \end{align*}
 \end{example}
 
@@ -223,10 +219,9 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \boxed{\Gamma \vdash_{\Sigma, \Omega} A} \\
     \inferrule{A \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
     \and
-    \inferrule{\Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \mid \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+    \inferrule{\rho\colon \Sub{\Xi}{\emptyset}  \\ \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
     {\Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\tmOp)
-    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
-    and $\rho : \Sub{\Xi}{\emptyset}$}
+    \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
   \end{mathpar}
   \caption{Intrinsic typing rules for a simple type theory $(\Sigma, \Omega)$}
   \label{fig:intrinsic-typing}
@@ -246,7 +241,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \\
     \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}}
     {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\;(\text{op}) 
-    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
   \end{mathpar}
   \caption{Annotatable raw terms for $(\Sigma, \Omega)$}
 \end{figure}
@@ -262,7 +257,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
     \and
     \inferrule{\Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
     {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\;(\tmOp)
-    \and \text{for $o\colon \Xi \vdash [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
+    \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$
     and $\rho : \Sub{\Xi}{\emptyset}$}
   \end{mathpar}
   \caption{Extrinsic typing rules for a simple type theory $(\Sigma, \Omega)$ with annotation}
@@ -276,7 +271,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
 \begin{definition}
   For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
   \[
-    \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \Mode \times \Type_{\Sigma}(\Xi)\right)^* \times \Mode \times \Type_{\Sigma}(\Xi).
+    \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \isDir{\Mode} \times \Type_{\Sigma}(\Xi)\right)^* \times \isDir{\Mode} \times \Type_{\Sigma}(\Xi).
   \]
   where $\Mode$ consists of $\chk$ for checking and $\syn$ for synthesis.
   Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\tmOp_o$ in a bidirectional system, i.e.
@@ -286,25 +281,26 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
   \]
   where $d$ and $d_i$'s indicate the modes of a construct and its arguments respectively.
 
-  For brevity, we write $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation $o$ with its arity. 
+  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation $o$ with its arity. 
 \end{definition}
 
 \begin{example}
   The term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{sec:bi-stlc} can be specified by operations 
   \begin{align*}
-    \mathsf{app}\colon A, B \vdash (A \bto B)^{\Rightarrow}, A^{\Leftarrow} \to B^{\Rightarrow} &&
-    \mathsf{abs}\colon A , B \vdash [A]B^{\Leftarrow} \to (A \bto B)^{\Leftarrow}
+    \mathsf{app}\colon A, B \rhd (A \bto B)^{\Rightarrow}, A^{\Leftarrow} \to B^{\Rightarrow} &&
+    \mathsf{abs}\colon A , B \rhd [A]B^{\Leftarrow} \to (A \bto B)^{\Leftarrow}
   \end{align*}
   extending $\Lambda_{\bto}$ (\Cref{ex:STLC-sig}) with the mode information.
 \end{example}
 
-\subsection{Bidirectionally Typed Terms: Intrinsic Typing vs.\ Extrinsic Typing}
+\begin{LTannote}{deriving from annotation}
+  deriving bidirectional binding signature from annotation
+\end{LTannote}
+\begin{theorem}[Signature annotation]
+  
+\end{theorem}
 
-\subsubsection{Intrinsically Typed Terms}
-
-
-
-\subsubsection{Extrinsically Typed Terms}
+\subsection{Extrinsically Typed Terms for Bidirectional Type Systems}
 
 \begin{figure}
   \centering
@@ -321,11 +317,11 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
   \begin{mathpar}
     \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1}\;\isDir{d_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}\;\isDir{d_n}}
     {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}\;\isDir{d}}\;(\text{op})
-    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
   \end{mathpar}
-  
   \caption{Raw terms for a bidirectional system $(\Sigma, \Omega)$}
 \end{figure}
+
 \begin{figure}
   \centering
   \small
@@ -343,7 +339,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
       \cdots \\
     \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}^{\isDir{d_n}}}
   {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\tmOp)
-    \and \text{for $o \colon \Xi \vdash [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
     \\
     \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$}
   \end{mathpar}
@@ -355,30 +351,24 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
 \end{example}
 
 
-\subsection{Between Binding Signatures and their Bidirectional Variants}
-\subsubsection{Soundness}
-\subsubsection{Completeness (Annotatability)}
-\subsection{Mode Correctness}
+\subsection{Soundness and Completeness with respect to Binding Signatures}
+
+\subsection{Annotatability}
 
 \section{Bidirectional Type Synthesis and Checking}
 
-\subsection{Substitution Properties}
-\subsection{Generic First-Order Unification}
-\cite{McBride2003,McBride2003a}
-\begin{definition}
-A \emph{decidable equality} for a type $X$ is a dependent function $\prod_{x, y : X} \left(\id{x}{y}\right) + \neg \left(\id{x}{y}\right)$.
-\end{definition}
+\subsection{Mode Correctness}
+%\subsection{Substitution Properties}
+%\subsection{Generic First-Order Unification}
+%\cite{McBride2003,McBride2003a}
+
  
 \subsection{Uniqueness of Synthesis}
 
-\subsection{Type Synthesis and Checking with Unification}
+\subsection{Type Synthesis and Checking}
 
-\section{Formal Implementation and Examples}
-\begin{LTannote}{de Bruijn}
-  In our Agda formalisation, we use de Bruijn indices to represent variables, so we don't use an arbitrary type $\Theta$ but the number of variables as the index of typing judgements.
-\end{LTannote}
+\section{Formalisation in \Agda with Examples}
 
-\citep{Xie2018}
 
 \section{Future Work}
 \begin{acks}

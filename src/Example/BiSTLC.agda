@@ -50,7 +50,7 @@ mutual
     ƛ_
       : (t : Λ⇇ B (A ∷ Γ))
       → Λ⇇ (A ↣ B) Γ
-    ⇉_by_
+    _↑by_
       : (t : Λ⇉ A Γ) (eq : B ≡ A)
       → Λ⇇ B Γ
 
@@ -59,29 +59,29 @@ mutual
 Λ Inf = Λ⇉
 
 toΛ : Tm _ mod A Γ → Λ mod A Γ
-toΛ (` x)       = ` x
-toΛ (_ ∋ t)     = _ ∋ toΛ t
-toΛ (⇉ t by eq) = ⇉ (toΛ t) by eq
-toΛ (t ·′ u)    = toΛ t · toΛ u
-toΛ (ƛ′ t)      = ƛ toΛ t
+toΛ (` x)      = ` x
+toΛ (_ ∋ t)    = _ ∋ toΛ t
+toΛ (t ↑by eq) = (toΛ t) ↑by eq
+toΛ (t ·′ u)   = toΛ t · toΛ u
+toΛ (ƛ′ t)     = ƛ toΛ t
 
 fromΛ : ∀ mod → Λ mod A Γ → Tm _ mod A Γ
 fromΛ Inf (` x)       = ` x
 fromΛ Inf (_ ∋ t)     = _ ∋ fromΛ Chk t
-fromΛ Chk (⇉ t by eq) = ⇉ fromΛ Inf t by eq
+fromΛ Chk (t ↑by eq) = fromΛ Inf t ↑by eq
 fromΛ Inf (t · u)     = fromΛ Inf t ·′ fromΛ Chk u
 fromΛ Chk (ƛ t)       = ƛ′ (fromΛ Chk t)
 
 from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
 from-toΛ (` x)       = refl
 from-toΛ (_ ∋ t)     = cong (_ ∋_) (from-toΛ t)
-from-toΛ (⇉ t by eq) = cong (⇉_by eq)  (from-toΛ t)
+from-toΛ (t ↑by eq)  = cong (_↑by eq)  (from-toΛ t)
 from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
 from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)
 
 to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
-to-fromΛ Inf (` x)       = refl
-to-fromΛ Inf (t · u)     = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
-to-fromΛ Inf (_ ∋ t)     = cong (_ ∋_) (to-fromΛ _ t)
-to-fromΛ Chk (ƛ t)       = cong ƛ_ (to-fromΛ _ t)
-to-fromΛ Chk (⇉ t by eq) = cong (⇉_by eq) (to-fromΛ _ t)
+to-fromΛ Inf (` x)      = refl
+to-fromΛ Inf (t · u)    = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
+to-fromΛ Inf (_ ∋ t)    = cong (_ ∋_) (to-fromΛ _ t)
+to-fromΛ Chk (ƛ t)      = cong ƛ_ (to-fromΛ _ t)
+to-fromΛ Chk (t ↑by eq) = cong (_↑by eq) (to-fromΛ _ t)

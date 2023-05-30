@@ -38,10 +38,10 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget
     : BTm BD Θ d A Γ
     → Tm  TD Θ A Γ
-  forget (` x)         = ` x
-  forget (_ ∋ t)       = forget t
-  forget (⇉ t by refl) = forget t
-  forget (op (i , r))  = op (_ , forgetᶜ (proj₂ (s i)) r)
+  forget (` x)        = ` x
+  forget (_ ∋ t)      = forget t
+  forget (t ↑by refl) = forget t
+  forget (op (i , r)) = op (_ , forgetᶜ (proj₂ (s i)) r)
 
   forgetᶜ
     : ∀ {D D′} → eraseᶜ D′ ≡ D

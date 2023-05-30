@@ -31,7 +31,7 @@ data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
     : ⊢⇆ Chk B Γ t
     → (eq : A ≡ B)
     → ⊢⇆ Inf A Γ (t ⦂ B)
-  ⊢⇉
+  ⊢↑
     : (eq : A ≡ B)
     → ⊢⇆ Inf B Γ t
     → ⊢⇆ Chk A Γ (t ↑)

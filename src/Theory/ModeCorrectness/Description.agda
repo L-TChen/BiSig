@@ -7,8 +7,8 @@ import Syntax.Simple.Description  as S
 module Theory.ModeCorrectness.Description (SD : S.Desc) (Id : Set)  where
 
 open import Syntax.NamedContext        SD Id
-open import Syntax.Simple.Term         SD
-  renaming (Tm to TExp; Tms to TExps; Sub to TSub)
+open import Syntax.Simple              SD
+  hiding (_++_)
 open import Syntax.BiTyped.Description SD
 
 private variable

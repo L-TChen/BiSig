@@ -30,7 +30,7 @@ data Tm (Θ : ℕ) : Fam₀ Θ where
   _∋_
     : (A : TExp Θ) (t : Tm Θ Chk A Γ)
     → Tm Θ Inf A Γ
-  ⇉_by_ : (t : Tm Θ Inf A Γ) (eq : B ≡ A)
+  _↑by_ : (t : Tm Θ Inf A Γ) (eq : B ≡ A)
     → Tm Θ Chk B Γ
   op : ⟦ D ⟧ (Tm Θ) d ⇒ Tm Θ d
 
@@ -43,7 +43,7 @@ mutual
     → Tm Θ d A Γ → Tm Θ d A Δ
   rename f (`  x)                    = ` f x
   rename f (A ∋ t)                   = A ∋ rename f t
-  rename f (⇉ t by eq)               = ⇉ rename f t by eq
+  rename f (t ↑by eq)               = rename f t ↑by eq
   rename f (op (i , p , σ , q , ts)) = op (i , p , σ , q , renameMap _ f ts)
 
   renameMap : (D : ArgsD Ξ)
@@ -81,7 +81,7 @@ mutual
     → ∀ {A} → Tm Θ d A Γ → Tm Θ d A Δ
   sub f (` x)                     = f x
   sub f (A ∋ t)                   = A ∋ sub f t
-  sub f (⇉ t by eq)               = ⇉ (sub f t) by eq
+  sub f (t ↑by eq)                = (sub f t) ↑by eq
   sub f (op (i , p , σ , q , ts)) =
     op (i , p , σ , q , subMap _ f ts)
 
@@ -104,15 +104,15 @@ infixr 5 ⟪_⟫_
 
 module _ {X : Fam Θ ℓ} (α : (D -Alg) X) where mutual
   fold : Tm Θ d ⇒ X d
-  fold (` x)         = α .var x
-  fold (A ∋ t)       = α .toInf (fold t)
-  fold (⇉ t by refl) = α .toChk (fold t)
+  fold (` x)        = α .var x
+  fold (A ∋ t)      = α .toInf (fold t)
+  fold (t ↑by refl) = α .toChk (fold t)
   fold (op (i , p , σ , q , ts)) = α .alg (i , p , σ , q , foldMap _ ts)
 
   foldMap : (D : ArgsD Ξ)
     → ⟦ D ⟧ᵃˢ (Tm Θ) ρ ⇒₁ ⟦ D ⟧ᵃˢ X ρ
   foldMap []        _                = _
-  foldMap (Θ ⊢[ _ ] _ ∷ Ds) (t , ts) = foldMapᵃ Θ t , foldMap Ds ts
+  foldMap (Δ ⊢[ _ ] _ ∷ Ds) (t , ts) = foldMapᵃ Δ t , foldMap Ds ts
 
   foldMapᵃ : (Δ : TExps Ξ)
     → ⟦ Δ ⟧ᵃ (Tm Θ d A) ρ ⇒₁ ⟦ Δ ⟧ᵃ (X d A) ρ

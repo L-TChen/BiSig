@@ -22,10 +22,10 @@ private variable
 infix 5 _⦂_
 
 data Raw (Θ : ℕ) : Mode → Set where
-  `_  : (x : Id)                       → Raw Θ Inf
+  `_  : (x : Id)                     → Raw Θ Inf
   _⦂_ : (t : Raw Θ Chk) (A : TExp Θ) → Raw Θ Inf
   _↑  : (t : Raw Θ Inf)              → Raw Θ Chk
-  op  : ⟦ D ⟧ (Raw Θ) d                → Raw Θ d
+  op  : ⟦ D ⟧ (Raw Θ) d              → Raw Θ d
 
 Raw⇐ Raw⇒ : ℕ → Set
 Raw⇐ Θ = Raw Θ Chk

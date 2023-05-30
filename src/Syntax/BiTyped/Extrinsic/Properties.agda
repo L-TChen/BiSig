@@ -91,7 +91,7 @@ module _ {Θ : ℕ} (σ : TSub Θ n) where mutual
     → Typability A Γ t _ σ
   sub-⊢ (⊢` x∈)    = ⊢` (sub-∈ σ x∈)
   sub-⊢ (⊢⦂ ⊢t eq) = ⊢⦂ (sub-⊢ ⊢t) (cong (sub σ) eq)
-  sub-⊢ (⊢⇉ eq ⊢t) = ⊢⇉ (cong (sub σ) eq) (sub-⊢ ⊢t) 
+  sub-⊢ (⊢↑ eq ⊢t) = ⊢↑ (cong (sub σ) eq) (sub-⊢ ⊢t) 
   sub-⊢ {A = A} (⊢op (i , m=d , ts) (ρ , eq , ⊢ts)) =
     ⊢op (i , m=d , ts ⟨ σ ⟩) (ρ ⨟ σ , AExp⟨ρσ⟩=A , sub-⊢ᵃˢ _ ρ ⊢ts)
     where

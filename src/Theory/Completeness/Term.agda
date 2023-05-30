@@ -111,6 +111,6 @@ module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Completeness BD TD) where mutu
   bidirectionaliseᵃ [] d     t with bidirectionalise t
   bidirectionaliseᵃ [] Chk t | Chk , t′ = t′
   bidirectionaliseᵃ [] Inf t | Chk , t′ = _ ∋ t′
-  bidirectionaliseᵃ [] Chk t | Inf , t′ = ⇉ t′ by refl
+  bidirectionaliseᵃ [] Chk t | Inf , t′ = t′ ↑by refl
   bidirectionaliseᵃ [] Inf t | Inf , t′ = t′
   bidirectionaliseᵃ (_ ∷ Θ) d t = bidirectionaliseᵃ Θ d t

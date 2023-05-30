@@ -33,19 +33,19 @@ private variable
   t u : Raw Θ d
 
 mutual
-  ∥_∥⇉
+  ∥_∥⇒
     : Γ ⊢ t ⇒ A
     → Tm⇒ Θ A ∥ Γ ∥cxt
-  ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
-  ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
-  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇉ =
+  ∥ ⊢` x      ∥⇒ = ` ∥ x ∥∈
+  ∥ ⊢⦂ t refl ∥⇒ = _ ∋ ∥ t ∥⇐
+  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇒ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 
-  ∥_∥⇇
+  ∥_∥⇐
     : Γ ⊢ t ⇐ A
     → Tm⇐ Θ A ∥ Γ ∥cxt
-  ∥ ⊢⇉ p t ∥⇇ = ⇉ ∥ t ∥⇉ by p
-  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇇ =
+  ∥ ⊢↑ p t ∥⇐ = ∥ t ∥⇒ ↑by p
+  ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇐ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 
   ∥-∥map : (D : ArgsD Ξ)
@@ -59,6 +59,6 @@ mutual
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ d)}
     → E.⟦ Δ ⟧ᵃ (Raw Θ)    (⊢⇆ d A) ρ Γ t
     → I.⟦ Δ ⟧ᵃ (Tm Θ d A)          ρ ∥ Γ ∥cxt
-  ∥-∥mapᵃ {d = Chk} []      p = ∥ p ∥⇇
-  ∥-∥mapᵃ {d = Inf} []      p = ∥ p ∥⇉
+  ∥-∥mapᵃ {d = Chk} []      p = ∥ p ∥⇐
+  ∥-∥mapᵃ {d = Inf} []      p = ∥ p ∥⇒
   ∥-∥mapᵃ           (A ∷ Θ) p = ∥-∥mapᵃ Θ p

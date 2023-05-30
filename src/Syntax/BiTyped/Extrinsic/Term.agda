@@ -26,15 +26,15 @@ private variable
 data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
   ⊢`
     : x ⦂ A ∈ Γ
-    → ⊢⇆ Infer A Γ (` x)
+    → ⊢⇆ Inf A Γ (` x)
   ⊢⦂
-    : ⊢⇆ Check B Γ t
+    : ⊢⇆ Chk B Γ t
     → (eq : A ≡ B)
-    → ⊢⇆ Infer A Γ (t ⦂ B)
+    → ⊢⇆ Inf A Γ (t ⦂ B)
   ⊢⇉
     : (eq : A ≡ B)
-    → ⊢⇆ Infer B Γ t
-    → ⊢⇆ Check A Γ (t ↑)
+    → ⊢⇆ Inf B Γ t
+    → ⊢⇆ Chk A Γ (t ↑)
   ⊢op
     : (t : R.⟦ D ⟧ (Raw Θ) d)
     → (⊢t : ⟦ D ⟧ ⊢⇆ d A Γ t)
@@ -42,8 +42,8 @@ data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
 
 infix 6 _⊢_⇒_ _⊢_⇐_
 
-_⊢_⇒_ : Cxt Θ → Raw Θ Infer → TExp Θ → Set
-Γ ⊢ t ⇒ A = ⊢⇆ Infer A Γ t
+_⊢_⇒_ : Cxt Θ → Raw Θ Inf → TExp Θ → Set
+Γ ⊢ t ⇒ A = ⊢⇆ Inf A Γ t
 
-_⊢_⇐_ : Cxt Θ → Raw Θ Check → TExp Θ → Set
-Γ ⊢ t ⇐ A = ⊢⇆ Check A Γ t
+_⊢_⇐_ : Cxt Θ → Raw Θ Chk → TExp Θ → Set
+Γ ⊢ t ⇐ A = ⊢⇆ Chk A Γ t

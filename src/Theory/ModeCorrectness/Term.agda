@@ -57,7 +57,7 @@ mutual
     uniq-⇉ᶜ (mc i) meq ⊢ts ⊢us
 
   uniq-⇉ᶜ
-    : ∀ {D} → ModeCorrectᶜ D → ConD.mode D ≡ Infer
+    : ∀ {D} → ModeCorrectᶜ D → ConD.mode D ≡ Inf
     → ∀ {rs ts us}
     → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇆ ts Γ rs
     → ⟦ ConD.args D ⟧ᵃˢ (Raw m) ⊢⇆ us Γ rs
@@ -74,18 +74,18 @@ mutual
     → ∀ {x} → x ∈ Known [] Ds
     → V.lookup σ₁ x ≡ V.lookup σ₂ x -- σ₁ x ≡ σ₂ x
   uniq-⇉Map []                    _             _          _         ()
-  uniq-⇉Map (_ ⊢[ Check ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
+  uniq-⇉Map (_ ⊢[ Chk ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-⇉Map Ds SDs ⊢ts ⊢us
-  uniq-⇉Map (Θ ⊢[ Infer ] C ∷ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ∈-++⁻ (fv C) i
+  uniq-⇉Map (Θ ⊢[ Inf ] C ∷ Ds) (SD , SDs)    (⊢t , ⊢ts) (⊢u , ⊢us) i with ∈-++⁻ (fv C) i
   ... | inl j = uniq-⇉Mapᵃ C Θ SD ⊢t ⊢u (uniq-⇉Map Ds SDs ⊢ts ⊢us) j
   ... | inr j = uniq-⇉Map Ds SDs ⊢ts ⊢us j
 
   uniq-⇉Mapᵃ
     : (C : TExp n) (Θ : TExps n)
     → ModeCorrectᵃ xs Θ
-    → {t : R.⟦ Θ ⟧ᵃ (Raw m Infer)}
-    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Infer (C ⟨ σ₁ ⟩)) σ₁ Γ t)
-    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Infer (C ⟨ σ₂ ⟩)) σ₂ Γ t)
+    → {t : R.⟦ Θ ⟧ᵃ (Raw m Inf)}
+    → (⊢t : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Inf (C ⟨ σ₁ ⟩)) σ₁ Γ t)
+    → (⊢u : ⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ Inf (C ⟨ σ₂ ⟩)) σ₂ Γ t)
     → (∀ {x} → x ∈ xs → V.lookup σ₁ x ≡ V.lookup σ₂ x)
     → ∀ {x} → x ∈ fv C
     → V.lookup σ₁ x ≡ V.lookup σ₂ x
@@ -142,19 +142,19 @@ module _ {m : ℕ} where mutual
     → Maybe (∃₂ λ l (γ : AList n l) → AccTypabilityⁿ Ds ρ Γ ts σ l (toSub γ))
 
   synthesise/inheritⁿ {Ds = []}     ρ Γ _        σ = just (_ , [] , tt)
-  synthesise/inheritⁿ {Ds = Δ B.⊢[ Check ] A ∷ Ds} ρ Γ (t , ts) σ with inheritᵃ Δ ρ Γ t σ (A ⟨ ρ ⟩)
+  synthesise/inheritⁿ {Ds = Δ B.⊢[ Chk ] A ∷ Ds} ρ Γ (t , ts) σ with inheritᵃ Δ ρ Γ t σ (A ⟨ ρ ⟩)
   ... | nothing = nothing
   ... | just (_ , γ  , ⊢t) with synthesise/inheritⁿ ρ Γ ts (σ ⨟ γ)
   ... | nothing = nothing
   ... | just (_ , γ′ , ⊢ts) = just (_ , γ ⨟ γ′ , {!⊢t!} , {!⊢ts!})
-  synthesise/inheritⁿ {Ds = Δ B.⊢[ Infer ] A ∷ Ds} ρ Γ (t , ts) σ with synthesiseᵃ Δ ρ Γ t σ
+  synthesise/inheritⁿ {Ds = Δ B.⊢[ Inf ] A ∷ Ds} ρ Γ (t , ts) σ with synthesiseᵃ Δ ρ Γ t σ
   ... | nothing = nothing
   ... | just (_ , γ , A , ⊢t) with synthesise/inheritⁿ ρ Γ ts (σ ⨟ γ)
   ... | nothing = nothing 
   ... | just (_ , γ′ , ⊢ts)  = just (_ , γ ⨟ γ′ , {!⊢t!} , {!⊢ts!}) 
 
   synthesiseᵃ
-    : (Δ : TExps Ξ) → (ρ : TSub Ξ m) (Γ : Cxt m) (t : R.⟦ Δ ⟧ᵃ (Raw m Infer)) (σ : AList m n)
+    : (Δ : TExps Ξ) → (ρ : TSub Ξ m) (Γ : Cxt m) (t : R.⟦ Δ ⟧ᵃ (Raw m Inf)) (σ : AList m n)
     → Maybe (∃₂ λ l (γ : AList n l) → AccSynthesisᵃ Δ ρ Γ t σ l (toSub γ))
   synthesiseᵃ []      ρ Γ t σ = synthesise Γ t σ 
   synthesiseᵃ (A ∷ Δ) ρ Γ (x , t) σ with synthesiseᵃ Δ ρ (x ⦂ A ⟨ ρ ⟩ , Γ) t σ
@@ -162,7 +162,7 @@ module _ {m : ℕ} where mutual
   ... | just (_ , γ , B , ⊢t) = just (_ , γ , B , {!⊢t!})
 
   inheritᵃ
-    : (Δ : TExps Ξ) (ρ : TSub Ξ m) (Γ : Cxt m) (t : R.⟦ Δ ⟧ᵃ (Raw m Check)) (σ : AList m n)
+    : (Δ : TExps Ξ) (ρ : TSub Ξ m) (Γ : Cxt m) (t : R.⟦ Δ ⟧ᵃ (Raw m Chk)) (σ : AList m n)
       (A : TExp m)
     → Maybe (∃₂ λ l (γ : AList n l) → AccTypabilityᵃ Δ ρ A Γ t σ l (toSub γ))
   inheritᵃ []      ρ Γ t σ A = inherit Γ t σ A

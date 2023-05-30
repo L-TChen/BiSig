@@ -39,8 +39,8 @@ module Raw (Id : Set) (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) whe
   annotate (` x)   = just (_ , ` x)
   annotate (t ⦂ A) with annotate t
   ... | nothing       = nothing
-  ... | just (Check , tᵇ) = just (_ , tᵇ ⦂ A)
-  ... | just (Infer , tᵇ) = just (_ , tᵇ ↑ ⦂ A)
+  ... | just (Chk , tᵇ) = just (_ , tᵇ ⦂ A)
+  ... | just (Inf , tᵇ) = just (_ , tᵇ ↑ ⦂ A)
   annotate (op (i , ts))  with annotateᶜ {D′ = B.rules BD (s i .proj₁)} (s i .proj₂) ts
   ... | nothing = nothing
   ... | just (eq , ts)  = just (_ , op (s i .proj₁ , eq , ts))
@@ -71,10 +71,10 @@ module Raw (Id : Set) (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) whe
   annotateᵃ [] d     t with annotate t
   ... | nothing = nothing
   -- [TODO] What property does this clause refute? 
-  annotateᵃ [] Infer t | just (Check , tᵇ) = nothing
-  annotateᵃ [] Check t | just (Check , tᵇ) = just tᵇ
-  annotateᵃ [] Check t | just (Infer , tᵇ) = just (tᵇ ↑)
-  annotateᵃ [] Infer t | just (Infer , tᵇ) = just tᵇ
+  annotateᵃ [] Inf t | just (Chk , tᵇ) = nothing
+  annotateᵃ [] Chk t | just (Chk , tᵇ) = just tᵇ
+  annotateᵃ [] Chk t | just (Inf , tᵇ) = just (tᵇ ↑)
+  annotateᵃ [] Inf t | just (Inf , tᵇ) = just tᵇ
   annotateᵃ (_ ∷ Δ) d (x , t) with annotateᵃ Δ d t
   ... | nothing = nothing
   ... | just tᵇ = just (x , tᵇ)
@@ -90,7 +90,7 @@ module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mu
   annotate
     :        Tm  Θ   A Γ
     → ∃[ d ] BTm Θ d A Γ
-  annotate (` x)        = Infer , ` x
+  annotate (` x)        = Inf , ` x
   annotate (op (i , r)) = _ , op (_ , annotateᶜ (proj₂ (s i)) r)
 
   annotateᶜ : ∀ {D D′} → eraseᶜ D′ ≡ D
@@ -110,8 +110,8 @@ module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Annotatability BD TD) where mu
     → T.⟦ Δ ⟧ᵃ (Tm  Θ A)   ρ Γ
     → B.⟦ Δ ⟧ᵃ (BTm Θ d A) ρ Γ
   annotateMapᵃ [] d     t with annotate t
-  annotateMapᵃ [] Check t | Check , t′ = t′
-  annotateMapᵃ [] Infer t | Check , t′ = _ ∋ t′
-  annotateMapᵃ [] Check t | Infer , t′ = ⇉ t′ by refl
-  annotateMapᵃ [] Infer t | Infer , t′ = t′
+  annotateMapᵃ [] Chk t | Chk , t′ = t′
+  annotateMapᵃ [] Inf t | Chk , t′ = _ ∋ t′
+  annotateMapᵃ [] Chk t | Inf , t′ = ⇉ t′ by refl
+  annotateMapᵃ [] Inf t | Inf , t′ = t′
   annotateMapᵃ (_ ∷ Θ) d t = annotateMapᵃ Θ d t

@@ -26,17 +26,17 @@ private
 infix 9 `_
 
 data Tm (Θ : ℕ) : Fam₀ Θ where
-  `_ : _∈_ ⇒ Tm Θ Infer
+  `_ : _∈_ ⇒ Tm Θ Inf
   _∋_
-    : (A : TExp Θ) (t : Tm Θ Check A Γ)
-    → Tm Θ Infer A Γ
-  ⇉_by_ : (t : Tm Θ Infer A Γ) (eq : B ≡ A)
-    → Tm Θ Check B Γ
+    : (A : TExp Θ) (t : Tm Θ Chk A Γ)
+    → Tm Θ Inf A Γ
+  ⇉_by_ : (t : Tm Θ Inf A Γ) (eq : B ≡ A)
+    → Tm Θ Chk B Γ
   op : ⟦ D ⟧ (Tm Θ) d ⇒ Tm Θ d
 
 Tm⇒ Tm⇐ : (Θ : ℕ) → _
-Tm⇒ Θ = Tm Θ Infer
-Tm⇐ Θ = Tm Θ Check
+Tm⇒ Θ = Tm Θ Inf
+Tm⇐ Θ = Tm Θ Chk
 
 mutual
   rename : Ren Γ Δ
@@ -64,7 +64,7 @@ infixr 5 ⟨_⟩_
 ⟨ f ⟩ t = rename f t
 
 Sub : (Γ Δ : Cxt Θ) → Set
-Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm _ Infer A Δ
+Sub Γ Δ = ∀ {A} (x : A ∈ Γ) → Tm _ Inf A Δ
 
 exts : Sub Γ Δ → Sub (A ∷ Γ) (A ∷ Δ)
 exts f (here px) = ` here px
@@ -105,8 +105,8 @@ infixr 5 ⟪_⟫_
 module _ {X : Fam Θ ℓ} (α : (D -Alg) X) where mutual
   fold : Tm Θ d ⇒ X d
   fold (` x)         = α .var x
-  fold (A ∋ t)       = α .toInfer (fold t)
-  fold (⇉ t by refl) = α .toCheck (fold t)
+  fold (A ∋ t)       = α .toInf (fold t)
+  fold (⇉ t by refl) = α .toChk (fold t)
   fold (op (i , p , σ , q , ts)) = α .alg (i , p , σ , q , foldMap _ ts)
 
   foldMap : (D : ArgsD Ξ)

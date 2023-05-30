@@ -25,18 +25,17 @@ open import Theory.Ontologisation.Context          Id
 open B SD
 
 private variable
-  mod   : Mode
-  n m l : ℕ
-  σ     : TSub n m
-  A B C : TExp n
-  x y   : Id
-  Γ     : Cxt n
-  t u   : Raw m mod
+  d   : Mode
+  Ξ Θ : ℕ
+  ρ   : TSub Ξ Θ
+  A B : TExp Θ
+  Γ   : Cxt Θ
+  t u : Raw Θ d
 
 mutual
   ∥_∥⇉
     : Γ ⊢ t ⇒ A
-    → Tm⇒ m A ∥ Γ ∥cxt
+    → Tm⇒ Θ A ∥ Γ ∥cxt
   ∥ ⊢` x      ∥⇉ = ` ∥ x ∥∈
   ∥ ⊢⦂ t refl ∥⇉ = _ ∋ ∥ t ∥⇇
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇉ =
@@ -44,22 +43,22 @@ mutual
 
   ∥_∥⇇
     : Γ ⊢ t ⇐ A
-    → Tm⇐ m A ∥ Γ ∥cxt
+    → Tm⇐ Θ A ∥ Γ ∥cxt
   ∥ ⊢⇉ p t ∥⇇ = ⇉ ∥ t ∥⇉ by p
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇇ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 
-  ∥-∥map : (D : ArgsD n)
-    → {t : R.⟦ D ⟧ᵃˢ (Raw m)}
-    → E.⟦ D ⟧ᵃˢ (Raw m) ⊢⇆ σ Γ t
-    → (I.⟦ D ⟧ᵃˢ (Tm  m))      σ ∥ Γ ∥cxt
-  ∥-∥map []                 _        = tt
-  ∥-∥map (Θ ⊢[ m ] B ∷ Ds) (p , ps) = ∥-∥mapᵃ Θ p , ∥-∥map Ds ps
+  ∥-∥map : (D : ArgsD Ξ)
+    → {t : R.⟦ D ⟧ᵃˢ (Raw Θ)}
+    → E.⟦ D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ Γ t
+    → I.⟦ D ⟧ᵃˢ (Tm  Θ)    ρ ∥ Γ ∥cxt
+  ∥-∥map []                _        = tt
+  ∥-∥map (Δ ⊢[ d ] _ ∷ Ds) (p , ps) = ∥-∥mapᵃ Δ p , ∥-∥map Ds ps
 
-  ∥-∥mapᵃ : (Θ : TExps n)
-    → {t : R.⟦ Θ ⟧ᵃ (Raw m mod)}
-    → E.⟦ Θ ⟧ᵃ (Raw m) (⊢⇆ mod A) σ Γ t
-    → I.⟦ Θ ⟧ᵃ (Tm m mod A) σ ∥ Γ ∥cxt
-  ∥-∥mapᵃ {mod = Check} []       p = ∥ p ∥⇇
-  ∥-∥mapᵃ {mod = Infer} []       p = ∥ p ∥⇉
-  ∥-∥mapᵃ               (A ∷ Θ) p = ∥-∥mapᵃ Θ p
+  ∥-∥mapᵃ : (Δ : TExps Ξ)
+    → {t : R.⟦ Δ ⟧ᵃ (Raw Θ d)}
+    → E.⟦ Δ ⟧ᵃ (Raw Θ)    (⊢⇆ d A) ρ Γ t
+    → I.⟦ Δ ⟧ᵃ (Tm Θ d A)          ρ ∥ Γ ∥cxt
+  ∥-∥mapᵃ {d = Chk} []      p = ∥ p ∥⇇
+  ∥-∥mapᵃ {d = Inf} []      p = ∥ p ∥⇉
+  ∥-∥mapᵃ           (A ∷ Θ) p = ∥-∥mapᵃ Θ p

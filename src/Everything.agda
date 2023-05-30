@@ -1,4 +1,4 @@
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --safe #-}
 
 import Prelude
 
@@ -58,3 +58,4 @@ import Theory.ModeCorrectness.Description
 import Example.Implicational
 import Example.STLC
 import Example.BiSTLC
+import Example.Outline

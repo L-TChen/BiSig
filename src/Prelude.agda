@@ -103,7 +103,7 @@ private variable
   A B C : Set ℓ
 
 data Mode : Set where
-  Check Infer : Mode
+  Chk Inf : Mode
 
 _≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
   → Dec ((x , i) ≡ (y , j))

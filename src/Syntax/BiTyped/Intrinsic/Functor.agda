@@ -40,8 +40,8 @@ private variable
 
 record _-Alg (D : Desc) (X : Fam Θ ℓ) : Set ℓ where
   field
-    var     : _∈_       ⇒ X Infer
-    toInfer : X Check   ⇒ X Infer
-    toCheck : X Infer   ⇒ X Check
-    alg     : ⟦ D ⟧ X d ⇒ X d
+    var   : _∈_       ⇒ X Inf
+    toInf : X Chk     ⇒ X Inf
+    toChk : X Inf     ⇒ X Chk
+    alg   : ⟦ D ⟧ X d ⇒ X d
 open _-Alg public

@@ -21,12 +21,12 @@ open import Syntax.BiTyped.Description ΛₜD
 Λ⇆D = record
   { Op    = ΛOp
   ; decOp = decΛOp
-  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Infer ] ` # 1 ↣ ` # 0 ]
-                           ρ[ [] ⊢[ Check ] ` # 1 ] [] ⇒ ` # 0
+  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Inf ] ` # 1 ↣ ` # 0 ]
+                           ρ[ [] ⊢[ Chk ] ` # 1 ] [] ⇒ ` # 0
                     -- Γ ⊢ t ⇉ (A → B)    Γ ⊢ u ⇇ A
                     -- ----------------------------
                     --   Γ ⊢ t u ⇉ B
-              ; `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Check ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0) } }
+              ; `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Chk ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0) } }
                     -- Γ , x : A ⊢ t ⇇ B
                     -----------------------
                     -- Γ ⊢ λ x . t ⇇ A → B
@@ -55,8 +55,8 @@ mutual
       → Λ⇇ B Γ
 
 Λ : Mode → Λₜ m → Cxt m → Set
-Λ Check = Λ⇇
-Λ Infer = Λ⇉
+Λ Chk = Λ⇇
+Λ Inf = Λ⇉
 
 toΛ : Tm _ mod A Γ → Λ mod A Γ
 toΛ (` x)       = ` x
@@ -66,11 +66,11 @@ toΛ (t ·′ u)    = toΛ t · toΛ u
 toΛ (ƛ′ t)      = ƛ toΛ t
 
 fromΛ : ∀ mod → Λ mod A Γ → Tm _ mod A Γ
-fromΛ Infer (` x)       = ` x
-fromΛ Infer (_ ∋ t)     = _ ∋ fromΛ Check t
-fromΛ Check (⇉ t by eq) = ⇉ fromΛ Infer t by eq
-fromΛ Infer (t · u)     = fromΛ Infer t ·′ fromΛ Check u
-fromΛ Check (ƛ t)       = ƛ′ (fromΛ Check t)
+fromΛ Inf (` x)       = ` x
+fromΛ Inf (_ ∋ t)     = _ ∋ fromΛ Chk t
+fromΛ Chk (⇉ t by eq) = ⇉ fromΛ Inf t by eq
+fromΛ Inf (t · u)     = fromΛ Inf t ·′ fromΛ Chk u
+fromΛ Chk (ƛ t)       = ƛ′ (fromΛ Chk t)
 
 from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
 from-toΛ (` x)       = refl
@@ -80,8 +80,8 @@ from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
 from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)
 
 to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
-to-fromΛ Infer (` x)       = refl
-to-fromΛ Infer (t · u)     = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
-to-fromΛ Infer (_ ∋ t)     = cong (_ ∋_) (to-fromΛ _ t)
-to-fromΛ Check (ƛ t)       = cong ƛ_ (to-fromΛ _ t)
-to-fromΛ Check (⇉ t by eq) = cong (⇉_by eq) (to-fromΛ _ t)
+to-fromΛ Inf (` x)       = refl
+to-fromΛ Inf (t · u)     = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
+to-fromΛ Inf (_ ∋ t)     = cong (_ ∋_) (to-fromΛ _ t)
+to-fromΛ Chk (ƛ t)       = cong ƛ_ (to-fromΛ _ t)
+to-fromΛ Chk (⇉ t by eq) = cong (⇉_by eq) (to-fromΛ _ t)

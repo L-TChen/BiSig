@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 module Example.Outline (Id : Set) where
 
 open import Prelude
@@ -176,12 +178,12 @@ TypeInference = {m n : ℕ} (Γ : Vec (Ty m) n) (r : Raw m n)
               → Dec (Σ[ m' ∈ ℕ ] Σ[ ts ∈ TSub m m' ] Σ[ τ ∈ Ty m' ] Typed' (tsub ts) τ Γ r)
 
 data Raw⇆ (m : ℕ) : ℕ → Mode → Set where
-  `_   : Fin n → Raw⇆ m n Infer
-  _∋_  : Ty m → Raw⇆ m n Check → Raw⇆ m n Infer
-  _∋⇆_ : Ty m → Raw⇆ m n Check → Raw⇆ m n Infer
-  _↑   : Raw⇆ m n Infer → Raw⇆ m n Check
-  app  : Raw⇆ m n Infer → Raw⇆ m n Check → Raw⇆ m n Infer
-  abs  : Raw⇆ m (suc n) Check → Raw⇆ m n Check
+  `_   : Fin n → Raw⇆ m n Inf
+  _∋_  : Ty m → Raw⇆ m n Chk → Raw⇆ m n Inf
+  _∋⇆_ : Ty m → Raw⇆ m n Chk → Raw⇆ m n Inf
+  _↑   : Raw⇆ m n Inf → Raw⇆ m n Chk
+  app  : Raw⇆ m n Inf → Raw⇆ m n Chk → Raw⇆ m n Inf
+  abs  : Raw⇆ m (suc n) Chk → Raw⇆ m n Chk
 
 variable
   r' r'' s' : Raw⇆ _ _ _
@@ -227,16 +229,16 @@ data AddMeta {d m : ℕ} : {n : ℕ} → Raw m n → {mode : Mode} → Raw⇆ (d
 
 Bidirectionalisation : Set
 Bidirectionalisation = {m n : ℕ} (r : Raw m n)
-                     → Σ[ d ∈ ℕ ] Σ[ r' ∈ Raw⇆ (d + m) n Infer ] AddMeta r r'
+                     → Σ[ d ∈ ℕ ] Σ[ r' ∈ Raw⇆ (d + m) n Inf ] AddMeta r r'
 
 -- ~ Syntax.BiTyped.Intrinsic.Term
 data Typed⇆ {m : ℕ} : Ty m → {n : ℕ} → (Γ : Vec (Ty m) n) → Mode → Set where
-  `_   : (i : τ V.∈ Γ) → Typed⇆ τ Γ Infer
-  _∋_  : (τ : Ty m) → Typed⇆ τ Γ Check → Typed⇆ τ Γ Infer
-  _∋⇆_ : (τ : Ty m) → Typed⇆ τ Γ Check → Typed⇆ τ Γ Infer
-  _↑_  : Typed⇆ σ Γ Infer → σ ≡ τ → Typed⇆ τ Γ Check
-  app  : Typed⇆ (imp σ τ) Γ Infer → Typed⇆ σ Γ Check → Typed⇆ τ Γ Infer
-  abs  : Typed⇆ τ (σ ∷ Γ) Check → Typed⇆ (imp σ τ) Γ Check
+  `_   : (i : τ V.∈ Γ) → Typed⇆ τ Γ Inf
+  _∋_  : (τ : Ty m) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
+  _∋⇆_ : (τ : Ty m) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
+  _↑_  : Typed⇆ σ Γ Inf → σ ≡ τ → Typed⇆ τ Γ Chk
+  app  : Typed⇆ (imp σ τ) Γ Inf → Typed⇆ σ Γ Chk → Typed⇆ τ Γ Inf
+  abs  : Typed⇆ τ (σ ∷ Γ) Chk → Typed⇆ (imp σ τ) Γ Chk
 
 eraseType⇆ : {Γ : Vec (Ty m) n} → Typed⇆ τ Γ mode → Raw⇆ m n mode
 eraseType⇆ (` i)     = ` V.index i
@@ -284,7 +286,7 @@ data Typed⇆' (f : Ty (d + m) → Ty m') :
   abs  : Typed⇆' f τ (σ ∷ Γ) r' → Typed⇆' f (imp (f (tsub (extTSub d) σ)) τ) Γ (abs r')
 
 TypeInference⇆ : Set
-TypeInference⇆ = {d m n : ℕ} (Γ : TSub n m) (r : Raw⇆ (d + m) n Infer)
+TypeInference⇆ = {d m n : ℕ} (Γ : TSub n m) (r : Raw⇆ (d + m) n Inf)
                → Dec (Σ[ m' ∈ ℕ ] Σ[ ts ∈ TSub (d + m) m' ] Σ[ τ ∈ Ty m' ]
                       Typed⇆' (tsub ts) τ Γ r)
 

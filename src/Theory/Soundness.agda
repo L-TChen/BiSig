@@ -23,11 +23,11 @@ open import Syntax.BiTyped.Intrinsic.Term
 open import Theory.Erasure.Description
 
 private variable
-  mod   : Mode
-  n m   : ℕ
-  A B C : TExp n
-  σ     : TSub n m
-  Γ     : Cxt n
+  d   : Mode
+  Ξ Θ : ℕ
+  A B : TExp Θ
+  ρ   : TSub Ξ Θ
+  Γ   : Cxt Θ
 
 -- A bidirectional typing is sound with respect to a base typing
 -- if every bidirectional typing rule corresonds to a base typing rule.
@@ -36,8 +36,8 @@ Soundness BD TD = (j : BD .Op) → Σ[ i ∈ TD .Op ] eraseᶜ (BD .rules j) ≡
 
 module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
   forget
-    : BTm BD m mod A Γ
-    → Tm  TD m A Γ
+    : BTm BD Θ d A Γ
+    → Tm  TD Θ A Γ
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t
@@ -45,20 +45,21 @@ module _ (BD : B.Desc) (TD : T.Desc) (s : Soundness BD TD) where mutual
 
   forgetᶜ
     : ∀ {D D′} → eraseᶜ D′ ≡ D
-    → B.⟦ D′ ⟧ᶜ (BTm BD m) mod A Γ → T.⟦ D ⟧ᶜ (Tm TD m) A Γ
+    → B.⟦ D′ ⟧ᶜ (BTm BD Θ) d A Γ
+    → T.⟦ D ⟧ᶜ  (Tm  TD Θ)   A Γ
   forgetᶜ refl (_ , σ , A=B , ts) = σ , A=B , forgetMap _ ts
   -- p is ignored.
 
   forgetMap
-    : (D : B.ArgsD n)
-    → B.⟦ D ⟧ᵃˢ         (BTm BD m) σ Γ
-    → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm TD m)  σ Γ
+    : (D : B.ArgsD Ξ)
+    → B.⟦ D ⟧ᵃˢ         (BTm BD Θ) ρ Γ
+    → T.⟦ eraseᵃˢ D ⟧ᵃˢ (Tm TD Θ)  ρ Γ
   forgetMap []                 _        = _
   forgetMap (Θ ⊢[ m ] B ∷ Ds) (t , ts) = forgetMapᵃ Θ t , forgetMap Ds ts
 
   forgetMapᵃ
-    : (Θ : TExps n)
-    → B.⟦ Θ ⟧ᵃ (BTm BD m mod A) σ Γ
-    → T.⟦ Θ ⟧ᵃ (Tm  TD m  A)    σ Γ
+    : (Δ : TExps Ξ)
+    → B.⟦ Δ ⟧ᵃ (BTm BD Θ d A) ρ Γ
+    → T.⟦ Δ ⟧ᵃ (Tm  TD Θ   A) ρ Γ
   forgetMapᵃ []       t = forget t
   forgetMapᵃ (_ ∷ Θ) t = forgetMapᵃ Θ t

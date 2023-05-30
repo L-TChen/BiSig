@@ -7,8 +7,7 @@ import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Extrinsic.Term {SD : S.Desc} (Id : Set) (D : B.Desc SD) where
 
-open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T)
+open import Syntax.Simple SD
 
 open import Syntax.NamedContext SD Id
 

@@ -5,21 +5,18 @@ import Syntax.Simple.Description as S
 import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Intrinsic.Operation {SD : S.Desc} {D : T.Desc SD} where
-open import Syntax.Simple.Term        SD
-  using () renaming (Tm₀ to T; Tm to TExp; Tms to TExps)
-open import Syntax.Simple.Association SD
+open import Syntax.Simple             SD
 
 open import Syntax.Context            SD
 
 open import Syntax.Typed.Intrinsic.Functor
 open import Syntax.Typed.Intrinsic.Term D
 
-private
-  variable
-    m n   : ℕ
-    σ     : AList n m
-    A B   : TExp m
-    Γ Δ   : Cxt m
+private variable
+  m n   : ℕ
+  σ     : AList n m
+  A B   : TExp m
+  Γ Δ   : Cxt m
 
 -- mutual
 --   _≟_ : (t u : Tm m A Γ) → Dec (t ≡ u)

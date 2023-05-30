@@ -52,7 +52,6 @@ import Theory.Ontologisation.Term
 
 import Theory.ModeCorrectness.Description
 -- import Theory.ModeCorrectness.Term -- [TODO] not finished yet
-                                   -- [TODO] migrate to de Bruijn–indexed raw terms
 
 -- Examples
 

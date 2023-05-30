@@ -7,41 +7,39 @@ import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Extrinsic.Functor (SD : S.Desc) (Id : Set) where
 
-open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Sub to TSub)
+open import Syntax.Simple SD
 
 open import Syntax.NamedContext   SD Id
 import Syntax.BiTyped.Raw.Functor SD Id as R
 
 open B SD
 
-Pred :  (ℓ′ : Level) → (n : ℕ) → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
-Pred ℓ′ n X = (mod : Mode) → TExp n → Cxt n → X mod → Set ℓ′
+Pred :  (ℓ′ : Level) → ℕ → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
+Pred ℓ′ Θ X = (d : Mode) → TExp Θ → Cxt Θ → X d → Set ℓ′
 
 Pred₀ : ℕ → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc lzero))
-Pred₀ n X = Pred lzero n X
+Pred₀ Θ X = Pred lzero Θ X
 
 private variable
-  n m l : ℕ
-  σ     : TSub n m
-  mod   : Mode
-  A B   : TExp n
-  X     : Mode → Set ℓ
+  Ξ Θ : ℕ
+  ρ   : TSub Ξ Θ
+  d   : Mode
+  X   : Mode → Set ℓ
 
-⟦_⟧ᵃ : (Θ : List (TExp n)) (X : Mode → Set ℓ) (P : Cxt m → X mod → Set ℓ′)
-  → TSub n m → Cxt m → R.⟦ Θ ⟧ᵃ (X mod) → Set ℓ′
-⟦ []    ⟧ᵃ X P σ Γ t       = P Γ t
-⟦ A ∷ D ⟧ᵃ X P σ Γ (x , t) = ⟦ D ⟧ᵃ X P σ (x ⦂ A ⟨ σ ⟩ , Γ) t
+⟦_⟧ᵃ : (Δ : TExps Ξ) (X : Mode → Set ℓ) (P : Cxt Θ → X d → Set ℓ′)
+  → TSub Ξ Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (X d) → Set ℓ′
+⟦ []    ⟧ᵃ X P ρ Γ t       = P Γ t
+⟦ A ∷ Δ ⟧ᵃ X P ρ Γ (x , t) = ⟦ Δ ⟧ᵃ X P ρ (x ⦂ A ⟨ ρ ⟩ , Γ) t
 
-⟦_⟧ᵃˢ : (D : ArgsD n) (X : Mode → Set ℓ) (P : Pred ℓ′ m X)
-  → TSub n m → Cxt m → R.⟦ D ⟧ᵃˢ X → Set ℓ′
+⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : Mode → Set ℓ) (P : Pred ℓ′ Θ X)
+  → TSub Ξ Θ → Cxt Θ → R.⟦ D ⟧ᵃˢ X → Set ℓ′
 ⟦ []              ⟧ᵃˢ X _ _ _ _        = ⊤
-⟦ Θ ⊢[ m ] B ∷ Ds ⟧ᵃˢ X P σ Γ (t , ts) =
-  ⟦ Θ ⟧ᵃ X (P m (B ⟨ σ ⟩)) σ Γ t × ⟦ Ds ⟧ᵃˢ X P σ Γ ts
+⟦ Δ ⊢[ d ] A ∷ Ds ⟧ᵃˢ X P ρ Γ (t , ts) =
+  ⟦ Δ ⟧ᵃ X (P d (A ⟨ ρ ⟩)) ρ Γ t × ⟦ Ds ⟧ᵃˢ X P ρ Γ ts
 
-⟦_⟧ᶜ : (D : ConD) → Pred ℓ′ m X → Pred ℓ′ m (R.⟦ D ⟧ᶜ X)
-⟦ ι {n} mod B D ⟧ᶜ P mod′ A Γ (mod≡mod′ , t) =
-  Σ[ σ ∈ TSub n _ ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ _ P σ Γ t
+⟦_⟧ᶜ : (D : ConD) → Pred ℓ′ Θ X → Pred ℓ′ Θ (R.⟦ D ⟧ᶜ X)
+⟦ ι {Ξ} d A D ⟧ᶜ P d′ A₀ Γ (d≡d′ , t) =
+  Σ[ σ ∈ TSub Ξ _ ] A ⟨ σ ⟩ ≡ A₀ × ⟦ D ⟧ᵃˢ _ P σ Γ t
 
-⟦_⟧ : (D : Desc) → Pred ℓ′ n X → Pred ℓ′ n (R.⟦ D ⟧ X)
-⟦ D ⟧ P m A Γ (i , t) = ⟦ D .rules i ⟧ᶜ P m A Γ t
+⟦_⟧ : (D : Desc) → Pred ℓ′ Θ X → Pred ℓ′ Θ (R.⟦ D ⟧ X)
+⟦ D ⟧ P Θ A Γ (i , t) = ⟦ D .rules i ⟧ᶜ P Θ A Γ t

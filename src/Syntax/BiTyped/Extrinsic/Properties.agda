@@ -44,7 +44,7 @@ Typabilityⁿ D ρ Γ ts n σ =
 Typabilityᵃ : (Δ : TExps Ξ)
   → TSub Ξ Θ → TExp Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw Θ d) → 𝐘 Θ
 Typabilityᵃ Θ ρ A Γ t n σ = ⟦ Θ ⟧ᵃ (Raw n)
-  (⊢⇆ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ t)
+  (⊢⇆ _ $ A ⟨ σ ⟩) (ρ ⨟ σ) (Γ ⟨ σ ⟩) (tsubᵃ σ _ t)
 
 Synthesis : Cxt Θ → Raw Θ d → 𝐘 {ℕ} {TSub} Θ
 Synthesis Γ t _ σ = ∃[ A ] Typability A Γ t _ σ

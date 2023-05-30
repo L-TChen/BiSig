@@ -15,77 +15,80 @@ open import Syntax.BiTyped.Raw.Functor SD Id
 open B SD
 
 private variable
-  n m k l : ℕ
-  mod : Mode
+  n m l : ℕ
+  Ξ Θ Θ₁ Θ₂ : ℕ
+  d : Mode
 
 infix 5 _⦂_
 
-data Raw (m : ℕ) : Mode → Set where
-  `_  : (x : Id)                       → Raw m Infer
-  _⦂_ : (t : Raw m Check) (A : TExp m) → Raw m Infer
-  _↑  : (t : Raw m Infer)              → Raw m Check
-  op  : ⟦ D ⟧ (Raw m) mod              → Raw m mod
+data Raw (Θ : ℕ) : Mode → Set where
+  `_  : (x : Id)                       → Raw Θ Infer
+  _⦂_ : (t : Raw Θ Check) (A : TExp Θ) → Raw Θ Infer
+  _↑  : (t : Raw Θ Infer)              → Raw Θ Check
+  op  : ⟦ D ⟧ (Raw Θ) d                → Raw Θ d
 
 Raw⇐ Raw⇒ : ℕ → Set
-Raw⇐ m = Raw m Check
-Raw⇒ m = Raw m Infer
+Raw⇐ Θ = Raw Θ Check
+Raw⇒ Θ = Raw Θ Infer
 
-module _ (ρ : Ren m n) where mutual
-  trename : Raw m mod → Raw n mod
+module _ (ρ : TRen Θ₁ Θ₂) where mutual
+  trename : Raw Θ₁ d → Raw Θ₂ d
   trename (` x)   = ` x
   trename (t ⦂ A) = trename t ⦂ rename ρ A
   trename (t ↑)   = trename t ↑
-  trename (op (i , refl , ts))  = op (i , refl , trenameⁿ ts)
+  trename (op (i , refl , ts))  = op (i , refl , trenameⁿ _ ts)
 
-  trenameⁿ : {D : ArgsD k}
-    → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
-  trenameⁿ {D = []}     _        = _
-  trenameⁿ {D = A ∷ D} (t , ts) = trenameᵃ t , trenameⁿ ts
+  trenameⁿ : (D : ArgsD Ξ)
+    → ⟦ D ⟧ᵃˢ (Raw Θ₁) → ⟦ D ⟧ᵃˢ (Raw Θ₂)
+  trenameⁿ []      _        = _
+  trenameⁿ (Δ ⊢[ _ ] A ∷ D) (t , ts) = trenameᵃ Δ t , trenameⁿ D ts
 
-  trenameᵃ : {D : TExps k}
-    → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
-  trenameᵃ {D = []}     t       = trename t
-  trenameᵃ {D = A ∷ D} (x , t) = x , trenameᵃ t
+  trenameᵃ : (Δ : TExps Ξ)
+    → ⟦ Δ ⟧ᵃ (Raw Θ₁ d) → ⟦ Δ ⟧ᵃ (Raw Θ₂ d)
+  trenameᵃ []      t       = trename t
+  trenameᵃ (A ∷ Δ) (x , t) = x , trenameᵃ Δ t
 
-twkˡ : m ≤ n → Raw m mod → Raw n mod
+{-
+twkˡ : m ≤ n → Raw m d → Raw n d
 twkˡⁿ : {D : ArgsD k} → m ≤ n
   → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
 twkˡᵃ : {D : TExps k} → m ≤ n
-  → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
+  → ⟦ D ⟧ᵃ (Raw m d) → ⟦ D ⟧ᵃ (Raw n d)
 
 twkˡ  (less-than-or-equal refl) = trename  injectˡ
-twkˡⁿ (less-than-or-equal refl) = trenameⁿ injectˡ
-twkˡᵃ (less-than-or-equal refl) = trenameᵃ injectˡ
+twkˡⁿ (less-than-or-equal refl) = trenameⁿ injectˡ _ -- trenameⁿ injectˡ
+twkˡᵃ (less-than-or-equal refl) = trenameᵃ injectˡ _
 
-twkᵐ : (m n {l} : ℕ) → Raw (m + l) mod → Raw (m + n + l) mod
+twkᵐ : (m n {l} : ℕ) → Raw (m + l) d → Raw (m + n + l) d
 twkᵐⁿ : {D : ArgsD k} (m n {l} : ℕ)
   → ⟦ D ⟧ᵃˢ (Raw (m + l)) → ⟦ D ⟧ᵃˢ (Raw (m + n + l))
 twkᵐᵃ : {D : TExps k} (m n {l} : ℕ)
-  → ⟦ D ⟧ᵃ (Raw (m + l) mod) → ⟦ D ⟧ᵃ (Raw (m + n + l) mod)
+  → ⟦ D ⟧ᵃ (Raw (m + l) d) → ⟦ D ⟧ᵃ (Raw (m + n + l) d)
 
 twkᵐ  m n = trename  (insert-mid m n)
-twkᵐⁿ m n = trenameⁿ (insert-mid m n)
-twkᵐᵃ m n = trenameᵃ (insert-mid m n)
+twkᵐⁿ m n = trenameⁿ (insert-mid m n) _
+twkᵐᵃ m n = trenameᵃ (insert-mid m n) _
+-}
 
 module _ (σ : TSub m n) where mutual
-  tsub : Raw m mod → Raw n mod
+  tsub : Raw m d → Raw n d
   tsub (` x)   = ` x
   tsub (t ⦂ A) = tsub t ⦂ sub σ A
   tsub (t ↑)   = tsub t ↑
-  tsub (op (i , eq , ts)) = op (i , eq , tsubⁿ ts)
+  tsub (op (i , eq , ts)) = op (i , eq , tsubⁿ _ ts)
 
-  tsubⁿ : {D : ArgsD k}
+  tsubⁿ : (D : ArgsD Ξ)
     → ⟦ D ⟧ᵃˢ (Raw m) → ⟦ D ⟧ᵃˢ (Raw n)
-  tsubⁿ {D = []}     _        = _
-  tsubⁿ {D = A ∷ D} (t , ts) = tsubᵃ t , tsubⁿ ts
+  tsubⁿ []       _       = _
+  tsubⁿ (A ∷ D) (t , ts) = tsubᵃ _ t , tsubⁿ _ ts
 
-  tsubᵃ : {D : TExps k}
-    → ⟦ D ⟧ᵃ (Raw m mod) → ⟦ D ⟧ᵃ (Raw n mod)
-  tsubᵃ {D = []}     t      = tsub t
-  tsubᵃ {D = A ∷ D} (x , t) = x , tsubᵃ t
+  tsubᵃ : (Δ : TExps Ξ)
+    → ⟦ Δ ⟧ᵃ (Raw m d) → ⟦ Δ ⟧ᵃ (Raw n d)
+  tsubᵃ []      t       = tsub t
+  tsubᵃ (A ∷ Δ) (x , t) = x , tsubᵃ _ t
 
-module _ {m : ℕ} where mutual
-  tsub-id : (t : Raw m mod)
+module _ {Θ : ℕ} where mutual
+  tsub-id : (t : Raw Θ d)
     → tsub id t ≡ t
   tsub-id (` x)              = refl
   tsub-id (t ⦂ A)            =
@@ -94,20 +97,20 @@ module _ {m : ℕ} where mutual
   tsub-id (op (i , eq , ts)) =
     cong (λ ts → op (i , eq , ts)) (tsubⁿ-id ts)
 
-  tsubⁿ-id : {D : ArgsD k}
-    → (ts : ⟦ D ⟧ᵃˢ (Raw m))
-    → tsubⁿ id ts ≡ ts
+  tsubⁿ-id : {D : ArgsD Ξ}
+    → (ts : ⟦ D ⟧ᵃˢ (Raw Θ))
+    → tsubⁿ id _ ts ≡ ts
   tsubⁿ-id {D = []}     ts       = refl
   tsubⁿ-id {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-id t) (tsubⁿ-id ts)
 
-  tsubᵃ-id : {D : TExps k}
-    → (t : ⟦ D ⟧ᵃ (Raw m mod))
-    → tsubᵃ id t ≡ t
-  tsubᵃ-id {D = []}             = tsub-id
-  tsubᵃ-id {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-id t)
+  tsubᵃ-id : {Δ : TExps Ξ}
+    → (t : ⟦ Δ ⟧ᵃ (Raw Θ d))
+    → tsubᵃ id _ t ≡ t
+  tsubᵃ-id {Δ = []}             = tsub-id
+  tsubᵃ-id {Δ = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-id t)
 
 module _ (σ : TSub m n) (ρ : TSub n l) where mutual
-  tsub-⨟ : (t : Raw m mod)
+  tsub-⨟ : (t : Raw m d)
     → tsub (σ ⨟ ρ) t ≡ tsub ρ (tsub σ t)
     
   tsub-⨟ (` x)   = refl
@@ -115,20 +118,20 @@ module _ (σ : TSub m n) (ρ : TSub n l) where mutual
   tsub-⨟ (t ↑)   = cong _↑ (tsub-⨟ t)
   tsub-⨟ (op (i , eq , ts)) = cong (λ ts → op (i , eq , ts)) (tsubⁿ-⨟ ts)
 
-  tsubⁿ-⨟ : {D : ArgsD k}
+  tsubⁿ-⨟ : {D : ArgsD Ξ}
     → (ts : ⟦ D ⟧ᵃˢ (Raw m))
-    → tsubⁿ (σ ⨟ ρ) ts ≡ tsubⁿ ρ (tsubⁿ σ ts)
+    → tsubⁿ (σ ⨟ ρ) _ ts ≡ tsubⁿ ρ _ (tsubⁿ σ _ ts)
   tsubⁿ-⨟ {D = []}     ts       = refl
   tsubⁿ-⨟ {D = D ∷ Ds} (t , ts) = cong₂ _,_ (tsubᵃ-⨟ t) (tsubⁿ-⨟ ts)
 
-  tsubᵃ-⨟ : {D : TExps k}
-    → (t : ⟦ D ⟧ᵃ (Raw m mod))
-    → tsubᵃ (σ ⨟ ρ) t ≡ tsubᵃ ρ (tsubᵃ σ t)
-  tsubᵃ-⨟ {D = []}             = tsub-⨟
-  tsubᵃ-⨟ {D = D ∷ Ds} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
+  tsubᵃ-⨟ : {Δ : TExps Ξ}
+    → (t : ⟦ Δ ⟧ᵃ (Raw m d))
+    → tsubᵃ (σ ⨟ ρ) _ t ≡ tsubᵃ ρ _ (tsubᵃ σ _ t)
+  tsubᵃ-⨟ {Δ = []}            = tsub-⨟
+  tsubᵃ-⨟ {Δ = _ ∷ _} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
 
-module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
-  tsubₐ-⨟ : (t : Raw m mod)
+module _ {d : Mode} (σ : AList m n) (ρ : AList n l) where mutual
+  tsubₐ-⨟ : (t : Raw m d)
     → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
   tsubₐ-⨟ t = begin
     tsub (toSub (σ ⨟ ρ)) t
@@ -139,22 +142,22 @@ module _ {mod : Mode} (σ : AList m n) (ρ : AList n l) where mutual
     where open ≡-Reasoning
 
 instance
-  RawSubIsPresheaf : IsPresheaf λ m → Raw m mod
+  RawSubIsPresheaf : IsPresheaf λ m → Raw m d
   RawSubIsPresheaf ._⟨_⟩ t σ   = tsub σ t
   RawSubIsPresheaf .⟨⟩-id      = tsub-id
   RawSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsub-⨟ σ ρ t
  
-  RawⁿSubIsPresheaf : {AD : ArgsD k} → IsPresheaf λ m → ⟦ AD ⟧ᵃˢ (Raw m)
-  RawⁿSubIsPresheaf ._⟨_⟩ t σ   = tsubⁿ σ t
+  RawⁿSubIsPresheaf : {AD : ArgsD Ξ} → IsPresheaf λ m → ⟦ AD ⟧ᵃˢ (Raw m)
+  RawⁿSubIsPresheaf ._⟨_⟩ t σ   = tsubⁿ σ _ t
   RawⁿSubIsPresheaf .⟨⟩-id      = tsubⁿ-id
   RawⁿSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubⁿ-⨟ σ ρ t
 
---  RawᵃSubIsPresheaf : {Θ : TExps k} → IsPresheaf λ m → ⟦ Θ ⟧ᵃ (Raw m mod)
+--  RawᵃSubIsPresheaf : {Θ : TExps Ξ} → IsPresheaf λ m → ⟦ Θ ⟧ᵃ (Raw m d)
 --  RawᵃSubIsPresheaf ._⟨_⟩ t σ   = tsubᵃ σ t
 --  RawᵃSubIsPresheaf .⟨⟩-id      = tsubᵃ-id
 --  RawᵃSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubᵃ-⨟ σ ρ t
 
-  RawAListIsPresheaf : IsPresheaf λ m → Raw m mod
+  RawAListIsPresheaf : IsPresheaf λ m → Raw m d
   RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
   RawAListIsPresheaf .⟨⟩-id      = tsub-id
   RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟

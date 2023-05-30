@@ -6,14 +6,13 @@ import Syntax.Simple.Description as S
 
 module Syntax.Typed.Description (SD : S.Desc)  where
 
-open import Syntax.Simple.Term SD as Ty
-  renaming (Tm to TExp)
+open import Syntax.Simple SD as Ty
 
 record ArgD (Ξ : ℕ) : Set where
   constructor _⊢_
   field
-    cxt  : List (TExp Ξ) -- context extension
-    type : TExp Ξ        -- the type of an argument
+    cxt  : TExps Ξ -- context extension
+    type : TExp  Ξ -- the type of an argument
 
 ArgsD : ℕ → Set
 ArgsD Ξ = List (ArgD Ξ)

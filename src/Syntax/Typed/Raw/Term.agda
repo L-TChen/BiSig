@@ -23,7 +23,7 @@ data Raw (Θ : ℕ) : Set where
   _⦂_ : (t : Raw Θ) (A : TExp Θ) → Raw Θ
   op  : ⟦ D ⟧ (Raw Θ)            → Raw Θ
 
-module _ (ρ : Ren Θ₁ Θ₂) where mutual
+module _ (ρ : TRen Θ₁ Θ₂) where mutual
   trename : Raw Θ₁ → Raw Θ₂
   trename (` x)         = ` x
   trename (t ⦂ A)       = trename t ⦂ rename ρ A

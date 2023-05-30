@@ -7,13 +7,11 @@ import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Raw.Functor (SD : S.Desc) (Id : Set) where
 
-open import Syntax.Simple.Term SD
-  renaming (Tm to TExp; Tm₀ to T; Tms to TExps)
+open import Syntax.Simple SD
 open B SD
 
 private variable
-  n m : ℕ
-  mod : Mode
+  Ξ Θ : ℕ
   A B : Set
 
 Fam : (ℓ : Level) → Set (lsuc ℓ)
@@ -22,17 +20,17 @@ Fam ℓ = Mode → Set ℓ
 Fam₀ : Set₁
 Fam₀ = Fam lzero
 
-⟦_⟧ᵃ : (D : TExps n) → Set ℓ → Set ℓ
+⟦_⟧ᵃ : (Δ : TExps Ξ) → Set ℓ → Set ℓ
 ⟦ []    ⟧ᵃ X = X
-⟦ A ∷ Θ ⟧ᵃ X = Id × ⟦ Θ ⟧ᵃ X
+⟦ A ∷ Δ ⟧ᵃ X = Id × ⟦ Δ ⟧ᵃ X
 
-⟦_⟧ᵃˢ : (D : ArgsD n) (X : Fam ℓ) → Set ℓ
+⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : Fam ℓ) → Set ℓ
 ⟦ []              ⟧ᵃˢ _ = ⊤
-⟦ Θ ⊢[ m ] _ ∷ Ds ⟧ᵃˢ X = ⟦ Θ ⟧ᵃ (X m) × ⟦ Ds ⟧ᵃˢ X
+⟦ Δ ⊢[ d ] _ ∷ Ds ⟧ᵃˢ X = ⟦ Δ ⟧ᵃ (X d) × ⟦ Ds ⟧ᵃˢ X
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ
-⟦ ι mod₁  _ D ⟧ᶜ X mod₂ = mod₁ ≡ mod₂ × ⟦ D ⟧ᵃˢ X
+⟦ ι d₁  _ D ⟧ᶜ X d₂ = d₁ ≡ d₂ × ⟦ D ⟧ᵃˢ X
 -- (⟦ ι _     _ D ⟧ᶜ X) _    = ⊥
 
 ⟦_⟧ : (D : Desc) (X : Fam ℓ) → Fam ℓ
-⟦ D ⟧ X mod = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X mod
+⟦ D ⟧ X d = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X d

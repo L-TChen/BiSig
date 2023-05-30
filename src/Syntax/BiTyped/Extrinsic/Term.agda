@@ -28,9 +28,9 @@ data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
     : x ⦂ A ∈ Γ
     → ⊢⇆ Inf A Γ (` x)
   ⊢⦂
-    : ⊢⇆ Chk B Γ t
-    → (eq : A ≡ B)
-    → ⊢⇆ Inf A Γ (t ⦂ B)
+    : ⊢⇆ Chk A Γ t
+  --  → (eq : A ≡ B)
+    → ⊢⇆ Inf A Γ (t ⦂ A)
   ⊢↑
     : (eq : A ≡ B)
     → ⊢⇆ Inf B Γ t

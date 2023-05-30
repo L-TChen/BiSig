@@ -20,12 +20,12 @@ ModeCorrectᵃ xs (A ∷ Θ) = fv A ⊆ xs × ModeCorrectᵃ xs Θ
 
 module _ (xs₀ : List (Fin n)) where
   Known : ArgsD n →  List (Fin n)
-  Known []                     = xs₀
+  Known []                  = xs₀
   Known (Θ ⊢[ Chk ] C ∷ Ds) =         Known Ds
   Known (Θ ⊢[ Inf ] C ∷ Ds) = fv C ++ Known Ds
 
   ModeCorrectᵃˢ : ArgsD n → Set
-  ModeCorrectᵃˢ []                     = ⊤
+  ModeCorrectᵃˢ []                  = ⊤
   ModeCorrectᵃˢ (Θ ⊢[ Chk ] C ∷ Ds) = let xs = Known Ds in
     fv C ⊆ xs × ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
   ModeCorrectᵃˢ (Θ ⊢[ Inf ] C ∷ Ds) = let xs = Known Ds in

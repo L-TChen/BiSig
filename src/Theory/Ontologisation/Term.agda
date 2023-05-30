@@ -36,8 +36,8 @@ mutual
   ∥_∥⇒
     : Γ ⊢ t ⇒ A
     → Tm⇒ Θ A ∥ Γ ∥cxt
-  ∥ ⊢` x      ∥⇒ = ` ∥ x ∥∈
-  ∥ ⊢⦂ t refl ∥⇒ = _ ∋ ∥ t ∥⇐
+  ∥ ⊢` x ∥⇒ = ` ∥ x ∥∈
+  ∥ ⊢⦂ t ∥⇒ = _ ∋ ∥ t ∥⇐
   ∥ ⊢op (i , q , t) (σ , B=A , p) ∥⇒ =
     op (i , q , σ , B=A , ∥-∥map _ p)
 

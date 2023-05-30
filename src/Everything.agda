@@ -39,10 +39,10 @@ import Syntax.BiTyped.Extrinsic.Properties
 -- [TODO] history of parser generators
 
 -- Theory of Bidirectional Type Checking
+import Theory.Soundness
+
 import Theory.Completeness.Description
 import Theory.Completeness.Term
-
-import Theory.Soundness
 
 import Theory.Erasure.Description
 import Theory.Erasure.Term
@@ -51,6 +51,7 @@ import Theory.Ontologisation.Context
 import Theory.Ontologisation.Term
 
 import Theory.ModeCorrectness.Description
+import Theory.ModeCorrectness.UniqueSynthesised
 -- import Theory.ModeCorrectness.Term -- [TODO] not finished yet
 
 -- Examples

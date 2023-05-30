@@ -53,31 +53,6 @@ Synthesisᵃ : (Δ : TExps Ξ)
   → TSub Ξ Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw Θ d) → 𝐘 {ℕ} {TSub} Θ
 Synthesisᵃ Δ ρ Γ t n σ = ∃[ A ] Typabilityᵃ Δ ρ A Γ t n σ
 
-AccTypability : TExp Θ → Cxt Θ → Raw Θ d → AList Θ n → 𝐘 n
-AccTypability A Γ t σ = Typability A Γ t [ toSub σ ⨟]
-
-AccTypabilityⁿ : (D : B.ArgsD SD Ξ)
-  → TSub Ξ Θ → Cxt Θ → R.⟦ D ⟧ᵃˢ (Raw Θ) → AList Θ n → 𝐘 n
-AccTypabilityⁿ D ρ Γ ts σ = Typabilityⁿ D ρ Γ ts [ toSub σ ⨟]
-
-AccTypabilityᵃ : (Δ : TExps Ξ)
-  → TSub Ξ Θ → TExp Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw Θ d) → AList Θ n → 𝐘 n
-AccTypabilityᵃ Θ ρ A Γ t σ = Typabilityᵃ Θ ρ A Γ t [ toSub σ ⨟]
-
-AccSynthesis : Cxt Θ → Raw Θ d → AList Θ n → 𝐘 n
-AccSynthesis Γ t σ = Synthesis Γ t [ toSub σ ⨟]
-
-AccSynthesisᵃ : (Δ : TExps Ξ)
-  → TSub Ξ Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw Θ d) → AList Θ n → 𝐘 n
-AccSynthesisᵃ Δ ρ Γ t σ = Synthesisᵃ Δ ρ Γ t [ toSub σ ⨟]
-
-module _ {Θ n : ℕ} (Γ : Cxt Θ) (σ : AList Θ n) where
-  DecAccSynthesis : Raw⇒ Θ → Set
-  DecAccSynthesis t = DecMinₐ (AccSynthesis Γ t σ)
-
-  DecAccInheritance : Raw⇐ Θ → TExp Θ → Set
-  DecAccInheritance t A = DecMinₐ (AccTypability A Γ t σ)
-
 module _ (σ : TSub Θ n) where
   sub-∈
     : x ⦂ A ∈ Γ
@@ -90,7 +65,7 @@ module _ {Θ : ℕ} (σ : TSub Θ n) where mutual
     : ⊢⇆ d     A Γ t 
     → Typability A Γ t _ σ
   sub-⊢ (⊢` x∈)    = ⊢` (sub-∈ σ x∈)
-  sub-⊢ (⊢⦂ ⊢t eq) = ⊢⦂ (sub-⊢ ⊢t) (cong (sub σ) eq)
+  sub-⊢ (⊢⦂ ⊢t)    = ⊢⦂ (sub-⊢ ⊢t)
   sub-⊢ (⊢↑ eq ⊢t) = ⊢↑ (cong (sub σ) eq) (sub-⊢ ⊢t) 
   sub-⊢ {A = A} (⊢op (i , m=d , ts) (ρ , eq , ⊢ts)) =
     ⊢op (i , m=d , ts ⟨ σ ⟩) (ρ ⨟ σ , AExp⟨ρσ⟩=A , sub-⊢ᵃˢ _ ρ ⊢ts)
@@ -118,7 +93,6 @@ module _ {Θ : ℕ} (σ : TSub Θ n) where mutual
     → Typabilityᵃ Δ ρ A Γ t _ σ 
   sub-⊢ᵃ []      ρ ⊢t = sub-⊢ ⊢t
   sub-⊢ᵃ (A ∷ Θ) ρ ⊢t rewrite ⟨⟩-⨟ ρ σ A = sub-⊢ᵃ Θ ρ ⊢t
-      
 
 module _ {Θ : ℕ} (σ : TSub Θ n) where
   Typability-ext

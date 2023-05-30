@@ -60,7 +60,7 @@ module Intrinsic where mutual
 
   forget
     : BiTm Θ d A Γ
-    → Tm   Θ    A Γ
+    → Tm   Θ   A Γ
   forget (` x)         = ` x
   forget (_ ∋ t)       = forget t
   forget (⇉ t by refl) = forget t

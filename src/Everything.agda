@@ -39,8 +39,8 @@ import Syntax.BiTyped.Extrinsic.Properties
 -- [TODO] history of parser generators
 
 -- Theory of Bidirectional Type Checking
-import Theory.Annotatability.Description
-import Theory.Annotatability.Term
+import Theory.Completeness.Description
+import Theory.Completeness.Term
 
 import Theory.Soundness
 

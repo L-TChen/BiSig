@@ -13,13 +13,13 @@ private variable
   Ξ     : ℕ
 
 eraseᵃ : B.ArgD Ξ → T.ArgD Ξ
-eraseᵃ (Θ ⊢[ m ] B)= Θ ⊢ B
+eraseᵃ (Δ ⊢[ d ] B)= Δ ⊢ B
 
 eraseᵃˢ : B.ArgsD Ξ → T.ArgsD Ξ
 eraseᵃˢ = L.map eraseᵃ
 
 eraseᶜ : B.ConD → T.ConD
-eraseᶜ (ι {n} mod A D) = ι A (eraseᵃˢ D)
+eraseᶜ (ι {Ξ} d A D) = ι A (eraseᵃˢ D)
 
 erase : B.Desc → T.Desc
 erase (desc Op rules) = desc Op (eraseᶜ ∘ rules)

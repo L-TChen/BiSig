@@ -30,7 +30,6 @@ Fam₀ = Fam lzero
 
 ⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ
 ⟦ ι d₁  _ D ⟧ᶜ X d₂ = d₁ ≡ d₂ × ⟦ D ⟧ᵃˢ X
--- (⟦ ι _     _ D ⟧ᶜ X) _    = ⊥
 
 ⟦_⟧ : (D : Desc) (X : Fam ℓ) → Fam ℓ
 ⟦ D ⟧ X d = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X d

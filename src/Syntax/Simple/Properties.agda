@@ -80,40 +80,31 @@ module _ {m : ℕ} where mutual
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
     → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
-    → x ∈ fv A
+    → x ∈ₜ A
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-inv (` x)      p (here refl) = p
-  ≡-fv-inv (op′ i ts) p j = ≡-fv-invⁿ ts (op-inj₃ p) j
+  ≡-fv-inv (op′ i ts) p (ops x∈)    = ≡-fv-invⁿ ts (op-inj₃ p) x∈
 
-  ≡-fv-invⁿ : {n : ℕ} (As : Tm Γ ^ n)
+  ≡-fv-invⁿ : (As : Tm Γ ^ n)
     → subⁿ σ₁ As ≡ subⁿ σ₂ As
-    → x ∈ fvⁿ As
+    → x ∈ₜₛ As
     → lookup σ₁ x ≡ lookup σ₂ x
-  ≡-fv-invⁿ {n = suc n} (A ∷ As) p i with ∈-++⁻ (fv A) i
-  ... | inl j = ≡-fv-inv  A  (V.∷-injectiveˡ p) j
-  ... | inr j = ≡-fv-invⁿ As (V.∷-injectiveʳ p) j
+  ≡-fv-invⁿ (A ∷ As) p (head x∈) = ≡-fv-inv  A  (V.∷-injectiveˡ p) x∈
+  ≡-fv-invⁿ (A ∷ As) p (tail x∈) = ≡-fv-invⁿ As (V.∷-injectiveʳ p) x∈
 
-module _ (σ₁ σ₂ : Sub Γ Δ) where mutual
+module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv : (A : Tm Γ)
-    → (∀ {x} → x ∈ fv A → lookup σ₁ x ≡ lookup σ₂ x)
+    → (∀ {x} → x ∈ₜ A → lookup σ₁ x ≡ lookup σ₂ x)
     → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
   ≡-fv (` x)      p = p (here refl)
-  ≡-fv (op′ _ ts) p = cong (λ ts → op′ _ ts) (≡-fvⁿ ts p)
+  ≡-fv (op′ _ ts) p = cong (λ ts → op′ _ ts) (≡-fvⁿ ts (p ∘ ops)) -- (≡-fvⁿ ts p)
 
   ≡-fvⁿ : {n : ℕ} (As : Tm Γ ^ n)
-    → (∀ {x} → x ∈ fvⁿ  As → lookup σ₁ x ≡ lookup σ₂ x)
+    → (∀ {x} → x ∈ₜₛ As → lookup σ₁ x ≡ lookup σ₂ x)
     → subⁿ σ₁ As ≡ subⁿ σ₂ As
   ≡-fvⁿ {zero}  []       _ = refl
   ≡-fvⁿ {suc n} (A ∷ As) p = cong₂ _∷_
-    (≡-fv A λ k → p (∈-++⁺ˡ k)) (≡-fvⁿ As λ k → p (∈-++⁺ʳ (fv A) k))
-
-{-
-SubFv : List (Fin Ξ) → ℕ → Set
-SubFv xs Δ = Σ[ ys ∈ List (Fin _ × Tm Δ) ] map proj₁ ys ≡ xs
-
-Covered : {Ξ : ℕ} → List (Fin Ξ) → Set
-Covered xs = (x : Fin _) → x ∈ xs
--}
+    (≡-fv A (p ∘ head)) (≡-fvⁿ As (p ∘ tail))
 
 ------------------------------------------------------------------------------
 -- t ≺ (p ▷ t)

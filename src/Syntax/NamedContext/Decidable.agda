@@ -1,7 +1,7 @@
 open import Prelude
   hiding (lookup)
 
-module Syntax.NamedContext.Decidable {Id : Set} (_≟_ : (x y : Id) → Dec (x ≡ y)) where
+module Syntax.NamedContext.Decidable (Id : Set) ⦃ DecEqId : DecEq Id ⦄ where 
 
 open import Syntax.NamedContext.Base Id
 

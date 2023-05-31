@@ -4,36 +4,41 @@ open import Prelude
 
 import Syntax.Simple.Description  as S
 
-module Theory.ModeCorrectness.Description (SD : S.Desc) (Id : Set)  where
+module Theory.ModeCorrectness.Description (SD : S.Desc)   where
 
-open import Syntax.NamedContext        SD Id
 open import Syntax.Simple              SD
-  hiding (_++_)
 open import Syntax.BiTyped.Description SD
 
 private variable
-  n : ℕ
+  Ξ : ℕ
 
-ModeCorrectᵃ : List (Fin n) → TExps n → Set
-ModeCorrectᵃ xs []      = ⊤
-ModeCorrectᵃ xs (A ∷ Θ) = fv A ⊆ xs × ModeCorrectᵃ xs Θ
+_∈ᵥ_ : Fin Ξ → TExps Ξ → Set
+i ∈ᵥ As = L.Any (i ∈ₜ_) As
 
-module _ (xs₀ : List (Fin n)) where
-  Known : ArgsD n →  List (Fin n)
-  Known []                  = xs₀
-  Known (Θ ⊢[ Chk ] C ∷ Ds) =         Known Ds
-  Known (Θ ⊢[ Inf ] C ∷ Ds) = fv C ++ Known Ds
+_⊆ᵥ_ : TExp Ξ → TExps Ξ → Set
+A ⊆ᵥ As = ∀ {i} → i ∈ₜ A → i ∈ᵥ As
 
-  ModeCorrectᵃˢ : ArgsD n → Set
+ModeCorrectᵃ : TExps Ξ → TExps Ξ → Set
+ModeCorrectᵃ _  []      = ⊤
+ModeCorrectᵃ As (A ∷ Δ) = A ⊆ᵥ As × ModeCorrectᵃ As Δ
+
+module _ (A₀ : TExps Ξ) where
+  Known : ArgsD Ξ → TExps Ξ
+  Known []                  = A₀
+  Known (_ ⊢[ Chk ] _ ∷ Ds) =     Known Ds
+  Known (_ ⊢[ Inf ] A ∷ Ds) = A ∷ Known Ds
+
+  ModeCorrectᵃˢ : ArgsD Ξ → Set
   ModeCorrectᵃˢ []                  = ⊤
-  ModeCorrectᵃˢ (Θ ⊢[ Chk ] C ∷ Ds) = let xs = Known Ds in
-    fv C ⊆ xs × ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Θ ⊢[ Inf ] C ∷ Ds) = let xs = Known Ds in
-    ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
+  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = let As = Known Ds in
+     A ⊆ᵥ As × ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
+  ModeCorrectᵃˢ (Δ ⊢[ Inf ] A ∷ Ds) = let As = Known Ds in
+               ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
 
 ModeCorrectᶜ : ConD → Set
-ModeCorrectᶜ (ι Chk C Ds) = ModeCorrectᵃˢ (fv C) Ds
-ModeCorrectᶜ (ι Inf C Ds) = ModeCorrectᵃˢ []     ([] ⊢[ Chk ] C ∷ Ds)
+ModeCorrectᶜ (ι Chk A Ds) = ModeCorrectᵃˢ (A ∷ [])  Ds
+ModeCorrectᶜ (ι Inf A Ds) = ModeCorrectᵃˢ [] ([] ⊢[ Chk ] A ∷ Ds)
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)
+

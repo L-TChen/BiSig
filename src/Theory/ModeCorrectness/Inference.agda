@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K --rewriting #-}
+{-# OPTIONS --with-K #-}
 
 open import Prelude
   hiding (lookup; _⟨_⟩_)
@@ -9,13 +9,11 @@ import Syntax.BiTyped.Description as B
 import Theory.ModeCorrectness.Description as M
 
 module Theory.ModeCorrectness.Inference {SD : S.Desc}
-  (Id : Set) (_≟Id_ : (x y : Id) → Dec (x ≡ y))
-  (D : B.Desc SD) (mc : M.ModeCorrect SD Id D) where
+  (Id : Set) ⦃ decEqId : DecEq Id ⦄
+  (D : B.Desc SD) (mc : M.ModeCorrect SD D) where
 
-open import Syntax.Context                SD
-  renaming (Cxt to UCxt)
 open import Syntax.NamedContext           SD Id
-open import Syntax.NamedContext.Decidable _≟Id_
+open import Syntax.NamedContext.Decidable    Id
 
 open import Syntax.Simple SD
 
@@ -24,57 +22,32 @@ open import Syntax.BiTyped.Raw.Term                 Id D
   renaming (_⦂_ to infix 4 _⦂_)
 open import Syntax.BiTyped.Extrinsic.Functor     SD Id
 open import Syntax.BiTyped.Extrinsic.Term           Id D
-open import Syntax.BiTyped.Extrinsic.Properties     Id D
+
+-- open import Syntax.BiTyped.Extrinsic.Properties     Id D
 
 open import Theory.ModeCorrectness.UniqueSynthesised Id D mc
 
-open M SD Id
+open M SD
 open B SD
 
 private variable
   d   : Mode
   Ξ Θ : ℕ
   A B : TExp Θ
+  As  : TExps Θ
   xs  : List (Fin Ξ)
   Γ   : Cxt   Θ
   ρ   : TSub Ξ Θ
   t u : Raw Θ d
 
-Synthesisable : Cxt Θ → Raw⇒ Θ → Set
-Synthesisable Γ t = ∃[ A ] Γ ⊢ t ⇒ A
-
-Synthesisableᵃ
-  : (Δ : TExps Ξ) → TSub Ξ Θ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw⇒ Θ) → Set
-Synthesisableᵃ {Ξ} {Θ} Δ ρ Γ t = Σ[ A ∈ TExp Ξ ] ⟦ Δ ⟧ᵃ (Raw Θ) (_⊢_⇒ A ⟨ ρ ⟩) ρ Γ t
-
-Inheritable : Cxt Θ → Raw⇐ Θ → TExp Θ → Set
-Inheritable = _⊢_⇐_
-
-Inheritableᵃ
-  : (Δ : TExps Ξ) → TSub Ξ Θ → TExp Ξ → Cxt Θ → R.⟦ Δ ⟧ᵃ (Raw⇐ Θ) → Set
-Inheritableᵃ {Ξ} {Θ} Δ ρ A Γ t = ⟦ Δ ⟧ᵃ (Raw Θ) (_⊢_⇐ A ⟨ ρ ⟩) ρ Γ t
-
-module Maybe-Checker where
+module _ where mutual
   synthesise
     : (Γ : Cxt 0) (t : Raw⇒ 0)
-    → Dec (Synthesisable Γ t)
+    → Dec (∃[ A ] Γ ⊢ t ⇒ A)
 
   inherit
     : (Γ : Cxt 0) (t : Raw⇐ 0) (A : TExp 0)
-    → Dec (Inheritable Γ t A)
-
-  synthesise/inheritⁿ
-    : {Ds : ArgsD Ξ} → (ρ : TSub Ξ 0) (Γ : Cxt 0) (ts : R.⟦ Ds ⟧ᵃˢ (Raw 0)) 
-    → Maybe (⟦ Ds ⟧ᵃˢ (Raw 0) ⊢⇆ ρ Γ ts)
-
-  synthesiseᵃ
-    : (Δ : TExps Ξ) (ρ : TSub Ξ 0) (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇒ 0))
-    → Maybe (Synthesisableᵃ Δ ρ Γ t)
-
-  inheritᵃ
-    : (Δ : TExps Ξ) (ρ : TSub Ξ 0) (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇐ 0)) 
-      (A : TExp Ξ)
-    → Maybe (Inheritableᵃ Δ ρ A Γ t)
+    → Dec (Γ ⊢ t ⇐ A)
 
   synthesise Γ (` x)   with lookup Γ x
   ... | no  x∉       = no λ where (A , ⊢` x∈) → x∉ (A , x∈)
@@ -84,19 +57,48 @@ module Maybe-Checker where
   ... | no  ⊬t = no λ where (A , ⊢⦂ ⊢t) → ⊬t ⊢t
   ... | yes ⊢t = yes (A , ⊢⦂ ⊢t)
 
-  -- Mode correctness will be used in the inductive cases
-  synthesise Γ (op (i , eq , ts)) = {!!}
+  synthesise Γ (op (i , t@(eq , ts))) with synthesiseᶜ (Desc.rules D i) (mc i) eq Γ t
+  ... | no ⊬t  = no λ where (A , ⊢op _ ⊢t) → ⊬t (A , ⊢t)
+  ... | yes (A , ⊢t) = yes (A , ⊢op _ ⊢t)
 
   inherit Γ (t ↑)  A with synthesise Γ t
-  ... | no ⊬t = no λ where (⊢↑ refl ⊢t) → ⊬t (A , ⊢t)
+  ... | no  ⊬t = no λ where (⊢↑ refl ⊢t) → ⊬t (A , ⊢t)
   ... | yes (B , ⊢t) with A ≟ B
   ... | no ¬A=B = no (¬switch ⊢t ¬A=B)
   ... | yes A=B = yes (⊢↑ A=B ⊢t)
 
-  inherit Γ (op (i , eq , ts)) A = {!!}
+  inherit Γ (op (i , t@(eq , ts))) A with inheritᶜ (Desc.rules D i) (mc i) eq Γ t A
+  ... | no  ⊬t = no (λ where (⊢op _ ⊢t) → ⊬t ⊢t)
+  ... | yes ⊢t = yes (⊢op _ ⊢t)
+
+  synthesiseᶜ
+    : (D : ConD) → ModeCorrectᶜ D → ConD.mode D ≡ Inf
+    → (Γ : Cxt 0) (t : R.⟦ D ⟧ᶜ (Raw 0) Inf)
+    → Dec (∃[ A ] ⟦ D ⟧ᶜ ⊢⇆ Inf A Γ t)
+  synthesiseᶜ D (A⊆As , tt , SDs) refl Γ t = {!!}
+
+  inheritᶜ
+    : (D : ConD) → ModeCorrectᶜ D → ConD.mode D ≡ Chk
+    → (Γ : Cxt 0) (t : R.⟦ D ⟧ᶜ (Raw 0) Chk) (A : TExp 0)
+    → Dec (⟦ D ⟧ᶜ ⊢⇆ Chk A Γ t)
+  inheritᶜ (ι Chk A Ds) mc refl Γ t A₀ = {!!}
+
+  synthesise/inhertⁿ
+    : (Ds : ArgsD Ξ) → ModeCorrectᵃˢ As Ds
+    → (Γ : Cxt 0) (ts : R.⟦ Ds ⟧ᵃˢ (Raw 0))
+    → Dec {!!}
+  synthesise/inhertⁿ = {!!}
+
+  synthesiseᵃ
+    : (Δ : TExps Ξ) (ρ : TSub Ξ 0) (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇒ 0))
+    → Dec {!!}
+
+  inheritᵃ
+    : (Δ : TExps Ξ) (ρ : TSub Ξ 0) (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇐ 0)) 
+      (A : TExp Ξ)
+    → Dec {!!}
 
   synthesiseᵃ         = {!!}
 
   inheritᵃ            = {!!}
 
-  synthesise/inheritⁿ = {!!}

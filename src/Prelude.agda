@@ -13,8 +13,7 @@ open import Data.Empty.Polymorphic             public
 open import Data.Unit                          public
   using () renaming (⊤ to ⊤₀; tt to tt₀)
 open import Data.Unit.Polymorphic              public
-  using (⊤; tt)
-
+  using (⊤)
 open import Data.Maybe                         public
   using (Maybe; nothing; just)
 
@@ -38,7 +37,7 @@ module L where
   open import Data.List.Properties               public
 
   open import Data.List.Relation.Unary.Any       public
-    using (here; there; index)
+    using (Any; here; there; index)
   open import Data.List.Membership.Propositional public
     using (_∈_)
   open import Data.List.Membership.Propositional.Properties public
@@ -101,6 +100,8 @@ variable
 private variable
   m n l : ℕ
   A B C : Set ℓ
+  
+pattern tt = lift tt₀
 
 data Mode : Set where
   Chk Inf : Mode

@@ -1,135 +1,67 @@
-{-# OPTIONS --safe #-}
-
-module Example.Outline (Id : Set) where
+module Example.Outline where
 
 open import Prelude
 
 variable
-  d m m' m'' n : ℕ
+  n    : ℕ
   mode : Mode
 
+-- From parser generators to type-inferencer generators
+-- Using datatype-generic programming to quantify over simple type systems
+-- Only an overall picture in this file (no datatype-generic implementations)
+
+-- Simplest types (with metavariables)
+
 -- Syntax.Simple.Term
-data Ty (m : ℕ) : Set where
-  `_   : Fin m → Ty m
-  base : Ty m
-  imp  : Ty m → Ty m → Ty m
+data TExp (m : ℕ) : Set where
+  `_   : Fin m → TExp m
+  base : TExp m
+  imp  : TExp m → TExp m → TExp m
+
+-- Metavariables used only in typing rules and not elsewhere
+Ty : Set
+Ty = TExp 0
 
 variable
-  σ σ' τ : Ty m
+  σ τ : Ty
+  Γ   : List Ty
 
-TSub : ℕ → ℕ → Set
-TSub m m' = Vec (Ty m') m
+-- Simply typed λ-calculus, intrinsically scoped and typed
 
-variable
-  ts Γ : TSub _ _
+data Core : Ty → List Ty → Set where
+  `_  : τ ∈ Γ → Core τ Γ
+  app : Core (imp σ τ) Γ → Core σ Γ → Core τ Γ
+  abs : Core τ (σ ∷ Γ) → Core (imp σ τ) Γ
 
-tsub : TSub m m' → Ty m → Ty m'
-tsub ts (` i)     = V.lookup ts i
-tsub ts  base     = base
-tsub ts (imp t u) = imp (tsub ts t) (tsub ts u)
+-- The programmer writes untyped terms, whose types should be inferred
+-- General type inference quickly becomes undecidable; introduce type annotations
+-- Type checking subsumed by type inference
 
-compTSub : TSub m' m'' → TSub m m' → TSub m m''
-compTSub ts' ts = V.map (tsub ts') ts
+data Raw : ℕ → Set where
+  `_  : Fin n → Raw n
+  _∋_ : Ty → Raw n → Raw n
+  app : Raw n → Raw n → Raw n
+  abs : Raw (suc n) → Raw n
 
-tsub-comp : (ts : TSub m' m'') (us : TSub m m')
-          → tsub (compTSub ts us) ≐ tsub ts ∘ tsub us
-tsub-comp ts us (` i)     = V.lookup-map i (tsub ts) us
-tsub-comp ts us  base     = refl
-tsub-comp ts us (imp t u) = cong₂ imp (tsub-comp ts us t) (tsub-comp ts us u)
+variable r s : Raw _
 
-extTSub : (d : ℕ) → TSub m (d + m)
-extTSub d = tabulate (`_ ∘ (d ↑ʳ_))
+-- Including type annotations in typed terms to ensure that they are respected
 
--- assuming the existence of a base type
-baseTy : {m : ℕ} → Ty m
-baseTy = base
-
-fillBase : (d : ℕ) → TSub m m' → TSub (d + m) m'
-fillBase _ = V.replicate baseTy V.++_
-
-fillBase-extTSub : (d : ℕ) (ts : TSub m m')
-                 → compTSub (fillBase d ts) (extTSub d) ≡ ts
-fillBase-extTSub d ts =
-  begin
-    compTSub (fillBase d ts) (extTSub d)
-      ≡⟨ refl ⟩
-    V.map (tsub (fillBase d ts)) (tabulate (`_ ∘ (d ↑ʳ_)))
-      ≡⟨ sym (V.tabulate-∘ (tsub (fillBase d ts)) (`_ ∘ (d ↑ʳ_))) ⟩
-    tabulate (tsub (fillBase d ts) ∘ `_ ∘ (d ↑ʳ_))
-      ≡⟨ refl ⟩
-    tabulate (lookup (V.replicate base V.++ ts) ∘ (d ↑ʳ_))
-      ≡⟨ V.tabulate-cong (V.lookup-++ʳ {m = d} (V.replicate base) ts) ⟩
-    tabulate (lookup ts)
-      ≡⟨ V.tabulate∘lookup ts ⟩
-    ts
-  ∎
-  where open ≡-Reasoning
-
--- -- Syntax.BiTyped.RawNoMode.Term
--- data Parsed : Set where
---   `_  : Id → Parsed
---   _∋_ : Ty 0 → Parsed → Parsed
---   app : Parsed → Parsed → Parsed
---   abs : Id → Parsed → Parsed
-
-data Raw (m : ℕ) : ℕ → Set where
-  `_  : Fin n → Raw m n
-  _∋_ : Ty m → Raw m n → Raw m n
-  app : Raw m n → Raw m n → Raw m n
-  abs : Raw m (suc n) → Raw m n
-
-variable r s : Raw _ _
-
-mapRaw : (Ty m → Ty m') → Raw m n → Raw m' n
-mapRaw f (` i)     = ` i
-mapRaw f (τ ∋ r)   = f τ ∋ mapRaw f r
-mapRaw f (app r s) = app (mapRaw f r) (mapRaw f s)
-mapRaw f (abs r)   = abs (mapRaw f r)
-
-mapRaw-∘ : (f : Ty m' → Ty m'') (g : Ty m → Ty m')
-           (r : Raw m n) → mapRaw (f ∘ g) r ≡ mapRaw f (mapRaw g r)
-mapRaw-∘ f g (` i)     = refl
-mapRaw-∘ f g (τ ∋ r)   = cong (f (g τ) ∋_) (mapRaw-∘ f g r)
-mapRaw-∘ f g (app r s) = cong₂ app (mapRaw-∘ f g r) (mapRaw-∘ f g s)
-mapRaw-∘ f g (abs r)   = cong  abs (mapRaw-∘ f g r)
-
-mapRaw-cong : {f g : Ty m → Ty m'} → f ≐ g
-            → (r : Raw m n) → mapRaw f r ≡ mapRaw g r
-mapRaw-cong f≐g (` i)     = refl
-mapRaw-cong f≐g (τ ∋  r)  = cong₂ _∋_ (f≐g τ) (mapRaw-cong f≐g r)
-mapRaw-cong f≐g (app r s) = cong₂ app (mapRaw-cong f≐g r) (mapRaw-cong f≐g s)
-mapRaw-cong f≐g (abs r)   = cong  abs (mapRaw-cong f≐g r)
-
--- module _ where
-
---   private variable
---     iden : Id
---     i    : Fin n
---     ids  : Vec Id n
---     p p' : Parsed
-
-  -- data deBruijn : Parsed → ∀ {n} → Raw n → Vec Id n → Set where
-  --   `_  : ids [ i ]= iden → deBruijn (` iden) (` i) ids
-  --   _∋_ : σ ≡ τ → deBruijn p r ids → deBruijn (σ ∋ p) (τ ∋ r) ids
-  --   app : deBruijn p r ids → deBruijn p' r' ids → deBruijn (app p p') (app r r') ids
-  --   abs : deBruijn p r (iden ∷ ids) → deBruijn (abs iden p) (abs r) ids
-
-data Typed {m : ℕ} : Ty m → {n : ℕ} → Vec (Ty m) n → Set where
-  `_  : τ V.∈ Γ → Typed τ Γ
-  _∋_ : (τ : Ty m) → Typed τ Γ → Typed τ Γ
+data Typed : Ty → List Ty → Set where
+  `_  : τ ∈ Γ → Typed τ Γ
+  _∋_ : (τ : Ty) → Typed τ Γ → Typed τ Γ
   app : Typed (imp σ τ) Γ → Typed σ Γ → Typed τ Γ
   abs : Typed τ (σ ∷ Γ) → Typed (imp σ τ) Γ
 
-eraseType : {Γ : Vec (Ty m) n} → Typed τ Γ → Raw m n
-eraseType (` i)     = ` V.index i
+-- Goal: ‘invert’ the following function
+
+eraseType : Typed τ Γ → Raw (length Γ)
+eraseType (` i)     = ` L.index i
 eraseType (τ ∋ t)   = τ ∋  eraseType t
 eraseType (app t u) = app (eraseType t) (eraseType u)
 eraseType (abs t)   = abs (eraseType t)
 
-data Core {m : ℕ} : Ty m → {n : ℕ} → Vec (Ty m) n → Set where
-  `_  : τ V.∈ Γ → Core τ Γ
-  app : Core (imp σ τ) Γ → Core σ Γ → Core τ Γ
-  abs : Core τ (σ ∷ Γ) → Core (imp σ τ) Γ
+-- Remove type annotations for subsequent development
 
 toCore : Typed τ Γ → Core τ Γ
 toCore (` i)     = ` i
@@ -137,282 +69,159 @@ toCore (τ ∋ t)   = toCore t
 toCore (app t u) = app (toCore t) (toCore u)
 toCore (abs t)   = abs (toCore t)
 
--- record Typed' (f : Ty m → Ty m') (τ : Ty m') (Γ : Vec (Ty m) n) (r : Raw m n) : Set where
---   constructor _,_
---   field
---     term : Typed τ (V.map f Γ)
---     proof : eraseType term ≡ mapRaw f r
+-- Intrinsically enforcing the inversion equation (algebraic ornamentation)
+-- Typing τ Γ r  ≅  Σ[ t ∈ Typed τ Γ ] eraseType t ≡ r
 
--- map-∈ : ∀ {a b} {A : Set a} {B : Set b} {x n} {xs : Vec A n}
---         (f : A → B) → x V.∈ xs → f x V.∈ V.map f xs
--- map-∈ f (V.here eq) = V.here  (cong f eq)
--- map-∈ f (V.there i) = V.there (map-∈ f i)
+data Typing : Ty → (Γ : List Ty) → Raw (length Γ) → Set where
+  `_  : (i : τ ∈ Γ) → Typing τ Γ (` L.index i)
+  _∋_ : (τ : Ty) → Typing τ Γ r → Typing τ Γ (τ ∋ r)
+  app : Typing (imp σ τ) Γ r → Typing σ Γ s → Typing τ Γ (app r s)
+  abs : Typing τ (σ ∷ Γ) r → Typing (imp σ τ) Γ (abs r)
 
--- index-map-∈ : ∀ {a b} {A : Set a} {B : Set b} {x n} {xs : Vec A n}
---               (f : A → B) (i : x V.∈ xs) → V.index (map-∈ f i) ≡ V.index i
--- index-map-∈ f (V.here eq) = refl
--- index-map-∈ f (V.there i) = cong suc (index-map-∈ f i)
+-- Decide whether there is a typed term that erases to the given raw term
+-- (or a typing derivation for the given raw term)
+-- if the raw term satisfies some constraint, e.g., having enough type annotations
 
--- module Typed'EnrichedConstructors {f : Ty m → Ty m'} where
+TypeInference' : (∀ {n} → Raw n → Set) → Set
+TypeInference' P = (Γ : List Ty) (r : Raw (length Γ))
+                 → P r → Dec (Σ[ τ ∈ Ty ] Typing τ Γ r)
 
---   var' : (i : τ V.∈ Γ) → Typed' f (f τ) Γ (` V.index i)
---   var' i = (` map-∈ f i) , cong `_ (index-map-∈ f i)
+-- Decide whether a given raw term has a type
+-- or abort with the excuse that the term doesn’t satisfy the constraint
 
---   ann' : (τ : Ty m) → Typed' f (f τ) Γ r → Typed' f (f τ) Γ (τ ∋ r)
---   ann' τ (t , eq) = (f τ ∋ t) , cong (f τ ∋_) eq
+TypeInference : (∀ {n} → Raw n → Set) → Set
+TypeInference P = (Γ : List Ty) (r : Raw (length Γ))
+                → Dec (Σ[ τ ∈ Ty ] Typing τ Γ r) ⊎ ¬ P r
 
---   app' : Typed' f (imp σ τ) Γ r → Typed' f σ Γ s → Typed' f τ Γ (app r s)
---   app' (t , teq) (u , ueq) = app t u , cong₂ app teq ueq
+-- The second version is stronger (and more convenient to use)
 
---   abs' : Typed' f τ (σ ∷ Γ) r → Typed' f (imp (f σ) τ) Γ (abs r)
---   abs' (t , eq) = abs t , cong abs eq
+TypeInference-lemma : {P : ∀ {n} → Raw n → Set} → TypeInference P → TypeInference' P
+TypeInference-lemma infer Γ r p
+    with infer Γ r
+... | inl  d = d
+... | inr ¬p with ¬p p
+...          | ()
 
-data Typed' (f : Ty m → Ty m') : Ty m' → {n : ℕ} → TSub n m → Raw m n → Set where
-  `_  : (i : τ V.∈ Γ) → Typed' f (f τ) Γ (` V.index i)
-  _∋_ : (τ : Ty m) → Typed' f (f τ) Γ r → Typed' f (f τ) Γ (τ ∋ r)
-  app : Typed' f (imp σ τ) Γ r → Typed' f σ Γ s → Typed' f τ Γ (app r s)
-  abs : Typed' f τ (σ ∷ Γ) r → Typed' f (imp (f σ) τ) Γ (abs r)
-
-TypeInference : Set
-TypeInference = {m n : ℕ} (Γ : Vec (Ty m) n) (r : Raw m n)
-              → Dec (Σ[ m' ∈ ℕ ] Σ[ ts ∈ TSub m m' ] Σ[ τ ∈ Ty m' ] Typed' (tsub ts) τ Γ r)
-
-data Raw⇆ (m : ℕ) : ℕ → Mode → Set where
-  `_   : Fin n → Raw⇆ m n Inf
-  _∋_  : Ty m → Raw⇆ m n Chk → Raw⇆ m n Inf
-  _∋⇆_ : Ty m → Raw⇆ m n Chk → Raw⇆ m n Inf
-  _↑   : Raw⇆ m n Inf → Raw⇆ m n Chk
-  app  : Raw⇆ m n Inf → Raw⇆ m n Chk → Raw⇆ m n Inf
-  abs  : Raw⇆ m (suc n) Chk → Raw⇆ m n Chk
-
-variable
-  r' r'' s' : Raw⇆ _ _ _
-
-mapRaw⇆ : (Ty m → Ty m') → Raw⇆ m n mode → Raw⇆ m' n mode
-mapRaw⇆ f (` i)     = ` i
-mapRaw⇆ f (τ ∋  r)  = f τ ∋  mapRaw⇆ f r
-mapRaw⇆ f (τ ∋⇆ r)  = f τ ∋⇆ mapRaw⇆ f r
-mapRaw⇆ f (r ↑)     = mapRaw⇆ f r ↑
-mapRaw⇆ f (app r s) = app (mapRaw⇆ f r) (mapRaw⇆ f s)
-mapRaw⇆ f (abs r)   = abs (mapRaw⇆ f r)
-
-data AddMeta {d m : ℕ} : {n : ℕ} → Raw m n → {mode : Mode} → Raw⇆ (d + m) n mode → Set where
-  `_   : (i : Fin n) → AddMeta (` i) (` i)
-  _∋_  : (τ : Ty m) → AddMeta r r' → AddMeta (τ ∋ r) (tsub (extTSub d) τ ∋ r')
-  _∋⇆_ : (i : Fin (d + m)) → AddMeta r r' → AddMeta r ((` i) ∋⇆ r')
-  _↑   : AddMeta r r' → AddMeta r (r' ↑)
-  app  : AddMeta r r' → AddMeta s s' → AddMeta (app r s) (app r' s')
-  abs  : AddMeta r r' → AddMeta (abs r) (abs r')
-
--- eraseMode : Raw⇆ m n mode → Maybe (Raw m n)
--- eraseMode (` i)     = ⦇ (` i) ⦈
--- eraseMode (τ ∋  r)  = ⦇ (τ ∋_) (eraseMode r) ⦈
--- eraseMode (τ ∋⇆ r)  = if isYes (isVar τ) then eraseMode r else nothing
--- eraseMode (r ↑)     =        eraseMode r
--- eraseMode (app r s) = ⦇ app (eraseMode r) (eraseMode s) ⦈
--- eraseMode (abs r)   = ⦇ abs (eraseMode r) ⦈
-
--- eraseMode-mapRaw⇆ : (f : Ty m → Ty m') (r : Raw⇆ m n mode)
---                   → eraseMode (mapRaw⇆ f r) ≡ mapRaw f (eraseMode r)
--- eraseMode-mapRaw⇆ f (` i)     = refl
--- eraseMode-mapRaw⇆ f (τ ∋  r)  = cong (f τ ∋_) (eraseMode-mapRaw⇆ f r)
--- eraseMode-mapRaw⇆ f (τ ∋⇆ r)  = eraseMode-mapRaw⇆ f r
--- eraseMode-mapRaw⇆ f (r ↑)     = eraseMode-mapRaw⇆ f r
--- eraseMode-mapRaw⇆ f (app r s) = cong₂ app (eraseMode-mapRaw⇆ f r) (eraseMode-mapRaw⇆ f s)
--- eraseMode-mapRaw⇆ f (abs r)   = cong  abs (eraseMode-mapRaw⇆ f r)
-
--- record Raw⇆' (m n : ℕ) (mode : Mode) (r : Raw m n) : Set where
---   constructor _,_
---   field
---     term : Raw⇆ m n mode
---     proof : eraseMode term ≡ just r
-
-Bidirectionalisation : Set
-Bidirectionalisation = {m n : ℕ} (r : Raw m n)
-                     → Σ[ d ∈ ℕ ] Σ[ r' ∈ Raw⇆ (d + m) n Inf ] AddMeta r r'
+-- Bidirectional type system for STLC
+-- Terms are syntactically classified into two categories
+-- based on whether their types can be inferred or (only) checked
+-- If a bidirectional type system is designed well (i.e., mode-correct),
+-- from inferred types we can derive what the types of checked terms should be
 
 -- ~ Syntax.BiTyped.Intrinsic.Term
-data Typed⇆ {m : ℕ} : Ty m → {n : ℕ} → (Γ : Vec (Ty m) n) → Mode → Set where
-  `_   : (i : τ V.∈ Γ) → Typed⇆ τ Γ Inf
-  _∋_  : (τ : Ty m) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
-  _∋⇆_ : (τ : Ty m) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
+data Typed⇆ : Ty → List Ty → Mode → Set where
+  `_   : (i : τ ∈ Γ) → Typed⇆ τ Γ Inf  -- context is known
+  _∋_  : (τ : Ty) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
   _↑_  : Typed⇆ σ Γ Inf → σ ≡ τ → Typed⇆ τ Γ Chk
   app  : Typed⇆ (imp σ τ) Γ Inf → Typed⇆ σ Γ Chk → Typed⇆ τ Γ Inf
   abs  : Typed⇆ τ (σ ∷ Γ) Chk → Typed⇆ (imp σ τ) Γ Chk
 
-eraseType⇆ : {Γ : Vec (Ty m) n} → Typed⇆ τ Γ mode → Raw⇆ m n mode
-eraseType⇆ (` i)     = ` V.index i
-eraseType⇆ (τ ∋  t)  = τ ∋  eraseType⇆ t
-eraseType⇆ (τ ∋⇆ t)  = τ ∋⇆ eraseType⇆ t
+-- Bidirectional raw terms, retaining only the modes
+
+-- It is possible to syntactically decide whether there are enough type annotations:
+-- wherever a checked term needs to be used as an inferred term,
+-- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
+
+data Raw⇆ : ℕ → Mode → Set where
+  `_   : Fin n → Raw⇆ n Inf
+  _∋_  : Ty → Raw⇆ n Chk → Raw⇆ n Inf
+  _↑   : Raw⇆ n Inf → Raw⇆ n Chk
+  app  : Raw⇆ n Inf → Raw⇆ n Chk → Raw⇆ n Inf
+  abs  : Raw⇆ (suc n) Chk → Raw⇆ n Chk
+
+variable r' s' : Raw⇆ _ _
+
+-- First step: see if we can successfully assign modes to raw terms
+-- Same inversion story
+
+eraseMode : Raw⇆ n mode → Raw n
+eraseMode (` i)       = ` i
+eraseMode (τ ∋ r')    = τ ∋ eraseMode r'
+eraseMode (r' ↑)      = eraseMode r'
+eraseMode (app r' s') = app (eraseMode r') (eraseMode s')
+eraseMode (abs r')    = abs (eraseMode r')
+
+data HasMode : {n : ℕ} → Mode → Raw n → Set where
+  `_  : (i : Fin n) → HasMode Inf (` i)
+  _∋_ : (τ : Ty) → HasMode Chk r → HasMode Inf (τ ∋ r)
+  _↑  : HasMode Inf r → HasMode Chk r
+  app : HasMode Inf r → HasMode Chk s → HasMode Inf (app r s)
+  abs : HasMode Chk r → HasMode Chk (abs r)
+
+Bidirectionalisation : Set
+Bidirectionalisation = {n : ℕ} (r : Raw n) → Dec (HasMode Inf r)
+
+toRaw⇆ : {r : Raw n} → HasMode mode r → Raw⇆ n mode
+toRaw⇆ (` i)     = ` i
+toRaw⇆ (τ ∋ p)   = τ ∋ toRaw⇆ p
+toRaw⇆ (p ↑)     = toRaw⇆ p ↑
+toRaw⇆ (app p q) = app (toRaw⇆ p) (toRaw⇆ q)
+toRaw⇆ (abs p)   = abs (toRaw⇆ p)
+
+-- Second step: bidirectional type inference
+-- Same inversion story again!
+
+eraseType⇆ : Typed⇆ τ Γ mode → Raw⇆ (length Γ) mode
+eraseType⇆ (` i)     = ` L.index i
+eraseType⇆ (τ ∋ t)   = τ ∋ eraseType⇆ t
 eraseType⇆ (t ↑ eq)  = (eraseType⇆ t) ↑
 eraseType⇆ (app t u) = app (eraseType⇆ t) (eraseType⇆ u)
 eraseType⇆ (abs t)   = abs (eraseType⇆ t)
 
--- record Typed⇆' (f : Ty (d + m) → Ty m') (τ : Ty m') (Γ : TSub n m)
---                (r : Raw⇆ (d + m) n mode) : Set where
---   constructor _,_
---   field
---     term : Typed⇆ τ (V.map (f ∘ tsub (extTSub d)) Γ) mode
---     proof : eraseType⇆ term ≡ mapRaw⇆ f r
-
--- module Typed⇆'EnrichedConstructors {f : Ty (d + m) → Ty m'} {Γ : TSub n m} where
-
---   var' : (i : τ V.∈ Γ) → Typed⇆' f (f (tsub (extTSub d) τ)) Γ (` V.index i)
---   var' i = (` map-∈ (f ∘ tsub (extTSub d)) i) ,
---            cong `_ (index-map-∈ (f ∘ tsub (extTSub d)) i)
-
---   ann' : (τ : Ty (d + m)) → Typed⇆' f (f τ) Γ r' → Typed⇆' f (f τ) Γ (τ ∋ r')
---   ann' τ (t , eq) = (f τ ∋ t) , cong (f τ ∋_) eq
-
---   ann⇆' : (τ : Ty (d + m)) → Typed⇆' f (f τ) Γ r' → Typed⇆' f (f τ) Γ (τ ∋⇆ r')
---   ann⇆' τ (t , eq) = (f τ ∋⇆ t) , cong (f τ ∋⇆_) eq
-
---   emb' : Typed⇆' f σ Γ r' → σ ≡ τ → Typed⇆' f τ Γ (r' ↑)
---   emb' (t , eq) eq' = (t ↑ eq') , cong _↑ eq
-
---   app' : Typed⇆' f (imp σ τ) Γ r' → Typed⇆' f σ Γ s' → Typed⇆' f τ Γ (app r' s')
---   app' (t , teq) (u , ueq) = app t u , cong₂ app teq ueq
-
---   abs' : Typed⇆' f τ (σ ∷ Γ) r' → Typed⇆' f (imp (f (tsub (extTSub d) σ)) τ) Γ (abs r')
---   abs' (t , eq) = abs t , cong abs eq
-
-data Typed⇆' (f : Ty (d + m) → Ty m') :
-  Ty m' → {n : ℕ} → Vec (Ty m) n → {mode : Mode} → Raw⇆ (d + m) n mode → Set where
-  `_   : (i : τ V.∈ Γ) → Typed⇆' f (f (tsub (extTSub d) τ)) Γ (` V.index i)
-  _∋_  : (τ : Ty (d + m)) → Typed⇆' f (f τ) Γ r' → Typed⇆' f (f τ) Γ (τ ∋  r')
-  _∋⇆_ : (τ : Ty (d + m)) → Typed⇆' f (f τ) Γ r' → Typed⇆' f (f τ) Γ (τ ∋⇆ r')
-  _↑_  : Typed⇆' f σ Γ r' → σ ≡ τ → Typed⇆' f τ Γ (r' ↑)
-  app  : Typed⇆' f (imp σ τ) Γ r' → Typed⇆' f σ Γ s' → Typed⇆' f τ Γ (app r' s')
-  abs  : Typed⇆' f τ (σ ∷ Γ) r' → Typed⇆' f (imp (f (tsub (extTSub d) σ)) τ) Γ (abs r')
+data Typing⇆ : Ty → (Γ : List Ty) {mode : Mode} → Raw⇆ (length Γ) mode → Set where
+  `_  : (i : τ ∈ Γ) → Typing⇆ τ Γ (` L.index i)
+  _∋_ : (τ : Ty) → Typing⇆ τ Γ r' → Typing⇆ τ Γ (τ ∋ r')
+  _↑_ : Typing⇆ σ Γ r' → σ ≡ τ → Typing⇆ τ Γ (r' ↑)
+  app : Typing⇆ (imp σ τ) Γ r' → Typing⇆ σ Γ s' → Typing⇆ τ Γ (app r' s')
+  abs : Typing⇆ τ (σ ∷ Γ) r' → Typing⇆ (imp σ τ) Γ (abs r')
 
 TypeInference⇆ : Set
-TypeInference⇆ = {d m n : ℕ} (Γ : TSub n m) (r : Raw⇆ (d + m) n Inf)
-               → Dec (Σ[ m' ∈ ℕ ] Σ[ ts ∈ TSub (d + m) m' ] Σ[ τ ∈ Ty m' ]
-                      Typed⇆' (tsub ts) τ Γ r)
+TypeInference⇆ = (Γ : List Ty) (r' : Raw⇆ (length Γ) Inf)
+               → Dec (Σ[ τ ∈ Ty ] Typing⇆ τ Γ r')
+
+-- Eventually we want to perform ordinary type inference (the spec)
+-- using bidirectional type inference (the impl);
+-- the two type systems should be somehow related to make that possible
 
 Soundness : Set
-Soundness = ∀ {d m m' n τ Γ mode} {ts : TSub (d + m) m'}
-              {r : Raw m n} {r' : Raw⇆ (d + m) n mode} → AddMeta r r'
-            → Typed⇆' (tsub ts) τ Γ r' → Typed' (tsub ts ∘ tsub (extTSub d)) τ Γ r
-
-Completeness : Set
-Completeness = ∀ {d m m' n τ Γ mode} {ts : TSub (d + m) m'}
-                 {r : Raw m n} {r' : Raw⇆ (d + m) n mode} → AddMeta r r'
-               → Typed' (tsub ts ∘ tsub (extTSub d)) τ Γ r
-               → Σ[ ts' ∈ TSub (d + m) m' ] Typed⇆' (tsub ts') τ Γ r'
-
--- module Implementation (bidir : Bidirectionalisation) (inf⇆ : TypeInference⇆)
---                       (soundness : Soundness) (completeness : Completeness) where
-
---   open ≡-Reasoning
-
---   inf : TypeInference
---   inf Γ r with bidir r
---   ... | d , r' , a = map′
---     (λ { (m' , τ , ts , t) →
---           m' , τ , compTSub ts (extTSub d) ,
---           {!   !} })
---     {!   !}
---     (inf⇆ (V.map (tsub (extTSub d)) Γ) r')
-
--- module Implementation (bidir : Bidirectionalisation) (inf⇆ : TypeInference⇆)
---                       (soundness : Soundness) (completeness : Completeness) where
-
---   open ≡-Reasoning
-
---   inf : TypeInference
---   inf Γ r =
---     let (d , r') = bidir r
---     in  map′
---           (λ { (m' , τ , ts , t) →
---                 m' , τ , compTSub ts (extTSub d) ,
---                 subst₂ (Typed' τ)
---                   (begin
---                      V.map (tsub ts) (V.map (tsub (extTSub d)) Γ)
---                        ≡⟨ sym (V.map-∘ (tsub ts) (tsub (extTSub d)) Γ) ⟩
---                      V.map (tsub ts ∘ tsub (extTSub d)) Γ
---                        ≡⟨ sym (V.map-cong (tsub-comp ts (extTSub d)) Γ) ⟩
---                      V.map (tsub (compTSub ts (extTSub d))) Γ
---                    ∎)
---                   (begin
---                      eraseMode (mapRaw⇆ (tsub ts) (Raw⇆'.term r'))
---                        ≡⟨ eraseMode-mapRaw⇆ (tsub ts) (Raw⇆'.term r') ⟩
---                      mapRaw (tsub ts) (eraseMode (Raw⇆'.term r'))
---                        ≡⟨ cong (mapRaw (tsub ts)) (Raw⇆'.proof r') ⟩
---                      mapRaw (tsub ts) (mapRaw (tsub (extTSub d)) r)
---                        ≡⟨ sym (mapRaw-∘ (tsub ts) (tsub (extTSub d)) r) ⟩
---                      mapRaw (tsub ts ∘ tsub (extTSub d)) r
---                        ≡⟨ sym (mapRaw-cong (tsub-comp ts (extTSub d)) r) ⟩
---                      mapRaw (tsub (compTSub ts (extTSub d))) r
---                    ∎)
---                   (soundness t) })
---           (λ { (m' , τ , ts , t) →
---                 m' , τ , fillBase d ts ,
---                 completeness
---                   (subst₂ (Typed' τ)
---                      (begin
---                         V.map (tsub ts) Γ
---                           ≡⟨ sym (V.map-cong (λ σ → cong (flip tsub σ) (fillBase-extTSub d ts)) Γ) ⟩
---                         V.map (tsub (compTSub (fillBase d ts) (extTSub d))) Γ
---                           ≡⟨ V.map-cong (tsub-comp (fillBase d ts) (extTSub d)) Γ ⟩
---                         V.map (tsub (fillBase d ts) ∘ tsub (extTSub d)) Γ
---                           ≡⟨ V.map-∘ (tsub (fillBase d ts)) (tsub (extTSub d)) Γ ⟩
---                         V.map (tsub (fillBase d ts)) (V.map (tsub (extTSub d)) Γ)
---                       ∎)
---                      (begin
---                         mapRaw (tsub ts) r
---                           ≡⟨ sym (mapRaw-cong (λ σ → cong (flip tsub σ) (fillBase-extTSub d ts)) r) ⟩
---                         mapRaw (tsub (compTSub (fillBase d ts) (extTSub d))) r
---                           ≡⟨ mapRaw-cong (tsub-comp (fillBase d ts) (extTSub d)) r ⟩
---                         mapRaw (tsub (fillBase d ts) ∘ tsub (extTSub d)) r
---                           ≡⟨ mapRaw-∘ (tsub (fillBase d ts)) (tsub (extTSub d)) r ⟩
---                         mapRaw (tsub (fillBase d ts)) (mapRaw (tsub (extTSub d)) r)
---                           ≡⟨ cong (mapRaw (tsub (fillBase d ts))) (sym (Raw⇆'.proof r')) ⟩
---                         mapRaw (tsub (fillBase d ts)) (eraseMode (Raw⇆'.term r'))
---                           ≡⟨ sym (eraseMode-mapRaw⇆ (tsub (fillBase d ts)) (Raw⇆'.term r')) ⟩
---                         eraseMode (mapRaw⇆ (tsub (fillBase d ts)) (Raw⇆'.term r'))
---                       ∎)
---                      t) })
---           (inf⇆ (V.map (tsub (extTSub d)) Γ) (Raw⇆'.term r'))
+Soundness = {τ : Ty} {Γ : List Ty} {r : Raw (length Γ)} {mode : Mode}
+            (p : HasMode mode r) → Typing⇆ τ Γ (toRaw⇆ p) → Typing τ Γ r
 
 soundness : Soundness
 soundness (` ._)    (` i)      = ` i
-soundness (τ ∋ a)   (._ ∋ t)   = τ ∋ (soundness a t)
-soundness (i ∋⇆ a)  (._ ∋⇆ t)  = soundness a t
-soundness (a ↑)     (t ↑ refl) = soundness a t
-soundness (app a b) (app t u)  = app (soundness a t) (soundness b u)
-soundness (abs a)   (abs t)    = abs (soundness a t)
+soundness (._ ∋ p)  (τ ∋ t)    = τ ∋ soundness p t
+soundness (p ↑)     (t ↑ refl) = soundness p t
+soundness (app p q) (app t u)  = app (soundness p t) (soundness q u)
+soundness (abs p)   (abs t)    = abs (soundness p t)
 
--- completeness : Completeness
--- completeness (` ._) (var i refl) = _ , var i refl
--- completeness (τ ∋  a) (ann .τ eq t) = {!   !} , ann (tsub (extTSub _) τ) {!   !} (proj₂ (completeness a t))
--- completeness (ann⇆ a eq)  t = {! completeness a t  !}
--- completeness (a ↑)     t = {!   !}
--- completeness (app a b) t = {!   !}
--- completeness (abs a)   t = {!   !}
+Completeness : Set
+Completeness = {τ : Ty} {Γ : List Ty} {r : Raw (length Γ)} {mode : Mode}
+               (p : HasMode mode r) → Typing τ Γ r → Typing⇆ τ Γ (toRaw⇆ p)
 
--- map≡just : ∀ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} (f : A → B) (ma : Maybe A) {b : B}
---          → M.map f ma ≡ just b → Σ[ a ∈ A ] ma ≡ just a × f a ≡ b
--- map≡just f (just a) refl = a , refl , refl
+completeness : Completeness
+completeness (` ._)    (` i)     = ` i
+completeness (._ ∋ p)  (τ ∋ t)   = τ ∋ completeness p t
+completeness (p ↑)     t         = completeness p t ↑ refl
+completeness (app p q) (app t u) = app (completeness p t) (completeness q u)
+completeness (abs p)   (abs t)   = abs (completeness p t)
 
--- module _ where
+infer : Bidirectionalisation → TypeInference⇆
+      → Soundness → Completeness
+      → TypeInference (HasMode Inf)
+infer bidir infer⇆ s c Γ r with bidir r
+... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇆ Γ (toRaw⇆ p)))
+... | no ¬p = inr ¬p
 
-  -- open Typed'EnrichedConstructors
+{-
 
-  -- soundness : Soundness
-  -- soundness (` ._)    ((` i)      , refl) = {! var' i !}
-  -- soundness (τ ∋  a)  ((._ ∋  t)  , eq  ) = {! (soundness a (t , refl)) !}
-  -- soundness (i ∋⇆ a)  ((._ ∋⇆ t)  , eq  ) = {! ann' (` i) (soundness a (t , refl)) !}
-  -- soundness (a ↑)     ((t ↑ refl) , eq  ) = {! soundness a (t , refl) !}
-  -- soundness (app a b) (app t u    , eq  ) = {! app' (soundness a (t , refl)) (soundness b (u , refl)) !}
-  -- soundness (abs a)   (abs t      , eq  ) = {! abs' (soundness a (t , refl)) !}
+Core τ Γ   ←   Typed τ Γ
 
--- completeness : Completeness
--- completeness {r = ` i} t = {!   !}
--- completeness {r = σ ∋  r} ((τ ∋ t) , eq) = let (t' , eq') = completeness (t , {!   !})
---                                            in  (τ ∋ t') , cong₂ _∋_ {!   !} eq'
--- completeness {r = σ ∋⇆ r} (     t  , eq) = let (t' , eq') = completeness {r = r} (t , eq)
---                                            in  (_ ∋⇆ t') , {!   !}
--- completeness {r = r ↑} t = {!   !}
--- completeness {r = app r s} t = {!   !}
--- completeness {r = abs r} t = {!   !}
+                 ↑
+
+               Typing τ Γ r            ←           Typing⇆ τ Γ Inf r'
+
+                 ↑                                    ↑
+
+               r : Raw n   →   HasMode Inf r   →   r' : Raw⇆ n Inf
+
+-}

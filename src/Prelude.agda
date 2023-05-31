@@ -38,7 +38,7 @@ module L where
   open import Data.List.Properties               public
 
   open import Data.List.Relation.Unary.Any       public
-    using (here; there)
+    using (here; there; index)
   open import Data.List.Membership.Propositional public
     using (_∈_)
   open import Data.List.Membership.Propositional.Properties public

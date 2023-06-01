@@ -26,6 +26,9 @@ Tm₀ = Tm 0
 Tms : ℕ → Set
 Tms Θ = List (Tm Θ)
 
+Tms₀ : Set
+Tms₀ = List Tm₀
+
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
   fold (` x)             = α .var x
@@ -43,7 +46,7 @@ mutual
   fvⁿ : Tm Θ ^ n → List (Fin Θ)
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
-  
+
 mutual
   size : Tm Θ → ℕ
   size (` x)      = 1
@@ -52,7 +55,7 @@ mutual
   sizeⁿ : Tm Θ ^ n → ℕ
   sizeⁿ []       = 0
   sizeⁿ (t ∷ ts) = size t + sizeⁿ ts
-  
+
 mutual
   _≟ₜ_ : (t u : Tm Θ) → Dec (t ≡ u)
   (` x) ≟ₜ (` y) with  x ≟ y
@@ -77,7 +80,7 @@ mutual
 -- [TODO] Generalise it to an Any predicate
 infix 4 _∈ₜ_ _∈ₜₛ_ _∈ₜ?_ _∈ₜₛ?_ _∉ₜ_ _∉ₜₛ_
 
-mutual 
+mutual
   data _∈ₜ_ (x : Fin Θ) : Tm Θ → Set where
     here : {y : Fin Θ} → x ≡ y → x ∈ₜ ` y
     ops  : {n : ℕ} {i : n ∈ D} {ts : Tm Θ ^ n}
@@ -87,7 +90,7 @@ mutual
     head : {t : Tm Θ} {ts : Tm Θ ^ n}
       → (x∈ : x ∈ₜ t) → x ∈ₜₛ (t ∷ ts)
     tail : {t : Tm Θ} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ₜₛ ts) 
+      → (x∈ : x ∈ₜₛ ts)
       → x ∈ₜₛ (t ∷ ts)
 
 _∉ₜ_ : (x : Fin Θ) → Tm Θ → Set
@@ -122,7 +125,7 @@ length∈ₜₛ (tail x∈) = suc (length∈ₜₛ x∈)
 
 lookup∈ₜₛ : {x : Fin Θ} {ts : Tm Θ ^ n}
   → (i : x ∈ₜₛ ts)
-  → x ∈ₜ lookup ts (length∈ₜₛ i) 
+  → x ∈ₜ lookup ts (length∈ₜₛ i)
 lookup∈ₜₛ (head x∈) = x∈
 lookup∈ₜₛ (tail x∈) = lookup∈ₜₛ x∈
 
@@ -141,7 +144,7 @@ module _ (ρ : Ren Θ n) where mutual
     → Tm Θ ^ l → Tm n ^ l
   renameⁿ []        = []
   renameⁿ (t ∷ ts) = rename t ∷ renameⁿ ts
-  
+
 Ren-id : Ren Θ Θ
 Ren-id = λ i → i -- allFin _
 
@@ -202,7 +205,7 @@ wk≤ˡ (less-than-or-equal refl) = wkˡ
 
 weaken : Tm Θ → Tm (suc Θ)
 weaken = rename suc -- rename $ tabulate suc
--} 
+-}
 mutual
   punchOutTm : {x : Fin (suc Θ)} {t : Tm (suc Θ)}
     → ¬ x ∈ₜ t → Tm Θ
@@ -230,7 +233,7 @@ punchInTmⁿ x = renameⁿ (punchIn x) -- renameⁿ (tabulate (punchIn x))
 record Step (Θ : ℕ) : Set where
   constructor step
   field
-    {iᵤ iₜ} : ℕ 
+    {iᵤ iₜ} : ℕ
     pos : iᵤ ʳ+ suc iₜ ∈ D
     us  : Tm Θ ^ iᵤ
     ts  : Tm Θ ^ iₜ
@@ -257,13 +260,13 @@ module _ {x : Fin Θ} where mutual
   walk : {t : Tm Θ}
     → x ∈ₜ t → Steps Θ
   walk (here x)                      = []
-  walk (ops {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈  
+  walk (ops {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈
 
   walkTms : m ʳ+ (suc n) ∈ D
     → (t : Tm Θ) (us : Tm Θ ^ m) (ts : Tm Θ ^ n)
     → (x∈ : x ∈ₜₛ t ∷ ts)
     → Steps Θ
-  walkTms i t₀ us ts (head x∈) = 
+  walkTms i t₀ us ts (head x∈) =
     step i us ts ∷ walk x∈
   walkTms i t₀ us (t ∷ ts) (tail x∈) =
     walkTms i t (t₀ ∷ us) ts x∈
@@ -272,10 +275,10 @@ _≺_ : Tm Θ → Tm Θ → Set
 _≺_ = _<_ on size
 
 ≺-wf : WellFounded (_≺_ {Θ})
-≺-wf = On.wellFounded size <-wf 
+≺-wf = On.wellFounded size <-wf
 
 ------------------------------------------------------------------------------
--- Instances of Presheaves 
+-- Instances of Presheaves
 
 open ≡-Reasoning
 
@@ -313,7 +316,7 @@ Ren-assoc σ ρ γ = refl
   lookup (tabulate (λ i → lookup γ (lookup ρ i))) (lookup σ i)
     ∎)
   -}
-    
+
 module _ {Θ : ℕ} where mutual
   sub-id : (t : Tm Θ)
     → sub Sub-id t ≡ t
@@ -346,7 +349,7 @@ opaque
     : (σ : Sub Θ Θ₁) (ρ : Sub Θ₁ Θ₂) (γ : Sub Θ₂ Θ₃)
     → Sub-⨟ (Sub-⨟ σ ρ) γ ≡ Sub-⨟ σ (Sub-⨟ ρ γ)
   Sub-assoc σ ρ γ = tabulate-cong (λ i → begin
-    sub γ (sub (Sub-⨟ σ ρ) (` i)) 
+    sub γ (sub (Sub-⨟ σ ρ) (` i))
       ≡⟨ cong (sub γ ) (sub-⨟ σ ρ (` i)) ⟩
     sub γ (sub ρ (sub σ (` i)))
       ≡⟨ sym $ sub-⨟ ρ γ (sub σ $ ` i) ⟩
@@ -354,16 +357,16 @@ opaque
       ∎)
 
   Sub-⨟-idᵣ : (σ : Sub Θ n)
-    → Sub-⨟ σ Sub-id ≡ σ 
+    → Sub-⨟ σ Sub-id ≡ σ
   Sub-⨟-idᵣ σ = begin
     Sub-⨟ σ Sub-id
       ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
-    tabulate (λ i → lookup σ i) 
+    tabulate (λ i → lookup σ i)
       ≡⟨ tabulate∘lookup σ ⟩
     σ
       ∎
 
-  Sub-⨟-idₗ : (σ : Sub Θ n) → Sub-⨟ Sub-id σ ≡ σ 
+  Sub-⨟-idₗ : (σ : Sub Θ n) → Sub-⨟ Sub-id σ ≡ σ
   Sub-⨟-idₗ σ = begin
     Sub-⨟ Sub-id σ
       ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
@@ -399,7 +402,7 @@ instance
 
   SubIsCategory : IsCategory ℕ Sub
   SubIsCategory .id      = Sub-id
-  SubIsCategory ._⨟_     = Sub-⨟ 
+  SubIsCategory ._⨟_     = Sub-⨟
   SubIsCategory .⨟-assoc = Sub-assoc
   SubIsCategory .⨟-idᵣ   = Sub-⨟-idᵣ
   SubIsCategory .⨟-idₗ   = Sub-⨟-idₗ
@@ -424,7 +427,7 @@ instance
   TmRenIsPresheaf : IsPresheaf Tm
   TmRenIsPresheaf ._⟨_⟩ t ρ = rename ρ t
   TmRenIsPresheaf .⟨⟩-id t    = rename-id t
-  TmRenIsPresheaf .⟨⟩-⨟ σ ρ t = rename-⨟ σ ρ t 
+  TmRenIsPresheaf .⟨⟩-⨟ σ ρ t = rename-⨟ σ ρ t
 
   TmsRenIsPresheaf : IsPresheaf (λ Θ → Tm Θ ^ n)
   TmsRenIsPresheaf ._⟨_⟩ ts ρ = renameⁿ ρ ts

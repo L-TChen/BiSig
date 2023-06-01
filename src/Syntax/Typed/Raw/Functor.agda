@@ -5,25 +5,29 @@ open import Prelude
 import Syntax.Simple.Description as S
 import Syntax.Typed.Description  as T
 
-module Syntax.Typed.Raw.Functor (SD : S.Desc) (Id : Set) where
+module Syntax.Typed.Raw.Functor (SD : S.Desc) where
 
 open import Syntax.Simple SD
 open T SD
 
 private variable
-  n m : ℕ
-  A B : Set
+  n Ξ : ℕ
 
-⟦_⟧ᵃ : (Δ : TExps n) → Set ℓ → Set ℓ
-⟦ []    ⟧ᵃ X = X
-⟦ A ∷ Δ ⟧ᵃ X = Id × ⟦ Δ ⟧ᵃ X
+Fam : (ℓ : Level) → Set (lsuc ℓ)
+Fam ℓ = ℕ → Set ℓ
 
-⟦_⟧ᵃˢ : (ADs : ArgsD n) (X : Set ℓ) → Set ℓ
-⟦ []         ⟧ᵃˢ _ = ⊤
-⟦ Δ ⊢ A ∷ Ds ⟧ᵃˢ X = ⟦ Δ ⟧ᵃ X × ⟦ Ds ⟧ᵃˢ X
+Fam₀ : Set₁
+Fam₀ = Fam lzero
 
-⟦_⟧ᶜ : (D : ConD) (X : Set ℓ) → Set ℓ
+⟦_⟧ᵃ : (Δ : TExps Ξ) → Fam ℓ → Fam ℓ
+⟦ Δ ⟧ᵃ X n = X (length Δ + n)
+
+⟦_⟧ᵃˢ : (ADs : ArgsD Ξ) (X : Fam ℓ) → Fam ℓ
+⟦ []           ⟧ᵃˢ _ _ = ⊤
+⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X n = ⟦ Δ ⟧ᵃ X n × ⟦ Ds ⟧ᵃˢ X n
+
+⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ
 ⟦ ι _ D ⟧ᶜ X = ⟦ D ⟧ᵃˢ X
 
-⟦_⟧ : (D : Desc) (X : Set ℓ) → Set ℓ
-⟦ D ⟧ X = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X
+⟦_⟧ : (D : Desc) → Fam ℓ → Fam ℓ
+⟦ D ⟧ X n = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X n

@@ -1,5 +1,30 @@
 
 
+@inproceedings{Xie2018,
+  address =       {Cham},
+  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
+  booktitle =     {Programming Languages and Systems. ESOP 2018},
+  editor =        {Ahmed, Amal},
+  pages =         {272--299},
+  publisher =     {Springer International Publishing},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Let Arguments Go First},
+  volume =        {10801},
+  year =          {2018},
+  abstract =      {Bi-directional type checking has proved to be an
+                   extremely useful and versatile tool for type checking
+                   and type inference. The conventional presentation of
+                   bi-directional type checking consists of two modes:
+                   inference mode and checked mode. In traditional
+                   bi-directional type-checking, type annotations are
+                   used to guide (via the checked mode) the type
+                   inference/checking procedure to determine the type of
+                   an expression, and type information flows from
+                   functions to arguments.},
+  doi =           {10.1007/978-3-319-89884-1_10},
+  isbn =          {978-3-319-89884-1},
+}
+
 @book{Wadler2022,
   author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
   month =         aug,
@@ -403,6 +428,37 @@
   url =           {https://doi.org/10.1145/3428195},
 }
 
+@article{Pierce2000,
+  address =       {New York, NY, USA},
+  author =        {Pierce, Benjamin C. and Turner, David N.},
+  journal =       {ACM Transactions on Programming Languages and
+                   Systems},
+  month =         {jan},
+  number =        {1},
+  pages =         {1--44},
+  publisher =     {Association for Computing Machinery},
+  title =         {Local type inference},
+  volume =        {22},
+  year =          {2000},
+  abstract =      {We study two partial type inference methods for a
+                   language combining subtyping and impredicative
+                   polymorphism. Both methods are local in the sense
+                   that missing annotations are recovered using only
+                   information from adjacent nodes in the syntax tree,
+                   without long-distance constraints such as unification
+                   variables. One method infers type arguments in
+                   polymorphic applications using a local constraint
+                   solver. The other infers annotations on bound
+                   variables in function abstractions by propagating
+                   type constraints downward from enclosing application
+                   nodes. We motivate our design choices by a
+                   statistical analysis of the uses of type inference in
+                   a sizable body of existing ML code.},
+  doi =           {10.1145/345099.345100},
+  issn =          {0164-0925},
+  url =           {https://doi.org/10.1145/345099.345100},
+}
+
 @article{Dunfield2021,
   address =       {New York, NY, USA},
   author =        {Dunfield, Jana and Krishnaswami, Neel},
@@ -458,52 +514,5 @@
                    from first to second order as follows.},
   doi =           {10.1007/978-3-642-15205-4_26},
   isbn =          {978-3-642-15205-4},
-}
-
-@article{McBride2003,
-  author =        {McBride, Conor},
-  journal =       {Journal of Functional Programming},
-  number =        {6},
-  pages =         {1061--1075},
-  publisher =     {Cambridge University Press},
-  title =         {First-order unification by structural recursion},
-  volume =        {13},
-  year =          {2003},
-  doi =           {10.1017/S0956796803004957},
-}
-
-@unpublished{McBride2003a,
-  author =        {McBride, Conor},
-  note =          {Supplement to the paper `First-Order Unification by
-                   Structural Recursion'},
-  title =         {First-order unification by structural recursion:
-                   Correct proof},
-  year =          {2003},
-  url =           {http://www.strictlypositive.org/foubsr-website/},
-}
-
-@inproceedings{Xie2018,
-  address =       {Cham},
-  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
-  booktitle =     {Programming Languages and Systems. ESOP 2018},
-  editor =        {Ahmed, Amal},
-  pages =         {272--299},
-  publisher =     {Springer International Publishing},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Let Arguments Go First},
-  volume =        {10801},
-  year =          {2018},
-  abstract =      {Bi-directional type checking has proved to be an
-                   extremely useful and versatile tool for type checking
-                   and type inference. The conventional presentation of
-                   bi-directional type checking consists of two modes:
-                   inference mode and checked mode. In traditional
-                   bi-directional type-checking, type annotations are
-                   used to guide (via the checked mode) the type
-                   inference/checking procedure to determine the type of
-                   an expression, and type information flows from
-                   functions to arguments.},
-  doi =           {10.1007/978-3-319-89884-1_10},
-  isbn =          {978-3-319-89884-1},
 }
 

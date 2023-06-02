@@ -34,7 +34,7 @@ module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   foldⁿ : {l : ℕ} → Tm Θ ^ l → X Θ ^ l
   foldⁿ []       = []
   foldⁿ (t ∷ ts) = fold t ∷ foldⁿ ts
-
+{-
 mutual
   fv : Tm Θ → List (Fin Θ)
   fv (` x)             = x ∷ []
@@ -43,7 +43,7 @@ mutual
   fvⁿ : Tm Θ ^ n → List (Fin Θ)
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
-  
+-} 
 mutual
   size : Tm Θ → ℕ
   size (` x)      = 1
@@ -75,56 +75,56 @@ mutual
   ... | yes q = yes (cong₂ _∷_ p q)
 
 -- [TODO] Generalise it to an Any predicate
-infix 4 _∈ₜ_ _∈ₜₛ_ _∈ₜ?_ _∈ₜₛ?_ _∉ₜ_ _∉ₜₛ_
+infix 4 _∈ᵥ_ _∈ᵥₛ_ _∈ᵥ?_ _∈ᵥₛ?_ _∉ᵥ_ _∉ᵥₛ_
 
 mutual 
-  data _∈ₜ_ (x : Fin Θ) : Tm Θ → Set where
-    here : {y : Fin Θ} → x ≡ y → x ∈ₜ ` y
-    ops  : {n : ℕ} {i : n ∈ D} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ₜₛ ts) → x ∈ₜ op (n , i , ts)
+  data _∈ᵥ_ (x : Fin Θ) : Tm Θ → Set where
+    here : {y : Fin Θ} → x ≡ y → x ∈ᵥ ` y
+    op  : {n : ℕ} {i : n ∈ D} {ts : Tm Θ ^ n}
+      → (x∈ : x ∈ᵥₛ ts) → x ∈ᵥ op (n , i , ts)
 
-  data _∈ₜₛ_ (x : Fin Θ) : Tm Θ ^ n → Set where
+  data _∈ᵥₛ_ (x : Fin Θ) : Tm Θ ^ n → Set where
     head : {t : Tm Θ} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ₜ t) → x ∈ₜₛ (t ∷ ts)
+      → (x∈ : x ∈ᵥ t) → x ∈ᵥₛ (t ∷ ts)
     tail : {t : Tm Θ} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ₜₛ ts) 
-      → x ∈ₜₛ (t ∷ ts)
+      → (x∈ : x ∈ᵥₛ ts) 
+      → x ∈ᵥₛ (t ∷ ts)
 
-_∉ₜ_ : (x : Fin Θ) → Tm Θ → Set
-x ∉ₜ t = ¬ x ∈ₜ t
+_∉ᵥ_ : (x : Fin Θ) → Tm Θ → Set
+x ∉ᵥ t = ¬ x ∈ᵥ t
 
-_∉ₜₛ_ : (x : Fin Θ) → Tm Θ ^ n → Set
-x ∉ₜₛ ts = ¬ x ∈ₜₛ ts
+_∉ᵥₛ_ : (x : Fin Θ) → Tm Θ ^ n → Set
+x ∉ᵥₛ ts = ¬ x ∈ᵥₛ ts
 
 mutual
-  _∈ₜ?_ : (x : Fin Θ) (t : Tm Θ) → Dec (x ∈ₜ t)
-  x ∈ₜ? ` y with x ≟ y
+  _∈ᵥ?_ : (x : Fin Θ) (t : Tm Θ) → Dec (x ∈ᵥ t)
+  x ∈ᵥ? ` y with x ≟ y
   ... | yes p = yes (here p)
   ... | no ¬p = no λ where (here p) → ¬p p
-  x ∈ₜ? op (_ , _ , ts) with x ∈ₜₛ? ts
-  ... | yes p = yes (ops p)
+  x ∈ᵥ? op (_ , _ , ts) with x ∈ᵥₛ? ts
+  ... | yes p = yes (op p)
   ... | no ¬p = no λ where
-    (ops x∈) → ¬p x∈
+    (op x∈) → ¬p x∈
 
-  _∈ₜₛ?_ : (x : Fin Θ) (ts : Tm Θ ^ n) → Dec (x ∈ₜₛ ts)
-  _∈ₜₛ?_ {_} x [] = no λ ()
-  _∈ₜₛ?_ {_} x (t ∷ ts) with x ∈ₜ? t
+  _∈ᵥₛ?_ : (x : Fin Θ) (ts : Tm Θ ^ n) → Dec (x ∈ᵥₛ ts)
+  _∈ᵥₛ?_ {_} x [] = no λ ()
+  _∈ᵥₛ?_ {_} x (t ∷ ts) with x ∈ᵥ? t
   ... | yes p = yes (head p)
-  ... | no ¬p with x ∈ₜₛ? ts
+  ... | no ¬p with x ∈ᵥₛ? ts
   ... | yes q = yes (tail q)
   ... | no ¬q = no λ where
     (head x∈) → ¬p x∈
     (tail x∈) → ¬q x∈
 
-length∈ₜₛ : {x : Fin Θ} {ts : Tm Θ ^ n} → x ∈ₜₛ ts → Fin n
-length∈ₜₛ (head x∈) = zero
-length∈ₜₛ (tail x∈) = suc (length∈ₜₛ x∈)
+length∈ᵥₛ : {x : Fin Θ} {ts : Tm Θ ^ n} → x ∈ᵥₛ ts → Fin n
+length∈ᵥₛ (head x∈) = zero
+length∈ᵥₛ (tail x∈) = suc (length∈ᵥₛ x∈)
 
-lookup∈ₜₛ : {x : Fin Θ} {ts : Tm Θ ^ n}
-  → (i : x ∈ₜₛ ts)
-  → x ∈ₜ lookup ts (length∈ₜₛ i) 
-lookup∈ₜₛ (head x∈) = x∈
-lookup∈ₜₛ (tail x∈) = lookup∈ₜₛ x∈
+lookup∈ᵥₛ : {x : Fin Θ} {ts : Tm Θ ^ n}
+  → (i : x ∈ᵥₛ ts)
+  → x ∈ᵥ lookup ts (length∈ᵥₛ i) 
+lookup∈ᵥₛ (head x∈) = x∈
+lookup∈ᵥₛ (tail x∈) = lookup∈ᵥₛ x∈
 
 ------------------------------------------------------------------------------
 -- Substitution structure
@@ -205,13 +205,13 @@ weaken = rename suc -- rename $ tabulate suc
 -} 
 mutual
   punchOutTm : {x : Fin (suc Θ)} {t : Tm (suc Θ)}
-    → ¬ x ∈ₜ t → Tm Θ
+    → ¬ x ∈ᵥ t → Tm Θ
   punchOutTm {_} {x} {` y}  x∉ = ` punchOut (x∉ ∘ here)
   punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
-    op (_ , i , punchOutTmⁿ (x∉ ∘ ops))
+    op (_ , i , punchOutTmⁿ (x∉ ∘ op))
 
   punchOutTmⁿ : {x : Fin (suc Θ)} {ts : Tm (suc Θ) ^ n}
-    → ¬ x ∈ₜₛ ts → Tm Θ ^ n
+    → ¬ x ∈ᵥₛ ts → Tm Θ ^ n
   punchOutTmⁿ {ts = []}     _  = []
   punchOutTmⁿ {ts = t ∷ ts} x∉ =
     punchOutTm (x∉ ∘ head) ∷ punchOutTmⁿ (x∉ ∘ tail)
@@ -225,7 +225,7 @@ punchInTmⁿ : (x : Fin (suc Θ))
 punchInTmⁿ x = renameⁿ (punchIn x) -- renameⁿ (tabulate (punchIn x))
 
 ------------------------------------------------------------------------------
--- Zipper for Simple Terms
+
 
 record Step (Θ : ℕ) : Set where
   constructor step
@@ -255,13 +255,13 @@ _▷_ : Steps Θ → Tm Θ → Tm Θ
 
 module _ {x : Fin Θ} where mutual
   walk : {t : Tm Θ}
-    → x ∈ₜ t → Steps Θ
-  walk (here x)                      = []
-  walk (ops {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈  
+    → x ∈ᵥ t → Steps Θ
+  walk (here x)                     = []
+  walk (op {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈  
 
   walkTms : m ʳ+ (suc n) ∈ D
     → (t : Tm Θ) (us : Tm Θ ^ m) (ts : Tm Θ ^ n)
-    → (x∈ : x ∈ₜₛ t ∷ ts)
+    → (x∈ : x ∈ᵥₛ t ∷ ts)
     → Steps Θ
   walkTms i t₀ us ts (head x∈) = 
     step i us ts ∷ walk x∈

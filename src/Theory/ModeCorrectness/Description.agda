@@ -12,33 +12,29 @@ open import Syntax.BiTyped.Description SD
 private variable
   Ξ : ℕ
 
-_∈ᵥ_ : Fin Ξ → TExps Ξ → Set
-i ∈ᵥ As = L.Any (i ∈ₜ_) As
-
 _⊆ᵥ_ : TExp Ξ → TExps Ξ → Set
-A ⊆ᵥ As = ∀ {i} → i ∈ₜ A → i ∈ᵥ As
+A ⊆ᵥ As = ∀ {i} → i ∈ᵥ A → L.Any (i ∈ᵥ_) As
 
 ModeCorrectᵃ : TExps Ξ → TExps Ξ → Set
 ModeCorrectᵃ _  []      = ⊤
 ModeCorrectᵃ As (A ∷ Δ) = A ⊆ᵥ As × ModeCorrectᵃ As Δ
 
 module _ (A₀ : TExps Ξ) where
-  Known : ArgsD Ξ → TExps Ξ
-  Known []                  = A₀
-  Known (_ ⊢[ Chk ] _ ∷ Ds) =     Known Ds
-  Known (_ ⊢[ Syn ] A ∷ Ds) = A ∷ Known Ds
+  known : ArgsD Ξ → TExps Ξ
+  known []                  = A₀
+  known (_ ⊢[ Chk ] _ ∷ Ds) =     known Ds
+  known (_ ⊢[ Syn ] A ∷ Ds) = A ∷ known Ds
 
   ModeCorrectᵃˢ : ArgsD Ξ → Set
   ModeCorrectᵃˢ []                  = ⊤
-  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = let As = Known Ds in
+  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = let As = known Ds in
      A ⊆ᵥ As × ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) = let As = Known Ds in
+  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) = let As = known Ds in
                ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
 
 ModeCorrectᶜ : ConD → Set
-ModeCorrectᶜ (ι Chk A Ds) = ModeCorrectᵃˢ (A ∷ [])  Ds
-ModeCorrectᶜ (ι Syn A Ds) = ModeCorrectᵃˢ [] ([] ⊢[ Chk ] A ∷ Ds)
+ModeCorrectᶜ (ι Chk A Ds) = ModeCorrectᵃˢ (A ∷ []) Ds
+ModeCorrectᶜ (ι Syn A Ds) = ModeCorrectᵃˢ []       ([] ⊢[ Chk ] A ∷ Ds)
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)
-

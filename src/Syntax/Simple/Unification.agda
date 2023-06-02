@@ -14,11 +14,11 @@ private variable
 
 -- 
 flex∉ : {x : Fin (suc m)} {t : Tm (suc m)}
-  → x ∉ₜ t → AList (suc m) m
+  → x ∉ᵥ t → AList (suc m) m
 flex∉ {x = x} x∉ = punchOutTm x∉ / x ∷ []
 
 flex : (x : Fin m) (t : Tm m) → Maybe (∃ (AList m))
-flex {suc m} x t with x ∈ₜ? t
+flex {suc m} x t with x ∈ᵥ? t
 flex {suc m} x (` y)  | yes (here x=y) = just (_ , [])
 flex {suc m} x (op _) | yes _          = nothing
 ... | no x∉ = just (_ , flex∉ x∉)

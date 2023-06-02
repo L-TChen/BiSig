@@ -32,13 +32,13 @@ op≢var()
 
 op-inj
   : {(l , i , ts) (k , j , us) : ⟦ D ⟧ (Tm Ξ)}
-  → op (l , i , ts) ≡ op (k , j , us)
+  → _≡_ {A = Tm _ } (op (l , i , ts)) (op (k , j , us))
   → Σ (l ≡ k) λ where refl → Σ (i ≡ j) λ where refl → ts ≡ us
 op-inj refl = refl , refl , refl
 
 op-inj₁₂
   : {(l , i , ts) (k , j , us) : ⟦ D ⟧ (Tm Ξ)}
-  → op (l , i , ts) ≡ op (k , j , us)
+  → _≡_ {A = Tm _ } (op (l , i , ts)) (op (k , j , us))
   → (l , i) ≡ (k , j)
 op-inj₁₂ refl = refl
 
@@ -54,53 +54,53 @@ op-cong⇔ = record { to = cong (op′ _) ; from = op-inj₃ }
 
 ------------------------------------------------------------------------------
 -- Proofs about free variables
-
+{-
 mutual
-  ∈ₜ→∈fv : x ∈ₜ t → x ∈ fv t
+  ∈ₜ→∈fv : x ∈ᵥ t → x ∈ fv t
   ∈ₜ→∈fv (here p) = here p
-  ∈ₜ→∈fv (ops p)  = ∈ₜ→∈fvⁿ p
+  ∈ₜ→∈fv (op   p) = ∈ₜ→∈fvⁿ p
 
-  ∈ₜ→∈fvⁿ : x ∈ₜₛ ts → x ∈ fvⁿ ts
+  ∈ₜ→∈fvⁿ : x ∈ᵥₛ ts → x ∈ fvⁿ ts
   ∈ₜ→∈fvⁿ (head x∈)         = ∈-++⁺ˡ        (∈ₜ→∈fv x∈)
   ∈ₜ→∈fvⁿ (tail {_} {t} x∈) = ∈-++⁺ʳ (fv t) (∈ₜ→∈fvⁿ x∈)
 
 module _ {m : ℕ} where mutual 
-  ∈fv→∈ₜ : {t : Tm m} {x : Fin m} → x ∈ fv t → x ∈ₜ t
+  ∈fv→∈ₜ : {t : Tm m} {x : Fin m} → x ∈ fv t → x ∈ᵥ t
   ∈fv→∈ₜ {` x}  (here px) = here px
-  ∈fv→∈ₜ {op _} x∈        = ops $ ∈fv→∈ₜⁿ x∈
+  ∈fv→∈ₜ {op _} x∈        = op (∈fv→∈ₜⁿ x∈)
 
-  ∈fv→∈ₜⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ fvⁿ ts → x ∈ₜₛ ts
+  ∈fv→∈ₜⁿ : {x : Fin m} {ts : Tm m ^ l} → x ∈ fvⁿ ts → x ∈ᵥₛ ts
   ∈fv→∈ₜⁿ  {suc l} {x} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
   ... | inl x∈t  = head (∈fv→∈ₜ x∈t)
   ... | inr x∈ts = tail (∈fv→∈ₜⁿ x∈ts)
-
-∈→≡ : x ∈ₜ ` y → x ≡ y
+-}
+∈→≡ : x ∈ᵥ ` y → x ≡ y
 ∈→≡  (here x=y) = x=y
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv-inv : (A : Tm Γ) 
     → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
-    → x ∈ₜ A
+    → x ∈ᵥ A
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-inv (` x)      p (here refl) = p
-  ≡-fv-inv (op′ i ts) p (ops x∈)    = ≡-fv-invⁿ ts (op-inj₃ p) x∈
+  ≡-fv-inv (op′ i ts) p (op x∈)    = ≡-fv-invⁿ ts (op-inj₃ p) x∈
 
   ≡-fv-invⁿ : (As : Tm Γ ^ n)
     → subⁿ σ₁ As ≡ subⁿ σ₂ As
-    → x ∈ₜₛ As
+    → x ∈ᵥₛ As
     → lookup σ₁ x ≡ lookup σ₂ x
   ≡-fv-invⁿ (A ∷ As) p (head x∈) = ≡-fv-inv  A  (V.∷-injectiveˡ p) x∈
   ≡-fv-invⁿ (A ∷ As) p (tail x∈) = ≡-fv-invⁿ As (V.∷-injectiveʳ p) x∈
 
 module _ {σ₁ σ₂ : Sub Γ Δ} where mutual
   ≡-fv : (A : Tm Γ)
-    → (∀ {x} → x ∈ₜ A → lookup σ₁ x ≡ lookup σ₂ x)
+    → (∀ {x} → x ∈ᵥ A → lookup σ₁ x ≡ lookup σ₂ x)
     → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
   ≡-fv (` x)      p = p (here refl)
-  ≡-fv (op′ _ ts) p = cong (λ ts → op′ _ ts) (≡-fvⁿ ts (p ∘ ops)) -- (≡-fvⁿ ts p)
+  ≡-fv (op′ _ ts) p = cong (λ ts → op′ _ ts) (≡-fvⁿ ts (p ∘ op)) -- (≡-fvⁿ ts p)
 
   ≡-fvⁿ : {n : ℕ} (As : Tm Γ ^ n)
-    → (∀ {x} → x ∈ₜₛ As → lookup σ₁ x ≡ lookup σ₂ x)
+    → (∀ {x} → x ∈ᵥₛ As → lookup σ₁ x ≡ lookup σ₂ x)
     → subⁿ σ₁ As ≡ subⁿ σ₂ As
   ≡-fvⁿ {zero}  []       _ = refl
   ≡-fvⁿ {suc n} (A ∷ As) p = cong₂ _∷_
@@ -224,7 +224,7 @@ module _ {m : ℕ} where
 module _ {m : ℕ} {x : Fin (suc m)} where
   mutual
     punchInTm-punchOutTm
-      : (x∉ : x ∉ₜ t)
+      : (x∉ : x ∉ᵥ t)
       → punchInTm x (punchOutTm x∉) ≡ t
     punchInTm-punchOutTm {` y}      x∉ = cong `_ (punchIn-punchOut (x∉ ∘ here))
     {- cong `_ $ begin
@@ -235,17 +235,17 @@ module _ {m : ℕ} {x : Fin (suc m)} where
       y
         ∎
         -}
-    punchInTm-punchOutTm {op′ i ts} x∉ = cong (op′ i) (punchInTm-punchOutTmⁿ (x∉ ∘ ops))
+    punchInTm-punchOutTm {op′ i ts} x∉ = cong (op′ i) (punchInTm-punchOutTmⁿ (x∉ ∘ op))
 
     punchInTm-punchOutTmⁿ
-      : (x∉ : x ∉ₜₛ ts)
+      : (x∉ : x ∉ᵥₛ ts)
       → punchInTmⁿ x (punchOutTmⁿ x∉) ≡ ts
     punchInTm-punchOutTmⁿ {ts = []}     x∉ = refl
     punchInTm-punchOutTmⁿ {ts = t ∷ ts} x∉ = cong₂ _∷_
       (punchInTm-punchOutTm (x∉ ∘ head)) (punchInTm-punchOutTmⁿ (λ z → x∉ (tail z)))
 
   mutual
-    x∉punchInTm : (t : Tm m) → x ∉ₜ punchInTm x t
+    x∉punchInTm : (t : Tm m) → x ∉ᵥ punchInTm x t
     x∉punchInTm (` y)      (here eq) = F.punchInᵢ≢i x y (sym eq)
     {- (sym $ begin
       x
@@ -254,9 +254,9 @@ module _ {m : ℕ} {x : Fin (suc m)} where
         ≡⟨ lookup∘tabulate (punchIn x) y ⟩
       punchIn x y ∎)
     -}
-    x∉punchInTm (op′ i ts) (ops x∈ts) = x∉punchInTmⁿ ts x∈ts
+    x∉punchInTm (op′ i ts) (op x∈ts) = x∉punchInTmⁿ ts x∈ts
 
-    x∉punchInTmⁿ : (ts : Tm m ^ l) → x ∉ₜₛ punchInTmⁿ x ts
+    x∉punchInTmⁿ : (ts : Tm m ^ l) → x ∉ᵥₛ punchInTmⁿ x ts
     x∉punchInTmⁿ []       ()
     x∉punchInTmⁿ (t ∷ ts) (head x∈) = x∉punchInTm t x∈
     x∉punchInTmⁿ (t ∷ ts) (tail x∈) = x∉punchInTmⁿ ts x∈
@@ -302,7 +302,7 @@ module _ {u : Tm m} {x : Fin (suc m)} where opaque
     punchIn-t⟨u/x⟩=tⁿ (t ∷ ts) = cong₂ _∷_ (punchIn-t⟨u/x⟩=t t) (punchIn-t⟨u/x⟩=tⁿ ts)
 
   mutual
-    t⟨u/x⟩=punchOut : {t : Tm (suc m)} (x∉ : x ∉ₜ t)
+    t⟨u/x⟩=punchOut : {t : Tm (suc m)} (x∉ : x ∉ᵥ t)
       → t ⟨ u for x ⟩ ≡ punchOutTm x∉
     t⟨u/x⟩=punchOut {t} x∉ = begin
       t ⟨ u for x ⟩
@@ -318,7 +318,7 @@ module _ {u : Tm m} {x : Fin (suc m)} where opaque
   → ps L.++ qs ▷ t ≡ ps ▷ qs ▷ t
 ++-▷ []                 qs t = refl
 ++-▷ (step i us ts ∷ ps) qs t = 
-  cong (λ u → op $ _ , i , us ʳ++ (u ∷ ts)) (++-▷ ps qs t) 
+  cong (λ u → op (_ , i , us ʳ++ (u ∷ ts))) (++-▷ ps qs t) 
 
 ++-▷▷₁ : (ps : Steps n) (p : Step n) (t : Tm n)
   → ps ▷ (p ▷₁ t) ≡ ps L.++ L.[ p ] ▷ t
@@ -326,14 +326,14 @@ module _ {u : Tm m} {x : Fin (suc m)} where opaque
 ++-▷▷₁ (p ∷ ps) p₀ t = cong (p ▷₁_) (++-▷▷₁ ps p₀ t)
 
 module _ {m : ℕ} {x : Fin m} where mutual
-  ▷walk=id : {t : Tm m} → (x∈ : x ∈ₜ t)
+  ▷walk=id : {t : Tm m} → (x∈ : x ∈ᵥ t)
     → t ≡ walk x∈ ▷ ` x
   ▷walk=id (here refl)              = refl
-  ▷walk=id (ops {_} {i} {t ∷ _} x∈) = ▷walks=id i t [] x∈ 
+  ▷walk=id (op {_} {i} {t ∷ _} x∈) = ▷walks=id i t [] x∈ 
 
   ▷walks=id : (i : l ʳ+ (suc k) ∈ D)
     → (t : Tm m) (us : Tm m ^ l) {ts : Tm m ^ k}
-    → (x∈ : x ∈ₜₛ t ∷ ts)
+    → (x∈ : x ∈ᵥₛ t ∷ ts)
     → op′ i (us ʳ++ (t ∷ ts)) ≡ walkTms i t us ts x∈ ▷ ` x
   ▷walks=id {l} {k} i t us (head x∈) =
     cong (λ t → op′ _ (us ʳ++ (t ∷ _))) (▷walk=id x∈)
@@ -395,7 +395,7 @@ no-cycle t ps = no-cycle′ t ps (≺-wf t)
 
 unify-occur
   : (σ : Sub m n) {x : Fin m} {t : Tm m}
-  → x ∈ₜ t
+  → x ∈ᵥ t
   → ` x ⟨ σ ⟩ ≡ t ⟨ σ ⟩
   → ` x ≡ t
 unify-occur σ {x} {t} x∈ eq =

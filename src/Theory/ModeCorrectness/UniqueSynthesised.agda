@@ -58,7 +58,7 @@ mutual
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
-    → ∀ {x} → x ∈ᵥ Known [] Ds
+    → ∀ {x} → L.Any (x ∈ᵥ_) (Known [] Ds)
     → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
   uniq-↑ⁿ []                  _             _          _         ()
   uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
@@ -74,8 +74,8 @@ mutual
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
     → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
     → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
-    → (∀ {x} → x ∈ᵥ As → V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
-    → ∀ {x} → x ∈ₜ C
+    → (∀ {x} → L.Any (x ∈ᵥ_) As → V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
+    → ∀ {x} → x ∈ᵥ C
     → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
   uniq-↑ᵃ C []      _           ⊢t ⊢u f = ≡-fv-inv C (uniq-↑ ⊢t ⊢u)
   uniq-↑ᵃ C (A ∷ Δ) (A⊆xs , SD) ⊢t ⊢u f = 

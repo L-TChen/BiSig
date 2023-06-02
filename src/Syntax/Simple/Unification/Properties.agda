@@ -151,7 +151,7 @@ module _(t u : Tm m) (ts us : Tm m ^ k) where
 -- Correctness of FlexRigid
 ----------------------------------------------------------------------
 
-module _ {m : ℕ} {x : Fin (suc m)} {t : Tm (suc m)} (x∉ : x ∉ₜ t) where
+module _ {m : ℕ} {x : Fin (suc m)} {t : Tm (suc m)} (x∉ : x ∉ᵥ t) where
   ≈-flexRigid∉ : (` x ≈ t) _ $ punchOutTm x∉ for x
   ≈-flexRigid∉ = begin
     ` x ⟨ (punchOutTm x∉) for x ⟩
@@ -177,7 +177,7 @@ module _ {m : ℕ} {x : Fin (suc m)} {t : Tm (suc m)} (x∉ : x ∉ₜ t) where
 -- Correctness of Flex-Rigid/Flex 
 ----------------------------------------------------------------------
 flex-mgu : (x : Fin m) (t : Tm m) → DecMGU (` x) t
-flex-mgu {suc m} x t with x ∈ₜ? t
+flex-mgu {suc m} x t with x ∈ᵥ? t
 flex-mgu x (` y)     | yes (here refl) = inl (_ , id , Min-id {ℕ} {Sub} (` y ≈ ` y) refl)
 flex-mgu x (op′ _ _) | yes x∈ = inr λ where
   {j = σ} eq → op≢var (unify-occur σ x∈  eq)

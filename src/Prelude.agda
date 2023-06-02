@@ -104,7 +104,7 @@ private variable
 pattern tt = lift tt₀
 
 data Mode : Set where
-  Chk Inf : Mode
+  Chk Syn : Mode
 
 _≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
   → Dec ((x , i) ≡ (y , j))

@@ -72,9 +72,9 @@ module _ where mutual
   ... | yes ⊢t = yes (⊢op _ ⊢t)
 
   synthesiseᶜ
-    : (D : ConD) → ModeCorrectᶜ D → ConD.mode D ≡ Inf
-    → (Γ : Cxt 0) (t : R.⟦ D ⟧ᶜ (Raw 0) Inf)
-    → Dec (∃[ A ] ⟦ D ⟧ᶜ ⊢⇆ Inf A Γ t)
+    : (D : ConD) → ModeCorrectᶜ D → ConD.mode D ≡ Syn
+    → (Γ : Cxt 0) (t : R.⟦ D ⟧ᶜ (Raw 0) Syn)
+    → Dec (∃[ A ] ⟦ D ⟧ᶜ ⊢⇆ Syn A Γ t)
   synthesiseᶜ D (A⊆As , tt , SDs) refl Γ t = {!!}
 
   inheritᶜ

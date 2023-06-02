@@ -21,7 +21,7 @@ open import Syntax.BiTyped.Description ΛₜD
 Λ⇆D = record
   { Op    = ΛOp
   ; decOp = decΛOp
-  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Inf ] ` # 1 ↣ ` # 0 ]
+  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Syn ] ` # 1 ↣ ` # 0 ]
                            ρ[ [] ⊢[ Chk ] ` # 1 ] [] ⇒ ` # 0
                     -- Γ ⊢ t ⇉ (A → B)    Γ ⊢ u ⇇ A
                     -- ----------------------------
@@ -56,7 +56,7 @@ mutual
 
 Λ : Mode → Λₜ m → Cxt m → Set
 Λ Chk = Λ⇇
-Λ Inf = Λ⇉
+Λ Syn = Λ⇉
 
 toΛ : Tm _ mod A Γ → Λ mod A Γ
 toΛ (` x)      = ` x
@@ -66,10 +66,10 @@ toΛ (t ·′ u)   = toΛ t · toΛ u
 toΛ (ƛ′ t)     = ƛ toΛ t
 
 fromΛ : ∀ mod → Λ mod A Γ → Tm _ mod A Γ
-fromΛ Inf (` x)       = ` x
-fromΛ Inf (_ ∋ t)     = _ ∋ fromΛ Chk t
-fromΛ Chk (t ↑by eq) = fromΛ Inf t ↑by eq
-fromΛ Inf (t · u)     = fromΛ Inf t ·′ fromΛ Chk u
+fromΛ Syn (` x)       = ` x
+fromΛ Syn (_ ∋ t)     = _ ∋ fromΛ Chk t
+fromΛ Chk (t ↑by eq) = fromΛ Syn t ↑by eq
+fromΛ Syn (t · u)     = fromΛ Syn t ·′ fromΛ Chk u
 fromΛ Chk (ƛ t)       = ƛ′ (fromΛ Chk t)
 
 from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
@@ -80,8 +80,8 @@ from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
 from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)
 
 to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
-to-fromΛ Inf (` x)      = refl
-to-fromΛ Inf (t · u)    = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
-to-fromΛ Inf (_ ∋ t)    = cong (_ ∋_) (to-fromΛ _ t)
+to-fromΛ Syn (` x)      = refl
+to-fromΛ Syn (t · u)    = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
+to-fromΛ Syn (_ ∋ t)    = cong (_ ∋_) (to-fromΛ _ t)
 to-fromΛ Chk (ƛ t)      = cong ƛ_ (to-fromΛ _ t)
 to-fromΛ Chk (t ↑by eq) = cong (_↑by eq) (to-fromΛ _ t)

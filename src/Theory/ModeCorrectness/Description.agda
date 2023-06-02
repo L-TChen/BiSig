@@ -26,18 +26,18 @@ module _ (A₀ : TExps Ξ) where
   Known : ArgsD Ξ → TExps Ξ
   Known []                  = A₀
   Known (_ ⊢[ Chk ] _ ∷ Ds) =     Known Ds
-  Known (_ ⊢[ Inf ] A ∷ Ds) = A ∷ Known Ds
+  Known (_ ⊢[ Syn ] A ∷ Ds) = A ∷ Known Ds
 
   ModeCorrectᵃˢ : ArgsD Ξ → Set
   ModeCorrectᵃˢ []                  = ⊤
   ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = let As = Known Ds in
      A ⊆ᵥ As × ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Δ ⊢[ Inf ] A ∷ Ds) = let As = Known Ds in
+  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) = let As = Known Ds in
                ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
 
 ModeCorrectᶜ : ConD → Set
 ModeCorrectᶜ (ι Chk A Ds) = ModeCorrectᵃˢ (A ∷ [])  Ds
-ModeCorrectᶜ (ι Inf A Ds) = ModeCorrectᵃˢ [] ([] ⊢[ Chk ] A ∷ Ds)
+ModeCorrectᶜ (ι Syn A Ds) = ModeCorrectᵃˢ [] ([] ⊢[ Chk ] A ∷ Ds)
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)

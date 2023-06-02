@@ -22,14 +22,14 @@ private variable
 infix 5 _⦂_
 
 data Raw (Θ : ℕ) : Mode → Set where
-  `_  : (x : Id)                     → Raw Θ Inf
-  _⦂_ : (t : Raw Θ Chk) (A : TExp Θ) → Raw Θ Inf
-  _↑  : (t : Raw Θ Inf)              → Raw Θ Chk
+  `_  : (x : Id)                     → Raw Θ Syn
+  _⦂_ : (t : Raw Θ Chk) (A : TExp Θ) → Raw Θ Syn
+  _↑  : (t : Raw Θ Syn)              → Raw Θ Chk
   op  : ⟦ D ⟧ (Raw Θ) d              → Raw Θ d
 
 Raw⇐ Raw⇒ : ℕ → Set
 Raw⇐ Θ = Raw Θ Chk
-Raw⇒ Θ = Raw Θ Inf
+Raw⇒ Θ = Raw Θ Syn
 
 module _ (ρ : TRen Θ₁ Θ₂) where mutual
   trename : Raw Θ₁ d → Raw Θ₂ d

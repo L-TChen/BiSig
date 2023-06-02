@@ -44,7 +44,7 @@ mutual
     uniq-↑ᶜ (Desc.rules D i) (mc i) eq ⊢ts ⊢us
 
   uniq-↑ᶜ
-    : ∀ D → ModeCorrectᶜ D → ConD.mode D ≡ Inf
+    : ∀ D → ModeCorrectᶜ D → ConD.mode D ≡ Syn
     → ∀ {ts ρ₁ ρ₂}
     → ⟦ ConD.args D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
     → ⟦ ConD.args D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
@@ -63,17 +63,17 @@ mutual
   uniq-↑ⁿ []                  _             _          _         ()
   uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us
-  uniq-↑ⁿ (Δ B.⊢[ Inf ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (here px) =
+  uniq-↑ⁿ (Δ B.⊢[ Syn ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (here px) =
     uniq-↑ᵃ C Δ SD ⊢t ⊢u (uniq-↑ⁿ Ds SDs ⊢ts ⊢us) px
-  uniq-↑ⁿ (Δ B.⊢[ Inf ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (there i) =
+  uniq-↑ⁿ (Δ B.⊢[ Syn ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (there i) =
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us i
 
   uniq-↑ᵃ
     : (C : TExp Ξ) (Δ : TExps Ξ)
     → ModeCorrectᵃ As Δ
-    → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Inf)}
-    → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Inf (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
-    → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Inf (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
+    → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
+    → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
+    → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
     → (∀ {x} → x ∈ᵥ As → V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
     → ∀ {x} → x ∈ₜ C
     → V.lookup ρ₁ x ≡ V.lookup ρ₂ x

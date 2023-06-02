@@ -112,10 +112,10 @@ TypeInference-lemma infer Γ r p
 
 -- ~ Syntax.BiTyped.Intrinsic.Term
 data Typed⇆ : Ty → List Ty → Mode → Set where
-  `_   : (i : τ ∈ Γ) → Typed⇆ τ Γ Inf  -- context is known
-  _∋_  : (τ : Ty) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
-  _↑_  : Typed⇆ σ Γ Inf → σ ≡ τ → Typed⇆ τ Γ Chk
-  app  : Typed⇆ (imp σ τ) Γ Inf → Typed⇆ σ Γ Chk → Typed⇆ τ Γ Inf
+  `_   : (i : τ ∈ Γ) → Typed⇆ τ Γ Syn  -- context is known
+  _∋_  : (τ : Ty) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Syn
+  _↑_  : Typed⇆ σ Γ Syn → σ ≡ τ → Typed⇆ τ Γ Chk
+  app  : Typed⇆ (imp σ τ) Γ Syn → Typed⇆ σ Γ Chk → Typed⇆ τ Γ Syn
   abs  : Typed⇆ τ (σ ∷ Γ) Chk → Typed⇆ (imp σ τ) Γ Chk
 
 -- Bidirectional raw terms, retaining only the modes
@@ -125,10 +125,10 @@ data Typed⇆ : Ty → List Ty → Mode → Set where
 -- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
 
 data Raw⇆ : ℕ → Mode → Set where
-  `_   : Fin n → Raw⇆ n Inf
-  _∋_  : Ty → Raw⇆ n Chk → Raw⇆ n Inf
-  _↑   : Raw⇆ n Inf → Raw⇆ n Chk
-  app  : Raw⇆ n Inf → Raw⇆ n Chk → Raw⇆ n Inf
+  `_   : Fin n → Raw⇆ n Syn
+  _∋_  : Ty → Raw⇆ n Chk → Raw⇆ n Syn
+  _↑   : Raw⇆ n Syn → Raw⇆ n Chk
+  app  : Raw⇆ n Syn → Raw⇆ n Chk → Raw⇆ n Syn
   abs  : Raw⇆ (suc n) Chk → Raw⇆ n Chk
 
 variable r' s' : Raw⇆ _ _
@@ -144,14 +144,14 @@ eraseMode (app r' s') = app (eraseMode r') (eraseMode s')
 eraseMode (abs r')    = abs (eraseMode r')
 
 data HasMode : {n : ℕ} → Mode → Raw n → Set where
-  `_  : (i : Fin n) → HasMode Inf (` i)
-  _∋_ : (τ : Ty) → HasMode Chk r → HasMode Inf (τ ∋ r)
-  _↑  : HasMode Inf r → HasMode Chk r
-  app : HasMode Inf r → HasMode Chk s → HasMode Inf (app r s)
+  `_  : (i : Fin n) → HasMode Syn (` i)
+  _∋_ : (τ : Ty) → HasMode Chk r → HasMode Syn (τ ∋ r)
+  _↑  : HasMode Syn r → HasMode Chk r
+  app : HasMode Syn r → HasMode Chk s → HasMode Syn (app r s)
   abs : HasMode Chk r → HasMode Chk (abs r)
 
 Bidirectionalisation : Set
-Bidirectionalisation = {n : ℕ} (r : Raw n) → Dec (HasMode Inf r)
+Bidirectionalisation = {n : ℕ} (r : Raw n) → Dec (HasMode Syn r)
 
 toRaw⇆ : {r : Raw n} → HasMode mode r → Raw⇆ n mode
 toRaw⇆ (` i)     = ` i
@@ -178,7 +178,7 @@ data Typing⇆ : Ty → (Γ : List Ty) {mode : Mode} → Raw⇆ (length Γ) mode
   abs : Typing⇆ τ (σ ∷ Γ) r' → Typing⇆ (imp σ τ) Γ (abs r')
 
 TypeInference⇆ : Set
-TypeInference⇆ = (Γ : List Ty) (r' : Raw⇆ (length Γ) Inf)
+TypeInference⇆ = (Γ : List Ty) (r' : Raw⇆ (length Γ) Syn)
                → Dec (Σ[ τ ∈ Ty ] Typing⇆ τ Γ r')
 
 -- Eventually we want to perform ordinary type inference (the spec)
@@ -209,7 +209,7 @@ completeness (abs p)   (abs t)   = abs (completeness p t)
 
 infer : Bidirectionalisation → TypeInference⇆
       → Soundness → Completeness
-      → TypeInference (HasMode Inf)
+      → TypeInference (HasMode Syn)
 infer bidir infer⇆ s c Γ r with bidir r
 ... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇆ Γ (toRaw⇆ p)))
 ... | no ¬p = inr ¬p
@@ -220,10 +220,10 @@ Core τ Γ   ←   Typed τ Γ
 
                  ↑
 
-               Typing τ Γ r            ←           Typing⇆ τ Γ Inf r'
+               Typing τ Γ r            ←           Typing⇆ τ Γ Syn r'
 
                  ↑                                    ↑
 
-               r : Raw n   →   HasMode Inf r   →   r' : Raw⇆ n Inf
+               r : Raw n   →   HasMode Syn r   →   r' : Raw⇆ n Syn
 
 -}

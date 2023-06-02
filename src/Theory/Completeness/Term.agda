@@ -39,7 +39,7 @@ module Raw (Id : Set) (BD : B.Desc) (TD : T.Desc) (s : Completeness BD TD) where
   bidirectionalise (t ⦂ A) with bidirectionalise t
   ... | nothing       = nothing
   ... | just (Chk , tᵇ) = just (_ , tᵇ ⦂ A)
-  ... | just (Inf , tᵇ) = just (_ , tᵇ ↑ ⦂ A)
+  ... | just (Syn , tᵇ) = just (_ , tᵇ ↑ ⦂ A)
   bidirectionalise (op (i , ts))  with bidirectionaliseᶜ {D′ = B.rules BD (s i .proj₁)} (s i .proj₂) ts
   ... | nothing = nothing
   ... | just (eq , ts)  = just (_ , op (s i .proj₁ , eq , ts))
@@ -70,10 +70,10 @@ module Raw (Id : Set) (BD : B.Desc) (TD : T.Desc) (s : Completeness BD TD) where
   bidirectionaliseᵃ [] d     t with bidirectionalise t
   ... | nothing = nothing
   -- [TODO] What property does this clause refute? 
-  bidirectionaliseᵃ [] Inf t | just (Chk , tᵇ) = nothing
+  bidirectionaliseᵃ [] Syn t | just (Chk , tᵇ) = nothing
   bidirectionaliseᵃ [] Chk t | just (Chk , tᵇ) = just tᵇ
-  bidirectionaliseᵃ [] Chk t | just (Inf , tᵇ) = just (tᵇ ↑)
-  bidirectionaliseᵃ [] Inf t | just (Inf , tᵇ) = just tᵇ
+  bidirectionaliseᵃ [] Chk t | just (Syn , tᵇ) = just (tᵇ ↑)
+  bidirectionaliseᵃ [] Syn t | just (Syn , tᵇ) = just tᵇ
   bidirectionaliseᵃ (_ ∷ Δ) d (x , t) with bidirectionaliseᵃ Δ d t
   ... | nothing = nothing
   ... | just tᵇ = just (x , tᵇ)
@@ -89,7 +89,7 @@ module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Completeness BD TD) where mutu
   bidirectionalise
     :        Tm  Θ   A Γ
     → ∃[ d ] BTm Θ d A Γ
-  bidirectionalise (` x)        = Inf , ` x
+  bidirectionalise (` x)        = Syn , ` x
   bidirectionalise (op (i , r)) = _ , op (_ , bidirectionaliseᶜ (proj₂ (s i)) r)
 
   bidirectionaliseᶜ : ∀ {D D′} → eraseᶜ D′ ≡ D
@@ -110,7 +110,7 @@ module Intrinsic (BD : B.Desc) (TD : T.Desc) (s : Completeness BD TD) where mutu
     → B.⟦ Δ ⟧ᵃ (BTm Θ d A) ρ Γ
   bidirectionaliseᵃ [] d     t with bidirectionalise t
   bidirectionaliseᵃ [] Chk t | Chk , t′ = t′
-  bidirectionaliseᵃ [] Inf t | Chk , t′ = _ ∋ t′
-  bidirectionaliseᵃ [] Chk t | Inf , t′ = t′ ↑by refl
-  bidirectionaliseᵃ [] Inf t | Inf , t′ = t′
+  bidirectionaliseᵃ [] Syn t | Chk , t′ = _ ∋ t′
+  bidirectionaliseᵃ [] Chk t | Syn , t′ = t′ ↑by refl
+  bidirectionaliseᵃ [] Syn t | Syn , t′ = t′
   bidirectionaliseᵃ (_ ∷ Θ) d t = bidirectionaliseᵃ Θ d t

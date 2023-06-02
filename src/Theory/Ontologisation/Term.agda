@@ -60,5 +60,5 @@ mutual
     → E.⟦ Δ ⟧ᵃ (Raw Θ)    (⊢⇆ d A) ρ Γ t
     → I.⟦ Δ ⟧ᵃ (Tm Θ d A)          ρ ∥ Γ ∥cxt
   ∥-∥mapᵃ {d = Chk} []      p = ∥ p ∥⇐
-  ∥-∥mapᵃ {d = Inf} []      p = ∥ p ∥⇒
+  ∥-∥mapᵃ {d = Syn} []      p = ∥ p ∥⇒
   ∥-∥mapᵃ           (A ∷ Θ) p = ∥-∥mapᵃ Θ p

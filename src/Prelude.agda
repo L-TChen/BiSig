@@ -105,6 +105,9 @@ private variable
 data Mode : Set where
   Chk Inf : Mode
 
+Chk≢Inf : Chk ≢ Inf
+Chk≢Inf ()
+
 _≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
   → Dec ((x , i) ≡ (y , j))
 here refl ≟∈ here refl = yes refl

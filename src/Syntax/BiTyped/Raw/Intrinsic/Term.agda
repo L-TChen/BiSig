@@ -14,8 +14,8 @@ open import Syntax.BiTyped.Raw.Intrinsic.Functor SD
 open B SD
 
 private variable
-  n    : ℕ
-  mode : Mode
+  n : ℕ
+  d : Mode
 
 infix 5 _∋_
 
@@ -23,7 +23,7 @@ data Raw : ℕ → Mode → Set where
   `_  : Fin n                       → Raw n Inf
   _∋_ : (A : TExp₀) (t : Raw n Chk) → Raw n Inf
   _↑  : (t : Raw n Inf)             → Raw n Chk
-  op  : ⟦ D ⟧ Raw n mode            → Raw n mode
+  op  : ⟦ D ⟧ Raw n d               → Raw n d
 
 Raw⇐ Raw⇒ : ℕ → Set
 Raw⇐ n = Raw n Chk

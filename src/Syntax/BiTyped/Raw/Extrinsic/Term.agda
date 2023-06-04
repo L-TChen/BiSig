@@ -19,16 +19,15 @@ open R using (Raw; `_; _∋_; op)
 open import Syntax.BiTyped.Raw.Extrinsic.Functor SD
 
 private variable
-  n    : ℕ
-  r    : Raw n
-  mode : Mode
+  n : ℕ
+  r : Raw n
+  d : Mode
 
 infix 5 _∋_
 
 data HasMode : {n : ℕ} → Mode → Raw n → Set where
-  `_  : (i : Fin n)                     → HasMode Inf (` i)
-  _∋_ : (A : TExp₀) (t : HasMode Chk r) → HasMode Inf (A ∋ r)
-  _↑  : (t : HasMode Inf r)             → HasMode Chk r
+  `_  : (i : Fin n)                      → HasMode Inf (` i)
+  _∋_ : (A : TExp₀) (t : HasMode Chk r)  → HasMode Inf (A ∋ r)
+  _↑  : (t : HasMode Inf r)              → HasMode Chk r
   op  : {rs : R.⟦ erase D ⟧ Raw n}
-      → ⟦ D ⟧ (λ k → HasMode {k}) n mode rs
-      → HasMode mode (op rs)
+      → ⟦ D ⟧ (λ k → HasMode {k}) n d rs → HasMode d   (op rs)

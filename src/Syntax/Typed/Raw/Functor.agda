@@ -20,7 +20,7 @@ Fam₀ : Set₁
 Fam₀ = Fam lzero
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) → Fam ℓ → Fam ℓ
-⟦ Δ ⟧ᵃ X n = X (length Δ + n)
+⟦ Δ ⟧ᵃ X n = X (length Δ ʳ+ n)
 
 ⟦_⟧ᵃˢ : (ADs : ArgsD Ξ) (X : Fam ℓ) → Fam ℓ
 ⟦ []           ⟧ᵃˢ _ _ = ⊤

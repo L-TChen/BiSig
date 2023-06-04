@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-} 
+{-# OPTIONS --safe #-}
 
 open import Prelude
 open import Syntax.Simple.Description
@@ -11,6 +11,9 @@ open import Syntax.Simple.Association D
 
 Cxt : ℕ → Set
 Cxt m = Context (Tm m)
+
+Cxt₀ : Set
+Cxt₀ = Cxt 0
 
 cxtSub : {m n : ℕ} → Sub m n
   → Cxt m → Cxt n

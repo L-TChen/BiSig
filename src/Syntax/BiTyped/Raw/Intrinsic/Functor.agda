@@ -20,14 +20,14 @@ Fam₀ : Set₁
 Fam₀ = Fam lzero
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) → Fam ℓ → Fam ℓ
-⟦ Δ ⟧ᵃ X n mode = X (length Δ + n) mode
+⟦ Δ ⟧ᵃ X n d = X (length Δ ʳ+ n) d
 
 ⟦_⟧ᵃˢ : (D : ArgsD Ξ) → Fam ℓ → (ℕ → Set ℓ)
-⟦ []                   ⟧ᵃˢ _ _ = ⊤
-⟦ (Δ ⊢[ mode ] _) ∷ Ds ⟧ᵃˢ X n = ⟦ Δ ⟧ᵃ X n mode × ⟦ Ds ⟧ᵃˢ X n
+⟦ []                ⟧ᵃˢ _ _ = ⊤
+⟦ (Δ ⊢[ d ] _) ∷ Ds ⟧ᵃˢ X n = ⟦ Δ ⟧ᵃ X n d × ⟦ Ds ⟧ᵃˢ X n
 
 ⟦_⟧ᶜ : (D : ConD) → Fam ℓ → Fam ℓ
-⟦ ι mode  _ D ⟧ᶜ X n mode' = mode ≡ mode' × ⟦ D ⟧ᵃˢ X n
+⟦ ι d  _ D ⟧ᶜ X n d' = d ≡ d' × ⟦ D ⟧ᵃˢ X n
 
 ⟦_⟧ : (D : Desc) → Fam ℓ → Fam ℓ
-⟦ D ⟧ X n mode = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X n mode
+⟦ D ⟧ X n d = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X n d

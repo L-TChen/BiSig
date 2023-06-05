@@ -23,7 +23,7 @@ private variable
 mutual
 
   bidirectionalise : (d : Mode) (t : Raw n) → Dec (HasMode d t)
-  bidirectionalise d t with bidirectionalise' t
+  bidirectionalise d   t with bidirectionalise' t
   bidirectionalise Chk t | inl        Inf-t           = yes (Inf-t ↑)
   bidirectionalise Inf t | inl        Inf-t           = yes  Inf-t
   bidirectionalise Chk t | inr (inl (¬Inf-t , Chk-t)) = yes  Chk-t
@@ -35,7 +35,7 @@ mutual
     : (t : Raw n)
     →    HasMode Inf t
     ⊎ (¬ HasMode Inf t × HasMode Chk t)
-    ⊎                  ¬ HasMode Chk t
+    ⊎                  ¬ HasMode Chk t  -- implies ¬ HasMode Inf t
   bidirectionalise' (` i) = inl (` i)
   bidirectionalise' (A ∋ t) with bidirectionalise Chk t
   ... | yes t' = inl (A ∋ t')

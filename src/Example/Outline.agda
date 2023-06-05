@@ -3,19 +3,15 @@ module Example.Outline where
 open import Prelude
 
 variable
-  n    : ℕ
-  mode : Mode
-
--- From parser generators to type-inferencer generators
--- Using datatype-generic programming to quantify over simple type systems
--- Only an overall picture in this file (no datatype-generic implementations)
+  n : ℕ
+  d : Mode
 
 -- Simplest types (with metavariables)
 
 -- Syntax.Simple.Term
 data TExp (m : ℕ) : Set where
-  `_   : Fin m → TExp m
-  base : TExp m
+  `_   : Fin m           → TExp m
+  base :                   TExp m
   imp  : TExp m → TExp m → TExp m
 
 -- Metavariables used only in typing rules and not elsewhere
@@ -26,72 +22,59 @@ variable
   σ τ : Ty
   Γ   : List Ty
 
--- Simply typed λ-calculus, intrinsically scoped and typed
-
-data Core : Ty → List Ty → Set where
-  `_  : τ ∈ Γ → Core τ Γ
-  app : Core (imp σ τ) Γ → Core σ Γ → Core τ Γ
-  abs : Core τ (σ ∷ Γ) → Core (imp σ τ) Γ
+-- From parser generators to type-inferencer generators
+-- Using datatype-generic programming to quantify over simple type systems
+-- Only an overall picture in this file (no datatype-generic implementations)
 
 -- The programmer writes untyped terms, whose types should be inferred
 -- General type inference quickly becomes undecidable; introduce type annotations
 -- Type checking subsumed by type inference
 
 data Raw : ℕ → Set where
-  `_  : Fin n → Raw n
-  _∋_ : Ty → Raw n → Raw n
+  `_  : Fin n         → Raw n
+  _∋_ : Ty → Raw n    → Raw n
   app : Raw n → Raw n → Raw n
-  abs : Raw (suc n) → Raw n
+  abs : Raw (suc n)   → Raw n
 
 variable r s : Raw _
 
--- Including type annotations in typed terms to ensure that they are respected
+-- The typing relation for simply typed λ-calculus
 
-data Typed : Ty → List Ty → Set where
-  `_  : τ ∈ Γ → Typed τ Γ
-  _∋_ : (τ : Ty) → Typed τ Γ → Typed τ Γ
-  app : Typed (imp σ τ) Γ → Typed σ Γ → Typed τ Γ
-  abs : Typed τ (σ ∷ Γ) → Typed (imp σ τ) Γ
+infix 3 _⊢_⦂_
 
--- Goal: ‘invert’ the following function
+data _⊢_⦂_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set where
 
-eraseType : Typed τ Γ → Raw (length Γ)
-eraseType (` i)     = ` L.index i
-eraseType (τ ∋ t)   = τ ∋  eraseType t
-eraseType (app t u) = app (eraseType t) (eraseType u)
-eraseType (abs t)   = abs (eraseType t)
+  `_  : (i : τ ∈ Γ)
+      → ---------------------
+        Γ ⊢ (` L.index i) ⦂ τ
 
--- Remove type annotations for subsequent development
+  _∋_ : (τ : Ty)
+      → Γ ⊢ r ⦂ τ
+      → ---------------
+        Γ ⊢ (τ ∋ r) ⦂ τ
 
-toCore : Typed τ Γ → Core τ Γ
-toCore (` i)     = ` i
-toCore (τ ∋ t)   = toCore t
-toCore (app t u) = app (toCore t) (toCore u)
-toCore (abs t)   = abs (toCore t)
+  app : Γ ⊢ r ⦂ imp σ τ
+      → Γ ⊢ s ⦂ σ
+      → ---------------
+        Γ ⊢ app r s ⦂ τ
 
--- Intrinsically enforcing the inversion equation (algebraic ornamentation)
--- Typing τ Γ r  ≅  Σ[ t ∈ Typed τ Γ ] eraseType t ≡ r
+  abs : σ ∷ Γ ⊢ r ⦂ τ
+      → -------------------
+        Γ ⊢ abs r ⦂ imp σ τ
 
-data Typing : Ty → (Γ : List Ty) → Raw (length Γ) → Set where
-  `_  : (i : τ ∈ Γ) → Typing τ Γ (` L.index i)
-  _∋_ : (τ : Ty) → Typing τ Γ r → Typing τ Γ (τ ∋ r)
-  app : Typing (imp σ τ) Γ r → Typing σ Γ s → Typing τ Γ (app r s)
-  abs : Typing τ (σ ∷ Γ) r → Typing (imp σ τ) Γ (abs r)
-
--- Decide whether there is a typed term that erases to the given raw term
--- (or a typing derivation for the given raw term)
+-- Decide whether there is a typing derivation for a given raw term
 -- if the raw term satisfies some constraint, e.g., having enough type annotations
 
 TypeInference' : (∀ {n} → Raw n → Set) → Set
 TypeInference' P = (Γ : List Ty) (r : Raw (length Γ))
-                 → P r → Dec (Σ[ τ ∈ Ty ] Typing τ Γ r)
+                 → P r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ)
 
 -- Decide whether a given raw term has a type
 -- or abort with the excuse that the term doesn’t satisfy the constraint
 
 TypeInference : (∀ {n} → Raw n → Set) → Set
 TypeInference P = (Γ : List Ty) (r : Raw (length Γ))
-                → Dec (Σ[ τ ∈ Ty ] Typing τ Γ r) ⊎ ¬ P r
+                → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ) ⊎ ¬ P r
 
 -- The second version is stronger (and more convenient to use)
 
@@ -105,87 +88,86 @@ TypeInference-lemma infer Γ r p
 -- Bidirectional type system for STLC
 -- Terms are syntactically classified into two categories
 -- based on whether their types can be inferred or (only) checked
--- If a bidirectional type system is designed well (i.e., mode-correct),
--- from inferred types we can derive what the types of checked terms should be
-
--- ~ Syntax.BiTyped.Intrinsic.Term
-data Typed⇆ : Ty → List Ty → Mode → Set where
-  `_   : (i : τ ∈ Γ) → Typed⇆ τ Γ Inf  -- context is known
-  _∋_  : (τ : Ty) → Typed⇆ τ Γ Chk → Typed⇆ τ Γ Inf
-  _↑_  : Typed⇆ σ Γ Inf → σ ≡ τ → Typed⇆ τ Γ Chk
-  app  : Typed⇆ (imp σ τ) Γ Inf → Typed⇆ σ Γ Chk → Typed⇆ τ Γ Inf
-  abs  : Typed⇆ τ (σ ∷ Γ) Chk → Typed⇆ (imp σ τ) Γ Chk
-
--- Bidirectional raw terms, retaining only the modes
-
--- It is possible to syntactically decide whether there are enough type annotations:
--- wherever a checked term needs to be used as an inferred term,
--- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
-
-data Raw⇆ : ℕ → Mode → Set where
-  `_   : Fin n → Raw⇆ n Inf
-  _∋_  : Ty → Raw⇆ n Chk → Raw⇆ n Inf
-  _↑   : Raw⇆ n Inf → Raw⇆ n Chk
-  app  : Raw⇆ n Inf → Raw⇆ n Chk → Raw⇆ n Inf
-  abs  : Raw⇆ (suc n) Chk → Raw⇆ n Chk
-
-variable r' s' : Raw⇆ _ _
-
--- First step: see if we can successfully assign modes to raw terms
--- Same inversion story
-
-eraseMode : Raw⇆ n mode → Raw n
-eraseMode (` i)       = ` i
-eraseMode (τ ∋ r')    = τ ∋ eraseMode r'
-eraseMode (r' ↑)      = eraseMode r'
-eraseMode (app r' s') = app (eraseMode r') (eraseMode s')
-eraseMode (abs r')    = abs (eraseMode r')
 
 data HasMode : {n : ℕ} → Mode → Raw n → Set where
-  `_  : (i : Fin n) → HasMode Inf (` i)
-  _∋_ : (τ : Ty) → HasMode Chk r → HasMode Inf (τ ∋ r)
-  _↑  : HasMode Inf r → HasMode Chk r
-  app : HasMode Inf r → HasMode Chk s → HasMode Inf (app r s)
-  abs : HasMode Chk r → HasMode Chk (abs r)
+
+  `_  : (i : Fin n)
+      → -----------------
+        HasMode Inf (` i)
+
+  _∋_ : (τ : Ty)
+      → HasMode Chk r
+      → -------------------
+        HasMode Inf (τ ∋ r)
+
+  _↑  : HasMode Inf r
+      → -------------
+        HasMode Chk r
+
+  app : HasMode Inf r
+      → HasMode Chk s
+      → ---------------------
+        HasMode Inf (app r s)
+
+  abs : HasMode Chk r
+      → -------------------
+        HasMode Chk (abs r)
+
+-- First step: syntactically decide whether there are enough type annotations
+-- Wherever a checked term needs to be used as an inferred term,
+-- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
 
 Bidirectionalisation : Set
-Bidirectionalisation = {n : ℕ} (r : Raw n) → Dec (HasMode Inf r)
-
-toRaw⇆ : {r : Raw n} → HasMode mode r → Raw⇆ n mode
-toRaw⇆ (` i)     = ` i
-toRaw⇆ (τ ∋ p)   = τ ∋ toRaw⇆ p
-toRaw⇆ (p ↑)     = toRaw⇆ p ↑
-toRaw⇆ (app p q) = app (toRaw⇆ p) (toRaw⇆ q)
-toRaw⇆ (abs p)   = abs (toRaw⇆ p)
+Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (HasMode Inf r)
 
 -- Second step: bidirectional type inference
--- Same inversion story again!
+-- If a bidirectional type system is designed well (i.e., d-correct),
+-- from inferred types we can derive what the types of checked terms should be
 
-eraseType⇆ : Typed⇆ τ Γ mode → Raw⇆ (length Γ) mode
-eraseType⇆ (` i)     = ` L.index i
-eraseType⇆ (τ ∋ t)   = τ ∋ eraseType⇆ t
-eraseType⇆ (t ↑ eq)  = (eraseType⇆ t) ↑
-eraseType⇆ (app t u) = app (eraseType⇆ t) (eraseType⇆ u)
-eraseType⇆ (abs t)   = abs (eraseType⇆ t)
+infix 3 _⊢_[_]_ _⊢_⇐_ _⊢_⇒_
 
-data Typing⇆ : Ty → (Γ : List Ty) {mode : Mode} → Raw⇆ (length Γ) mode → Set where
-  `_  : (i : τ ∈ Γ) → Typing⇆ τ Γ (` L.index i)
-  _∋_ : (τ : Ty) → Typing⇆ τ Γ r' → Typing⇆ τ Γ (τ ∋ r')
-  _↑_ : Typing⇆ σ Γ r' → σ ≡ τ → Typing⇆ τ Γ (r' ↑)
-  app : Typing⇆ (imp σ τ) Γ r' → Typing⇆ σ Γ s' → Typing⇆ τ Γ (app r' s')
-  abs : Typing⇆ τ (σ ∷ Γ) r' → Typing⇆ (imp σ τ) Γ (abs r')
+mutual
 
-TypeInference⇆ : Set
-TypeInference⇆ = (Γ : List Ty) (r' : Raw⇆ (length Γ) Inf)
-               → Dec (Σ[ τ ∈ Ty ] Typing⇆ τ Γ r')
+  _⊢_⇐_ _⊢_⇒_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set
+  Γ ⊢ r ⇐ τ = Γ ⊢ r [ Chk ] τ
+  Γ ⊢ r ⇒ τ = Γ ⊢ r [ Inf ] τ
+
+  data _⊢_[_]_ : (Γ : List Ty) → Raw (length Γ) → Mode → Ty → Set where
+
+    `_  : (i : τ ∈ Γ)
+        → ---------------------
+          Γ ⊢ (` L.index i) ⇒ τ
+
+    _∋_ : (τ : Ty)
+        → Γ ⊢ r ⇐ τ
+        → ---------------
+          Γ ⊢ (τ ∋ r) ⇒ τ
+
+    _↑_ : Γ ⊢ r ⇒ σ
+        → σ ≡ τ
+        → ---------
+          Γ ⊢ r ⇐ τ
+
+    app : Γ ⊢ r ⇒ imp σ τ
+        → Γ ⊢ s ⇐ σ
+        → ---------------
+          Γ ⊢ app r s ⇒ τ
+
+    abs : σ ∷ Γ ⊢ r ⇐ τ
+        → -------------------
+          Γ ⊢ abs r ⇐ imp σ τ
+
+TypeInference⇔ : Set
+TypeInference⇔ = (Γ : List Ty) {r : Raw (length Γ)}
+               → HasMode Inf r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⇒ τ)
 
 -- Eventually we want to perform ordinary type inference (the spec)
 -- using bidirectional type inference (the impl);
 -- the two type systems should be somehow related to make that possible
 
 Soundness : Set
-Soundness = {τ : Ty} {Γ : List Ty} {r : Raw (length Γ)} {mode : Mode}
-            (p : HasMode mode r) → Typing⇆ τ Γ (toRaw⇆ p) → Typing τ Γ r
+Soundness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
+          → HasMode d r  →  Γ ⊢ r [ d ] τ  →  Γ ⊢ r ⦂ τ
 
 soundness : Soundness
 soundness (` ._)    (` i)      = ` i
@@ -195,8 +177,8 @@ soundness (app p q) (app t u)  = app (soundness p t) (soundness q u)
 soundness (abs p)   (abs t)    = abs (soundness p t)
 
 Completeness : Set
-Completeness = {τ : Ty} {Γ : List Ty} {r : Raw (length Γ)} {mode : Mode}
-               (p : HasMode mode r) → Typing τ Γ r → Typing⇆ τ Γ (toRaw⇆ p)
+Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
+             → HasMode d r  →  Γ ⊢ r ⦂ τ  →  Γ ⊢ r [ d ] τ
 
 completeness : Completeness
 completeness (` ._)    (` i)     = ` i
@@ -205,23 +187,19 @@ completeness (p ↑)     t         = completeness p t ↑ refl
 completeness (app p q) (app t u) = app (completeness p t) (completeness q u)
 completeness (abs p)   (abs t)   = abs (completeness p t)
 
-infer : Bidirectionalisation → TypeInference⇆
+infer : Bidirectionalisation → TypeInference⇔
       → Soundness → Completeness
       → TypeInference (HasMode Inf)
-infer bidir infer⇆ s c Γ r with bidir r
-... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇆ Γ (toRaw⇆ p)))
+infer bidir infer⇔ s c Γ r with bidir r
+... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇔ Γ p))
 ... | no ¬p = inr ¬p
 
 {-
 
-Core τ Γ   ←   Typed τ Γ
+Γ ⊢ r ⦂ τ   ←   Γ ⊢ r ⇒ τ
 
-                 ↑
+  ↑               ↑
 
-               Typing τ Γ r            ←           Typing⇆ τ Γ Inf r'
-
-                 ↑                                    ↑
-
-               r : Raw n   →   HasMode Inf r   →   r' : Raw⇆ n Inf
+r : Raw n   →   HasMode Inf r
 
 -}

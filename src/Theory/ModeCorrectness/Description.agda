@@ -15,26 +15,39 @@ private variable
 _⊆ᵥ_ : TExp Ξ → TExps Ξ → Set
 A ⊆ᵥ As = ∀ {i} → i ∈ᵥ A → L.Any (i ∈ᵥ_) As
 
-ModeCorrectᵃ : TExps Ξ → TExps Ξ → Set
-ModeCorrectᵃ _  []      = ⊤
-ModeCorrectᵃ As (A ∷ Δ) = A ⊆ᵥ As × ModeCorrectᵃ As Δ
+Cover : TExps Ξ → TExps Ξ → Set
+Cover As = All (_⊆ᵥ As)
 
-module _ (A₀ : TExps Ξ) where
+module Chk where
+  ModeCorrectᵃˢ : ArgsD Ξ → TExps Ξ × Set → TExps Ξ × Set
+  ModeCorrectᵃˢ []                  (As , MC) = As , MC
+  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) (As , MC) =
+    ModeCorrectᵃˢ Ds (A ∷ As , (Cover As Δ × MC))
+  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) (As , MC) =
+    ModeCorrectᵃˢ Ds (As , (Cover As (A ∷ Δ) × MC))
+
+module Syn where 
   known : ArgsD Ξ → TExps Ξ
-  known []                  = A₀
-  known (_ ⊢[ Chk ] _ ∷ Ds) =     known Ds
+  known []                  = []
+  known (_ ⊢[ Chk ] A ∷ Ds) =     known Ds
   known (_ ⊢[ Syn ] A ∷ Ds) = A ∷ known Ds
 
   ModeCorrectᵃˢ : ArgsD Ξ → Set
-  ModeCorrectᵃˢ []                  = ⊤
-  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = let As = known Ds in
-     A ⊆ᵥ As × ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) = let As = known Ds in
-               ModeCorrectᵃ As Δ × ModeCorrectᵃˢ Ds
+  ModeCorrectᵃˢ []       = ⊤
+  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) = Cover (known Ds) (A ∷ Δ) × ModeCorrectᵃˢ Ds
+  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) = Cover (known Ds) Δ       × ModeCorrectᵃˢ Ds
 
 ModeCorrectᶜ : ConD → Set
-ModeCorrectᶜ (ι Chk A Ds) = ModeCorrectᵃˢ (A ∷ []) Ds
-ModeCorrectᶜ (ι Syn A Ds) = ModeCorrectᵃˢ []       ([] ⊢[ Chk ] A ∷ Ds)
+ModeCorrectᶜ (ι Chk A Ds) = Chk.ModeCorrectᵃˢ Ds (A ∷ [] , ⊤) .proj₂
+ModeCorrectᶜ (ι Syn A Ds) = A ⊆ᵥ (Syn.known Ds) × Syn.ModeCorrectᵃˢ Ds
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)
+
+
+Tightᶜ : ConD → Set
+Tightᶜ (ι {Ξ} Chk A Ds) =
+  (i : Fin Ξ) → L.Any (i ∈ᵥ_) (A ∷ Syn.known Ds)
+Tightᶜ (ι {Ξ} Syn A Ds) =
+  (i : Fin Ξ) → L.Any (i ∈ᵥ_) (Syn.known Ds)
+  -- Every i exsits in some variable of inferred types

@@ -7,10 +7,20 @@ module Syntax.Simple.Description where
 private variable
   X Y : Set
 
-Desc = List ℕ
+record Desc : Set₁ where
+  constructor desc
+  field
+    Op        : Set
+    ⦃ decEq ⦄ : DecEq Op
+    rules     : Op → ℕ
+open Desc public
 
 ⟦_⟧ : Desc → Set → Set
-⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] X ^ D
+⟦ D ⟧ X = Σ[ i ∈ D .Op ] X ^ D .rules i 
+-- Desc = List ℕ
+
+-- ⟦_⟧ : Desc → Set → Set
+-- ⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] X ^ D
 
 mapⁿ : {X Y : Set} {n : ℕ} (f : X → Y)
   → X ^ n → Y ^ n
@@ -19,7 +29,7 @@ mapⁿ f xs = V.map f xs
 
 fmap : (D : Desc) (f : X → Y)
   → ⟦ D ⟧ X → ⟦ D ⟧ Y
-fmap Ds f (D , i , xs) = D , i , mapⁿ f xs
+fmap Ds f (i , xs) = i , mapⁿ f xs
 
 record _-Alg (D : Desc) (X : ℕ → Set) : Set₁ where
   field

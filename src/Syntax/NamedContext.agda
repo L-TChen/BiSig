@@ -7,7 +7,6 @@ module Syntax.NamedContext (D : Desc) (Id : Set) where
 
 open import Syntax.NamedContext.Base Id public
 open import Syntax.Simple.Term        D
-open import Syntax.Simple.Association D
 
 Cxt : ℕ → Set
 Cxt m = Context (Tm m)
@@ -26,11 +25,11 @@ instance
   CxtSubIsPresheaf .⟨⟩-⨟ σ ρ ((x , A) ∷ Γ) =
     cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ)
 
-  CxtAListIsPresheaf : IsPresheaf Cxt
-  CxtAListIsPresheaf ._⟨_⟩ Γ σ = Γ ⟨ toSub σ ⟩
-  CxtAListIsPresheaf .⟨⟩-id []             = refl
-  CxtAListIsPresheaf .⟨⟩-id ((x , A) ∷ Γ)    =
-    cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-id {ℕ} {AList} A) (⟨⟩-id {ℕ} {AList} Γ)
-  CxtAListIsPresheaf .⟨⟩-⨟ σ ρ []          = refl
-  CxtAListIsPresheaf .⟨⟩-⨟ σ ρ ((x , A) ∷ Γ) =
-    cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ)
+--  CxtAListIsPresheaf : IsPresheaf Cxt
+--  CxtAListIsPresheaf ._⟨_⟩ Γ σ = Γ ⟨ toSub σ ⟩
+--  CxtAListIsPresheaf .⟨⟩-id []             = refl
+--  CxtAListIsPresheaf .⟨⟩-id ((x , A) ∷ Γ)    =
+--    cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-id {ℕ} {AList} A) (⟨⟩-id {ℕ} {AList} Γ)
+--  CxtAListIsPresheaf .⟨⟩-⨟ σ ρ []          = refl
+--  CxtAListIsPresheaf .⟨⟩-⨟ σ ρ ((x , A) ∷ Γ) =
+--    cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ)

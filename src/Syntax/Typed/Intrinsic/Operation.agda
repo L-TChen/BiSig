@@ -14,7 +14,6 @@ open import Syntax.Typed.Intrinsic.Term D
 
 private variable
   m n   : ℕ
-  σ     : AList n m
   A B   : TExp m
   Γ Δ   : Cxt m
 

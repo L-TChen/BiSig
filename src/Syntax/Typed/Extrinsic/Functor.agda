@@ -14,11 +14,11 @@ import Syntax.Typed.Raw.Functor SD Id as R
 
 open T SD
 
-Pred :  (ℓ′ : Level) → (n : ℕ) → (X : Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
+Pred :  (ℓ′ : Level) → (n : ℕ) → (X : Set ℓ) → Set (ℓ ⊔ lsuc ℓ′)
 Pred ℓ′ n X = TExp n → Cxt n → X → Set ℓ′
 
-Pred₀ : ℕ → (X : Set ℓ) → Set (lmax ℓ (lsuc lzero))
-Pred₀ n X = Pred lzero n X
+Pred₀ : ℕ → (X : Set ℓ) → Set _
+Pred₀ n X = Pred 0ℓ n X
 
 private variable
   Ξ Θ   : ℕ

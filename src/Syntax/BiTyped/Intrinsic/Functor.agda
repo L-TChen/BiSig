@@ -15,7 +15,7 @@ Fam : (Θ : ℕ) (ℓ : Level) → Set (lsuc ℓ)
 Fam Θ ℓ = Mode → TExp Θ → Cxt Θ → Set ℓ
 
 Fam₀ : ℕ → Set₁
-Fam₀ Θ = Fam Θ lzero
+Fam₀ Θ = Fam Θ 0ℓ
 
 private variable
   Ξ Θ : ℕ

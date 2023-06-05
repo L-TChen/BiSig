@@ -130,16 +130,16 @@ module _ (σ : TSub m n) (ρ : TSub n l) where mutual
   tsubᵃ-⨟ {Δ = []}            = tsub-⨟
   tsubᵃ-⨟ {Δ = _ ∷ _} (x , t) = cong (x ,_) (tsubᵃ-⨟ t)
 
-module _ {d : Mode} (σ : AList m n) (ρ : AList n l) where mutual
-  tsubₐ-⨟ : (t : Raw m d)
-    → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
-  tsubₐ-⨟ t = begin
-    tsub (toSub (σ ⨟ ρ)) t
-      ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
-    tsub (toSub σ ⨟ toSub ρ) t
-      ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
-    _ ∎ 
-    where open ≡-Reasoning
+-- module _ {d : Mode} (σ : AList m n) (ρ : AList n l) where mutual
+--   tsubₐ-⨟ : (t : Raw m d)
+--     → tsub (toSub (σ ⨟ ρ)) t ≡ tsub (toSub ρ) (tsub (toSub σ) t)
+--   tsubₐ-⨟ t = begin
+--     tsub (toSub (σ ⨟ ρ)) t
+--       ≡⟨ cong (λ σ → tsub σ t) (toSub-++ σ ρ) ⟩
+--     tsub (toSub σ ⨟ toSub ρ) t
+--       ≡⟨ tsub-⨟ (toSub σ) (toSub ρ) t ⟩
+--     _ ∎ 
+--     where open ≡-Reasoning
 
 instance
   RawSubIsPresheaf : IsPresheaf λ m → Raw m d
@@ -157,7 +157,7 @@ instance
 --  RawᵃSubIsPresheaf .⟨⟩-id      = tsubᵃ-id
 --  RawᵃSubIsPresheaf .⟨⟩-⨟ σ ρ t = tsubᵃ-⨟ σ ρ t
 
-  RawAListIsPresheaf : IsPresheaf λ m → Raw m d
-  RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
-  RawAListIsPresheaf .⟨⟩-id      = tsub-id
-  RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟
+--   RawAListIsPresheaf : IsPresheaf λ m → Raw m d
+--   RawAListIsPresheaf ._⟨_⟩ t σ   = tsub (toSub σ) t
+--   RawAListIsPresheaf .⟨⟩-id      = tsub-id
+--   RawAListIsPresheaf .⟨⟩-⨟       = tsubₐ-⨟

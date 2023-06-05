@@ -41,27 +41,26 @@ mutual
   uniq-↑ (⊢` x)    (⊢` y)   = uniq-∈ x y
   uniq-↑ (⊢⦂ ⊢t )  (⊢⦂ ⊢u ) = refl
   uniq-↑ (⊢op (i , eq , _) (ts , refl , ⊢ts)) (⊢op _ (us , refl , ⊢us)) =
-    uniq-↑ᶜ (Desc.rules D i) (mc i) eq ⊢ts ⊢us
+    uniq-↑ᶜ (Desc.rules D i) eq (mc i) ⊢ts ⊢us
 
   uniq-↑ᶜ
-    : ∀ D → ModeCorrectᶜ D → ConD.mode D ≡ Syn
+    : (D@(ι d A Ds) : ConD) → d ≡ Syn → ModeCorrectᶜ D
     → ∀ {ts ρ₁ ρ₂}
-    → ⟦ ConD.args D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
-    → ⟦ ConD.args D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
-    → ConD.type D ⟨ ρ₁ ⟩ ≡ ConD.type D ⟨ ρ₂ ⟩
-  uniq-↑ᶜ D (C⊆xs , _ , SDs) refl ⊢ts ⊢us =
-    ≡-fv (ConD.type D) λ x → uniq-↑ⁿ (ConD.args D) SDs ⊢ts ⊢us (C⊆xs x)
+    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
+    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
+    → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
+  uniq-↑ᶜ (ι Syn A Ds) refl (C⊆xs , SDs) ⊢ts ⊢us =
+    ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs x)
 
   uniq-↑ⁿ
-    : (Ds : ArgsD Ξ)
-    → ModeCorrectᵃˢ [] Ds
+    : (Ds : ArgsD Ξ) → Syn.ModeCorrectᵃˢ Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
-    → ∀ {x} → L.Any (x ∈ᵥ_) (Known [] Ds)
+    → ∀ {x} → L.Any (x ∈ᵥ_) (Syn.known Ds)
     → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
-  uniq-↑ⁿ []                  _             _          _         ()
-  uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , _ , SDs) (_ , ⊢ts)  (_ , ⊢us) =
+  uniq-↑ⁿ []                  _         _         _         ()
+  uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , SDs) (_ , ⊢ts) (_ , ⊢us) =
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us
   uniq-↑ⁿ (Δ B.⊢[ Syn ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (here px) =
     uniq-↑ᵃ C Δ SD ⊢t ⊢u (uniq-↑ⁿ Ds SDs ⊢ts ⊢us) px
@@ -69,8 +68,7 @@ mutual
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us i
 
   uniq-↑ᵃ
-    : (C : TExp Ξ) (Δ : TExps Ξ)
-    → ModeCorrectᵃ As Δ
+    : (C : TExp Ξ) (Δ : TExps Ξ) → Cover As Δ
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
     → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
     → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
@@ -78,7 +76,7 @@ mutual
     → ∀ {x} → x ∈ᵥ C
     → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
   uniq-↑ᵃ C []      _           ⊢t ⊢u f = ≡-fv-inv C (uniq-↑ ⊢t ⊢u)
-  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs , SD) ⊢t ⊢u f = 
+  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs ∷ SD) ⊢t ⊢u f = 
     uniq-↑ᵃ C Δ SD (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
     where A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) 
 

@@ -21,7 +21,7 @@ module N where
   open import Data.Nat as N       public
   open import Data.Nat.Properties public
 open N public
-  using (ℕ; zero; suc; _⊔_; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
+  using (ℕ; zero; suc; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
   renaming (_≤″_ to _≤_; _≥″_ to _≥_; _<″_ to _<_)
 
 module F where
@@ -42,7 +42,7 @@ module L where
     using (_∈_)
   open import Data.List.Membership.Propositional.Properties public
   open import Data.List.Relation.Unary.All       public
-    using (All)
+    using (All; []; _∷_)
   open import Data.List.Relation.Binary.Subset.Propositional public
     using (_⊆_)
 open L public using
@@ -86,16 +86,10 @@ module WF where
 open WF public
   hiding (module All)
 
-open import Level                                 public
-  using (Level; Lift; lift)
-  renaming (zero to lzero; suc to lsuc; _⊔_ to lmax)
-
+open import Prelude.Level                         public
 open import Prelude.Equivalence                   public
 open import Prelude.Logic                         public
 open import Prelude.Category                      public
-
-variable
-  ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ : Level
 
 private variable
   m n l : ℕ
@@ -106,21 +100,12 @@ pattern tt = lift tt₀
 data Mode : Set where
   Chk Syn : Mode
 
-_≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
-  → Dec ((x , i) ≡ (y , j))
-here refl ≟∈ here refl = yes refl
-there i   ≟∈ there j   with i ≟∈ j
-... | no ¬p    = no λ where refl → ¬p refl
-... | yes refl = yes refl
-here _    ≟∈ there _   = no λ ()
-there _   ≟∈ here  _   = no λ ()
-
 infixl 4 _^_
 _^_ : Set ℓ → ℕ → Set ℓ
 X ^ n = Vec X n
 
 Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
-Lift₀ {ℓ} = Lift {ℓ} lzero -- Lift {ℓ} lzero
+Lift₀ {ℓ} = Lift {ℓ} 0ℓ
 
 {-# DISPLAY Lift lzero A = Lift₀ A #-}
 

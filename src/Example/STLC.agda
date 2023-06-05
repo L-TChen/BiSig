@@ -51,7 +51,9 @@ infixr 7 ƛ_
 _ : Tm _ A (A ∷ Γ)
 _ = 𝑰 · ` here refl
 
+{-
 height : Tm _ A Γ → ℕ
 height (` x)   = 0
 height (t · u) = suc (height t ⊔ height u)
 height (ƛ t)   = suc (height t)
+-}

@@ -18,7 +18,7 @@ Fam : (ℓ : Level) → Set (lsuc ℓ)
 Fam ℓ = Mode → Set ℓ
 
 Fam₀ : Set₁
-Fam₀ = Fam lzero
+Fam₀ = Fam 0ℓ
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) → Set ℓ → Set ℓ
 ⟦ []    ⟧ᵃ X = X

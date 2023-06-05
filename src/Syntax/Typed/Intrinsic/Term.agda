@@ -9,7 +9,6 @@ module Syntax.Typed.Intrinsic.Term {SD : S.Desc} (D : T.Desc SD) where
 
 open import Syntax.Simple SD
   using (TExp; TExps; TSub)
-open import Syntax.Simple.Association SD
 
 open import Syntax.Context            SD
 open import Syntax.Typed.Intrinsic.Functor {SD}

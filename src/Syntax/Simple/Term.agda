@@ -18,7 +18,7 @@ data Tm (Θ : ℕ) : Set where
   `_ :       Fin Θ  → Tm Θ
   op : ⟦ D ⟧ (Tm Θ) → Tm Θ
 
-pattern op′ i ts = op (_ , i , ts)
+pattern op′ i ts = op (i , ts)
 
 Tm₀ : Set
 Tm₀ = Tm 0
@@ -28,22 +28,22 @@ Tms Θ = List (Tm Θ)
 
 module _ {X : ℕ → Set} (α : (D -Alg) X) where mutual
   fold : Tm ⇒₁ X
-  fold (` x)             = α .var x
-  fold (op (_ , i , ts)) = α .alg (_ , i , foldⁿ ts)
+  fold (` x)         = α .var x
+  fold (op (i , ts)) = α .alg (i , foldⁿ ts)
 
   foldⁿ : {l : ℕ} → Tm Θ ^ l → X Θ ^ l
   foldⁿ []       = []
   foldⁿ (t ∷ ts) = fold t ∷ foldⁿ ts
-{-
+
 mutual
   fv : Tm Θ → List (Fin Θ)
-  fv (` x)             = x ∷ []
-  fv (op (n , i , ts)) = fvⁿ ts
+  fv (` x)         = x ∷ []
+  fv (op (i , ts)) = fvⁿ ts
 
   fvⁿ : Tm Θ ^ n → List (Fin Θ)
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
--} 
+ 
 mutual
   size : Tm Θ → ℕ
   size (` x)      = 1
@@ -58,11 +58,11 @@ mutual
   (` x) ≟ₜ (` y) with  x ≟ y
   ... | yes p = yes (cong `_ p)
   ... | no ¬p = no λ where refl → ¬p refl
-  op (D , i , ts) ≟ₜ op (_ , j , us) with i ≟∈ j
+  op (i , ts) ≟ₜ op (j , us) with i ≟ j
   ... | no ¬p = no λ where refl → ¬p refl
   ... | yes refl with compareMap ts us
   ... | no ¬q = no λ where refl → ¬q refl
-  ... | yes q = yes (cong (λ ts → op (D , i , ts)) q)
+  ... | yes q = yes (cong (λ ts → op (i , ts)) q)
   (` x) ≟ₜ op u  = no λ ()
   op x  ≟ₜ (` y) = no λ ()
 
@@ -80,8 +80,8 @@ infix 4 _∈ᵥ_ _∈ᵥₛ_ _∈ᵥ?_ _∈ᵥₛ?_ _∉ᵥ_ _∉ᵥₛ_
 mutual 
   data _∈ᵥ_ (x : Fin Θ) : Tm Θ → Set where
     here : {y : Fin Θ} → x ≡ y → x ∈ᵥ ` y
-    op  : {n : ℕ} {i : n ∈ D} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ᵥₛ ts) → x ∈ᵥ op (n , i , ts)
+    op   : {i : D .Op} {ts : Tm Θ ^ D .rules i}
+      → (x∈ : x ∈ᵥₛ ts) → x ∈ᵥ op (i , ts)
 
   data _∈ᵥₛ_ (x : Fin Θ) : Tm Θ ^ n → Set where
     head : {t : Tm Θ} {ts : Tm Θ ^ n}
@@ -101,7 +101,7 @@ mutual
   x ∈ᵥ? ` y with x ≟ y
   ... | yes p = yes (here p)
   ... | no ¬p = no λ where (here p) → ¬p p
-  x ∈ᵥ? op (_ , _ , ts) with x ∈ᵥₛ? ts
+  x ∈ᵥ? op (i , ts) with x ∈ᵥₛ? ts
   ... | yes p = yes (op p)
   ... | no ¬p = no λ where
     (op x∈) → ¬p x∈
@@ -134,8 +134,8 @@ Ren Θ n = Fin Θ → Fin n -- Vec (Fin n) m
 
 module _ (ρ : Ren Θ n) where mutual
   rename : Tm Θ → Tm n
-  rename (` x)             = ` ρ x -- ` lookup ρ x
-  rename (op (_ , i , ts)) = op (_ , i , renameⁿ ts)
+  rename (` x)         = ` ρ x -- ` lookup ρ x
+  rename (op (i , ts)) = op (i , renameⁿ ts)
 
   renameⁿ : {l : ℕ}
     → Tm Θ ^ l → Tm n ^ l
@@ -153,8 +153,8 @@ Sub Θ n = Vec (Tm n) Θ
 
 module _ (σ : Sub Θ n) where mutual
   sub : Tm Θ → Tm n
-  sub (` x)  = lookup σ x
-  sub (op (_ , i , ts)) = op (_ , i , subⁿ ts)
+  sub (` x)         = lookup σ x
+  sub (op (i , ts)) = op (i , subⁿ ts)
 
   subⁿ : {l : ℕ}
     → Tm Θ ^ l → Tm n ^ l
@@ -171,109 +171,85 @@ opaque
   Sub-⨟ : Sub Θ₁ Θ₂ → Sub Θ₂ Θ₃ → Sub Θ₁ Θ₃
   Sub-⨟ σ₁ σ₂ = tabulate λ i → sub σ₂ (lookup σ₁ i)
 
-  sub-for : (Tm Θ) → (x y : Fin (suc Θ)) → Tm Θ
-  sub-for t x y with x ≟ y
-  ... | no ¬p = ` punchOut ¬p
-  ... | yes _ = t
-
-  _for_
-    : Tm Θ → Fin (suc Θ)
-    → Sub (suc Θ) Θ
-  t for x = tabulate (sub-for t x)
-
-  injectˡ : Ren Θ (Θ + n)
-  injectˡ = λ i → _↑ˡ_ i _ -- tabulate λ i → _↑ˡ_ i _
 
 {-
-wkʳ : Tm Θ → Tm (i + Θ)
-wkʳ = rename (_↑ʳ_ _) -- rename $ tabulate (_↑ʳ_ _)
-
-wkˡ : Tm Θ → Tm (Θ + i)
-wkˡ = rename injectˡ
-
-wkˡⁿ : Tm Θ ^ l → Tm (Θ + i) ^ l
-wkˡⁿ = renameⁿ injectˡ
-
-wkᵐ : (Θ i : ℕ) → Tm (Θ + l) → Tm (Θ + i + l)
-wkᵐ m n = rename (insert-mid m n) -- rename $ tabulate (insert-mid m n)
-
-wk≤ˡ : Θ ≤ n → Tm Θ → Tm n
-wk≤ˡ (less-than-or-equal refl) = wkˡ
-
-weaken : Tm Θ → Tm (suc Θ)
-weaken = rename suc -- rename $ tabulate suc
--} 
-mutual
-  punchOutTm : {x : Fin (suc Θ)} {t : Tm (suc Θ)}
-    → ¬ x ∈ᵥ t → Tm Θ
-  punchOutTm {_} {x} {` y}  x∉ = ` punchOut (x∉ ∘ here)
-  punchOutTm {_} {x} {op (_ , i , ts)} x∉ =
-    op (_ , i , punchOutTmⁿ (x∉ ∘ op))
-
-  punchOutTmⁿ : {x : Fin (suc Θ)} {ts : Tm (suc Θ) ^ n}
-    → ¬ x ∈ᵥₛ ts → Tm Θ ^ n
-  punchOutTmⁿ {ts = []}     _  = []
-  punchOutTmⁿ {ts = t ∷ ts} x∉ =
-    punchOutTm (x∉ ∘ head) ∷ punchOutTmⁿ (x∉ ∘ tail)
-
-punchInTm : (x : Fin (suc Θ))
-  → Tm Θ → Tm (suc Θ)
-punchInTm x = rename (punchIn x)-- rename (tabulate (punchIn x))
-
-punchInTmⁿ : (x : Fin (suc Θ))
-  → Tm Θ ^ n → Tm (suc Θ) ^ n
-punchInTmⁿ x = renameⁿ (punchIn x) -- renameⁿ (tabulate (punchIn x))
-
 ------------------------------------------------------------------------------
+-- Partial Substitution
 
+PSub : (Ξ Θ : ℕ) → Set₁
+PSub Ξ Θ = Σ[ P ∈ (Fin Ξ → Set) ] Σ[ σ ∈ ({i : Fin Ξ} → P i → Tm Θ) ]
+  ({i : Fin Ξ} (x y : P i) → σ x ≡ σ y)
 
-record Step (Θ : ℕ) : Set where
-  constructor step
+module _ ((P , σ , well-defined) : PSub Ξ Θ) where mutual
+  psub : (t : Tm Ξ) → (∀ {i} → i ∈ᵥ t → P i)
+    → Tm Θ
+  psub (` x)  p = σ (p (here refl))
+  psub (op (_ , i , ts)) p = op (_ , i , psubⁿ ts (p ∘ op))
+
+  psubⁿ : (ts : Tm Ξ ^ n) → (∀ {i} → i ∈ᵥₛ ts → P i)
+    → Tm Θ ^ n 
+  psubⁿ []       p = []
+  psubⁿ (t ∷ ts) p = psub t (p ∘ head) ∷ psubⁿ ts (p ∘ tail)
+
+module _ {Ξ : ℕ} where
+  _∪?_ : ((P₁ , σ₁ , p₁) (P₂ , σ₂ , p₂) : PSub Ξ Θ)
+    → Dec (∀ i → (x : P₁ i) (y : P₂ i) → σ₁ x ≡ σ₂ y)
+    --→ Dec (Σ[ (P , σ , p) ∈ PSub Ξ Θ ] Σ[ P=P₁+P₂ ∈ (∀ i → P i ⇔ (P₁ i ⊎ P₂ i)) ]
+    --    (∀ {i} → (x : P i) → [ (λ y → σ x ≡ σ₁ y) , (λ z → σ x ≡ σ₂ z) ]
+    --      (P=P₁+P₂ i .Equivalence.to x)))
+    --    -- σ x ≡ {!!} ⊎ {!!}))
+  (P₁ , σ₁ , p₁) ∪? (P₂ , σ₂ , p₂) = {!!}
+
+record _and_ (P Q : Prop) : Prop where
   field
-    {iᵤ iₜ} : ℕ 
-    pos : iᵤ ʳ+ suc iₜ ∈ D
-    us  : Tm Θ ^ iᵤ
-    ts  : Tm Θ ^ iₜ
-open Step public using ()
+    fst : P
+    snd : Q
 
-Steps : ℕ → Set
-Steps Θ = List (Step Θ)
+module _ ((P , σ) : PSub Ξ Θ) where mutual
+  psub : (t : Tm Ξ) → (∀ {i} → i ∈ᵥ t → P i)
+    → Tm Θ
+  psub (` x)             p = σ (p (here refl))  
+  psub (op (_ , i , ts)) p = op (_ , i , psubⁿ ts λ i∈ → p (op i∈))
 
-plugSteps : Steps Θ₁ → Sub Θ₁ Θ₂ → Steps Θ₂
-plugSteps []       σ  = []
-plugSteps (step pos us ts ∷ ps) σ =
-  step pos (subⁿ σ us) (subⁿ σ ts) ∷ plugSteps ps σ
+  psubⁿ : (ts : Tm Ξ ^ n) → (∀ {i} → i ∈ᵥₛ ts → P i)
+    → Tm Θ ^ n
+  psubⁿ []       _ = []
+  psubⁿ (t ∷ ts) p = psub t (λ i∈ → p (head i∈)) ∷ psubⁿ ts λ i∈ → p (tail i∈)
 
-infixr 4.5 _▷₁_ _▷_
+_∪_ : ((P₁ , σ₁) (P₂ , σ₂) : PSub Ξ Θ)
+  → Dec (Σ (PSub Ξ Θ) λ (P , σ) → {!(i : Fin Ξ) → P i → P₁ i and P₂ i !})
+_∪_ = {!!}
 
-_▷₁_ : Step Θ → Tm Θ → Tm Θ
-step i us ts ▷₁ t = op′ i $ us ʳ++ (t ∷ ts)
+∈ᵥ-≡ : {i x : Fin Ξ}
+  → ∥ i ∈ᵥ ` x ∥ → ∥ i ≡ x ∥
+∈ᵥ-≡ = squash-map λ where (here x) → x
 
-_▷_ : Steps Θ → Tm Θ → Tm Θ
-[]       ▷ t = t
-(p ∷ ps) ▷ t = p ▷₁ (ps ▷ t)
+∉[] : {i : Fin Ξ}
+  → ∥ i ∈ᵥₛ [] ∥ → ⊥ₚ
+∉[] ∣ () ∣
+module _ {Ξ Θ : ℕ} where mutual
+  eq : (t : Tm Ξ) (u : Tm Θ)
+    → Maybe ({ i : Fin Ξ} → ∥ i ∈ᵥ t ∥  → Tm Θ)
+  eq (` x)  u = just λ {i} p → case i ≟ x of λ where
+    (yes eq) → u
+    (no neq) → ⊥-elimₚ (refutingₚ neq (∈ᵥ-≡ p))
+  eq (op (_ , i , _)) (` _)            = nothing
+  eq (op (_ , i , ts)) (op (_ , j , us)) with i ≟∈ j
+  ... | no ¬p = nothing
+  ... | yes refl with eqⁿ ts us
+  ... | nothing = nothing
+  ... | just σ  = just λ i∈ → σ (squash-map (λ {(op x∈) → x∈}) i∈)
 
-module _ {x : Fin Θ} where mutual
-  walk : {t : Tm Θ}
-    → x ∈ᵥ t → Steps Θ
-  walk (here x)                     = []
-  walk (op {suc _} {i} {t ∷ ts} x∈) = walkTms i t [] ts x∈  
+  eqⁿ : (ts : Tm Ξ ^ n) (us : Tm Θ ^ n)
+    → Maybe ({i : Fin Ξ} → ∥ i ∈ᵥₛ ts ∥ → Tm Θ)
+  eqⁿ []       []       = just λ bot → ⊥-elimₚ (∉[] bot)
+  eqⁿ (t ∷ ts) (u ∷ us) with eq t u
+  ... | nothing = nothing
+  ... | just σ  with eqⁿ ts us
+  ... | nothing = nothing
+  ... | just σ′ = {!!}
 
-  walkTms : m ʳ+ (suc n) ∈ D
-    → (t : Tm Θ) (us : Tm Θ ^ m) (ts : Tm Θ ^ n)
-    → (x∈ : x ∈ᵥₛ t ∷ ts)
-    → Steps Θ
-  walkTms i t₀ us ts (head x∈) = 
-    step i us ts ∷ walk x∈
-  walkTms i t₀ us (t ∷ ts) (tail x∈) =
-    walkTms i t (t₀ ∷ us) ts x∈
-
-_≺_ : Tm Θ → Tm Θ → Set
-_≺_ = _<_ on size
-
-≺-wf : WellFounded (_≺_ {Θ})
-≺-wf = On.wellFounded size <-wf 
-
+-}
 ------------------------------------------------------------------------------
 -- Instances of Presheaves 
 
@@ -404,22 +380,6 @@ instance
   SubIsCategory .⨟-idᵣ   = Sub-⨟-idᵣ
   SubIsCategory .⨟-idₗ   = Sub-⨟-idₗ
 
-module _ {Θ : ℕ} where mutual
-  plugSteps-id : (ps : Steps Θ)
-    → plugSteps ps id ≡ ps
-  plugSteps-id []       = refl
-  plugSteps-id (step p us ts ∷ ps) = cong₂ _∷_
-    (cong₂ (step p) (subⁿ-id us) (subⁿ-id ts))
-    (plugSteps-id ps)
-
-module _ {Θ n l : ℕ} (σ : Sub Θ n) (ρ : Sub n l) where mutual
-  plugSteps-⨟ : (ps : Steps Θ)
-    → plugSteps ps (σ ⨟ ρ) ≡ plugSteps (plugSteps ps σ) ρ
-  plugSteps-⨟ []       = refl
-  plugSteps-⨟ (step p ts us ∷ ps) = cong₂ _∷_
-    (cong₂ (step p) (subⁿ-⨟ σ ρ ts ) (subⁿ-⨟ σ ρ us))
-    (plugSteps-⨟ ps)
-
 instance
   TmRenIsPresheaf : IsPresheaf Tm
   TmRenIsPresheaf ._⟨_⟩ t ρ = rename ρ t
@@ -440,11 +400,6 @@ instance
   TmsSubIsPresheaf ._⟨_⟩ t σ = subⁿ σ t
   TmsSubIsPresheaf .⟨⟩-id       = subⁿ-id
   TmsSubIsPresheaf .⟨⟩-⨟ σ ρ ts = subⁿ-⨟ σ ρ ts
-
-  plugSubIsPresheaf : IsPresheaf Steps
-  plugSubIsPresheaf ._⟨_⟩ = plugSteps
-  plugSubIsPresheaf .⟨⟩-id       = plugSteps-id
-  plugSubIsPresheaf .⟨⟩-⨟ σ ρ ts = plugSteps-⨟ σ ρ ts
 
 instance
   TmEquality : DecEq (Tm Θ)

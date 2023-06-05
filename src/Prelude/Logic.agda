@@ -2,18 +2,10 @@
 
 module Prelude.Logic where
 
-open import Function
-  hiding (_∋_; id; Equivalence; _⇔_)
-open import Data.Empty                         
-  using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
-open import Data.Product
-
-open import Level
-
+open import Prelude.Level
 open import Prelude.Equivalence
 
 private variable
-  ℓ ℓ₁ ℓ₂ ℓ′ : Level
   A B C : Set ℓ
   I : Set ℓ
   J : I → Set ℓ

@@ -14,11 +14,11 @@ import Syntax.BiTyped.Raw.Functor SD Id as R
 
 open B SD
 
-Pred :  (ℓ′ : Level) → ℕ → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc ℓ′))
+Pred :  (ℓ′ : Level) → ℕ → (X : Mode → Set ℓ) → Set (ℓ ⊔ lsuc ℓ′)
 Pred ℓ′ Θ X = (d : Mode) → TExp Θ → Cxt Θ → X d → Set ℓ′
 
-Pred₀ : ℕ → (X : Mode → Set ℓ) → Set (lmax ℓ (lsuc lzero))
-Pred₀ Θ X = Pred lzero Θ X
+Pred₀ : ℕ → (X : Mode → Set ℓ) → Set _
+Pred₀ Θ X = Pred 0ℓ Θ X
 
 private variable
   Ξ Θ : ℕ

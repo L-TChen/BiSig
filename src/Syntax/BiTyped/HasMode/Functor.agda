@@ -4,17 +4,17 @@ open import Prelude
 
 import Syntax.Simple.Description as S
 
-module Syntax.BiTyped.Raw.Extrinsic.Functor (SD : S.Desc) where
+module Syntax.BiTyped.HasMode.Functor (SD : S.Desc) where
 
 open import Syntax.Simple              SD
+import      Syntax.Typed.Raw.Functor   SD as R
 open import Syntax.BiTyped.Description SD
-import Syntax.Typed.Raw.Functor        SD as R
 
 open import Theory.Erasure.Description
 
 private variable
-  n Ξ : ℕ
-  X   : R.Fam ℓ
+  Ξ : ℕ
+  X : R.Fam ℓ
 
 Fam : (ℓ : Level) → R.Fam ℓ′ → Set (lmax (lsuc ℓ) ℓ′)
 Fam ℓ X = (n : ℕ) → Mode → X n → Set ℓ

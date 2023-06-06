@@ -2,9 +2,7 @@ module Example.Outline where
 
 open import Prelude
 
-variable
-  n : ℕ
-  d : Mode
+variable n : ℕ
 
 -- Simplest types (with metavariables)
 
@@ -194,12 +192,8 @@ infer bidir infer⇔ s c Γ r with bidir r
 ... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇔ Γ p))
 ... | no ¬p = inr ¬p
 
-{-
-
-Γ ⊢ r ⦂ τ   ←   Γ ⊢ r ⇒ τ
-
-  ↑               ↑
-
-r : Raw n   →   HasMode Inf r
-
--}
+--   Γ ⊢ r ⦂ τ   ←   Γ ⊢ r ⇒ τ
+--
+--     ↑               ↑
+--
+--   r : Raw n   →   HasMode Inf r

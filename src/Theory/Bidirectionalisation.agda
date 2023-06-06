@@ -9,13 +9,13 @@ open import Prelude
 
 open B SD
 
-open import Syntax.Typed.Raw.Functor             SD as TF
-open import Syntax.BiTyped.Raw.Extrinsic.Functor SD as BF
+open import Syntax.Typed.Raw.Functor       SD as TF
+open import Syntax.BiTyped.HasMode.Functor SD as BF
 
 open import Theory.Erasure.Description
 
-open import Syntax.Typed.Raw.Term      (erase BD)
-open import Syntax.BiTyped.Raw.Extrinsic.Term BD
+open import Syntax.Typed.Raw.Term (erase BD)
+open import Syntax.BiTyped.HasMode.Term  BD
 
 private variable
   n Ξ : ℕ

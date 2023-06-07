@@ -22,17 +22,17 @@ private variable
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) (X : R.Fam ℓ) (Y : (Γ : Cxt₀) → X (length Γ) → Set ℓ′)
      → TSub Ξ 0 → (Γ : Cxt₀) → R.⟦ Δ ⟧ᵃ X (length Γ) → Set ℓ′
-⟦ []    ⟧ᵃ X Y ρ Γ x = Y Γ x
-⟦ A ∷ Δ ⟧ᵃ X Y ρ Γ x = ⟦ Δ ⟧ᵃ X Y ρ ((A ⟨ ρ ⟩) ∷ Γ) x
+⟦ []    ⟧ᵃ X Y σ Γ x = Y Γ x
+⟦ A ∷ Δ ⟧ᵃ X Y σ Γ x = ⟦ Δ ⟧ᵃ X Y σ ((A ⟨ σ ⟩) ∷ Γ) x
 
 ⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
       → TSub Ξ 0 → (Γ : Cxt₀) → R.⟦ D ⟧ᵃˢ X (length Γ) → Set ℓ′
 ⟦ []           ⟧ᵃˢ _ _ _ _ _        = ⊤
-⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X Y ρ Γ (x , xs) =
-  ⟦ Δ ⟧ᵃ X (λ Γ x → Y Γ x (A ⟨ ρ ⟩)) ρ Γ x × ⟦ Ds ⟧ᵃˢ X Y ρ Γ xs
+⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X Y σ Γ (x , xs) =
+  ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 
 ⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ᶜ X)
-⟦ ι {Ξ} B D ⟧ᶜ X Y Γ x A = Σ[ ρ ∈ TSub Ξ 0 ] B ⟨ ρ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y ρ Γ x
+⟦ ι {Ξ} B D ⟧ᶜ X Y Γ x A = Σ[ σ ∈ TSub Ξ 0 ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ x
 
 ⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
 ⟦ D ⟧ X Y Γ (i , xs) A = ⟦ D .rules i ⟧ᶜ X Y Γ xs A

@@ -30,7 +30,7 @@ private variable
       → TSub Ξ 0 → (Γ : Cxt₀) → R.⟦ eraseᵃˢ D ⟧ᵃˢ X (length Γ) → Set ℓ′
 ⟦ []              ⟧ᵃˢ _ _ _ _ _        = ⊤
 ⟦ Δ ⊢[ d ] A ∷ Ds ⟧ᵃˢ X Y σ Γ (x , xs) =
-  ⟦ Δ ⟧ᵃ X (λ Γ x' → Y Γ x' d (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
+  ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' d (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 
 ⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
 ⟦ ι {Ξ} d B D ⟧ᶜ X Y Γ xs d′ A =

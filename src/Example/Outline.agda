@@ -165,14 +165,14 @@ TypeInference⇔ = (Γ : List Ty) {r : Raw (length Γ)}
 
 Soundness : Set
 Soundness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
-          → HasMode d r  →  Γ ⊢ r [ d ] τ  →  Γ ⊢ r ⦂ τ
+          → Γ ⊢ r [ d ] τ  →  Γ ⊢ r ⦂ τ
 
 soundness : Soundness
-soundness (` ._)    (` i)      = ` i
-soundness (._ ∋ p)  (τ ∋ t)    = τ ∋ soundness p t
-soundness (p ↑)     (t ↑ refl) = soundness p t
-soundness (app p q) (app t u)  = app (soundness p t) (soundness q u)
-soundness (abs p)   (abs t)    = abs (soundness p t)
+soundness (` i)      = ` i
+soundness (τ ∋ t)    = τ ∋ soundness t
+soundness (t ↑ refl) = soundness t
+soundness (app t u)  = app (soundness t) (soundness u)
+soundness (abs t)    = abs (soundness t)
 
 Completeness : Set
 Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
@@ -189,7 +189,7 @@ infer : Bidirectionalisation → TypeInference⇔
       → Soundness → Completeness
       → TypeInference (HasMode Inf)
 infer bidir infer⇔ s c Γ r with bidir r
-... | yes p = inl (map′ (map₂ (s p)) (map₂ (c p)) (infer⇔ Γ p))
+... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (infer⇔ Γ p))
 ... | no ¬p = inr ¬p
 
 --   Γ ⊢ r ⦂ τ   ←   Γ ⊢ r ⇒ τ

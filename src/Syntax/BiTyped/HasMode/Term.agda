@@ -41,6 +41,6 @@ data HasMode : {n : ℕ} → Mode → Raw n → Set where
         HasMode Chk r
 
   op  : {rs : R.⟦ erase D ⟧ Raw n}
-      → (ts : ⟦ D ⟧ (λ k → HasMode {k}) n d rs)
-      → ---------------------------------------
+      → (ts : ⟦ D ⟧ Raw (λ k → HasMode {k}) n d rs)
+      → -------------------------------------------
         HasMode d (op rs)

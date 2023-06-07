@@ -22,15 +22,16 @@ Fam ℓ X = (n : ℕ) → Mode → X n → Set ℓ
 Fam₀ : R.Fam₀ → Set₁
 Fam₀ = Fam lzero
 
-⟦_⟧ᵃ : (Δ : TExps Ξ) → Fam ℓ X → Fam ℓ (R.⟦ Δ ⟧ᵃ X)
-⟦ Δ ⟧ᵃ X n d x = X (length Δ ʳ+ n) d x
+⟦_⟧ᵃ : (Δ : TExps Ξ) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ Δ ⟧ᵃ X)
+⟦ Δ ⟧ᵃ X Y n d x = Y (length Δ ʳ+ n) d x
 
-⟦_⟧ᵃˢ : (D : ArgsD Ξ) → Fam ℓ X → (n : ℕ) → R.⟦ eraseᵃˢ D ⟧ᵃˢ X n → Set ℓ
-⟦ []                ⟧ᵃˢ _ _ _        = ⊤
-⟦ (Δ ⊢[ d ] _) ∷ Ds ⟧ᵃˢ X n (x , xs) = ⟦ Δ ⟧ᵃ X n d x × ⟦ Ds ⟧ᵃˢ X n xs
+⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
+      → (n : ℕ) → R.⟦ eraseᵃˢ D ⟧ᵃˢ X n → Set ℓ′
+⟦ []                ⟧ᵃˢ _ _ _ _        = ⊤
+⟦ (Δ ⊢[ d ] _) ∷ Ds ⟧ᵃˢ X Y n (x , xs) = ⟦ Δ ⟧ᵃ X Y n d x × ⟦ Ds ⟧ᵃˢ X Y n xs
 
-⟦_⟧ᶜ : (D : ConD) → Fam ℓ X → Fam ℓ (R.⟦ eraseᶜ D ⟧ᶜ X)
-⟦ ι d  _ D ⟧ᶜ X n d' t = d ≡ d' × ⟦ D ⟧ᵃˢ X n t
+⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
+⟦ ι d  _ D ⟧ᶜ X Y n d' t = d ≡ d' × ⟦ D ⟧ᵃˢ X Y n t
 
-⟦_⟧ : (D : Desc) → Fam ℓ X → Fam ℓ (R.⟦ erase D ⟧ X)
-⟦ D ⟧ X n d (i , t) = ⟦ D .rules i ⟧ᶜ X n d t
+⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ erase D ⟧ X)
+⟦ D ⟧ X Y n d (i , t) = ⟦ D .rules i ⟧ᶜ X Y n d t

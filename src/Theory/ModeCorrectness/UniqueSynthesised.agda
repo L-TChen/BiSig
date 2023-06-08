@@ -1,15 +1,13 @@
-{-# OPTIONS --safe #-}
-
 open import Prelude
 
 import Syntax.Simple.Description          as S
 import Syntax.BiTyped.Description         as B
-import Theory.ModeCorrectness.Description as M
+import Theory.ModeCorrectness.Description as MC
 
 module Theory.ModeCorrectness.UniqueSynthesised {SD : S.Desc}
-  (Id : Set) (D : B.Desc SD) (mc : M.ModeCorrect SD D) where
+  (Id : Set) (D : B.Desc SD) (mc : MC.ModeCorrect SD D) where
 
-open M SD
+open MC SD
 open B SD
 
 open import Syntax.NamedContext           SD Id
@@ -24,7 +22,7 @@ open import Syntax.BiTyped.Extrinsic.Term           Id D
 
 private variable
   Ξ Θ : ℕ
-  xs    : List (Fin Ξ)
+  xs    : Fins Ξ
   Γ     : Cxt  Θ
   A B   : TExp Ξ
   As    : TExps Ξ
@@ -49,36 +47,35 @@ mutual
     → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
     → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
     → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
-  uniq-↑ᶜ (ι Syn A Ds) refl (C⊆xs , SDs) ⊢ts ⊢us =
-    ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs x)
+  uniq-↑ᶜ (ι Syn A Ds) refl (SDs , C⊆xs) ⊢ts ⊢us =
+    ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs (∈ᵥ→∈fv x))
 
   uniq-↑ⁿ
     : (Ds : ArgsD Ξ) → Syn.ModeCorrectᵃˢ Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
-    → ∀ {x} → L.Any (x ∈ᵥ_) (Syn.known Ds)
-    → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
+    → ∀ {x} → x ∈ (known Ds)
+    → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
   uniq-↑ⁿ []                  _         _         _         ()
   uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , SDs) (_ , ⊢ts) (_ , ⊢us) =
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us
-  uniq-↑ⁿ (Δ B.⊢[ Syn ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (here px) =
-    uniq-↑ᵃ C Δ SD ⊢t ⊢u (uniq-↑ⁿ Ds SDs ⊢ts ⊢us) px
-  uniq-↑ⁿ (Δ B.⊢[ Syn ] C ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) (there i) =
-    uniq-↑ⁿ Ds SDs ⊢ts ⊢us i
+  uniq-↑ⁿ (Δ ⊢[ Syn ] A ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) x∈ with L.++⁻ (fv A) x∈
+  ... | inl x∈A  = uniq-↑ᵃ A Δ SD ⊢t ⊢u (uniq-↑ⁿ Ds SDs ⊢ts ⊢us) x∈A
+  ... | inr x∈Ds = uniq-↑ⁿ Ds SDs ⊢ts ⊢us x∈Ds
 
   uniq-↑ᵃ
-    : (C : TExp Ξ) (Δ : TExps Ξ) → Cover As Δ
+    : (C : TExp Ξ) (Δ : TExps Ξ) → Cover xs Δ
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
     → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
     → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
-    → (∀ {x} → L.Any (x ∈ᵥ_) As → V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
-    → ∀ {x} → x ∈ᵥ C
-    → V.lookup ρ₁ x ≡ V.lookup ρ₂ x
-  uniq-↑ᵃ C []      _           ⊢t ⊢u f = ≡-fv-inv C (uniq-↑ ⊢t ⊢u)
-  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs ∷ SD) ⊢t ⊢u f = 
-    uniq-↑ᵃ C Δ SD (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
-    where A₁=A₂ = ≡-fv A λ x∈fvA → f (A⊆xs x∈fvA) 
+    → (∀ {x} → x ∈ xs → ρ₁ x ≡ ρ₂ x) -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
+    → ∀ {x} → x ∈ fv C
+    → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
+  uniq-↑ᵃ C []      _  ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈fv→∈ᵥ x)
+  uniq-↑ᵃ C (A ∷ Δ) SD ⊢t ⊢u f = 
+    uniq-↑ᵃ C Δ (SD ∘ L.++⁺ʳ (fv A)) (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+    where A₁=A₂ = ≡-fv A λ x∈ → f (SD (L.++⁺ˡ (∈ᵥ→∈fv x∈))) -- (A⊆xs (∈ᵥ→∈fv x∈))
 
 ¬switch
   : {t : Raw⇒ Θ}

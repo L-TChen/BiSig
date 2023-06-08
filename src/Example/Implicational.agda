@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 open import Prelude
   hiding (_↣_)
 

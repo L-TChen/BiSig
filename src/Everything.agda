@@ -1,6 +1,8 @@
-{-# OPTIONS --safe #-}
-
 import Prelude
+import Prelude.Level      
+import Prelude.Equivalence
+import Prelude.Logic      
+import Prelude.Category   
 
 import Syntax.Context
 import Syntax.NamedContext
@@ -9,9 +11,6 @@ import Syntax.NamedContext
 import Syntax.Simple.Description
 import Syntax.Simple.Term
 import Syntax.Simple.Properties
--- import Syntax.Simple.Association
--- import Syntax.Simple.Unification
--- import Syntax.Simple.Unification.Properties
 
 import Syntax.Typed.Description
 import Syntax.Typed.Intrinsic.Functor

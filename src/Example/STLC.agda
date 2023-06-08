@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Example.STLC where
 
 open import Prelude
@@ -36,20 +34,18 @@ private variable
   A B : Λₜ  m
   Γ Δ : Cxt m
 
-pattern _·_ t u  = op (`app , _ ∷ _ ∷ [] , refl , t , u , _)
-pattern ƛ_ t     = op (`abs , _ ∷ _ ∷ [] , refl , t , _)
-
-infixl 8 _·_
-infixr 7 ƛ_
+pattern app ρ t u  = op (`app , ρ , refl , t , u , _)
+pattern lam ρ t    = op (`abs , ρ , refl , t , _)
 
 𝑰 : Tm _ (A ↣ A) Γ
-𝑰 = ƛ ` here refl
+𝑰 = lam (λ { zero → _ ; (suc zero) → _ }) (` here refl)  -- ƛ ` here refl
 
 𝐾₁ : Tm _ (A ↣ B ↣ A) Γ
-𝐾₁  = ƛ ƛ ` there (here refl)
+𝐾₁  = lam (λ { zero → _ ; (suc zero) → _ })
+       (lam (λ { zero → _ ; (suc zero) → _ }) (` there (here refl)))
 
 _ : Tm _ A (A ∷ Γ)
-_ = 𝑰 · ` here refl
+_ = app (λ { zero → _ ; (suc zero) → _ }) 𝑰 (` here refl)
 
 {-
 height : Tm _ A Γ → ℕ

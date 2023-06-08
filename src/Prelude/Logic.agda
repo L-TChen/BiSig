@@ -1,4 +1,4 @@
-{-# OPTIONS --with-K --safe #-}
+{-# OPTIONS --safe #-}
 
 module Prelude.Logic where
 

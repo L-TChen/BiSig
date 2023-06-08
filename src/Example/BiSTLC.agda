@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Example.BiSTLC where
 
 open import Prelude
@@ -33,8 +31,8 @@ open import Syntax.BiTyped.Description ΛₜD
 
 open import Syntax.BiTyped.Intrinsic.Term Λ⇆D
 
-pattern ƛ′_  t   = op (`abs , refl , _ ∷ _ ∷ [] , refl , t , _)
-pattern _·′_ t u = op (`app , refl , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern lam ρ t   = op (`abs , refl , ρ , refl , t , _)
+pattern app ρ t u = op (`app , refl , ρ , refl , t , u , _)
 
 mutual
   data Λ⇉ {m : ℕ} : Λₜ m → Cxt m → Set where
@@ -62,26 +60,19 @@ toΛ : Tm _ mod A Γ → Λ mod A Γ
 toΛ (` x)      = ` x
 toΛ (_ ∋ t)    = _ ∋ toΛ t
 toΛ (t ↑by eq) = (toΛ t) ↑by eq
-toΛ (t ·′ u)   = toΛ t · toΛ u
-toΛ (ƛ′ t)     = ƛ toΛ t
+toΛ (app ρ t u)   = toΛ t · toΛ u
+toΛ (lam ρ t)     = ƛ toΛ t
 
 fromΛ : ∀ mod → Λ mod A Γ → Tm _ mod A Γ
 fromΛ Syn (` x)       = ` x
 fromΛ Syn (_ ∋ t)     = _ ∋ fromΛ Chk t
 fromΛ Chk (t ↑by eq) = fromΛ Syn t ↑by eq
-fromΛ Syn (t · u)     = fromΛ Syn t ·′ fromΛ Chk u
-fromΛ Chk (ƛ t)       = ƛ′ (fromΛ Chk t)
+fromΛ Syn (t · u)     = app (λ { zero → _ ; (suc zero) → _}) (fromΛ Syn t) (fromΛ Chk u)
+fromΛ Chk (ƛ t)       = lam (λ { zero → _ ; (suc zero) → _}) (fromΛ Chk t)
 
-from-toΛ : (t : Tm _ mod A Γ) → fromΛ mod (toΛ t) ≡ t
-from-toΛ (` x)       = refl
-from-toΛ (_ ∋ t)     = cong (_ ∋_) (from-toΛ t)
-from-toΛ (t ↑by eq)  = cong (_↑by eq)  (from-toΛ t)
-from-toΛ (t ·′ u)    = cong₂ _·′_ (from-toΛ t) (from-toΛ u)
-from-toΛ (ƛ′ t)      = cong ƛ′_ (from-toΛ t)
-
-to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
-to-fromΛ Syn (` x)      = refl
-to-fromΛ Syn (t · u)    = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
-to-fromΛ Syn (_ ∋ t)    = cong (_ ∋_) (to-fromΛ _ t)
-to-fromΛ Chk (ƛ t)      = cong ƛ_ (to-fromΛ _ t)
-to-fromΛ Chk (t ↑by eq) = cong (_↑by eq) (to-fromΛ _ t)
+-- to-fromΛ : ∀ mod → (t : Λ mod A Γ) → toΛ (fromΛ mod t) ≡ t
+-- to-fromΛ Syn (` x)      = refl
+-- to-fromΛ Syn (t · u)    = cong₂ _·_ (to-fromΛ _ t) (to-fromΛ _ u)
+-- to-fromΛ Syn (_ ∋ t)    = cong (_ ∋_) (to-fromΛ _ t)
+-- to-fromΛ Chk (ƛ t)      = cong ƛ_ (to-fromΛ _ t)
+-- to-fromΛ Chk (t ↑by eq) = cong (_↑by eq) (to-fromΛ _ t)

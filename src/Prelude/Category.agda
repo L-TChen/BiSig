@@ -52,16 +52,16 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) (_≈_ : ∀ {X Y} →
     P Q     : 𝐘 C
 
   infixl 5 _∧_
-  infix 4 _⊒_ _⊑_
+--  infix 4 _⊒_ _⊑_
   infix  3 ¬′_
 --  infix  2 _≗_
   
-  _⊒_ _⊑_
-    : {C D E : Obj}
-    → Mor C D → Mor C E → Set
-  _⊒_ {C} {D} {E} f g = Σ[ h ∈ Mor E D ] (g ⨟ h) ≈ f
-
-  _⊑_ f g = g ⊒ f
+--  _⊒_ _⊑_
+--    : {C D E : Obj}
+--    → Mor C D → Mor C E → Set
+--  _⊒_ {C} {D} {E} f g = Σ[ h ∈ Mor E D ] (g ⨟ h) ≈ f
+--
+--  _⊑_ f g = g ⊒ f
 
 
   _∧_ : (P Q : 𝐘 C) → 𝐘 C
@@ -90,13 +90,13 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) (_≈_ : ∀ {X Y} →
 
   infixl 5 _[_⨟]
   
-  Min : 𝐘 C → 𝐘 C
-  Min {C} P D f = P D f ×
-    (∀ {D} (g : Mor C D) → P D g → f ⊑ g)
+--  Min : 𝐘 C → 𝐘 C
+--  Min {C} P D f = P D f ×
+--    (∀ {D} (g : Mor C D) → P D g → f ⊑ g)
 
-  ↑-closed : 𝐘 C → Set
-  ↑-closed {C} P = ∀ {D E} (f : Mor C D) (g : Mor C E)
-    → f ⊑ g → P _ f → P _ g  
+--  ↑-closed : 𝐘 C → Set
+--  ↑-closed {C} P = ∀ {D E} (f : Mor C D) (g : Mor C E)
+--    → f ⊑ g → P _ f → P _ g  
 
 --  Min≗
 --    : P ≗ Q
@@ -133,11 +133,11 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) (_≈_ : ∀ {X Y} →
 --    ; from = {!!} -- subst (P D) (⨟-idₗ f)
 --    }
 
-  Min-id
-    : (P : 𝐘 C)
-    → P C id
-    → Min P _ id
-  Min-id P Pid = Pid , λ g Pg → g , (⨟-idₗ g)
+--  Min-id
+--    : (P : 𝐘 C)
+--    → P C id
+--    → Min P _ id
+--  Min-id P Pid = Pid , λ g Pg → g , (⨟-idₗ g)
 --
 --  Min-⨟-id
 --    : (P : 𝐘 C) (f : Mor C D)

@@ -15,6 +15,9 @@ open import Data.Unit                          public
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 
+open import Data.Bool                          public
+  using (Bool; true; false; _∨_)
+
 open import Data.Maybe                         public
   using (Maybe; nothing; just)
 

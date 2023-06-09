@@ -2,7 +2,10 @@ module Example.Outline where
 
 open import Prelude
 
-variable n : ℕ
+variable
+  n : ℕ
+  b b₀ b₁ b₂ : Bool
+  d : Mode
 
 -- Simplest types (with metavariables)
 
@@ -34,7 +37,7 @@ data Raw : ℕ → Set where
   app : Raw n → Raw n → Raw n
   abs : Raw (suc n)   → Raw n
 
-variable r s : Raw _
+variable r r' s s' : Raw _
 
 -- The typing relation for simply typed λ-calculus
 
@@ -87,7 +90,7 @@ TypeInference-lemma infer Γ r p
 -- Terms are syntactically classified into two categories
 -- based on whether their types can be inferred or (only) checked
 
-data HasMode : {n : ℕ} → Mode → Raw n → Set where
+data HasMode : Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → -----------------
@@ -119,7 +122,7 @@ Bidirectionalisation : Set
 Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (HasMode Inf r)
 
 -- Second step: bidirectional type inference
--- If a bidirectional type system is designed well (i.e., d-correct),
+-- If a bidirectional type system is designed well (i.e., mode-correct),
 -- from inferred types we can derive what the types of checked terms should be
 
 infix 3 _⊢_[_]_ _⊢_⇐_ _⊢_⇒_
@@ -197,3 +200,79 @@ infer bidir infer⇔ s c Γ r with bidir r
 --     ↑               ↑
 --
 --   r : Raw n   →   HasMode Inf r
+
+data Or : List Bool → Bool → Set where
+  nil :                    Or []           false
+  hd  : ∀ {bs}           → Or (true  ∷ bs) true
+  tl  : ∀ {bs} → Or bs b → Or (false ∷ bs) b
+
+data DefChk : Bool → {n : ℕ} → Raw n → Set where
+  var : {i : Fin n} → DefChk false (` i)
+  ann :               DefChk false (τ ∋ r)
+  app :               DefChk false (app r s)
+  abs :               DefChk true  (abs r)
+
+data Missing : Bool → {n : ℕ} → Raw n → Set where
+  var : {i : Fin n} → Missing false (` i)
+  ann : Missing b r → Missing b (τ ∋ r)
+  app : ∀ {b₀ b₁ b₂} → DefChk b₀ r → Missing b₁ r → Missing b₂ s
+      → Or (b₀ ∷ b₁ ∷ b₂ ∷ []) b → Missing b (app r s)
+  abs : Missing b r → Missing b (abs r)
+
+missing-true' : (r : Raw n) → Missing true r → ¬ HasMode Chk r
+missing-true' (τ ∋ r)          (ann m)                   ((.τ ∋ p) ↑) = missing-true' r m   p
+missing-true' (app r s)        (app _ m₁ _ (tl hd))      (app p  q ↑) = missing-true' r m₁ (p ↑)
+missing-true' (app r s)        (app _ _ m₂ (tl (tl hd))) (app p  q ↑) = missing-true' s m₂  q
+missing-true' (app .(abs _) s) (app abs _ _ hd)          (app () q ↑)
+missing-true' (abs r)          (abs m)                   (abs p)      = missing-true' r m   p
+
+missing-true : (r : Raw n) → Missing true r → ¬ (Σ[ d ∈ Mode ] HasMode d r)
+missing-true r m (Chk , t) = missing-true' r m  t
+missing-true r m (Inf , t) = missing-true' r m (t ↑)
+
+mutual
+
+  missing-false : (r : Raw n) → Missing false r
+                → Σ[ d ∈ Mode ] HasMode d r
+  missing-false (` i)     _       = _ , ` i
+  missing-false (τ ∋ r)   (ann m) = _ , τ ∋ missing-false-Chk r m
+  missing-false (app r s) (app c mr ms (tl (tl (tl nil)))) =
+    _ , app (missing-false-Inf r mr c) (missing-false-Chk s ms)
+  missing-false (abs r)   (abs m) = _ , abs (missing-false-Chk r m)
+
+  missing-false-Chk : (r : Raw n) → Missing false r → HasMode Chk r
+  missing-false-Chk r m with missing-false r m
+  ... | Inf , t = t ↑
+  ... | Chk , t = t
+
+  missing-false-Inf : (r : Raw n) → Missing false r → DefChk false r → HasMode Inf r
+  missing-false-Inf r  m c   with missing-false r m
+  missing-false-Inf r  m c   | Inf ,  t    = t
+  missing-false-Inf ._ m var | Chk , (t ↑) = t
+  missing-false-Inf ._ m ann | Chk , (t ↑) = t
+  missing-false-Inf ._ m app | Chk , (t ↑) = t
+
+data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
+
+  `_   : (i : Fin n)
+       → --------------
+         (` i) ≤ᴬ (` i)
+
+  _∋_  : (τ : Ty)
+       → r ≤ᴬ r'
+       → -------------------
+         (τ ∋ r) ≤ᴬ (τ ∋ r')
+
+  _∋'_ : (τ : Ty)
+       → r ≤ᴬ r'
+       → -------------
+         r ≤ᴬ (τ ∋ r')
+
+  app  : r ≤ᴬ r'
+       → s ≤ᴬ s'
+       → --------------------
+         app r s ≤ᴬ app r' s'
+
+  abs  : r ≤ᴬ r'
+       → ---------------
+         abs r ≤ᴬ abs r'

@@ -4,7 +4,7 @@ open import Prelude
 
 variable
   n : ℕ
-  b b₀ b₁ b₂ : Bool
+  b b' b₀ b₁ b₂ b₃ : Bool
   d : Mode
 
 -- Simplest types (with metavariables)
@@ -201,56 +201,64 @@ infer bidir infer⇔ s c Γ r with bidir r
 --
 --   r : Raw n   →   HasMode Inf r
 
-data Or : List Bool → Bool → Set where
-  nil :                    Or []           false
-  hd  : ∀ {bs}           → Or (true  ∷ bs) true
-  tl  : ∀ {bs} → Or bs b → Or (false ∷ bs) b
+data And : List Bool → Bool → Set where
+  nil :                     And []           true
+  hd  : ∀ {bs}            → And (false ∷ bs) false
+  tl  : ∀ {bs} → And bs b → And (true  ∷ bs) b
 
-data DefChk : Bool → {n : ℕ} → Raw n → Set where
-  var : {i : Fin n} → DefChk false (` i)
-  ann :               DefChk false (τ ∋ r)
-  app :               DefChk false (app r s)
-  abs :               DefChk true  (abs r)
+data HasMode' : Bool → Bool → Mode → {n : ℕ} → Raw n → Set where
 
-data Missing : Bool → {n : ℕ} → Raw n → Set where
-  var : {i : Fin n} → Missing false (` i)
-  ann : Missing b r → Missing b (τ ∋ r)
-  app : ∀ {b₀ b₁ b₂} → DefChk b₀ r → Missing b₁ r → Missing b₂ s
-      → Or (b₀ ∷ b₁ ∷ b₂ ∷ []) b → Missing b (app r s)
-  abs : Missing b r → Missing b (abs r)
+  `_  : (i : Fin n)
+      → ----------------------------
+        HasMode' true true Inf (` i)
 
-missing-true' : (r : Raw n) → Missing true r → ¬ HasMode Chk r
-missing-true' (τ ∋ r)          (ann m)                   ((.τ ∋ p) ↑) = missing-true' r m   p
-missing-true' (app r s)        (app _ m₁ _ (tl hd))      (app p  q ↑) = missing-true' r m₁ (p ↑)
-missing-true' (app r s)        (app _ _ m₂ (tl (tl hd))) (app p  q ↑) = missing-true' s m₂  q
-missing-true' (app .(abs _) s) (app abs _ _ hd)          (app () q ↑)
-missing-true' (abs r)          (abs m)                   (abs p)      = missing-true' r m   p
+  _↑  : HasMode' true b Inf r
+      → ----------------------
+        HasMode' false b Chk r
 
-missing-true : (r : Raw n) → Missing true r → ¬ (Σ[ d ∈ Mode ] HasMode d r)
-missing-true r m (Chk , t) = missing-true' r m  t
-missing-true r m (Inf , t) = missing-true' r m (t ↑)
+  _∋_ : (τ : Ty)
+      → HasMode' b' b Chk r
+      → ---------------------------
+        HasMode' true b Inf (τ ∋ r)
+
+  ?∋_ : HasMode' true b Chk r
+      → --------------------------
+        HasMode' false false Inf r
+
+  app : HasMode' b₀ b₁ Inf r
+      → HasMode' b₂ b₃ Chk s
+      → And (b₁ ∷ b₃ ∷ []) b
+      → -----------------------------
+        HasMode' true b Inf (app r s)
+
+  abs : HasMode' b' b Chk r
+      → ---------------------------
+        HasMode' true b Chk (abs r)
+
+hasMode : HasMode' b true d r → HasMode d r
+hasMode (` i)   = ` i
+hasMode (t ↑)   = hasMode t ↑
+hasMode (τ ∋ t) = τ ∋ hasMode t
+hasMode (app t u (tl (tl nil))) = app (hasMode t) (hasMode u)
+hasMode (abs t) = abs (hasMode t)
+
+¬hasMode-Inf : HasMode' true b Chk r → ¬ HasMode Inf r
+¬hasMode-Inf (abs t) ()
 
 mutual
 
-  missing-false : (r : Raw n) → Missing false r
-                → Σ[ d ∈ Mode ] HasMode d r
-  missing-false (` i)     _       = _ , ` i
-  missing-false (τ ∋ r)   (ann m) = _ , τ ∋ missing-false-Chk r m
-  missing-false (app r s) (app c mr ms (tl (tl (tl nil)))) =
-    _ , app (missing-false-Inf r mr c) (missing-false-Chk s ms)
-  missing-false (abs r)   (abs m) = _ , abs (missing-false-Chk r m)
+  ¬hasMode-Chk : HasMode' true false Inf r → ¬ HasMode Chk r
+  ¬hasMode-Chk (τ ∋ t)            ((.τ ∋ u) ↑) = ¬hasMode t u
+  ¬hasMode-Chk (app t t' hd)      (app u u' ↑) = ¬hasMode t u
+  ¬hasMode-Chk (app t t' (tl hd)) (app u u' ↑) = ¬hasMode t' u'
 
-  missing-false-Chk : (r : Raw n) → Missing false r → HasMode Chk r
-  missing-false-Chk r m with missing-false r m
-  ... | Inf , t = t ↑
-  ... | Chk , t = t
-
-  missing-false-Inf : (r : Raw n) → Missing false r → DefChk false r → HasMode Inf r
-  missing-false-Inf r  m c   with missing-false r m
-  missing-false-Inf r  m c   | Inf ,  t    = t
-  missing-false-Inf ._ m var | Chk , (t ↑) = t
-  missing-false-Inf ._ m ann | Chk , (t ↑) = t
-  missing-false-Inf ._ m app | Chk , (t ↑) = t
+  ¬hasMode : HasMode' b false d r → ¬ HasMode d r
+  ¬hasMode (t ↑)              u          = ¬hasMode-Chk t u
+  ¬hasMode (τ ∋ t)            (.τ ∋ u)   = ¬hasMode t u
+  ¬hasMode (?∋ t)             u          = ¬hasMode-Inf t u
+  ¬hasMode (app t t' hd)      (app u u') = ¬hasMode t u
+  ¬hasMode (app t t' (tl hd)) (app u u') = ¬hasMode t' u'
+  ¬hasMode (abs t)            (abs u)    = ¬hasMode t u
 
 data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
 

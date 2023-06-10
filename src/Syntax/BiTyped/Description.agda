@@ -4,7 +4,7 @@ import Syntax.Simple.Description as S
 
 module Syntax.BiTyped.Description (SD : S.Desc) where
 
-open import Syntax.Context
+open import Syntax.Context     SD
 open import Syntax.Simple.Term SD as Ty
   renaming (Tm to TExp)
 
@@ -19,7 +19,7 @@ infixr 7 ρ-syntax _⊢[_]_
 record ArgD (Ξ : ℕ) : Set where
   constructor _⊢[_]_
   field
-    cxt  : List (TExp Ξ)
+    cxt  : Cxt Ξ -- List (TExp Ξ)
     mode : Mode
     type : TExp Ξ
 

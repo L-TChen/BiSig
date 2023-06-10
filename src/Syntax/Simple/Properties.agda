@@ -257,10 +257,6 @@ module _ {Ξ : ℕ} where
   ... | inl x∈t  = here (∈fv→∈ᵥ x∈t)
   ... | inr x∈ts = there (Any∈→Any∈ᵥ x∈ts)
 
-⊆-∈Sub : {xs ys : List (Fin Ξ)}
-  → ys ⊆ xs → ∈Sub xs Θ → ∈Sub ys Θ
-⊆-∈Sub ys⊆xs (ρ , ∈-irr) = (λ i → ρ i ∘ ys⊆xs) , λ x y → ∈-irr (ys⊆xs x) (ys⊆xs y)
-
 ∈sub-++ : {xs ys : Fins Ξ}
   → (ρ : ∈Sub xs Θ) (σ : ∈Sub ys Θ)
   → Consistent ρ σ
@@ -279,11 +275,13 @@ module _ {Ξ : ℕ} where
     ... | inr y₁ | inl x₁ = sym (con x₁ y₁)
     ... | inr y₁ | inr y₂ = q y₁ y₂
 
+{-
 ∈sub-++-inv : {xs ys : Fins Ξ}
   → ∈Sub (xs ++ ys) Θ
   → Σ[ ρ ∈ ∈Sub xs Θ ] Σ[ σ ∈ ∈Sub ys Θ ] Consistent ρ σ
 ∈sub-++-inv γ@(f , r) = ⊆-∈Sub L.++⁺ˡ γ  , ⊆-∈Sub (L.++⁺ʳ _) γ ,
   λ x y → r (L.++⁺ˡ x) (L.++⁺ʳ _ y)
+-}
 
 ⊑-refl : {xs : Fins Ξ}
   → (ρ : ∈Sub xs Θ) → ρ ⊑ ρ

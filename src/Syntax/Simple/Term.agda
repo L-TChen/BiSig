@@ -118,16 +118,6 @@ mutual
 _⊆ᵥ_ : Tm Ξ → Tms Ξ → Set
 A ⊆ᵥ As = ∀ {i} → i ∈ᵥ A → L.Any (i ∈ᵥ_) As
 
-length∈ᵥₛ : {x : Fin Θ} {ts : Tm Θ ^ n} → x ∈ᵥₛ ts → Fin n
-length∈ᵥₛ (head x∈) = zero
-length∈ᵥₛ (tail x∈) = suc (length∈ᵥₛ x∈)
-
-lookup∈ᵥₛ : {x : Fin Θ} {ts : Tm Θ ^ n}
-  → (i : x ∈ᵥₛ ts)
-  → x ∈ᵥ lookup ts (length∈ᵥₛ i) 
-lookup∈ᵥₛ (head x∈) = x∈
-lookup∈ᵥₛ (tail x∈) = lookup∈ᵥₛ x∈
-
 ------------------------------------------------------------------------------
 -- Substitution structure
 
@@ -192,16 +182,14 @@ _⊑_ : {xs ys : Fins Ξ}
   → ∈Sub xs Θ → ∈Sub ys Θ → Set
 _⊑_ {_} {_} {xs} {ys} ρ σ = xs ⊆ ys × Consistent ρ σ
 
-mutual
-  ∈sub : (t : Tm Ξ) → ∈Sub (fv t) Θ → Tm Θ
-  ∈sub (` x)         (ρ , _) = ρ x (here refl) -- ρ x (here refl) 
-  ∈sub (op (i , ts)) ρ       = op (i , ∈subⁿ ts ρ)
+module _ {vs : Fins Ξ} ((ρ , p) : ∈Sub vs Θ) where mutual
+  ∈sub : (t : Tm Ξ) → fv t ⊆ vs → Tm Θ
+  ∈sub (` x)         ⊆vs = ρ x (⊆vs (here refl))
+  ∈sub (op (i , ts)) ⊆vs = op (i , ∈subⁿ ts ⊆vs)
 
-  ∈subⁿ : (ts : Tm Ξ ^ n) → ∈Sub (fvⁿ ts) Θ → Tm Θ ^ n
-  ∈subⁿ []       ρ = []
-  ∈subⁿ (t ∷ ts) (ρ , ∈-irr) =
-    ∈sub t ((λ i i∈ → ρ i (L.++⁺ˡ i∈)) , λ x y → ∈-irr (L.++⁺ˡ x) (L.++⁺ˡ y))
-    ∷ ∈subⁿ ts ((λ i i∈ → ρ i (L.++⁺ʳ (fv t) i∈)) , (λ x y → ∈-irr (L.++⁺ʳ (fv t) x) (L.++⁺ʳ (fv t) y)))
+  ∈subⁿ : (ts : Tm Ξ ^ n) → fvⁿ ts ⊆ vs → Tm Θ ^ n
+  ∈subⁿ []       ⊆vs = []
+  ∈subⁿ (t ∷ ts) ⊆vs = ∈sub t (⊆vs ∘ L.++⁺ˡ) ∷ ∈subⁿ ts (⊆vs ∘ L.++⁺ʳ _)
 
-empty-∈sub : ∈Sub {Ξ} [] Θ
-empty-∈sub = (λ i ()) , λ ()
+∅∈sub : ∈Sub {Ξ} [] Θ
+∅∈sub = (λ _ ()) , λ ()

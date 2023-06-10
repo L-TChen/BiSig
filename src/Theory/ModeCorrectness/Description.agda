@@ -27,7 +27,6 @@ module Chk (B : TExp Ξ) where
   ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) =
     Cover (fv B ++ known Ds) Δ       × ModeCorrectᵃˢ Ds
 
-
 module Syn where 
   ModeCorrectᵃˢ : ArgsD Ξ → Set
   ModeCorrectᵃˢ []                  = ⊤
@@ -77,18 +76,18 @@ module Functor (Id : Set) where
     → Set ℓ′
   ⟦ []    ⟧ᵃ _  _    X P ρ Γ t       = P Γ t
   ⟦ A ∷ Δ ⟧ᵃ xs Δ⊆As X P ρ Γ (x , t) =
-    ⟦ Δ ⟧ᵃ xs (Δ⊆As ∘ L.++⁺ʳ (fv A)) X P ρ (x ⦂ ∈sub A (⊆-∈Sub (Δ⊆As ∘ L.++⁺ˡ) ρ) , Γ) t
---    ⟦ Δ ⟧ᵃ xs Δ⊆As X P ρ (x ⦂ ∈sub A (⊆-∈Sub A⊆As ρ) , Γ) t 
+    ⟦ Δ ⟧ᵃ xs (Δ⊆As ∘ L.++⁺ʳ (fv A)) X P ρ (x ⦂ ∈sub ρ A (Δ⊆As ∘ L.++⁺ˡ) , Γ) t
 
   ⟦_⟧⇒ᵃˢ : (Ds : ArgsD Ξ) (xs : Fins Ξ) → known Ds ⊆ xs → (MC : Syn.ModeCorrectᵃˢ Ds)
     → (X : Mode → Set ℓ) (P : Pred ℓ′ Θ X)
     → ∈Sub xs Θ
     → Cxt Θ → R.⟦ Ds ⟧ᵃˢ X → Set ℓ′
   ⟦ []                ⟧⇒ᵃˢ xs Ds⊆xs _           _ _ _ _ _        = ⊤
+
   ⟦ Δ ⊢[ Chk ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds , MC) X P ρ Γ (t , ts) =
-    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ʳ _) X (P Chk (∈sub A (⊆-∈Sub (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ˡ) ρ))) ρ Γ t
+    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ʳ _) X (P Chk (∈sub ρ A (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ˡ))) ρ Γ t
     × ⟦ Ds ⟧⇒ᵃˢ xs Ds⊆xs MC X P ρ Γ ts
+    
   ⟦ Δ ⊢[ Syn ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds        , MC) X P ρ Γ (t , ts) =
-    let ρA  = ⊆-∈Sub (Ds⊆xs ∘ L.++⁺ˡ) ρ
-    in ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ L.++⁺ʳ _ ∘ Δ⊆Ds) X (P Syn (∈sub A ρA)) ρ Γ t -- ρDs Γ t
+    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ L.++⁺ʳ _ ∘ Δ⊆Ds) X (P Syn (∈sub ρ A (Ds⊆xs ∘ L.++⁺ˡ))) ρ Γ t -- ρDs Γ t
       × ⟦ Ds ⟧⇒ᵃˢ xs (Ds⊆xs ∘ L.++⁺ʳ _) MC X P ρ Γ ts

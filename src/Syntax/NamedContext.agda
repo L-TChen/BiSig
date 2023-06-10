@@ -16,9 +16,9 @@ cxtSub σ ((x , A) ∷ Γ) = (x , sub σ A) ∷ cxtSub σ Γ
 
 instance
   CxtSubIsPresheaf : IsPresheaf Cxt
-  CxtSubIsPresheaf ._⟨_⟩ Γ σ   = cxtSub σ Γ
+  CxtSubIsPresheaf ._⟨_⟩ Γ σ             = cxtSub σ Γ
   CxtSubIsPresheaf .⟨⟩-id []             = refl
-  CxtSubIsPresheaf .⟨⟩-id ((x , A) ∷ Γ)    = cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-id {ℕ} {TSub} A) (⟨⟩-id Γ)
+  CxtSubIsPresheaf .⟨⟩-id ((x , A) ∷ Γ)  = cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-id {ℕ} {TSub} A) (⟨⟩-id Γ)
   CxtSubIsPresheaf .⟨⟩-⨟ σ ρ []          = refl
   CxtSubIsPresheaf .⟨⟩-⨟ σ ρ ((x , A) ∷ Γ) =
     cong₂ (λ A Γ → (x , A) ∷ Γ) (⟨⟩-⨟ σ ρ A) (⟨⟩-⨟ σ ρ Γ)

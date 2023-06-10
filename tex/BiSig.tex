@@ -373,6 +373,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
 
 \begin{theorem}[Decidability for Bidirectional Typing Judgements]
   For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode correct, the following two statements hold constructively.
+\LT{emphasise that LEM is not allowed.}
   \begin{enumerate}
     \item For every context $\Gamma$ and a pre-synthesised term $\isTerm{t}$, it is decidable that there exists a type $A$ and a bidirectional typing derivation of
       \[
@@ -399,7 +400,7 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
 
 \subsection{Decidability of Bidirectional Type Synthesis and Checking}
 
-\begin{theorem}{Uniqueness of Synthesised Types}\label{thm:unique-syn}
+\begin{theorem}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
   
 \end{theorem}
 
@@ -435,15 +436,15 @@ Accordingly, $\rho$ has to be applied to types that appear in the arity to const
       \]
       for each $i$, or there is no such extension $\rho'$ such that each raw term $t_i^{d_i}$ has a typing derivation. 
 
-    \item For every set $\Xi$ of type variables, a list $\Delta$ of types with variables in $\Xi$, a partial substitution $\rho\colon \PSub{\Xi, \emptyset}$ defined for all types in $\Delta$, and a raw term with mode $d$ then 
+    \item For every set $\Xi$ of type variables, a list $\Delta$ of types with variables in $\Xi$, a partial substitution $\rho\colon \PSub{\Xi, \emptyset}$ defined at least for all types in $\Delta$, a raw term $t$ with mode $d$, and a list of variables $\vec{x}$ then 
       \begin{enumerate}
         \item if $d$ is $\Rightarrow$, then it is decidable that there exists a type $A$ and a typing derivation of
           \[
-            \Gamma, \simsub{\Delta}{\rho} \vdash_{\Sigma, \Omega} t \Rightarrow A 
+            \Gamma, \vec{x} : \simsub{\Delta}{\rho} \vdash_{\Sigma, \Omega} t \Rightarrow A 
           \]
         \item if $d$ is $\Leftarrow$, then for every type $A$ it is decidable that there is a typing derivation of 
           \[
-            \Gamma, \simsub{\Delta}{\rho} \vdash_{\Sigma, \Omega} t \Leftarrow A.
+            \Gamma, \vec{x} : \simsub{\Delta}{\rho} \vdash_{\Sigma, \Omega} t \Leftarrow A.
           \]
       \end{enumerate}
   \end{enumerate}

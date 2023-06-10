@@ -239,34 +239,34 @@ app-abs = app (?∋ abs ((` zero) ↑)) (abs ((` zero) ↑)) hd
 
 toPre : Pre? true e d r → Pre d r
 toPre (` i)   = ` i
-toPre (τ ∋ t) = τ ∋ toPre t
-toPre (t ↑)   = toPre t ↑
-toPre (app t u (tl (tl nil))) = app (toPre t) (toPre u)
-toPre (abs t) = abs (toPre t)
+toPre (τ ∋ p) = τ ∋ toPre p
+toPre (p ↑)   = toPre p ↑
+toPre (app p q (tl (tl nil))) = app (toPre p) (toPre q)
+toPre (abs p) = abs (toPre p)
 
 to¬Pre-Inf : Pre? v true Chk r → ¬ Pre Inf r
-to¬Pre-Inf (abs t) ()
+to¬Pre-Inf (abs p) ()
 
 mutual
 
   to¬Pre-Chk : Pre? false true Inf r → ¬ Pre Chk r
-  to¬Pre-Chk (τ ∋ t)            ((.τ ∋ u) ↑) = to¬Pre t u
-  to¬Pre-Chk (app t t' hd)      (app u u' ↑) = to¬Pre t u
-  to¬Pre-Chk (app t t' (tl hd)) (app u u' ↑) = to¬Pre t' u'
+  to¬Pre-Chk (τ ∋ p)            ((.τ ∋ q) ↑) = to¬Pre p q
+  to¬Pre-Chk (app p p' hd)      (app q q' ↑) = to¬Pre p q
+  to¬Pre-Chk (app p p' (tl hd)) (app q q' ↑) = to¬Pre p' q'
 
   to¬Pre : Pre? false e d r → ¬ Pre d r
-  to¬Pre (τ ∋ t)            (.τ ∋ u)   = to¬Pre t u
-  to¬Pre (t ↑)              u          = to¬Pre-Chk t u
-  to¬Pre (?∋ t)             u          = to¬Pre-Inf t u
-  to¬Pre (app t t' hd)      (app u u') = to¬Pre t u
-  to¬Pre (app t t' (tl hd)) (app u u') = to¬Pre t' u'
-  to¬Pre (abs t)            (abs u)    = to¬Pre t u
+  to¬Pre (τ ∋ p)            (.τ ∋ q)   = to¬Pre p q
+  to¬Pre (p ↑)              q          = to¬Pre-Chk p q
+  to¬Pre (?∋ p)             q          = to¬Pre-Inf p q
+  to¬Pre (app p p' hd)      (app q q') = to¬Pre p q
+  to¬Pre (app p p' (tl hd)) (app q q') = to¬Pre p' q'
+  to¬Pre (abs p)            (abs q)    = to¬Pre p q
 
-Bidirectionalisation⁺ : Set
-Bidirectionalisation⁺ = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Inf r
+Bidirectionalisation? : Set
+Bidirectionalisation? = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Inf r
 
-Bidirectionalisation-lemma : Bidirectionalisation⁺ → Bidirectionalisation
-Bidirectionalisation-lemma bidir⁺ r with bidir⁺ r
+Bidirectionalisation-lemma : Bidirectionalisation? → Bidirectionalisation
+Bidirectionalisation-lemma bidir? r with bidir? r
 ... | false , _ , p = no (to¬Pre p)
 ... | true  , _ , p = yes (toPre p)
 
@@ -274,13 +274,13 @@ mutual
 
   bidirectionalise : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
   bidirectionalise d   r with bidirectionalise' r
-  bidirectionalise Chk r | inl               t     = _ , _ ,    t ↑
-  bidirectionalise Inf r | inl               t     = _ , _ ,    t
-  bidirectionalise Chk r | inr (inl          t   ) = _ , _ ,    t
-  bidirectionalise Inf r | inr (inl          t   ) = _ , _ , ?∋ t
-  bidirectionalise Chk r | inr (inr (_     , t  )) = _ , _ ,    t
-  bidirectionalise Inf r | inr (inr (false , t ↑)) = _ , _ ,    t
-  bidirectionalise Inf r | inr (inr (true  , t  )) = _ , _ , ?∋ t
+  bidirectionalise Chk r | inl               p     = _ , _ ,    p ↑
+  bidirectionalise Inf r | inl               p     = _ , _ ,    p
+  bidirectionalise Chk r | inr (inl          p   ) = _ , _ ,    p
+  bidirectionalise Inf r | inr (inl          p   ) = _ , _ , ?∋ p
+  bidirectionalise Chk r | inr (inr (_     , p  )) = _ , _ ,    p
+  bidirectionalise Inf r | inr (inr (false , p ↑)) = _ , _ ,    p
+  bidirectionalise Inf r | inr (inr (true  , p  )) = _ , _ , ?∋ p
 
   bidirectionalise'
     : (r : Raw n)

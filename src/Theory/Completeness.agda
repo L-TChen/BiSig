@@ -17,11 +17,10 @@ import      Syntax.Typed.Functor       SD as T
 
 open import Theory.Erasure.Description
 
-open import Syntax.BiTyped.Term          BD
-open import Syntax.BiTyped.Pre.Term      BD
-  renaming (Tm to Pre)
-open import Syntax.Typed.Term     (erase BD)
-open import Syntax.Typed.Raw.Term (erase BD)
+open import Syntax.BiTyped.Term      BD
+open import Syntax.BiTyped.Pre.Term  BD
+open import Syntax.Typed.Term (erase BD)
+open import Syntax.Typed.Raw  (erase BD)
 
 private variable
   Ξ : ℕ

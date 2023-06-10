@@ -1,10 +1,10 @@
 {-# OPTIONS --safe #-}
 
-open import Prelude
-
 import Syntax.Simple.Description as S
 
 module Syntax.BiTyped.Pre.Functor (SD : S.Desc) where
+
+open import Prelude
 
 open import Syntax.Simple              SD
 import      Syntax.Typed.Raw.Functor   SD as R

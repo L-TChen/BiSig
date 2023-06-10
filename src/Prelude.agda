@@ -15,9 +15,6 @@ open import Data.Unit                          public
 open import Data.Unit.Polymorphic              public
   using (⊤; tt)
 
-open import Data.Bool                          public
-  using (Bool; true; false; _∨_)
-
 open import Data.Maybe                         public
   using (Maybe; nothing; just)
 
@@ -55,6 +52,14 @@ open L public using
   ; All; _⊆_)
   renaming (_∈_ to infix 5 _∈_)
 
+open import Data.Bool                          public
+  using (Bool; true; false)
+
+data And : List Bool → Bool → Set where
+  nil :                       And []           true
+  hd  : ∀ {bs}              → And (false ∷ bs) false
+  tl  : ∀ {bs b} → And bs b → And (true  ∷ bs) b
+
 module V where
   open import Data.Vec            public
   open import Data.Vec.Properties public
@@ -63,7 +68,7 @@ module V where
   open import Data.Vec.Membership.Propositional public
     using (_∈_)
 open V public using
-  (Vec; []; _∷_; insert; lookup; tabulate
+  (Vec; []; _∷_; toList; insert; lookup; tabulate
   ; allFin; tabulate∘lookup; lookup∘tabulate; tabulate-cong)
 
 open import Data.String                        public

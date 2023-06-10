@@ -9,57 +9,56 @@ open import Prelude
 
 open B SD
 
-open import Syntax.Typed.Raw.Functor       SD as TF
-open import Syntax.BiTyped.HasMode.Functor SD as BF
+open import Syntax.Typed.Raw.Functor               SD as T
+open import Syntax.BiTyped.Pre.Generalised.Functor SD as P
 
 open import Theory.Erasure.Description
 
-open import Syntax.Typed.Raw.Term (erase BD)
-open import Syntax.BiTyped.HasMode.Term  BD
+open import Syntax.Typed.Raw.Term         (erase BD)
+open import Syntax.BiTyped.Pre.Generalised.Term  BD
+  renaming (Tm to Pre?)
 
 private variable
   n Ξ : ℕ
 
 mutual
 
-  bidirectionalise : (d : Mode) (t : Raw n) → Dec (HasMode d t)
-  bidirectionalise d   t with bidirectionalise' t
-  bidirectionalise Chk t | inl        Inf-t           = yes (Inf-t ↑)
-  bidirectionalise Inf t | inl        Inf-t           = yes  Inf-t
-  bidirectionalise Chk t | inr (inl (¬Inf-t , Chk-t)) = yes  Chk-t
-  bidirectionalise Inf t | inr (inl (¬Inf-t , Chk-t)) = no  ¬Inf-t
-  bidirectionalise Chk t | inr (inr          ¬Chk-t ) = no  ¬Chk-t
-  bidirectionalise Inf t | inr (inr          ¬Chk-t ) = no (¬Chk-t ∘ _↑)
+  bidirectionalise : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
+  bidirectionalise d   r with bidirectionalise' r
+  bidirectionalise Chk r | inl               t     = _ , _ ,    t ↑
+  bidirectionalise Inf r | inl               t     = _ , _ ,    t
+  bidirectionalise Chk r | inr (inl          t   ) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inl          t   ) = _ , _ , ?∋ t
+  bidirectionalise Chk r | inr (inr (_     , t  )) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inr (false , t ↑)) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inr (true  , t  )) = _ , _ , ?∋ t
 
   bidirectionalise'
-    : (t : Raw n)
-    →    HasMode Inf t
-    ⊎ (¬ HasMode Inf t × HasMode Chk t)
-    ⊎                  ¬ HasMode Chk t  -- implies ¬ HasMode Inf t
-  bidirectionalise' (` i) = inl (` i)
-  bidirectionalise' (A ∋ t) with bidirectionalise Chk t
-  ... | yes t' = inl (A ∋ t')
-  ... | no ¬t' = inr (inr λ { ((.A ∋ t') ↑) → ¬t' t' })
-  bidirectionalise' (op (i , ts)) with bidirectionaliseᶜ (BD .rules i) ts
-  ... | yes (Chk , Chk-ts@(d≡Chk , _)) =
-    inr (inl ((λ { (op (d≡Inf , _)) → Chk≢Inf (trans (sym d≡Chk) d≡Inf) }) , op Chk-ts))
-  ... | yes (Inf , Inf-ts) = inl (op Inf-ts)
-  ... | no ¬ts' = inr (inr λ { (op ts' ↑) → ¬ts' (_ , ts')
-                             ; (op ts'  ) → ¬ts' (_ , ts') })
+    : (r : Raw n)
+    →        Pre? true  true Inf r
+    ⊎        Pre? true  true Chk r
+    ⊎ ∃[ e ] Pre? false e    Chk r  -- implies ∃[ e' ] Pre? false e' Inf r
+  bidirectionalise' (` i)   = inl (` i)
+  bidirectionalise' (A ∋ r) with bidirectionalise Chk r
+  ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
+  ... | true  , _ , p = inl (          A ∋ p    )
+  bidirectionalise' (op (i , rs)) with bidirectionaliseᶜ (BD .rules i) rs
+  ... | false , Chk , p = inr (inr (_ , op (refl , p)  ))
+  ... | false , Inf , p = inr (inr (_ , op (refl , p) ↑))
+  ... | true  , Chk , p = inr (inl (    op (refl , p)  ))
+  ... | true  , Inf , p = inl (         op (refl , p)   )
 
   bidirectionaliseᶜ
-    : (D : ConD) (ts : TF.⟦ eraseᶜ D ⟧ᶜ Raw n)
-    → Dec (Σ[ d ∈ Mode ] BF.⟦ D ⟧ᶜ (λ k → HasMode {k}) n d ts)
-  bidirectionaliseᶜ (ι d _ D) ts with bidirectionaliseᵃˢ D ts
-  ... | yes ts' = yes (d , refl , ts')
-  ... | no ¬ts' = no λ (_ , _ , ts') → ¬ts' ts'
+    : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)
+    → ∃[ v ] ∃[ d ] P.⟦ D ⟧ᶜ Raw Pre? v d rs
+  bidirectionaliseᶜ (ι d _ Ds) rs with bidirectionaliseᵃˢ Ds rs
+  ... | vs , v , a , p = v , d , vs , a , refl , p
 
   bidirectionaliseᵃˢ
-    : (D : ArgsD Ξ) (ts : TF.⟦ eraseᵃˢ D ⟧ᵃˢ Raw n)
-    → Dec (BF.⟦ D ⟧ᵃˢ (λ k → HasMode {k}) n ts)
-  bidirectionaliseᵃˢ []                  _        = yes _
-  bidirectionaliseᵃˢ ((Δ ⊢[ d ] _) ∷ Ds) (t , ts) with bidirectionalise d t
-  ... | no ¬t' = no λ (t' , _) → ¬t' t'
-  ... | yes t' with bidirectionaliseᵃˢ Ds ts
-  ...          | yes ts' = yes (t' , ts')
-  ...          | no ¬ts' = no λ (_ , ts') → ¬ts' ts'
+    : (Ds : ArgsD Ξ)  (rs : T.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw n)
+    → ∃[ vs ] ∃[ v ] And (toList vs) v × P.⟦ Ds ⟧ᵃˢ Raw Pre? vs rs
+  bidirectionaliseᵃˢ []                  _        = _ , _ , nil , tt
+  bidirectionaliseᵃˢ ((Δ ⊢[ d ] _) ∷ Ds) (r , rs)
+      with bidirectionalise d r | bidirectionaliseᵃˢ Ds rs
+  ... | false , _ , p | vs , v , _ , q = false ∷ vs , false , hd   , (_ , p) , q
+  ... | true  , _ , p | vs , v , a , q = true  ∷ vs , v     , tl a , (_ , p) , q

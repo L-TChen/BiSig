@@ -1,10 +1,12 @@
+{-# OPTIONS --safe #-}
+
 module Example.Outline where
 
 open import Prelude
 
 variable
   n : ℕ
-  b b' b₀ b₁ b₂ b₃ : Bool
+  v v₀ v₁ e e₀ e₁ : Bool
   d : Mode
 
 -- Simplest types (with metavariables)
@@ -74,12 +76,12 @@ TypeInference' P = (Γ : List Ty) (r : Raw (length Γ))
 -- or abort with the excuse that the term doesn’t satisfy the constraint
 
 TypeInference : (∀ {n} → Raw n → Set) → Set
-TypeInference P = (Γ : List Ty) (r : Raw (length Γ))
-                → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ) ⊎ ¬ P r
+TypeInference E = (Γ : List Ty) (r : Raw (length Γ))
+                → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ) ⊎ E r
 
--- The second version is stronger (and more convenient to use)
+-- The second version is logically stronger and more useful in practice
 
-TypeInference-lemma : {P : ∀ {n} → Raw n → Set} → TypeInference P → TypeInference' P
+TypeInference-lemma : {P : ∀ {n} → Raw n → Set} → TypeInference (¬_ ∘ P) → TypeInference' P
 TypeInference-lemma infer Γ r p
     with infer Γ r
 ... | inl  d = d
@@ -90,36 +92,36 @@ TypeInference-lemma infer Γ r p
 -- Terms are syntactically classified into two categories
 -- based on whether their types can be inferred or (only) checked
 
-data HasMode : Mode → {n : ℕ} → Raw n → Set where
+data Pre : Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → -----------------
-        HasMode Inf (` i)
+        Pre Inf (` i)
 
   _∋_ : (τ : Ty)
-      → HasMode Chk r
+      → Pre Chk r
       → -------------------
-        HasMode Inf (τ ∋ r)
+        Pre Inf (τ ∋ r)
 
-  _↑  : HasMode Inf r
+  _↑  : Pre Inf r
       → -------------
-        HasMode Chk r
+        Pre Chk r
 
-  app : HasMode Inf r
-      → HasMode Chk s
+  app : Pre Inf r
+      → Pre Chk s
       → ---------------------
-        HasMode Inf (app r s)
+        Pre Inf (app r s)
 
-  abs : HasMode Chk r
+  abs : Pre Chk r
       → -------------------
-        HasMode Chk (abs r)
+        Pre Chk (abs r)
 
 -- First step: syntactically decide whether there are enough type annotations
 -- Wherever a checked term needs to be used as an inferred term,
 -- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
 
 Bidirectionalisation : Set
-Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (HasMode Inf r)
+Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (Pre Inf r)
 
 -- Second step: bidirectional type inference
 -- If a bidirectional type system is designed well (i.e., mode-correct),
@@ -160,7 +162,7 @@ mutual
 
 TypeInference⇔ : Set
 TypeInference⇔ = (Γ : List Ty) {r : Raw (length Γ)}
-               → HasMode Inf r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⇒ τ)
+               → Pre Inf r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⇒ τ)
 
 -- Eventually we want to perform ordinary type inference (the spec)
 -- using bidirectional type inference (the impl);
@@ -179,7 +181,7 @@ soundness (abs t)    = abs (soundness t)
 
 Completeness : Set
 Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
-             → HasMode d r  →  Γ ⊢ r ⦂ τ  →  Γ ⊢ r [ d ] τ
+             → Pre d r  →  Γ ⊢ r ⦂ τ  →  Γ ⊢ r [ d ] τ
 
 completeness : Completeness
 completeness (` ._)    (` i)     = ` i
@@ -190,7 +192,7 @@ completeness (abs p)   (abs t)   = abs (completeness p t)
 
 infer : Bidirectionalisation → TypeInference⇔
       → Soundness → Completeness
-      → TypeInference (HasMode Inf)
+      → TypeInference (¬_ ∘ Pre Inf)
 infer bidir infer⇔ s c Γ r with bidir r
 ... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (infer⇔ Γ p))
 ... | no ¬p = inr ¬p
@@ -199,66 +201,105 @@ infer bidir infer⇔ s c Γ r with bidir r
 --
 --     ↑               ↑
 --
---   r : Raw n   →   HasMode Inf r
+--   r : Raw n   →   Pre Inf r
 
-data And : List Bool → Bool → Set where
-  nil :                     And []           true
-  hd  : ∀ {bs}            → And (false ∷ bs) false
-  tl  : ∀ {bs} → And bs b → And (true  ∷ bs) b
+-- Strengthening bidirectionalisation
 
-data HasMode' : Bool → Bool → Mode → {n : ℕ} → Raw n → Set where
+data Pre? : (valid exact : Bool) → Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
-      → ----------------------------
-        HasMode' true true Inf (` i)
-
-  _↑  : HasMode' true b Inf r
-      → ----------------------
-        HasMode' false b Chk r
+      → ------------------------
+        Pre? true true Inf (` i)
 
   _∋_ : (τ : Ty)
-      → HasMode' b' b Chk r
-      → ---------------------------
-        HasMode' true b Inf (τ ∋ r)
+      → Pre? v e    Chk      r
+      → -----------------------
+        Pre? v true Inf (τ ∋ r)
 
-  ?∋_ : HasMode' true b Chk r
-      → --------------------------
-        HasMode' false false Inf r
+  _↑  : Pre? v true  Inf r
+      → ------------------
+        Pre? v false Chk r
 
-  app : HasMode' b₀ b₁ Inf r
-      → HasMode' b₂ b₃ Chk s
-      → And (b₁ ∷ b₃ ∷ []) b
-      → -----------------------------
-        HasMode' true b Inf (app r s)
+  ?∋_ : Pre? v     true  Chk r
+      → ----------------------
+        Pre? false false Inf r
 
-  abs : HasMode' b' b Chk r
-      → ---------------------------
-        HasMode' true b Chk (abs r)
+  app : Pre? v₀ e₀ Inf r
+      → Pre? v₁ e₁ Chk s
+      → And (v₀ ∷ v₁ ∷ []) v
+      → -------------------------
+        Pre? v true Inf (app r s)
 
-hasMode : HasMode' b true d r → HasMode d r
-hasMode (` i)   = ` i
-hasMode (t ↑)   = hasMode t ↑
-hasMode (τ ∋ t) = τ ∋ hasMode t
-hasMode (app t u (tl (tl nil))) = app (hasMode t) (hasMode u)
-hasMode (abs t) = abs (hasMode t)
+  abs : Pre? v e    Chk      r
+      → -----------------------
+        Pre? v true Chk (abs r)
 
-¬hasMode-Inf : HasMode' true b Chk r → ¬ HasMode Inf r
-¬hasMode-Inf (abs t) ()
+app-abs : Pre? false true Inf {zero} (app (abs (` zero)) (abs (` zero)))
+app-abs = app (?∋ abs ((` zero) ↑)) (abs ((` zero) ↑)) hd
+
+toPre : Pre? true e d r → Pre d r
+toPre (` i)   = ` i
+toPre (τ ∋ t) = τ ∋ toPre t
+toPre (t ↑)   = toPre t ↑
+toPre (app t u (tl (tl nil))) = app (toPre t) (toPre u)
+toPre (abs t) = abs (toPre t)
+
+to¬Pre-Inf : Pre? v true Chk r → ¬ Pre Inf r
+to¬Pre-Inf (abs t) ()
 
 mutual
 
-  ¬hasMode-Chk : HasMode' true false Inf r → ¬ HasMode Chk r
-  ¬hasMode-Chk (τ ∋ t)            ((.τ ∋ u) ↑) = ¬hasMode t u
-  ¬hasMode-Chk (app t t' hd)      (app u u' ↑) = ¬hasMode t u
-  ¬hasMode-Chk (app t t' (tl hd)) (app u u' ↑) = ¬hasMode t' u'
+  to¬Pre-Chk : Pre? false true Inf r → ¬ Pre Chk r
+  to¬Pre-Chk (τ ∋ t)            ((.τ ∋ u) ↑) = to¬Pre t u
+  to¬Pre-Chk (app t t' hd)      (app u u' ↑) = to¬Pre t u
+  to¬Pre-Chk (app t t' (tl hd)) (app u u' ↑) = to¬Pre t' u'
 
-  ¬hasMode : HasMode' b false d r → ¬ HasMode d r
-  ¬hasMode (t ↑)              u          = ¬hasMode-Chk t u
-  ¬hasMode (τ ∋ t)            (.τ ∋ u)   = ¬hasMode t u
-  ¬hasMode (?∋ t)             u          = ¬hasMode-Inf t u
-  ¬hasMode (app t t' hd)      (app u u') = ¬hasMode t u
-  ¬hasMode (app t t' (tl hd)) (app u u') = ¬hasMode t' u'
-  ¬hasMode (abs t)            (abs u)    = ¬hasMode t u
+  to¬Pre : Pre? false e d r → ¬ Pre d r
+  to¬Pre (τ ∋ t)            (.τ ∋ u)   = to¬Pre t u
+  to¬Pre (t ↑)              u          = to¬Pre-Chk t u
+  to¬Pre (?∋ t)             u          = to¬Pre-Inf t u
+  to¬Pre (app t t' hd)      (app u u') = to¬Pre t u
+  to¬Pre (app t t' (tl hd)) (app u u') = to¬Pre t' u'
+  to¬Pre (abs t)            (abs u)    = to¬Pre t u
+
+Bidirectionalisation⁺ : Set
+Bidirectionalisation⁺ = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Inf r
+
+Bidirectionalisation-lemma : Bidirectionalisation⁺ → Bidirectionalisation
+Bidirectionalisation-lemma bidir⁺ r with bidir⁺ r
+... | false , _ , p = no (to¬Pre p)
+... | true  , _ , p = yes (toPre p)
+
+mutual
+
+  bidirectionalise : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
+  bidirectionalise d   r with bidirectionalise' r
+  bidirectionalise Chk r | inl               t     = _ , _ ,    t ↑
+  bidirectionalise Inf r | inl               t     = _ , _ ,    t
+  bidirectionalise Chk r | inr (inl          t   ) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inl          t   ) = _ , _ , ?∋ t
+  bidirectionalise Chk r | inr (inr (_     , t  )) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inr (false , t ↑)) = _ , _ ,    t
+  bidirectionalise Inf r | inr (inr (true  , t  )) = _ , _ , ?∋ t
+
+  bidirectionalise'
+    : (r : Raw n)
+    →        Pre? true  true Inf r
+    ⊎        Pre? true  true Chk r
+    ⊎ ∃[ e ] Pre? false e    Chk r
+  bidirectionalise' (` i) = inl (` i)
+  bidirectionalise' (τ ∋ r) with bidirectionalise Chk r
+  ... | false , _ , p = inr (inr (_ , (τ ∋ p) ↑))
+  ... | true  , _ , p = inl (          τ ∋ p    )
+  bidirectionalise' (app r s) with bidirectionalise Inf r | bidirectionalise Chk s
+  ... | false , _ , p | v     , _ , q = inr (inr (_ , app p q  hd        ↑))
+  ... | true  , _ , p | false , _ , q = inr (inr (_ , app p q (tl  hd)   ↑))
+  ... | true  , _ , p | true  , _ , q = inl (         app p q (tl (tl nil)))
+  bidirectionalise' (abs r) with bidirectionalise Chk r
+  ... | false , _ , p = inr (inr (_ , abs p))
+  ... | true  , _ , p = inr (inl (    abs p))
+
+infix 3 _≤ᴬ_
 
 data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
 
@@ -271,7 +312,7 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
        → -------------------
          (τ ∋ r) ≤ᴬ (τ ∋ r')
 
-  _∋'_ : (τ : Ty)
+  _∋⁺_ : (τ : Ty)
        → r ≤ᴬ r'
        → -------------
          r ≤ᴬ (τ ∋ r')
@@ -284,3 +325,18 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
   abs  : r ≤ᴬ r'
        → ---------------
          abs r ≤ᴬ abs r'
+
+annotatability
+  : {r : Raw (length Γ)} → Pre? v e d r
+  → Γ ⊢ r ⦂ τ → Σ[ r' ∈ Raw (length Γ) ] r ≤ᴬ r' × Γ ⊢ r' [ d ] τ
+annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , ` i
+annotatability (p ↑) t with annotatability p t
+... | _ , r≤r' , t' = _ , r≤r' , t' ↑ refl
+annotatability (τ ∋ p) (.τ ∋ t) with annotatability p t
+... | _ , r≤r' , t' = _ , τ ∋ r≤r' , τ ∋ t'
+annotatability (?∋ p) t with annotatability p t
+... | _ , r≤r' , t' = _ , _ ∋⁺ r≤r' , _ ∋ t'
+annotatability (app p q _) (app t u) with annotatability p t | annotatability q u
+... | _ , r≤r' , t' | _ , s≤s' , u' = _ , app r≤r' s≤s' , app t' u'
+annotatability (abs p) (abs t) with annotatability p t
+... | _ , r≤r' , t' = _ , abs r≤r' , abs t'

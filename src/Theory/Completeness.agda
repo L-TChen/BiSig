@@ -11,14 +11,15 @@ open import Syntax.Simple  SD
 open import Syntax.Context SD
 open B SD
 
-open import Syntax.BiTyped.Functor         SD
-import      Syntax.BiTyped.HasMode.Functor SD as H
-import      Syntax.Typed.Functor           SD as T
+open import Syntax.BiTyped.Functor     SD
+import      Syntax.BiTyped.Pre.Functor SD as P
+import      Syntax.Typed.Functor       SD as T
 
 open import Theory.Erasure.Description
 
 open import Syntax.BiTyped.Term          BD
-open import Syntax.BiTyped.HasMode.Term  BD
+open import Syntax.BiTyped.Pre.Term      BD
+  renaming (Tm to Pre)
 open import Syntax.Typed.Term     (erase BD)
 open import Syntax.Typed.Raw.Term (erase BD)
 
@@ -31,7 +32,7 @@ private variable
 
 mutual
 
-  completeness : HasMode d r  →  Γ ⊢ r ⦂ A  →  Γ ⊢ r [ d ] A
+  completeness : Pre d r  →  Γ ⊢ r ⦂ A  →  Γ ⊢ r [ d ] A
   completeness (` ._)  (` i)    = ` i
   completeness (A ∋ p) (.A ∋ t) = A ∋ completeness p t
   completeness (p ↑)   t        = completeness p t ↑ refl
@@ -39,25 +40,25 @@ mutual
 
   completenessᶜ
     : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
-    → H.⟦ D ⟧ᶜ Raw (λ n → HasMode {n}) (length Γ) d rs
-    → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
-    → ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
+    → P.⟦        D ⟧ᶜ Raw Pre   d   rs
+    → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_   Γ rs   A
+    →   ⟦        D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
   completenessᶜ (ι _ _ Ds) (deq , ps) (σ , σeq , ts) =
     deq , σ , σeq , completenessᵃˢ Ds ps ts
 
   completenessᵃˢ
     : (Ds : ArgsD Ξ) {rs : R.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw (length Γ)} {σ : TSub Ξ 0}
-    → H.⟦ Ds ⟧ᵃˢ Raw (λ n → HasMode {n}) (length Γ) rs
-    → T.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw _⊢_⦂_ σ Γ rs
-    → ⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ σ Γ rs
+    → P.⟦         Ds ⟧ᵃˢ Raw Pre         rs
+    → T.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw _⊢_⦂_   σ Γ rs
+    →   ⟦         Ds ⟧ᵃˢ Raw _⊢_[_]_ σ Γ rs
   completenessᵃˢ []                  _        _        = tt
   completenessᵃˢ ((Δ ⊢[ _ ] _) ∷ Ds) (p , ps) (t , ts) =
     completenessᵃ Δ p t , completenessᵃˢ Ds ps ts
 
   completenessᵃ
     : (Δ : TExps Ξ) {r : R.⟦ Δ ⟧ᵃ Raw (length Γ)} {σ : TSub Ξ 0}
-    → H.⟦ Δ ⟧ᵃ Raw (λ n → HasMode {n}) (length Γ) d r
-    → T.⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' ⦂ A) σ Γ r
-    → ⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' [ d ] A) σ Γ r
+    → P.⟦ Δ ⟧ᵃ Raw Pre                       d     r
+    → T.⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' ⦂ A)     σ Γ r
+    →   ⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' [ d ] A) σ Γ r
   completenessᵃ []      p t = completeness    p t
   completenessᵃ (_ ∷ Δ) p t = completenessᵃ Δ p t

@@ -73,9 +73,9 @@ mutual
     → ∀ {x} → x ∈ fv C
     → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
   uniq-↑ᵃ C []      _  ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈fv→∈ᵥ x)
-  uniq-↑ᵃ C (A ∷ Δ) SD ⊢t ⊢u f = 
-    uniq-↑ᵃ C Δ (SD ∘ L.++⁺ʳ (fv A)) (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
-    where A₁=A₂ = ≡-fv A λ x∈ → f (SD (L.++⁺ˡ (∈ᵥ→∈fv x∈))) -- (A⊆xs (∈ᵥ→∈fv x∈))
+  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs ∷ Δ⊆xs) ⊢t ⊢u f = 
+    uniq-↑ᵃ C Δ Δ⊆xs (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+    where A₁=A₂ = ≡-fv A λ x∈ → f (A⊆xs (∈ᵥ→∈fv x∈))
 
 ¬switch
   : {t : Raw⇒ Θ}

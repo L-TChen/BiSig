@@ -304,9 +304,9 @@ module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
 
 module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
   ≡-fv : (A : Tm Θ₁)
-    → (∀ {x} → x ∈ᵥ A → σ₁ x ≡ σ₂ x) -- lookup σ₁ x ≡ lookup σ₂ x)
+    → (∀ {x} → x ∈ᵥ A → σ₁ x ≡ σ₂ x)
     → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
-  ≡-fv (` x)      p = p (here refl)
+  ≡-fv (` x)         p = p (here refl)
   ≡-fv (op (_ , ts)) p = cong (λ ts → op (_ , ts)) (≡-fvⁿ ts (p ∘ op)) -- (≡-fvⁿ ts p)
 
   ≡-fvⁿ : {n : ℕ} (As : Tm Θ₁ ^ n)

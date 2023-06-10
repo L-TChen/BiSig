@@ -100,10 +100,11 @@ module _ where mutual
 
   synthesiseᵃˢ []                  _         _ _        ρ = yes (_ , ρ , ⊑-refl ρ , (λ ()) , tt)
 
-  synthesiseᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) (Δ⊆Ds , SDs) Γ (t , ts) ρ with synthesiseᵃˢ Ds SDs Γ ts ρ
+  synthesiseᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) (A⊆ ∷ Δ⊆ , SDs) Γ (t , ts) ρ with synthesiseᵃˢ Ds SDs Γ ts ρ
   ... | no ¬p = no λ where
     (_ , σ , ρ⊑σ , Ds⊆ys , ⊢t , ⊢ts) → ¬p (_ , σ , ρ⊑σ , Ds⊆ys , ⊢ts)
-  ... | yes (ys , σ , ρ⊑σ , Ds⊆ys , ⊢ts) with inheritᵃ Δ ys (Ds⊆ys ∘ Δ⊆Ds ∘ L.++⁺ʳ _) σ Γ t (∈sub σ A (Ds⊆ys ∘ Δ⊆Ds ∘ L.++⁺ˡ))
+  ... | yes (ys , σ , ρ⊑σ , Ds⊆ys , ⊢ts) with inheritᵃ Δ ys
+    (A.map (λ {A} A⊆Ds {x} x∈ → Ds⊆ys (A⊆Ds x∈)) Δ⊆) σ Γ t (∈sub σ A (Ds⊆ys ∘ A⊆))
   ... | no ¬q = no λ where
     (zs , γ , σ⊑γ , Ds⊆zs , ⊢t , ⊢ts) → ¬q {!⊢t!}
   ... | yes ⊢t = yes (_ , σ , ρ⊑σ , Ds⊆ys , ⊢t , ⊢ts)
@@ -111,7 +112,7 @@ module _ where mutual
   synthesiseᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) (Δ⊆ , SDs) Γ (t , ts) ρ with synthesiseᵃˢ Ds SDs Γ ts ρ
   ... | no ¬p = no λ where
     (_ , σ , ρ⊑σ , Ds⊆ys , ⊢t , ⊢ts) → ¬p (_ , σ , ρ⊑σ , (Ds⊆ys ∘ L.++⁺ʳ _) , ⊢ts)
-  ... | yes (ys , σ , ρ⊑σ , Ds⊆ys , ⊢ts) with synthesiseᵃ Δ ys (Ds⊆ys ∘ Δ⊆) σ Γ t
+  ... | yes (ys , σ , ρ⊑σ , Ds⊆ys , ⊢ts) with synthesiseᵃ Δ ys (A.map (λ {A} A⊆ {x} x∈A → Ds⊆ys (A⊆ x∈A)) Δ⊆) σ Γ t
   ... | no ¬q         = no λ where
     (zs , σ , ρ⊑σ , Ds⊆ys , ⊢t , ⊢ts) → ¬q (∈sub σ A (Ds⊆ys ∘ L.++⁺ˡ) , {!⊢t!})
   ... | yes q         = {!!}
@@ -125,14 +126,14 @@ module _ where mutual
     : (Δ : TExps Ξ) (xs : Fins Ξ) (Δ⊆ : Cover xs Δ) (ρ : ∈Sub₀ xs)
     → (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇒ 0))
     → Dec (∃[ A ] MCF.⟦ Δ ⟧ᵃ xs Δ⊆ (Raw 0) (_⊢_⇒ A) ρ Γ t)
-  synthesiseᵃ []      As Δ⊆ ρ Γ t       = synthesise Γ t
-  synthesiseᵃ (A ∷ Δ) As Δ⊆ ρ Γ (x , t) =
-    synthesiseᵃ Δ As (Δ⊆ ∘ L.++⁺ʳ (fv A)) ρ (x ⦂ ∈sub ρ A (Δ⊆ ∘ L.++⁺ˡ) , Γ) t
+  synthesiseᵃ []      As Δ⊆        ρ Γ t       = synthesise Γ t
+  synthesiseᵃ (A ∷ Δ) As (A⊆ ∷ Δ⊆) ρ Γ (x , t) =
+    synthesiseᵃ Δ As Δ⊆ ρ (x ⦂ ∈sub ρ A A⊆ , Γ) t
 
   inheritᵃ
     : (Δ : TExps Ξ) (xs : Fins Ξ) (Δ⊆ : Cover xs Δ) (ρ : ∈Sub₀ xs)
     → (Γ : Cxt 0) (t : R.⟦ Δ ⟧ᵃ (Raw⇐ 0)) (A : Ty)
     → Dec (MCF.⟦ Δ ⟧ᵃ xs Δ⊆ (Raw 0) (_⊢_⇐ A) ρ Γ t)
-  inheritᵃ []      As Δ⊆ ρ Γ t       A₀ = inherit Γ t A₀
-  inheritᵃ (A ∷ Δ) As Δ⊆ ρ Γ (x , t) A₀ = 
-    inheritᵃ Δ As (Δ⊆ ∘ L.++⁺ʳ (fv A)) ρ (x ⦂ ∈sub ρ A (Δ⊆ ∘ L.++⁺ˡ) , Γ) t A₀
+  inheritᵃ []      xs Δ⊆        ρ Γ t       A₀ = inherit Γ t A₀
+  inheritᵃ (A ∷ Δ) xs (A⊆ ∷ Δ⊆) ρ Γ (x , t) A₀ = 
+    inheritᵃ Δ xs Δ⊆ ρ (x ⦂ ∈sub ρ A A⊆ , Γ) t A₀

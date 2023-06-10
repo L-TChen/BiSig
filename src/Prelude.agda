@@ -42,14 +42,17 @@ module L where
   open import Data.List.Membership.Propositional public
     using (_∈_)
   open import Data.List.Membership.Propositional.Properties public
-  open import Data.List.Relation.Unary.All       public
-    using (All; []; _∷_)
+  module A where
+    open import Data.List.Relation.Unary.All            public
+    open import Data.List.Relation.Unary.All.Properties public
+  open A using (All; []; _∷_) public
+  
   open import Data.List.Relation.Binary.Subset.Propositional public
     using (_⊆_)
 open L public using
   ( List; []; _∷_; length; _++_; zip
   ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
-  ; All; Any; _⊆_)
+  ; All; Any; _⊆_; module A)
   renaming (_∈_ to infix 5 _∈_)
 
 module V where
@@ -117,6 +120,7 @@ Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
 Lift₀ {ℓ} = Lift {ℓ} 0ℓ
 
 {-# DISPLAY Lift lzero A = Lift₀ A #-}
+
 
 ------------------------------------------------------------------------------
 -- Properties of _≗_

@@ -12,7 +12,7 @@ private variable
 
 -- every variable in A is contained in some As 
 Cover : Fins Ξ → TExps Ξ → Set
-Cover xs Δ = fvs Δ ⊆ xs -- All (λ A → fv A ⊆ xs) Δ
+Cover xs Δ = All (λ A → fv A ⊆ xs) Δ
 
 known : ArgsD Ξ → Fins Ξ
 known []                  = []
@@ -74,9 +74,9 @@ module Functor (Id : Set) where
     → ∈Sub xs Θ
     → Cxt Θ → R.⟦ Δ ⟧ᵃ (X d)
     → Set ℓ′
-  ⟦ []    ⟧ᵃ _  _    X P ρ Γ t       = P Γ t
-  ⟦ A ∷ Δ ⟧ᵃ xs Δ⊆As X P ρ Γ (x , t) =
-    ⟦ Δ ⟧ᵃ xs (Δ⊆As ∘ L.++⁺ʳ (fv A)) X P ρ (x ⦂ ∈sub ρ A (Δ⊆As ∘ L.++⁺ˡ) , Γ) t
+  ⟦ []    ⟧ᵃ _  _             X P ρ Γ t       = P Γ t
+  ⟦ A ∷ Δ ⟧ᵃ xs (A⊆xs ∷ Δ⊆xs) X P ρ Γ (x , t) =
+    ⟦ Δ ⟧ᵃ xs Δ⊆xs X P ρ (x ⦂ ∈sub ρ A A⊆xs , Γ) t
 
   ⟦_⟧⇒ᵃˢ : (Ds : ArgsD Ξ) (xs : Fins Ξ) → known Ds ⊆ xs → (MC : Syn.ModeCorrectᵃˢ Ds)
     → (X : Mode → Set ℓ) (P : Pred ℓ′ Θ X)
@@ -84,10 +84,10 @@ module Functor (Id : Set) where
     → Cxt Θ → R.⟦ Ds ⟧ᵃˢ X → Set ℓ′
   ⟦ []                ⟧⇒ᵃˢ xs Ds⊆xs _           _ _ _ _ _        = ⊤
 
-  ⟦ Δ ⊢[ Chk ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds , MC) X P ρ Γ (t , ts) =
-    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ʳ _) X (P Chk (∈sub ρ A (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ˡ))) ρ Γ t
+  ⟦ Δ ⊢[ Chk ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (A⊆Ds ∷ Δ⊆Ds , MC) X P ρ Γ (t , ts) =
+    ⟦ Δ ⟧ᵃ xs (A.map (λ {A} A⊆Ds {x} x∈ → Ds⊆xs (A⊆Ds x∈)) Δ⊆Ds) X (P Chk $ ∈sub ρ A (Ds⊆xs ∘ A⊆Ds)) ρ Γ t
     × ⟦ Ds ⟧⇒ᵃˢ xs Ds⊆xs MC X P ρ Γ ts
     
   ⟦ Δ ⊢[ Syn ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds        , MC) X P ρ Γ (t , ts) =
-    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ L.++⁺ʳ _ ∘ Δ⊆Ds) X (P Syn (∈sub ρ A (Ds⊆xs ∘ L.++⁺ˡ))) ρ Γ t -- ρDs Γ t
+    ⟦ Δ ⟧ᵃ xs (A.map (λ {A} A⊆Ds {x} x∈ → Ds⊆xs (L.++⁺ʳ _ (A⊆Ds x∈))) Δ⊆Ds) X (P Syn $ ∈sub ρ A (Ds⊆xs ∘ L.++⁺ˡ)) ρ Γ t
       × ⟦ Ds ⟧⇒ᵃˢ xs (Ds⊆xs ∘ L.++⁺ʳ _) MC X P ρ Γ ts

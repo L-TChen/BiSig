@@ -4,7 +4,6 @@ import Prelude
 
 import Syntax.Context
 
--- Syntaxes
 import Syntax.Simple.Description
 import Syntax.Simple.Term
 import Syntax.Simple.Association
@@ -36,8 +35,6 @@ import Theory.Pre.Term
 import Theory.Pre.Annotatability
 import Theory.Bidirectionalisation
 import Theory.Completeness
-
--- Examples
 
 import Example.Implicational
 import Example.STLC

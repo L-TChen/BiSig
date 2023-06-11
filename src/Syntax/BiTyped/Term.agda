@@ -12,7 +12,7 @@ open import Syntax.Context           SD
 import      Syntax.Typed.Raw.Functor SD as R
 open import Syntax.BiTyped.Functor   SD
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 open import Syntax.Typed.Raw.Term (erase D)
 
 private variable

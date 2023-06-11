@@ -9,7 +9,7 @@ open import Prelude
 
 open import Syntax.Simple SD
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 open import Syntax.Typed.Raw (erase D)
 

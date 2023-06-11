@@ -29,29 +29,36 @@ decΛOp = record { _≟_ = dec }
   ; rules = λ { `app → 2 ▷ ρ[ [] ⊢ ` # 1 ↣ ` # 0 ]  ρ[ [] ⊢ ` # 1 ] [] ⦂ ` # 0
               ; `abs → 2 ▷ ρ[ ` # 1 ∷ [] ⊢ ` # 0 ]                  [] ⦂ ` # 1 ↣ ` # 0 } }
 
-open import Syntax.Typed.Intrinsic.Term ΛₒD
+open import Syntax.Typed.Raw.Term ΛₒD
 
 private variable
-  m n : ℕ
-  A B : Λₜ  m
-  Γ Δ : Cxt m
-
-pattern _·_ t u  = op (`app , _ ∷ _ ∷ [] , refl , t , u , _)
-pattern ƛ_ t     = op (`abs , _ ∷ _ ∷ [] , refl , t , _)
+  m n   : ℕ
+  A B C : Λₜ  0
+  Γ Δ   : Cxt 0
 
 infixl 8 _·_
 infixr 7 ƛ_
 
-𝑰 : Tm _ (A ↣ A) Γ
-𝑰 = ƛ ` here refl
+pattern _·_ r s = op (`app , r , s , _)
+pattern ƛ_  r   = op (`abs , r , _)
 
-𝐾₁ : Tm _ (A ↣ B ↣ A) Γ
-𝐾₁  = ƛ ƛ ` there (here refl)
+S : Raw n
+S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
 
-_ : Tm _ A (A ∷ Γ)
-_ = 𝑰 · ` here refl
+height : Raw n → ℕ
+height (` i)   = 0
+height (_ ∋ r) = height r
+height (r · s) = suc (height r ⊔ height s)
+height (ƛ r)   = suc (height r)
 
-height : Tm _ A Γ → ℕ
-height (` x)   = 0
-height (t · u) = suc (height t ⊔ height u)
-height (ƛ t)   = suc (height t)
+open import Syntax.Typed.Term ΛₒD
+
+infixl 8 _·ᵀ_
+infixr 7 ƛᵀ_
+
+pattern _·ᵀ_ t u = op (_ ∷ _ ∷ [] , refl , t , u , _)
+pattern ƛᵀ_  t   = op (_ ∷ _ ∷ [] , refl , t , _)
+
+⊢S : Γ ⊢ S ⦂ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
+⊢S = ƛᵀ ƛᵀ ƛᵀ ` there (there (here refl)) ·ᵀ ` here refl ·ᵀ
+                    (` there (here refl)  ·ᵀ ` here refl)

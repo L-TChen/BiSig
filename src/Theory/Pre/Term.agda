@@ -13,7 +13,7 @@ open B SD
 import Syntax.BiTyped.Pre.Functor             SD as P
 import Syntax.BiTyped.Pre.Generalised.Functor SD as G
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 open import Syntax.Typed.Raw             (erase BD)
 

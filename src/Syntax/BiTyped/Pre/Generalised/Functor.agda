@@ -10,7 +10,7 @@ open import Syntax.Simple              SD
 import      Syntax.Typed.Raw.Functor   SD as R
 open import Syntax.BiTyped.Description SD
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 private variable
   Ξ : ℕ

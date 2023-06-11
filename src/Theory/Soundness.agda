@@ -15,7 +15,7 @@ open import Syntax.BiTyped.Functor   SD
 import      Syntax.Typed.Functor     SD as T
 import      Syntax.Typed.Raw.Functor SD as R
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 open import Syntax.BiTyped.Term          BD
 open import Syntax.Typed.Term     (erase BD)

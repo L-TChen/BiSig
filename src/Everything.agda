@@ -3,7 +3,6 @@
 import Prelude
 
 import Syntax.Context
-import Syntax.NamedContext
 
 -- Syntaxes
 import Syntax.Simple.Description
@@ -14,45 +13,29 @@ import Syntax.Simple.Unification
 import Syntax.Simple.Unification.Properties
 
 import Syntax.Typed.Description
-import Syntax.Typed.Intrinsic.Functor
-import Syntax.Typed.Intrinsic.Term
-import Syntax.Typed.Intrinsic.Operation
-import Syntax.Typed.Intrinsic.Properties
+import Syntax.Typed.Functor
+import Syntax.Typed.Term
+
 import Syntax.Typed.Raw.Functor
 import Syntax.Typed.Raw.Term
-import Syntax.Typed.Extrinsic.Functor
-import Syntax.Typed.Extrinsic.Term
+import Syntax.Typed.Raw.Ordering.Functor
+import Syntax.Typed.Raw.Ordering.Term
 
 import Syntax.BiTyped.Description
-import Syntax.BiTyped.Intrinsic.Functor
-import Syntax.BiTyped.Intrinsic.Term
-import Syntax.BiTyped.Raw.Functor
-import Syntax.BiTyped.Raw.Term
-import Syntax.BiTyped.Extrinsic.Functor
-import Syntax.BiTyped.Extrinsic.Term
-import Syntax.BiTyped.Extrinsic.Properties
+import Syntax.BiTyped.Functor
+import Syntax.BiTyped.Term
 
--- [TODO] Type-level specifications should make it clear that we’re operating on the same syntax tree throughout.
---        For example: scope checking, bidirectionalisation of raw terms, conversion between extrinsic and intrinsic terms
--- [TODO] What format (intrinsic vs extrinsic) does the compiler need eventually?
--- [TODO] User interface (for extending existing systems): correct and convenient bidirectional annotation of a base type system
--- [TODO] history of parser generators
+import Syntax.BiTyped.Pre.Functor
+import Syntax.BiTyped.Pre.Term
+import Syntax.BiTyped.Pre.Generalised.Functor
+import Syntax.BiTyped.Pre.Generalised.Term
 
--- Theory of Bidirectional Type Checking
+import Theory.Erasure
 import Theory.Soundness
-
-import Theory.Completeness.Description
-import Theory.Completeness.Term
-
-import Theory.Erasure.Description
-import Theory.Erasure.Term
-
-import Theory.Ontologisation.Context
-import Theory.Ontologisation.Term
-
-import Theory.ModeCorrectness.Description
-import Theory.ModeCorrectness.UniqueSynthesised
--- import Theory.ModeCorrectness.Term -- [TODO] not finished yet
+import Theory.Pre.Term
+import Theory.Pre.Annotatability
+import Theory.Bidirectionalisation
+import Theory.Completeness
 
 -- Examples
 

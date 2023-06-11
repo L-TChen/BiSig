@@ -10,7 +10,7 @@ open import Prelude
 open import Syntax.Simple  SD
 open import Syntax.Context SD
 
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 open import Syntax.Typed.Raw               (erase BD)
 open import Syntax.Typed.Raw.Ordering.Term (erase BD)

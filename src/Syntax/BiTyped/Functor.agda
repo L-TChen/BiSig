@@ -10,7 +10,7 @@ open import Syntax.Simple              SD
 open import Syntax.Context             SD
 import      Syntax.Typed.Raw.Functor   SD as R
 open import Syntax.BiTyped.Description SD as B
-open import Theory.Erasure.Description
+open import Theory.Erasure
 
 Fam : (ℓ′ : Level) (X : R.Fam ℓ) → Set (lmax ℓ (lsuc ℓ′))
 Fam ℓ′ X = (Γ : Cxt₀) → X (length Γ) → Mode → TExp₀ → Set ℓ′

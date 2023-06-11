@@ -32,7 +32,7 @@ private variable
   ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 
 ⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ᶜ X)
-⟦ ι {Ξ} B D ⟧ᶜ X Y Γ x A = Σ[ σ ∈ TSub Ξ 0 ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ x
+⟦ ι {Ξ} B D ⟧ᶜ X Y Γ xs A = Σ[ σ ∈ TSub Ξ 0 ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ xs
 
 ⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
 ⟦ D ⟧ X Y Γ (i , xs) A = ⟦ D .rules i ⟧ᶜ X Y Γ xs A

@@ -326,9 +326,7 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
        → ---------------
          abs r ≤ᴬ abs r'
 
-annotatability
-  : {r : Raw (length Γ)} → Pre? v e d r
-  → Γ ⊢ r ⦂ τ → Σ[ r' ∈ Raw (length Γ) ] r ≤ᴬ r' × Γ ⊢ r' [ d ] τ
+annotatability : Pre? v e d r  →  Γ ⊢ r ⦂ τ  →  ∃[ r' ]  r ≤ᴬ r'  ×  Γ ⊢ r' [ d ] τ
 annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , ` i
 annotatability (p ↑) t with annotatability p t
 ... | _ , r≤r' , t' = _ , r≤r' , t' ↑ refl

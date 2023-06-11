@@ -38,7 +38,7 @@ mutual
     : (r : Raw n)
     →        Pre? true  true Inf r
     ⊎        Pre? true  true Chk r
-    ⊎ ∃[ e ] Pre? false e    Chk r  -- implies ∃[ e' ] Pre? false e' Inf r
+    ⊎ ∃[ e ] Pre? false e    Chk r  -- implies ∃[ e ] Pre? false e Inf r
   bidirectionalise' (` i)   = inl (` i)
   bidirectionalise' (A ∋ r) with bidirectionalise? Chk r
   ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))

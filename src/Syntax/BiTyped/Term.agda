@@ -27,7 +27,7 @@ mutual
 
   _⊢_⇐_ _⊢_⇒_ : (Γ : Cxt₀) → Raw (length Γ) → TExp₀ → Set
   Γ ⊢ r ⇐ A = Γ ⊢ r [ Chk ] A
-  Γ ⊢ r ⇒ A = Γ ⊢ r [ Inf ] A
+  Γ ⊢ r ⇒ A = Γ ⊢ r [ Syn ] A
 
   data _⊢_[_]_ : Fam₀ Raw where
 

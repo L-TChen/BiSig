@@ -53,7 +53,7 @@ syntax ρ-syntax D Ds = ρ[ D ] Ds
 infix  6 ι
 
 _▷_⇒_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
-Ξ ▷ D ⇒ A = ι Inf A D
+Ξ ▷ D ⇒ A = ι Syn A D
 
 _▷_⇐_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
 Ξ ▷ D ⇐ A = ι Chk A D

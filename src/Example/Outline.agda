@@ -25,13 +25,13 @@ variable
   A B : Ty
   Γ   : List Ty
 
--- From parser generators to type-inferencer generators
+-- From parser generators to type-synthesiser generators
 -- Using datatype-generic programming to quantify over simple type systems
 -- Only an overall picture in this file (no datatype-generic implementations)
 
--- The programmer writes untyped terms, whose types should be inferred
--- General type inference quickly becomes undecidable; introduce type annotations
--- Type checking subsumed by type inference
+-- The programmer writes untyped terms, whose types should be synthesised
+-- General type synthesis quickly becomes undecidable; introduce type annotations
+-- Type checking subsumed by type synthesis
 
 data Raw : ℕ → Set where
   `_  : Fin n         → Raw n
@@ -68,64 +68,64 @@ data _⊢_⦂_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set where
 -- Decide whether there is a typing derivation for a given raw term
 -- if the raw term satisfies some constraint, e.g., having enough type annotations
 
-TypeInference' : (∀ {n} → Raw n → Set) → Set
-TypeInference' P = (Γ : List Ty) (r : Raw (length Γ))
+TypeSynthesis' : (∀ {n} → Raw n → Set) → Set
+TypeSynthesis' P = (Γ : List Ty) (r : Raw (length Γ))
                  → P r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⦂ A)
 
 -- Decide whether a given raw term has a type
 -- or abort with the excuse that the term doesn’t satisfy the constraint
 
-TypeInference : (∀ {n} → Raw n → Set) → Set
-TypeInference E = (Γ : List Ty) (r : Raw (length Γ))
+TypeSynthesis : (∀ {n} → Raw n → Set) → Set
+TypeSynthesis E = (Γ : List Ty) (r : Raw (length Γ))
                 → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⦂ A) ⊎ E r
 
 -- The second version is logically stronger and more useful in practice
 
-TypeInference-lemma : {P : ∀ {n} → Raw n → Set} → TypeInference (¬_ ∘ P) → TypeInference' P
-TypeInference-lemma infer Γ r p
-    with infer Γ r
+TypeSynthesis-lemma : {P : ∀ {n} → Raw n → Set} → TypeSynthesis (¬_ ∘ P) → TypeSynthesis' P
+TypeSynthesis-lemma syn Γ r p
+    with syn Γ r
 ... | inl  d = d
 ... | inr ¬p with ¬p p
 ...          | ()
 
 -- Bidirectional type system for STLC
 -- Terms are syntactically classified into two categories
--- based on whether their types can be inferred or checked
+-- based on whether their types can be synthesised or checked
 
 data Pre : Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → -------------
-        Pre Inf (` i)
+        Pre Syn (` i)
 
   _∋_ : (A : Ty)
       → Pre Chk r
       → ---------------
-        Pre Inf (A ∋ r)
+        Pre Syn (A ∋ r)
 
-  _↑  : Pre Inf r
+  _↑  : Pre Syn r
       → ---------
         Pre Chk r
 
-  app : Pre Inf r
+  app : Pre Syn r
       → Pre Chk s
       → -----------------
-        Pre Inf (app r s)
+        Pre Syn (app r s)
 
   abs : Pre Chk r
       → ---------------
         Pre Chk (abs r)
 
 -- First step: syntactically decide whether there are enough type annotations
--- Wherever a checked term needs to be used as an inferred term,
+-- Wherever a checked term needs to be used as an synthesised term,
 -- a type annotation is necessary, e.g., app (abs t ∋ imp B A) u
 
 Bidirectionalisation : Set
-Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (Pre Inf r)
+Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (Pre Syn r)
 
--- Second step: bidirectional type inference
+-- Second step: bidirectional type synthesis
 -- If a bidirectional type system is designed well (i.e., mode-correct),
--- from inferred types we can derive what the types of checked terms should be
+-- from synthesised types we can derive what the types of checked terms should be
 
 infix 3 _⊢_[_]_ _⊢_⇐_ _⊢_⇒_
 
@@ -133,7 +133,7 @@ mutual
 
   _⊢_⇐_ _⊢_⇒_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set
   Γ ⊢ r ⇐ A = Γ ⊢ r [ Chk ] A
-  Γ ⊢ r ⇒ A = Γ ⊢ r [ Inf ] A
+  Γ ⊢ r ⇒ A = Γ ⊢ r [ Syn ] A
 
   data _⊢_[_]_ : (Γ : List Ty) → Raw (length Γ) → Mode → Ty → Set where
 
@@ -160,12 +160,12 @@ mutual
         → -------------------
           Γ ⊢ abs r ⇐ imp A B
 
-TypeInference⇔ : Set
-TypeInference⇔ = (Γ : List Ty) {r : Raw (length Γ)}
-               → Pre Inf r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⇒ A)
+TypeSynthesis⇔ : Set
+TypeSynthesis⇔ = (Γ : List Ty) {r : Raw (length Γ)}
+               → Pre Syn r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⇒ A)
 
--- Eventually we want to perform ordinary type inference (the spec)
--- using bidirectional type inference (the impl);
+-- Eventually we want to perform ordinary type synthesis (the spec)
+-- using bidirectional type synthesis (the impl);
 -- the two type systems should be somehow related to make that possible
 
 Soundness : Set
@@ -190,18 +190,34 @@ completeness (p ↑)     t         = completeness p t ↑ refl
 completeness (app p q) (app t u) = app (completeness p t) (completeness q u)
 completeness (abs p)   (abs t)   = abs (completeness p t)
 
-infer : Bidirectionalisation → TypeInference⇔
-      → Soundness → Completeness
-      → TypeInference (¬_ ∘ Pre Inf)
-infer bidir infer⇔ s c Γ r with bidir r
-... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (infer⇔ Γ p))
+-- Completing the bijection between  Pre d r × Γ ⊢ r ⦂ A  and  Γ ⊢ r [ d ] A
+
+TypeErasure : Set
+TypeErasure = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
+            → Γ ⊢ r [ d ] A  →  Pre d r
+
+typeErasure : TypeErasure
+typeErasure (` i)     = ` (L.index i)
+typeErasure (A ∋ t)   = A ∋ typeErasure t
+typeErasure (t ↑ _)   = typeErasure t ↑
+typeErasure (app t u) = app (typeErasure t) (typeErasure u)
+typeErasure (abs t)   = abs (typeErasure t)
+
+-- Implementing a type synthesiser using a bidirectional one
+
+synthesise
+  : Bidirectionalisation → TypeSynthesis⇔
+  → Soundness → Completeness
+  → TypeSynthesis (¬_ ∘ Pre Syn)
+synthesise bidir syn⇔ s c Γ r with bidir r
+... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (syn⇔ Γ p))
 ... | no ¬p = inr ¬p
 
 --   Γ ⊢ r ⦂ A   ←   Γ ⊢ r ⇒ A
 --
 --     ↑               ↑
 --
---   r : Raw n   →   Pre Inf r
+--   r : Raw n   →   Pre Syn r
 
 -- Strengthening bidirectionalisation
 
@@ -209,32 +225,32 @@ data Pre? : (valid exact : Bool) → Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → ------------------------
-        Pre? true true Inf (` i)
+        Pre? true true Syn (` i)
 
   _∋_ : (A : Ty)
       → Pre? v e    Chk      r
       → -----------------------
-        Pre? v true Inf (A ∋ r)
+        Pre? v true Syn (A ∋ r)
 
-  _↑  : Pre? v true  Inf r
+  _↑  : Pre? v true  Syn r
       → ------------------
         Pre? v false Chk r
 
   ?∋_ : Pre? v     true  Chk r
       → ----------------------
-        Pre? false false Inf r
+        Pre? false false Syn r
 
-  app : Pre? v₀ e₀ Inf r
+  app : Pre? v₀ e₀ Syn r
       → Pre? v₁ e₁ Chk s
       → And (v₀ ∷ v₁ ∷ []) v
       → -------------------------
-        Pre? v true Inf (app r s)
+        Pre? v true Syn (app r s)
 
   abs : Pre? v e    Chk      r
       → -----------------------
         Pre? v true Chk (abs r)
 
-app-abs : Pre? false true Inf {zero} (app (abs (` zero)) (abs (` zero)))
+app-abs : Pre? false true Syn {zero} (app (abs (` zero)) (abs (` zero)))
 app-abs = app (?∋ abs ((` zero) ↑)) (abs ((` zero) ↑)) hd
 
 toPre : Pre? true e d r → Pre d r
@@ -244,24 +260,24 @@ toPre (p ↑)   = toPre p ↑
 toPre (app p q (tl (tl nil))) = app (toPre p) (toPre q)
 toPre (abs p) = abs (toPre p)
 
-to¬Pre-Inf : Pre? v true Chk r → ¬ Pre Inf r
-to¬Pre-Inf (abs p) ()
+to¬Pre-Syn : Pre? v true Chk r → ¬ Pre Syn r
+to¬Pre-Syn (abs p) ()
 
 mutual
 
-  to¬Pre-Chk : Pre? false true Inf r → ¬ Pre Chk r
+  to¬Pre-Chk : Pre? false true Syn r → ¬ Pre Chk r
   to¬Pre-Chk p (q ↑) = to¬Pre p q
 
   to¬Pre : Pre? false e d r → ¬ Pre d r
   to¬Pre (A ∋ p)            (.A ∋ q)   = to¬Pre p q
   to¬Pre (p ↑)              q          = to¬Pre-Chk p q
-  to¬Pre (?∋ p)             q          = to¬Pre-Inf p q
+  to¬Pre (?∋ p)             q          = to¬Pre-Syn p q
   to¬Pre (app p p' hd)      (app q q') = to¬Pre p q
   to¬Pre (app p p' (tl hd)) (app q q') = to¬Pre p' q'
   to¬Pre (abs p)            (abs q)    = to¬Pre p q
 
 Bidirectionalisation? : Set
-Bidirectionalisation? = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Inf r
+Bidirectionalisation? = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Syn r
 
 Bidirectionalisation-lemma : Bidirectionalisation? → Bidirectionalisation
 Bidirectionalisation-lemma bidir? r with bidir? r
@@ -273,23 +289,23 @@ mutual
   bidirectionalise : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
   bidirectionalise d   r with bidirectionalise' r
   bidirectionalise Chk r | inl               p     = _ , _ ,    p ↑
-  bidirectionalise Inf r | inl               p     = _ , _ ,    p
+  bidirectionalise Syn r | inl               p     = _ , _ ,    p
   bidirectionalise Chk r | inr (inl          p   ) = _ , _ ,    p
-  bidirectionalise Inf r | inr (inl          p   ) = _ , _ , ?∋ p
+  bidirectionalise Syn r | inr (inl          p   ) = _ , _ , ?∋ p
   bidirectionalise Chk r | inr (inr (_     , p  )) = _ , _ ,    p
-  bidirectionalise Inf r | inr (inr (false , p ↑)) = _ , _ ,    p
-  bidirectionalise Inf r | inr (inr (true  , p  )) = _ , _ , ?∋ p
+  bidirectionalise Syn r | inr (inr (false , p ↑)) = _ , _ ,    p
+  bidirectionalise Syn r | inr (inr (true  , p  )) = _ , _ , ?∋ p
 
   bidirectionalise'
     : (r : Raw n)
-    →        Pre? true  true Inf r
+    →        Pre? true  true Syn r
     ⊎        Pre? true  true Chk r
     ⊎ ∃[ e ] Pre? false e    Chk r
   bidirectionalise' (` i) = inl (` i)
   bidirectionalise' (A ∋ r) with bidirectionalise Chk r
   ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
   ... | true  , _ , p = inl (          A ∋ p    )
-  bidirectionalise' (app r s) with bidirectionalise Inf r | bidirectionalise Chk s
+  bidirectionalise' (app r s) with bidirectionalise Syn r | bidirectionalise Chk s
   ... | false , _ , p | v     , _ , q = inr (inr (_ , app p q  hd        ↑))
   ... | true  , _ , p | false , _ , q = inr (inr (_ , app p q (tl  hd)   ↑))
   ... | true  , _ , p | true  , _ , q = inl (         app p q (tl (tl nil)))

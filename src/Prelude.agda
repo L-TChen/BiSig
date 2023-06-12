@@ -111,10 +111,10 @@ private variable
   A B C : Set ℓ
 
 data Mode : Set where
-  Chk Inf : Mode
+  Chk Syn : Mode
 
-Chk≢Inf : Chk ≢ Inf
-Chk≢Inf ()
+Chk≢Syn : Chk ≢ Syn
+Chk≢Syn ()
 
 _≟∈_ : {A : Set ℓ} {x y : A} {xs : List A} → (i : x ∈ xs) (j : y ∈ xs)
   → Dec ((x , i) ≡ (y , j))

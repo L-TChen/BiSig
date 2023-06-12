@@ -36,7 +36,5 @@ import Theory.Pre.Annotatability
 import Theory.Bidirectionalisation
 import Theory.Completeness
 
-import Example.Implicational
-import Example.STLC
-import Example.BiSTLC
 import Example.Outline
+import Example.STLC

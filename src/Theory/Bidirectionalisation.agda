@@ -27,27 +27,27 @@ mutual
   bidirectionalise? : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
   bidirectionalise? d   r with bidirectionalise' r
   bidirectionalise? Chk r | inl               t     = _ , _ ,    t ↑
-  bidirectionalise? Inf r | inl               t     = _ , _ ,    t
+  bidirectionalise? Syn r | inl               t     = _ , _ ,    t
   bidirectionalise? Chk r | inr (inl          t   ) = _ , _ ,    t
-  bidirectionalise? Inf r | inr (inl          t   ) = _ , _ , ?∋ t
+  bidirectionalise? Syn r | inr (inl          t   ) = _ , _ , ?∋ t
   bidirectionalise? Chk r | inr (inr (_     , t  )) = _ , _ ,    t
-  bidirectionalise? Inf r | inr (inr (false , t ↑)) = _ , _ ,    t
-  bidirectionalise? Inf r | inr (inr (true  , t  )) = _ , _ , ?∋ t
+  bidirectionalise? Syn r | inr (inr (false , t ↑)) = _ , _ ,    t
+  bidirectionalise? Syn r | inr (inr (true  , t  )) = _ , _ , ?∋ t
 
   bidirectionalise'
     : (r : Raw n)
-    →        Pre? true  true Inf r
+    →        Pre? true  true Syn r
     ⊎        Pre? true  true Chk r
-    ⊎ ∃[ e ] Pre? false e    Chk r  -- implies ∃[ e ] Pre? false e Inf r
+    ⊎ ∃[ e ] Pre? false e    Chk r  -- implies ∃[ e ] Pre? false e Syn r
   bidirectionalise' (` i)   = inl (` i)
   bidirectionalise' (A ∋ r) with bidirectionalise? Chk r
   ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
   ... | true  , _ , p = inl (          A ∋ p    )
   bidirectionalise' (op (i , rs)) with bidirectionaliseᶜ (BD .rules i) rs
   ... | false , Chk , p = inr (inr (_ , op (refl , p)  ))
-  ... | false , Inf , p = inr (inr (_ , op (refl , p) ↑))
+  ... | false , Syn , p = inr (inr (_ , op (refl , p) ↑))
   ... | true  , Chk , p = inr (inl (    op (refl , p)  ))
-  ... | true  , Inf , p = inl (         op (refl , p)   )
+  ... | true  , Syn , p = inl (         op (refl , p)   )
 
   bidirectionaliseᶜ
     : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)

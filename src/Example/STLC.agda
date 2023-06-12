@@ -5,10 +5,38 @@ module Example.STLC where
 open import Prelude
   hiding (_↣_)
 
-open import Example.Implicational
+variable
+  n : ℕ
+  d : Mode
 
-open import Syntax.Typed.Description ΛₜD
-  renaming (_⊢_ to infix 4 _⊢_)
+import Syntax.Simple.Description as S
+
+ΛₜD : S.Desc
+ΛₜD = 0 -- base type
+    ∷ 2 -- function type
+    ∷ []
+
+{-
+data Λₜ : Set where
+  ι   :              Λₜ
+  _↣_ : (A B : Λₜ) → Λₜ
+-}
+
+open import Syntax.Simple.Term ΛₜD
+  using (`_; op)
+  renaming (Tm to Λₜ)
+
+open import Syntax.Context ΛₜD
+
+variable
+  A B C : Λₜ  0
+  Γ Δ   : Cxt 0
+
+infixr 8 _↣_
+
+pattern _↣_ A B = op (2 , there (here refl) , A ∷ B ∷ [])
+
+open import Syntax.BiTyped.Description ΛₜD
 
 data ΛOp : Set where
   `app `abs : ΛOp
@@ -22,19 +50,23 @@ decΛOp = record { _≟_ = dec }
     dec `abs `app = no λ ()
     dec `abs `abs = yes refl
 
-ΛₒD : Desc
-ΛₒD = record
+Λ⇔D : Desc
+Λ⇔D = record
   { Op    = ΛOp
   ; decOp = decΛOp
-  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢ ` # 1 ↣ ` # 0 ]  ρ[ [] ⊢ ` # 1 ] [] ⦂ ` # 0
-              ; `abs → 2 ▷ ρ[ ` # 1 ∷ [] ⊢ ` # 0 ]                  [] ⦂ ` # 1 ↣ ` # 0 } }
+  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Syn ] ` # 1 ↣ ` # 0 ]
+                           ρ[ [] ⊢[ Chk ] ` # 1 ] [] ⇒ ` # 0
+                    -- Γ ⊢ t ⇒ (A → B)    Γ ⊢ u ⇐ A
+                    -- ----------------------------
+                    --   Γ ⊢ t u ⇒ B
+              ; `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Chk ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0) } }
+                    -- Γ , x : A ⊢ t ⇐ B
+                    -----------------------
+                    -- Γ ⊢ λ x . t ⇐ A → B
 
-open import Syntax.Typed.Raw.Term ΛₒD
+open import Theory.Erasure
 
-private variable
-  m n   : ℕ
-  A B C : Λₜ  0
-  Γ Δ   : Cxt 0
+open import Syntax.Typed.Raw.Term (erase Λ⇔D)
 
 infixl 8 _·_
 infixr 7 ƛ_
@@ -45,20 +77,14 @@ pattern ƛ_  r   = op (`abs , r , _)
 S : Raw n
 S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
 
-height : Raw n → ℕ
-height (` i)   = 0
-height (_ ∋ r) = height r
-height (r · s) = suc (height r ⊔ height s)
-height (ƛ r)   = suc (height r)
+open import Syntax.BiTyped.Term Λ⇔D
 
-open import Syntax.Typed.Term ΛₒD
+infixl 8 _·ᴮ_
+infixr 7 ƛᴮ_
 
-infixl 8 _·ᵀ_
-infixr 7 ƛᵀ_
+pattern _·ᴮ_ t u = op (refl , _ ∷ _ ∷ [] , refl , t , u , _)
+pattern ƛᴮ_  t   = op (refl , _ ∷ _ ∷ [] , refl , t , _)
 
-pattern _·ᵀ_ t u = op (_ ∷ _ ∷ [] , refl , t , u , _)
-pattern ƛᵀ_  t   = op (_ ∷ _ ∷ [] , refl , t , _)
-
-⊢S : Γ ⊢ S ⦂ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
-⊢S = ƛᵀ ƛᵀ ƛᵀ ` there (there (here refl)) ·ᵀ ` here refl ·ᵀ
-                    (` there (here refl)  ·ᵀ ` here refl)
+⊢S : Γ ⊢ S ⇐ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
+⊢S = ƛᴮ ƛᴮ ƛᴮ ((` there (there (here refl)) ·ᴮ ((` here refl) ↑ refl) ·ᴮ
+                     ((` there (here refl)  ·ᴮ ((` here refl) ↑ refl)) ↑ refl)) ↑ refl)

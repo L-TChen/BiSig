@@ -27,20 +27,20 @@ data Pre? : (valid exact : Bool) → Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → ------------------------
-        Pre? true true Inf (` i)
+        Pre? true true Syn (` i)
 
   _∋_ : (A : TExp₀)
       → Pre? v e    Chk      r
       → -----------------------
-        Pre? v true Inf (A ∋ r)
+        Pre? v true Syn (A ∋ r)
 
-  _↑  : Pre? v true  Inf r
+  _↑  : Pre? v true  Syn r
       → ------------------
         Pre? v false Chk r
 
   ?∋_ : Pre? v     true  Chk r
       → ----------------------
-        Pre? false false Inf r
+        Pre? false false Syn r
 
   op  : {rs : R.⟦ erase D ⟧ Raw n}
       → ⟦ D ⟧ Raw Pre? v e d rs

@@ -22,18 +22,18 @@ module _ (xs₀ : List (Fin n)) where
   Known : ArgsD n →  List (Fin n)
   Known []                  = xs₀
   Known (Θ ⊢[ Chk ] C ∷ Ds) =         Known Ds
-  Known (Θ ⊢[ Inf ] C ∷ Ds) = fv C ++ Known Ds
+  Known (Θ ⊢[ Syn ] C ∷ Ds) = fv C ++ Known Ds
 
   ModeCorrectᵃˢ : ArgsD n → Set
   ModeCorrectᵃˢ []                  = ⊤
   ModeCorrectᵃˢ (Θ ⊢[ Chk ] C ∷ Ds) = let xs = Known Ds in
     fv C ⊆ xs × ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Θ ⊢[ Inf ] C ∷ Ds) = let xs = Known Ds in
+  ModeCorrectᵃˢ (Θ ⊢[ Syn ] C ∷ Ds) = let xs = Known Ds in
     ModeCorrectᵃ xs Θ × ModeCorrectᵃˢ Ds
 
 ModeCorrectᶜ : ConD → Set
 ModeCorrectᶜ (ι Chk C Ds) = ModeCorrectᵃˢ (fv C) Ds
-ModeCorrectᶜ (ι Inf C Ds) = ModeCorrectᵃˢ []     ([] ⊢[ Chk ] C ∷ Ds)
+ModeCorrectᶜ (ι Syn C Ds) = ModeCorrectᵃˢ []     ([] ⊢[ Chk ] C ∷ Ds)
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)

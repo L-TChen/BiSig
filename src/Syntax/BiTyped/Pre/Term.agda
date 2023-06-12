@@ -26,14 +26,14 @@ data Pre : Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
       → -------------
-        Pre Inf (` i)
+        Pre Syn (` i)
 
   _∋_ : (A : TExp₀)
       → Pre Chk r
       → ---------------
-        Pre Inf (A ∋ r)
+        Pre Syn (A ∋ r)
 
-  _↑  : Pre Inf r
+  _↑  : Pre Syn r
       → ---------
         Pre Chk r
 

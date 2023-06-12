@@ -47,22 +47,22 @@ mutual
   toPreᵃˢ ((Δ ⊢[ _ ] _) ∷ Ds) (.true ∷ vs) (tl a) ((_ , p) , ps) =
     toPre p , toPreᵃˢ Ds vs a ps
 
-to¬Pre-Inf : Pre? v true Chk r → ¬ Pre Inf r
-to¬Pre-Inf (op (_ , _ , _ , d≡Chk , _)) (op (d≡Inf , _)) = Chk≢Inf (trans (sym d≡Chk) d≡Inf)
+to¬Pre-Syn : Pre? v true Chk r → ¬ Pre Syn r
+to¬Pre-Syn (op (_ , _ , _ , d≡Chk , _)) (op (d≡Syn , _)) = Chk≢Syn (trans (sym d≡Chk) d≡Syn)
 
 mutual
 
-  to¬Pre-Chk : Pre? false true Inf r → ¬ Pre Chk r
+  to¬Pre-Chk : Pre? false true Syn r → ¬ Pre Chk r
   to¬Pre-Chk (A ∋ p) ((.A ∋ q) ↑) = to¬Pre p q
   to¬Pre-Chk (op (_ , ps)) (op qs ↑) = to¬Preᶜ (BD .rules _) ps qs
-  to¬Pre-Chk (op (_ , _ , _ , d≡Inf , _)) (op (d≡Chk , _)) = Chk≢Inf (trans (sym d≡Chk) d≡Inf)
+  to¬Pre-Chk (op (_ , _ , _ , d≡Syn , _)) (op (d≡Chk , _)) = Chk≢Syn (trans (sym d≡Chk) d≡Syn)
 
   to¬Pre : Pre? false e d r → ¬ Pre d r
   to¬Pre (A ∋ p)       (.A ∋ q) = to¬Pre p q
   to¬Pre (p ↑)         q        = to¬Pre-Chk p q
-  to¬Pre (?∋ p)        q        = to¬Pre-Inf p q
+  to¬Pre (?∋ p)        q        = to¬Pre-Syn p q
   to¬Pre (op (_ , ps)) (op qs)  = to¬Preᶜ (BD .rules _) ps qs
-  to¬Pre (op (_ , _ , _ , d≡Chk , _)) (op (d≡Inf , _) ↑) = Chk≢Inf (trans (sym d≡Chk) d≡Inf)
+  to¬Pre (op (_ , _ , _ , d≡Chk , _)) (op (d≡Syn , _) ↑) = Chk≢Syn (trans (sym d≡Chk) d≡Syn)
 
   to¬Preᶜ
     : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw n}

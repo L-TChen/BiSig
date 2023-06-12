@@ -48,7 +48,7 @@
   \postcode{115}
 }
 
-\title{A Formal and Practical Metatheory of Bidirectional Type Synthesis for Simple Types}
+\title{A Practical Metatheory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
   This paper proposes a formal theory of bidirectional typing.
@@ -257,7 +257,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 %  \label{fig:intrinsic-typing}
 %\end{figure}
 
-\subsection{Simple Type Theories}
+\subsection{Simple Type Theory of a Signature}
 
 \begin{figure}
   \centering
@@ -271,7 +271,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     \\
     \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}}
     {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\;(\text{op}) 
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
   \caption{Annotatable raw terms for $(\Sigma, \Omega)$}
 \end{figure}
@@ -293,14 +293,14 @@ This is not only for brevity but also necessary to compare the type equality dur
   \label{fig:extrinsic-typing}
 \end{figure}
 
-\subsection{Bidirectional Binding Signatures and Bidirectional Type Systems}
+\subsection{Bidirectional Binding Signatures and their Bidirectional Type Systems}
 
 \begin{definition}
   For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
   \[
     \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \isDir{\Mode}\right)^* \times \Type_{\Sigma}(\Xi) \times \isDir{\Mode}.
   \]
-  where $\Mode$ consists of $\chk$ for checking and $\syn$ for synthesis.
+  where $\Mode$ consists of two inhabitants $\chk$ for checking and $\syn$ for synthesis.
   Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\tmOp_o$ in a bidirectional system, i.e.
   an arity is a $4$-tuple
   \[
@@ -338,7 +338,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     \and
     \inferrule{\cdot \vdash_{\Sigma} A \\ \vdash_{\Sigma, \Omega}\isTerm{t}^\isDir{\chk}}{\vdash_{\Sigma, \Omega} \isTerm{t \annote A}^\isDir{\syn}}\;(\text{anno})
     \and
-    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{\syn}}{\vdash_{\Sigma, \Omega} (\isTerm{t \uparrow})^\isDir{\chk}}\;(\text{sub})
+    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{\syn}}{\vdash_{\Sigma, \Omega} {\isTerm{t\mathord{\uparrow}}}^\isDir{\chk}}\;(\text{sub})
   \end{mathpar}
   \begin{mathpar}
     \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1}^\isDir{d_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}^\isDir{d_n}}
@@ -383,7 +383,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 \subsection{Bidirectionalisation}
 \begin{theorem}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
-  For every raw term $t$ and a mode $d$, it is decidable that $t$ has a mode $d$, i.e.\ $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t}\,\isDir{d}$ is derivable.
+  For every raw term $t$ and a mode $d$, it is decidable that $t$ has a mode $d$, i.e.\ $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$ is derivable.
 \end{theorem}
 
 \subsection{Completeness versus Annotatability}
@@ -395,39 +395,39 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 \begin{theorem}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
   Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
-  Then, for every raw $t$ with a synthesis mode $\Rightarrow$, and any derivations of 
+  Then, for every raw $t$ with a synthesis mode and two derivations of 
   \[
-    \Gamma \vdash t \Rightarrow A
+    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow A
     \quad\text{and}\quad
-    \Gamma \vdash t \Rightarrow B
+    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow B
   \]
-  for some types $A$ and $B$, the synthesised types must be equal, i.e.\ $A = B$.
+  for some types $A$ and $B$ respectively, the synthesised types must be equal, i.e.\ $A = B$.
 \end{theorem}
  
 
-\subsection{Decidability of Type Synthesis}
+\subsection{Trichotomy of Annotatable Raw Terms}
 
-\begin{theorem}[Decidability for Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
+\begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
   For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, the following two statements hold.
 
   \begin{enumerate}
-    \item For every context $\Gamma$ and a raw term $\isTerm{t}$ with a synthesis mode, it is decidable that there exists a type $A$ and a derivation of
+    \item For every context $\Gamma$ and raw term $\isTerm{t}$ with a synthesis mode, it is decidable that there exists a type $A$ and a derivation of
       \[
         \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A.
       \]
-    \item For every context $\Gamma$, a raw term $\isTerm{t}$ with a checking mode, and a type $A$, it is decidable that there is a derivation of
+    \item For every context $\Gamma$, raw term $\isTerm{t}$ with a checking mode, and type $A$, it is decidable that there exists a derivation of
       \[
         \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A.
       \]
   \end{enumerate}
 \end{theorem}
 
-\begin{corollary}[`Decidability' of Type Synthesis]
-  \LT{Still call it `decidability'?}
+\begin{corollary}[Trichotomy of Annotatable Raw Terms]
+  \LT{trichotomy over decidability?}
   Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
-  Then, for every context $\Gamma$ and raw term $t$, one and only one of the following statements holds:
+  Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
   \begin{enumerate}
-    \item there is a typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
+    \item there exists a typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
     \item there is no typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
     \item $t$ cannot have a synthesis mode.
   \end{enumerate}
@@ -439,22 +439,16 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 
 
-\subsection{Proof for Decidability of Bidirectional Type Synthesis} 
+\subsection{Decidability of Bidirectional Type Synthesis}
 
-\begin{theorem}[Bidirectional Type Synthesis and Checking]
-  For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, each of the following statements holds.
+
+\begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
+  By induction on raw terms $t$ with a mode and for the (op) rule on the list of arguments.
+Moreover, if the type $A$ of $t$ is synthesised and checked against $B$ but $A \neq B$, then \Cref{thm:unique-syn} is applied to derive a contradiction.
+
   \begin{enumerate}
-    \item For every context $\Gamma$ and a raw term $t^d$ with a mode $d$, 
-      \begin{enumerate}
-        \item if $d$ is $\Rightarrow$, then it is decidable that there exists a type $A$ and a typing derivation of
-          \[\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A;
-          \]
-        \item if $d$ is $\Leftarrow$, then for every type $A$ it is decidable that there is a typing derivation of
-          \[
-            \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A.
-          \]
-      \end{enumerate}
-
+    \item 
+        \LT{explain all cases but operation here}
 %    \item For every mode-correct operation $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$, a context $\Gamma$, and a raw term
 %      \[
 %        \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)}, 
@@ -463,32 +457,24 @@ This is not only for brevity but also necessary to compare the type equality dur
 %      \[
 %        \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^\isDir{d}.
 %      \]
-    \item For every set $\Xi$ of type variables, a list of
+    \item For every set $\Xi$ of type variables, list of
       \[
         \left(\Delta_i, A_i, d_i\right) : \Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \Mode, 
       \]
-      a \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, a context $\Gamma$, and raw terms $t_i$'s with a mode $d_i$, either one of the following statements holds:
+      \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s with a mode $d_i$,
       \begin{enumerate}
-        \item there exists a minimal extension $\ext{\rho}$ of $\rho$ such that there are typing derivations of
+        \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that all     of following judgements are derivable
           \[
             \Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
           \]
-          for each $i$;
 
-        \item there is no extension $\ext{\rho}$ such that all $\Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}$ has a typing derivation. 
+        \item or there is no extension $\ext{\rho}$ such that all $\Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}$ has a typing derivation. 
       \end{enumerate}
-  \end{enumerate}
-\end{theorem}
-By induction on raw terms $t$ with a mode and on the list of arguments for operations. 
-Moreover, if the type $A$ of $t$ is synthesised and checked against $B$ but $A \neq B$, then \Cref{thm:unique-syn} is applied to derive a contradiction.
-\begin{proof}
-  \begin{enumerate}
-    
   \end{enumerate}
 \end{proof}
 
-
 \section{Formalisation and More Examples} \label{sec:formalisation}
+\LT{how to type Agda code without lhs2tex?}
 
 \begin{enumerate}
   \item Bidirectional binding signature, functor, and terms (extrinsic typing, raw terms, raw terms with a mode, i.e.\ pre-typed terms).

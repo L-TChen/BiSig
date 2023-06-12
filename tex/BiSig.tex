@@ -380,6 +380,15 @@ This is not only for brevity but also necessary to compare the type equality dur
 \section{Soundness, Completeness, and Bidirectionalisation} \label{sec:annotatability}
 
 \subsection{Soundness and Completeness}
+\begin{theorem}[Soundness]\label{thm:term-soundness}
+    
+\end{theorem}
+
+
+
+\begin{theorem}[Completeness]\label{thm:term-completeness}
+    
+\end{theorem}
 
 \subsection{Bidirectionalisation}
 \begin{theorem}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
@@ -405,7 +414,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \end{theorem}
  
 
-\subsection{Trichotomy of Annotatable Raw Terms}
+\subsection{Trichotomy of Raw Terms by Type Synthesis}
 
 \begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
   For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, the following two statements hold.
@@ -422,7 +431,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \end{enumerate}
 \end{theorem}
 
-\begin{corollary}[Trichotomy of Annotatable Raw Terms]
+\begin{corollary}[Trichotomy of Raw Terms]
   \LT{trichotomy over decidability?}
   Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
   Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
@@ -433,7 +442,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \end{enumerate}
 \end{corollary}
 \begin{proof}
-  Combine \Cref{thm:bidirectionalisation} and \Cref{thm:bidirectional-type-synthesis}.
+  Combine  \Cref{thm:term-soundness,thm:term-completeness,thm:bidirectionalisation} with \Cref{thm:bidirectional-type-synthesis},.
   
 \end{proof}
 

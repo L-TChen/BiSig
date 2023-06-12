@@ -436,9 +436,9 @@ This is not only for brevity but also necessary to compare the type equality dur
   Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
   Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
   \begin{enumerate}
-    \item there exists a typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
-    \item there is no typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
-    \item $t$ cannot have a synthesis mode.
+    \item $t$ has a synthesis mode and there exists a typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
+    \item $t$ has a synthesis mode but there is no typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
+    \item $t$ does not have a synthesis mode.
   \end{enumerate}
 \end{corollary}
 \begin{proof}

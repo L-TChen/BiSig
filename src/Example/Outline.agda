@@ -22,7 +22,7 @@ Ty : Set
 Ty = TExp 0
 
 variable
-  σ τ : Ty
+  A B : Ty
   Γ   : List Ty
 
 -- From parser generators to type-inferencer generators
@@ -47,37 +47,37 @@ infix 3 _⊢_⦂_
 
 data _⊢_⦂_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set where
 
-  `_  : (i : τ ∈ Γ)
+  `_  : (i : A ∈ Γ)
       → ---------------------
-        Γ ⊢ (` L.index i) ⦂ τ
+        Γ ⊢ (` L.index i) ⦂ A
 
-  _∋_ : (τ : Ty)
-      → Γ ⊢ r ⦂ τ
+  _∋_ : (A : Ty)
+      → Γ ⊢ r ⦂ A
       → ---------------
-        Γ ⊢ (τ ∋ r) ⦂ τ
+        Γ ⊢ (A ∋ r) ⦂ A
 
-  app : Γ ⊢ r ⦂ imp σ τ
-      → Γ ⊢ s ⦂ σ
+  app : Γ ⊢ r ⦂ imp A B
+      → Γ ⊢ s ⦂ A
       → ---------------
-        Γ ⊢ app r s ⦂ τ
+        Γ ⊢ app r s ⦂ B
 
-  abs : σ ∷ Γ ⊢ r ⦂ τ
+  abs : A ∷ Γ ⊢ r ⦂ B
       → -------------------
-        Γ ⊢ abs r ⦂ imp σ τ
+        Γ ⊢ abs r ⦂ imp A B
 
 -- Decide whether there is a typing derivation for a given raw term
 -- if the raw term satisfies some constraint, e.g., having enough type annotations
 
 TypeInference' : (∀ {n} → Raw n → Set) → Set
 TypeInference' P = (Γ : List Ty) (r : Raw (length Γ))
-                 → P r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ)
+                 → P r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⦂ A)
 
 -- Decide whether a given raw term has a type
 -- or abort with the excuse that the term doesn’t satisfy the constraint
 
 TypeInference : (∀ {n} → Raw n → Set) → Set
 TypeInference E = (Γ : List Ty) (r : Raw (length Γ))
-                → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⦂ τ) ⊎ E r
+                → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⦂ A) ⊎ E r
 
 -- The second version is logically stronger and more useful in practice
 
@@ -90,35 +90,35 @@ TypeInference-lemma infer Γ r p
 
 -- Bidirectional type system for STLC
 -- Terms are syntactically classified into two categories
--- based on whether their types can be inferred or (only) checked
+-- based on whether their types can be inferred or checked
 
 data Pre : Mode → {n : ℕ} → Raw n → Set where
 
   `_  : (i : Fin n)
-      → -----------------
+      → -------------
         Pre Inf (` i)
 
-  _∋_ : (τ : Ty)
+  _∋_ : (A : Ty)
       → Pre Chk r
-      → -------------------
-        Pre Inf (τ ∋ r)
+      → ---------------
+        Pre Inf (A ∋ r)
 
   _↑  : Pre Inf r
-      → -------------
+      → ---------
         Pre Chk r
 
   app : Pre Inf r
       → Pre Chk s
-      → ---------------------
+      → -----------------
         Pre Inf (app r s)
 
   abs : Pre Chk r
-      → -------------------
+      → ---------------
         Pre Chk (abs r)
 
 -- First step: syntactically decide whether there are enough type annotations
 -- Wherever a checked term needs to be used as an inferred term,
--- a type annotation is necessary, e.g., app (abs t ∋ imp σ τ) u
+-- a type annotation is necessary, e.g., app (abs t ∋ imp B A) u
 
 Bidirectionalisation : Set
 Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (Pre Inf r)
@@ -132,60 +132,60 @@ infix 3 _⊢_[_]_ _⊢_⇐_ _⊢_⇒_
 mutual
 
   _⊢_⇐_ _⊢_⇒_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set
-  Γ ⊢ r ⇐ τ = Γ ⊢ r [ Chk ] τ
-  Γ ⊢ r ⇒ τ = Γ ⊢ r [ Inf ] τ
+  Γ ⊢ r ⇐ A = Γ ⊢ r [ Chk ] A
+  Γ ⊢ r ⇒ A = Γ ⊢ r [ Inf ] A
 
   data _⊢_[_]_ : (Γ : List Ty) → Raw (length Γ) → Mode → Ty → Set where
 
-    `_  : (i : τ ∈ Γ)
+    `_  : (i : A ∈ Γ)
         → ---------------------
-          Γ ⊢ (` L.index i) ⇒ τ
+          Γ ⊢ (` L.index i) ⇒ A
 
-    _∋_ : (τ : Ty)
-        → Γ ⊢ r ⇐ τ
+    _∋_ : (A : Ty)
+        → Γ ⊢ r ⇐ A
         → ---------------
-          Γ ⊢ (τ ∋ r) ⇒ τ
+          Γ ⊢ (A ∋ r) ⇒ A
 
-    _↑_ : Γ ⊢ r ⇒ σ
-        → σ ≡ τ
+    _↑_ : Γ ⊢ r ⇒ A
+        → A ≡ B
         → ---------
-          Γ ⊢ r ⇐ τ
+          Γ ⊢ r ⇐ B
 
-    app : Γ ⊢ r ⇒ imp σ τ
-        → Γ ⊢ s ⇐ σ
+    app : Γ ⊢ r ⇒ imp A B
+        → Γ ⊢ s ⇐ A
         → ---------------
-          Γ ⊢ app r s ⇒ τ
+          Γ ⊢ app r s ⇒ B
 
-    abs : σ ∷ Γ ⊢ r ⇐ τ
+    abs : A ∷ Γ ⊢ r ⇐ B
         → -------------------
-          Γ ⊢ abs r ⇐ imp σ τ
+          Γ ⊢ abs r ⇐ imp A B
 
 TypeInference⇔ : Set
 TypeInference⇔ = (Γ : List Ty) {r : Raw (length Γ)}
-               → Pre Inf r → Dec (Σ[ τ ∈ Ty ] Γ ⊢ r ⇒ τ)
+               → Pre Inf r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⇒ A)
 
 -- Eventually we want to perform ordinary type inference (the spec)
 -- using bidirectional type inference (the impl);
 -- the two type systems should be somehow related to make that possible
 
 Soundness : Set
-Soundness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
-          → Γ ⊢ r [ d ] τ  →  Γ ⊢ r ⦂ τ
+Soundness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
+          → Γ ⊢ r [ d ] A  →  Γ ⊢ r ⦂ A
 
 soundness : Soundness
 soundness (` i)      = ` i
-soundness (τ ∋ t)    = τ ∋ soundness t
+soundness (A ∋ t)    = A ∋ soundness t
 soundness (t ↑ refl) = soundness t
 soundness (app t u)  = app (soundness t) (soundness u)
 soundness (abs t)    = abs (soundness t)
 
 Completeness : Set
-Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {τ : Ty}
-             → Pre d r  →  Γ ⊢ r ⦂ τ  →  Γ ⊢ r [ d ] τ
+Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
+             → Pre d r  →  Γ ⊢ r ⦂ A  →  Γ ⊢ r [ d ] A
 
 completeness : Completeness
 completeness (` ._)    (` i)     = ` i
-completeness (._ ∋ p)  (τ ∋ t)   = τ ∋ completeness p t
+completeness (._ ∋ p)  (A ∋ t)   = A ∋ completeness p t
 completeness (p ↑)     t         = completeness p t ↑ refl
 completeness (app p q) (app t u) = app (completeness p t) (completeness q u)
 completeness (abs p)   (abs t)   = abs (completeness p t)
@@ -197,7 +197,7 @@ infer bidir infer⇔ s c Γ r with bidir r
 ... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (infer⇔ Γ p))
 ... | no ¬p = inr ¬p
 
---   Γ ⊢ r ⦂ τ   ←   Γ ⊢ r ⇒ τ
+--   Γ ⊢ r ⦂ A   ←   Γ ⊢ r ⇒ A
 --
 --     ↑               ↑
 --
@@ -211,10 +211,10 @@ data Pre? : (valid exact : Bool) → Mode → {n : ℕ} → Raw n → Set where
       → ------------------------
         Pre? true true Inf (` i)
 
-  _∋_ : (τ : Ty)
+  _∋_ : (A : Ty)
       → Pre? v e    Chk      r
       → -----------------------
-        Pre? v true Inf (τ ∋ r)
+        Pre? v true Inf (A ∋ r)
 
   _↑  : Pre? v true  Inf r
       → ------------------
@@ -239,7 +239,7 @@ app-abs = app (?∋ abs ((` zero) ↑)) (abs ((` zero) ↑)) hd
 
 toPre : Pre? true e d r → Pre d r
 toPre (` i)   = ` i
-toPre (τ ∋ p) = τ ∋ toPre p
+toPre (A ∋ p) = A ∋ toPre p
 toPre (p ↑)   = toPre p ↑
 toPre (app p q (tl (tl nil))) = app (toPre p) (toPre q)
 toPre (abs p) = abs (toPre p)
@@ -250,12 +250,10 @@ to¬Pre-Inf (abs p) ()
 mutual
 
   to¬Pre-Chk : Pre? false true Inf r → ¬ Pre Chk r
-  to¬Pre-Chk (τ ∋ p)            ((.τ ∋ q) ↑) = to¬Pre p q
-  to¬Pre-Chk (app p p' hd)      (app q q' ↑) = to¬Pre p q
-  to¬Pre-Chk (app p p' (tl hd)) (app q q' ↑) = to¬Pre p' q'
+  to¬Pre-Chk p (q ↑) = to¬Pre p q
 
   to¬Pre : Pre? false e d r → ¬ Pre d r
-  to¬Pre (τ ∋ p)            (.τ ∋ q)   = to¬Pre p q
+  to¬Pre (A ∋ p)            (.A ∋ q)   = to¬Pre p q
   to¬Pre (p ↑)              q          = to¬Pre-Chk p q
   to¬Pre (?∋ p)             q          = to¬Pre-Inf p q
   to¬Pre (app p p' hd)      (app q q') = to¬Pre p q
@@ -288,9 +286,9 @@ mutual
     ⊎        Pre? true  true Chk r
     ⊎ ∃[ e ] Pre? false e    Chk r
   bidirectionalise' (` i) = inl (` i)
-  bidirectionalise' (τ ∋ r) with bidirectionalise Chk r
-  ... | false , _ , p = inr (inr (_ , (τ ∋ p) ↑))
-  ... | true  , _ , p = inl (          τ ∋ p    )
+  bidirectionalise' (A ∋ r) with bidirectionalise Chk r
+  ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
+  ... | true  , _ , p = inl (          A ∋ p    )
   bidirectionalise' (app r s) with bidirectionalise Inf r | bidirectionalise Chk s
   ... | false , _ , p | v     , _ , q = inr (inr (_ , app p q  hd        ↑))
   ... | true  , _ , p | false , _ , q = inr (inr (_ , app p q (tl  hd)   ↑))
@@ -307,15 +305,15 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
        → --------------
          (` i) ≤ᴬ (` i)
 
-  _∋_  : (τ : Ty)
+  _∋_  : (A : Ty)
        → r ≤ᴬ r'
        → -------------------
-         (τ ∋ r) ≤ᴬ (τ ∋ r')
+         (A ∋ r) ≤ᴬ (A ∋ r')
 
-  _∋⁺_ : (τ : Ty)
+  _∋⁺_ : (A : Ty)
        → r ≤ᴬ r'
        → -------------
-         r ≤ᴬ (τ ∋ r')
+         r ≤ᴬ (A ∋ r')
 
   app  : r ≤ᴬ r'
        → s ≤ᴬ s'
@@ -326,14 +324,14 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
        → ---------------
          abs r ≤ᴬ abs r'
 
-annotatability : Pre? v e d r  →  Γ ⊢ r ⦂ τ  →  ∃[ r' ]  r ≤ᴬ r'  ×  Γ ⊢ r' [ d ] τ
+annotatability : Pre? v e d r  →  Γ ⊢ r ⦂ A  →  ∃[ r' ]  r ≤ᴬ r'  ×  Γ ⊢ r' [ d ] A
 annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , ` i
 annotatability (p ↑) t with annotatability p t
 ... | _ , r≤r' , t' = _ , r≤r' , t' ↑ refl
-annotatability (τ ∋ p) (.τ ∋ t) with annotatability p t
-... | _ , r≤r' , t' = _ , τ ∋ r≤r' , τ ∋ t'
-annotatability (?∋ p) t with annotatability p t
-... | _ , r≤r' , t' = _ , _ ∋⁺ r≤r' , _ ∋ t'
+annotatability (A ∋ p) (.A ∋ t) with annotatability p t
+... | _ , r≤r' , t' = _ , A ∋ r≤r' , A ∋ t'
+annotatability {A = A} (?∋ p) t with annotatability p t
+... | _ , r≤r' , t' = _ , A ∋⁺ r≤r' , A ∋ t'
 annotatability (app p q _) (app t u) with annotatability p t | annotatability q u
 ... | _ , r≤r' , t' | _ , s≤s' , u' = _ , app r≤r' s≤s' , app t' u'
 annotatability (abs p) (abs t) with annotatability p t

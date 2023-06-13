@@ -6,10 +6,7 @@ import Syntax.Context
 
 import Syntax.Simple.Description
 import Syntax.Simple.Term
-import Syntax.Simple.Association
 import Syntax.Simple.Properties
-import Syntax.Simple.Unification
-import Syntax.Simple.Unification.Properties
 
 import Syntax.Typed.Description
 import Syntax.Typed.Functor

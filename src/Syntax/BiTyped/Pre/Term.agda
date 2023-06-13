@@ -28,7 +28,7 @@ data Pre : Mode → {n : ℕ} → Raw n → Set where
       → -------------
         Pre Syn (` i)
 
-  _∋_ : (A : TExp₀)
+  _∋_ : (A : Ty)
       → Pre Chk r
       → ---------------
         Pre Syn (A ∋ r)

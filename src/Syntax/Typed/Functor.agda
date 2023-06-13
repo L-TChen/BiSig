@@ -11,22 +11,22 @@ open import Syntax.Context           SD
 open import Syntax.Typed.Description SD
 import      Syntax.Typed.Raw.Functor SD as R
 
-Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (lmax ℓ (lsuc ℓ′))
-Fam ℓ′ X = (Γ : Cxt₀) → X (length Γ) → TExp₀ → Set ℓ′
+Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
+Fam ℓ′ X = (Γ : Cxt 0) → X (length Γ) → Ty → Set ℓ′
 
-Fam₀ : (X : R.Fam ℓ) → Set (lmax ℓ (lsuc lzero))
-Fam₀ X = Fam lzero X
+Fam₀ : (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc 0ℓ)
+Fam₀ X = Fam 0ℓ X
 
 private variable
   Ξ : ℕ
 
-⟦_⟧ᵃ : (Δ : TExps Ξ) (X : R.Fam ℓ) (Y : (Γ : Cxt₀) → X (length Γ) → Set ℓ′)
-     → TSub Ξ 0 → (Γ : Cxt₀) → R.⟦ Δ ⟧ᵃ X (length Γ) → Set ℓ′
+⟦_⟧ᵃ : (Δ : TExps Ξ) (X : R.Fam ℓ) (Y : (Γ : Cxt 0) → X (length Γ) → Set ℓ′)
+     → TSub Ξ 0 → (Γ : Cxt 0) → R.⟦ Δ ⟧ᵃ X (length Γ) → Set ℓ′
 ⟦ []    ⟧ᵃ X Y σ Γ x = Y Γ x
 ⟦ A ∷ Δ ⟧ᵃ X Y σ Γ x = ⟦ Δ ⟧ᵃ X Y σ ((A ⟨ σ ⟩) ∷ Γ) x
 
 ⟦_⟧ᵃˢ : (D : ArgsD Ξ) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
-      → TSub Ξ 0 → (Γ : Cxt₀) → R.⟦ D ⟧ᵃˢ X (length Γ) → Set ℓ′
+      → TSub Ξ 0 → (Γ : Cxt 0) → R.⟦ D ⟧ᵃˢ X (length Γ) → Set ℓ′
 ⟦ []           ⟧ᵃˢ _ _ _ _ _        = ⊤
 ⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X Y σ Γ (x , xs) =
   ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs

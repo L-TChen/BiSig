@@ -19,5 +19,5 @@ infix 5 _∋_
 
 data Raw : ℕ → Set where
   `_  : Fin n                   → Raw n
-  _∋_ : (A : TExp₀) (t : Raw n) → Raw n
+  _∋_ : (A : Ty) (t : Raw n) → Raw n
   op  : ⟦ D ⟧ Raw n             → Raw n

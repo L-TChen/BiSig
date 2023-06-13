@@ -17,7 +17,7 @@ Fam : (ℓ : Level) → Set (lsuc ℓ)
 Fam ℓ = ℕ → Set ℓ
 
 Fam₀ : Set₁
-Fam₀ = Fam lzero
+Fam₀ = Fam 0ℓ
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) → Fam ℓ → Fam ℓ
 ⟦ Δ ⟧ᵃ X n = X (length Δ ʳ+ n)

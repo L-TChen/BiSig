@@ -10,11 +10,11 @@ open import Syntax.Simple            SD
 open import Syntax.Typed.Description SD
 import      Syntax.Typed.Raw.Functor SD as R
 
-Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (lmax ℓ (lsuc ℓ′))
+Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
 Fam ℓ′ X = {n : ℕ} → X n → X n → Set ℓ′
 
-Fam₀ : (X : R.Fam ℓ) → Set (lmax ℓ (lsuc lzero))
-Fam₀ X = Fam lzero X
+Fam₀ : (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc 0ℓ)
+Fam₀ X = Fam 0ℓ X
 
 private variable
   Ξ : ℕ

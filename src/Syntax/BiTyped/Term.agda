@@ -16,16 +16,16 @@ open import Theory.Erasure
 open import Syntax.Typed.Raw.Term (erase D)
 
 private variable
-  Γ   : Cxt₀
+  Γ   : Cxt 0
   r   : Raw _
   d   : Mode
-  A B : TExp₀
+  A B : Ty
 
 infix 6 _⊢_[_]_ _⊢_⇒_ _⊢_⇐_
 
 mutual
 
-  _⊢_⇐_ _⊢_⇒_ : (Γ : Cxt₀) → Raw (length Γ) → TExp₀ → Set
+  _⊢_⇐_ _⊢_⇒_ : (Γ : Cxt 0) → Raw (length Γ) → Ty → Set
   Γ ⊢ r ⇐ A = Γ ⊢ r [ Chk ] A
   Γ ⊢ r ⇒ A = Γ ⊢ r [ Syn ] A
 
@@ -35,7 +35,7 @@ mutual
         → ---------------------
           Γ ⊢ (` L.index i) ⇒ A
 
-    _∋_ : (A : TExp₀)
+    _∋_ : (A : Ty)
         → Γ ⊢ r ⇐ A
         → Γ ⊢ (A ∋ r) ⇒ A
 

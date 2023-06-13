@@ -14,7 +14,7 @@ open import Theory.Erasure
 
 open import Syntax.Typed.Raw               (erase BD)
 open import Syntax.Typed.Raw.Ordering.Term (erase BD)
-import      Syntax.Typed.Raw.Ordering.Functor     SD as A
+import      Syntax.Typed.Raw.Ordering.Functor     SD as O
 
 open import Syntax.BiTyped.Pre.Generalised.Term    BD
 import      Syntax.BiTyped.Pre.Generalised.Functor SD as G
@@ -31,8 +31,8 @@ private variable
   v e : Bool
   d   : Mode
   r   : Raw _
-  Γ   : Cxt₀
-  A   : TExp₀
+  Γ   : Cxt 0
+  A   : Ty
 
 mutual
 
@@ -55,7 +55,7 @@ mutual
     : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw _}
     → G.⟦ D ⟧ᶜ Raw Pre? v d rs
     → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
-    → ∃[ rs' ] A.⟦ eraseᶜ D , eraseᶜ D ⟧ᶜ Raw _≤ᴬ_ refl rs rs'
+    → ∃[ rs' ] O.⟦ eraseᶜ D , eraseᶜ D ⟧ᶜ Raw _≤ᴬ_ refl rs rs'
              × B.⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs' d A
   annotatabilityᶜ (ι _ _ Ds) (vs , a , deq , ps) (σ , σeq , ts)
       with annotatabilityᵃˢ Ds vs ps ts
@@ -66,7 +66,7 @@ mutual
     → (vs : Vec Bool (length Ds))
     → G.⟦ Ds ⟧ᵃˢ Raw Pre? vs rs
     → T.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw _⊢_⦂_ σ Γ rs
-    → ∃[ rs' ] A.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw _≤ᴬ_ rs rs'
+    → ∃[ rs' ] O.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw _≤ᴬ_ rs rs'
              × B.⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ σ Γ rs'
   annotatabilityᵃˢ [] _ _ _ = _ , _ , _
   annotatabilityᵃˢ ((Δ ⊢[ _ ] _) ∷ Ds) (_ ∷ vs) ((_ , p) , ps) (t , ts)

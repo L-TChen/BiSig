@@ -11,10 +11,22 @@ variable
 
 import Syntax.Simple.Description as S
 
+data ΛₜOp : Set where
+  base imp : ΛₜOp
+
+instance
+
+  decΛₜOp : DecEq ΛₜOp
+  decΛₜOp = record { _≟_ = dec }
+    where
+      dec : (x y : ΛₜOp) → Dec (x ≡ y)
+      dec base base = yes refl
+      dec base imp  = no λ ()
+      dec imp  base = no λ ()
+      dec imp  imp  = yes refl
+
 ΛₜD : S.Desc
-ΛₜD = 0 -- base type
-    ∷ 2 -- function type
-    ∷ []
+ΛₜD = S.desc ΛₜOp λ { base → 0; imp → 2 }
 
 {-
 data Λₜ : Set where
@@ -34,7 +46,7 @@ variable
 
 infixr 8 _↣_
 
-pattern _↣_ A B = op (2 , there (here refl) , A ∷ B ∷ [])
+pattern _↣_ A B = op (imp , A ∷ B ∷ [])
 
 open import Syntax.BiTyped.Description ΛₜD
 
@@ -68,6 +80,9 @@ open import Theory.Erasure
 
 open import Syntax.Typed.Raw.Term (erase Λ⇔D)
 
+variable
+  r s : Raw _
+
 infixl 8 _·_
 infixr 7 ƛ_
 
@@ -80,10 +95,13 @@ S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
 open import Syntax.BiTyped.Term Λ⇔D
 
 infixl 8 _·ᴮ_
-infixr 7 ƛᴮ_
+-- infixr 7 ƛᴮ_
 
-pattern _·ᴮ_ t u = op (refl , _ ∷ _ ∷ [] , refl , t , u , _)
-pattern ƛᴮ_  t   = op (refl , _ ∷ _ ∷ [] , refl , t , _)
+_·ᴮ_ : Γ ⊢ r ⇒ (A ↣ B)  →  Γ ⊢ s ⇐ A  →  Γ ⊢ (r · s) ⇒ B
+t ·ᴮ u = op (refl , lookup (_ ∷ _ ∷ []) , refl , t , u , _)
+
+ƛᴮ_ : (A ∷ Γ) ⊢ r ⇐ B  →  Γ ⊢ (ƛ r) ⇐ (A ↣ B)
+ƛᴮ t = op (refl , lookup (_ ∷ _ ∷ []) , refl , t , _)
 
 ⊢S : Γ ⊢ S ⇐ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
 ⊢S = ƛᴮ ƛᴮ ƛᴮ ((` there (there (here refl)) ·ᴮ ((` here refl) ↑ refl) ·ᴮ

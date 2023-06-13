@@ -14,9 +14,9 @@ import      Syntax.Typed.Raw.Functor SD as R
 open import Syntax.Typed.Raw.Term     D
 
 private variable
-  Γ : Cxt₀
+  Γ : Cxt 0
   r : Raw _
-  A : TExp₀
+  A : Ty
 
 infix 6 _⊢_⦂_
 
@@ -26,7 +26,7 @@ data _⊢_⦂_ : Fam₀ Raw where
       → ---------------------
         Γ ⊢ (` L.index i) ⦂ A
 
-  _∋_ : (A : TExp₀)
+  _∋_ : (A : Ty)
       → Γ ⊢ r ⦂ A
       → ---------------
         Γ ⊢ (A ∋ r) ⦂ A

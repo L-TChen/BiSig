@@ -24,10 +24,10 @@ open import Syntax.Typed.Raw  (erase BD)
 
 private variable
   Ξ : ℕ
-  Γ : Cxt₀
+  Γ : Cxt 0
   r : Raw _
   d : Mode
-  A : TExp₀
+  A : Ty
 
 mutual
 

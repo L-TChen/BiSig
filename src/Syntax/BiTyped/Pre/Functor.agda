@@ -16,11 +16,11 @@ private variable
   Ξ : ℕ
   X : R.Fam ℓ
 
-Fam : (ℓ : Level) → R.Fam ℓ′ → Set (lmax (lsuc ℓ) ℓ′)
+Fam : (ℓ : Level) → R.Fam ℓ′ → Set (lsuc ℓ ⊔ ℓ′)
 Fam ℓ X = Mode → {n : ℕ} → X n → Set ℓ
 
 Fam₀ : R.Fam₀ → Set₁
-Fam₀ = Fam lzero
+Fam₀ = Fam 0ℓ
 
 ⟦_⟧ᵃ : (Δ : TExps Ξ) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ Δ ⟧ᵃ X)
 ⟦ Δ ⟧ᵃ X Y d x = Y d x

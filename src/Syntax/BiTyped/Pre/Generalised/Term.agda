@@ -29,7 +29,7 @@ data Pre? : (valid exact : Bool) → Mode → {n : ℕ} → Raw n → Set where
       → ------------------------
         Pre? true true Syn (` i)
 
-  _∋_ : (A : TExp₀)
+  _∋_ : (A : Ty)
       → Pre? v e    Chk      r
       → -----------------------
         Pre? v true Syn (A ∋ r)

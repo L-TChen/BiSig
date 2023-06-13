@@ -169,8 +169,8 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{example}
   The term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{subsec:binding-sig} can be specified by operations 
   \begin{align*}
-    \mathsf{app}\colon A, B \rhd (A \bto B)^{\Rightarrow}, A^{\Leftarrow} \to B^{\Rightarrow} &&
-    \mathsf{abs}\colon A , B \rhd [A]B^{\Leftarrow} \to (A \bto B)^{\Leftarrow}
+    \mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn} &&
+    \mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}
   \end{align*}
   extending $\Lambda_{\bto}$ (\Cref{ex:STLC-sig}) with the mode information.
 \end{example}
@@ -217,7 +217,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\tmOp)
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
     \\
-    \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}$}
+    \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}$}
   \end{mathpar}
   \caption{Typing rules for a bidirectional system $(\Sigma, \Omega)$}
 \end{figure}

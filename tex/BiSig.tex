@@ -7,7 +7,7 @@
 \EnableBpAbbreviations
 \usepackage[all,cmtip]{xy}
 
-\usepackage{xfrac,xspace,xcolor,subcaption}
+\usepackage{subcaption,xfrac,xspace,xcolor,xspace}
 \usepackage{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage[inline]{enumitem} % for environment enumerate*
@@ -48,7 +48,7 @@
   \postcode{115}
 }
 
-\title{A Practical Metatheory of Bidirectional Type Synthesis for Simple Types}
+\title{A Constructive Metatheory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
   This paper proposes a formal theory of bidirectional typing.
@@ -130,13 +130,13 @@ Plan of this paper:
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \Leftarrow B \\ A = B}{\Gamma \vdash \isTerm{t : B}\Rightarrow A}\;(\text{anno})
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Gamma \vdash \isTerm{t\uparrow} \Leftarrow A}\;(\text{sub})
+    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Gamma \vdash \isTerm{t\subsum} \Leftarrow A}\;(\text{sub})
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Gamma \vdash \isTerm{u} \Leftarrow A}{\Gamma \vdash \isTerm{t\;u} \Rightarrow B}\;(\text{app})
     \and
     \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \Leftarrow B}{\Gamma \vdash \isTerm{\lam{x}t} \Leftarrow A \bto B}\;(\text{abs})
   \end{mathpar}
-  \caption{The extrinsic style of bidirectional simply typed $\lambda$-calculus with type variables}
+  \caption{Bidirectional simply typed $\lambda$-calculus $\Lambda^{\Leftrightarrow}_{\bto}$}
   \label{fig:bi-stlc}
 \end{figure}
 \begin{remark}
@@ -161,9 +161,8 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
     \begin{mathpar}
       \boxed{\Theta\vdash_{\Sigma} A} \\
       \inferrule{\Theta \ni X_i}{\Theta \vdash_\Sigma X_i} \and
-      \inferrule{\Theta \vdash_{\Sigma} A_1 \\ \cdots \\ \Theta \vdash_{\Sigma} A_n}{\Theta \vdash_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}
+    \inferrule{\Theta \vdash_{\Sigma} A_1 \\ \cdots \\ \Theta \vdash_{\Sigma} A_{\arity(o)}}{\Theta \vdash_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
     \end{mathpar}
-    where $n = \arity_i$
     \caption{Type formation}
     \label{fig:simple-type}
   \end{minipage}
@@ -181,10 +180,9 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
 \end{figure}
 
 \begin{example}\label{ex:implication}
-  Simply typed $\lambda$-calculus typically includes a binary implication type denoted by $\bto$ and some base types to ensure that the set of all types is non-empty.
+  Simply typed $\lambda$-calculus $\Lambda_{\bto}$ typically includes a binary implication type denoted by $\bto$ and some base types to ensure that the set of all types is non-empty.
   The type signature $\Sigma_{\bto}$ of simply typed $\lambda$-calculus consists of a binary operation $\bto$ and a base type (nullary operation) $N$.
-  In the case of simply typed $\lambda$-calculus with binary products, we can extend $\Sigma_{\bto}$ by adding a binary operation $\btimes$ to represent the binary product type.
-  This extended signature is denoted as $\Sigma_{\bto, \btimes}$.
+  In the case of simply typed $\lambda$-calculus $\Lambda_{\bto, \btimes}$ with binary products, we can extend $\Sigma_{\bto}$ by adding a binary operation $\btimes$ to represent the binary product type, denoted as $\Sigma_{\bto, \btimes}$.
 \end{example}
 
 \subsection{Binding Signatures} \label{subsec:binding-sig}
@@ -201,7 +199,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
     \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs where
     \item the $i$-th pair $(\Delta_i, A_i) :\Cxt_{\Sigma}(\Xi) \times \Term_{\Sigma}(\Xi)$ are types of the binding variables and the type of the $i$-th argument of $\tmOp_{o}$.
   \end{enumerate}
-  For brevity, we write $o \colon \Xi \rhd (\Delta_1)A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation $o$ with its arity. 
+  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A$ to indicate an operation with its arity. 
 \end{definition}
 \begin{remark}[Terminology on binding signature]
   \cite{Aczel1978,Fiore2010}
@@ -257,7 +255,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 %  \label{fig:intrinsic-typing}
 %\end{figure}
 
-\subsection{Simple Type Theory of a Signature}
+\subsection{Simple Type Theory for a Signature}
 
 \begin{figure}
   \centering
@@ -273,7 +271,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\;(\text{op}) 
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  \caption{Annotatable raw terms for $(\Sigma, \Omega)$}
+  \caption{Raw terms for $(\Sigma, \Omega)$ with annotation}
 \end{figure}
 
 \begin{figure}
@@ -304,11 +302,11 @@ This is not only for brevity but also necessary to compare the type equality dur
   Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\tmOp_o$ in a bidirectional system, i.e.
   an arity is a $4$-tuple
   \[
-    \left(\Xi, \left[\left(\Delta_1, A_1, d_1\right), \ldots, \left(\Delta_{n}, A_{n}, d_n\right) \right], A, d\right)
+    \left(\Xi, \left[\left(\Delta_1; A_1; d_1\right), \ldots, \left(\Delta_{n}; A_{n}; d_n\right) \right], A, d\right)
   \]
   where $d$ and $d_i$'s indicate the modes of a construct and its arguments respectively.
 
-  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation $o$ with its arity. 
+  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation with its arity. 
 \end{definition}
 
 \begin{example}
@@ -320,32 +318,27 @@ This is not only for brevity but also necessary to compare the type equality dur
   extending $\Lambda_{\bto}$ (\Cref{ex:STLC-sig}) with the mode information.
 \end{example}
 
-\LT{deriving bidirectional binding signature from annotation}
-
-\LT{Signature Erasure}
-\begin{theorem}[Signature annotation]
-  
-\end{theorem}
-
+\LT{Some remark about signature erasure and annotation; introduce the notation $\erase{\Omega}$}
 
 \begin{figure}
   \centering
   \small
   \begin{mathpar}
     \boxed{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}}
+    \quad\text{where $\vdash_{\Sigma, \erase{\Omega}} \isTerm{t}$}
     \\
     \inferrule{x : \Identifier}{\vdash_{\Sigma, \Omega} \isTerm{x}^\isDir{\syn}}\;(\text{var})
     \and
-    \inferrule{\cdot \vdash_{\Sigma} A \\ \vdash_{\Sigma, \Omega}\isTerm{t}^\isDir{\chk}}{\vdash_{\Sigma, \Omega} \isTerm{t \annote A}^\isDir{\syn}}\;(\text{anno})
+    \inferrule{\cdot \vdash_{\Sigma} A \\ \vdash_{\Sigma, \Omega}\isTerm{t}^\isDir{\chk}}{\vdash_{\Sigma, \Omega} (\isTerm{t \annote A})^\isDir{\syn}}\;(\text{anno})
     \and
-    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{\syn}}{\vdash_{\Sigma, \Omega} {\isTerm{t\mathord{\uparrow}}}^\isDir{\chk}}\;(\text{sub})
+    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{\syn}}{\vdash_{\Sigma, \Omega} {\isTerm{t\subsum}}^\isDir{\chk}}\;(\text{ sub})
   \end{mathpar}
   \begin{mathpar}
     \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1}^\isDir{d_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}^\isDir{d_n}}
     {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\isDir{d}}\;(\text{op})
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
   \end{mathpar}
-  \caption{Raw terms with a mode $d$ for a bidirectional type system $(\Sigma, \Omega)$}
+  \caption{Raw terms in some mode $d$ for a bidirectional type system $(\Sigma, \Omega)$}
 \end{figure}
 
 \begin{figure}
@@ -353,13 +346,13 @@ This is not only for brevity but also necessary to compare the type equality dur
   \small
   \begin{mathpar}
     \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{d}}
-    \quad \text{where $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$} 
+    \quad \text{where $\vdash_{\Sigma, \erase{\Omega}} \isTerm{t}$ and $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$} 
     \\
-    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\syn}\;(\var)
+    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\isDir{\syn}}\;(\var)
     \and
-    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^\chk \\ A = B}{\mid \Gamma \vdash_{\Sigma, \Omega} (\isTerm{t \annote B}):  A^\syn}\;(\text{anno})
+    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}{\Gamma \vdash_{\Sigma, \Omega} (\isTerm{t \annote B}):  A^\isDir{\syn}}\;(\text{anno})
     \and
-    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\syn} \\ A = B}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t\uparrow} : A^\chk}\;(\text{sub})
+    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\isDir{\syn}} \\ A = B}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t\subsum} : A^\isDir{\chk}}\;(\text{sub})
     \\
     \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} : \simsub{A_{1}}{\rho}^{\isDir{d_1}} \\
       \cdots \\
@@ -367,7 +360,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\tmOp)
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
     \\
-    \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\syn}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\chk}$}
+    \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}$}
   \end{mathpar}
   \caption{Typing rules for a bidirectional system $(\Sigma, \Omega)$}
 \end{figure}
@@ -391,9 +384,9 @@ This is not only for brevity but also necessary to compare the type equality dur
 \end{theorem}
 
 \subsection{Bidirectionalisation}
-\begin{theorem}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
-  For every raw term $t$ and a mode $d$, it is decidable that $t$ has a mode $d$, i.e.\ $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$ is derivable.
-\end{theorem}
+\begin{proposition}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
+  For every raw term $t$ and a mode $d$, it is decidable that $t$ is in mode $d$, i.e.\ $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$ is derivable.
+\end{proposition}
 
 \subsection{Completeness versus Annotatability}
 
@@ -404,7 +397,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 \begin{theorem}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
   Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
-  Then, for every raw $t$ with a synthesis mode and two derivations of 
+  Then, for every raw term $t$ in synthesising mode and two derivations of 
   \[
     \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow A
     \quad\text{and}\quad
@@ -420,11 +413,11 @@ This is not only for brevity but also necessary to compare the type equality dur
   For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, the following two statements hold.
 
   \begin{enumerate}
-    \item For every context $\Gamma$ and raw term $\isTerm{t}$ with a synthesis mode, it is decidable that there exists a type $A$ and a derivation of
+    \item For every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode, it is decidable that there is a type~$A$ and a derivation of
       \[
         \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A.
       \]
-    \item For every context $\Gamma$, raw term $\isTerm{t}$ with a checking mode, and type $A$, it is decidable that there exists a derivation of
+    \item For every context $\Gamma$, raw term $\isTerm{t}$ in checking mode, and type $A$, it is decidable that there is a derivation of
       \[
         \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A.
       \]
@@ -432,17 +425,16 @@ This is not only for brevity but also necessary to compare the type equality dur
 \end{theorem}
 
 \begin{corollary}[Trichotomy of Raw Terms]
-  \LT{trichotomy over decidability?}
   Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
   Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
   \begin{enumerate}
-    \item $t$ has a synthesis mode and there exists a typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
-    \item $t$ has a synthesis mode but there is no typing derivation of $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
-    \item $t$ does not have a synthesis mode.
+    \item $t$ is synthesising and there exists a typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
+    \item $t$ is synthesising but there is no typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
+    \item $t$ is not synthesising.
   \end{enumerate}
 \end{corollary}
 \begin{proof}
-  Combine  \Cref{thm:term-soundness,thm:term-completeness,thm:bidirectionalisation} with \Cref{thm:bidirectional-type-synthesis},.
+  Combine  \Cref{thm:term-soundness,thm:term-completeness,thm:bidirectionalisation} with \Cref{thm:bidirectional-type-synthesis}.
   
 \end{proof}
 
@@ -452,8 +444,8 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
-  By induction on raw terms $t$ with a mode and for the (op) rule on the list of arguments.
-Moreover, if the type $A$ of $t$ is synthesised and checked against $B$ but $A \neq B$, then \Cref{thm:unique-syn} is applied to derive a contradiction.
+  By induction on raw terms $t$ in some mode and for the $(\text{op})$ rule on the list of arguments.
+  Moreover, if the type $A$ of $t$ is synthesised and checked against $B$ but $A \neq B$, then \Cref{thm:unique-syn} is applied to derive a contradiction.
 
   \begin{enumerate}
     \item 
@@ -470,7 +462,7 @@ Moreover, if the type $A$ of $t$ is synthesised and checked against $B$ but $A \
       \[
         \left(\Delta_i, A_i, d_i\right) : \Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \Mode, 
       \]
-      \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s with a mode $d_i$,
+      \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s in mode $d_i$,
       \begin{enumerate}
         \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that all     of following judgements are derivable
           \[

@@ -1,33 +1,39 @@
 \documentclass[acmsmall,screen]{acmart}
+
+\ifPDFTeX
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
+\else
+\usepackage{polyglossia}
+\setdefaultlanguage{british}
+\fi
 
-\usepackage{bm,braket,mathtools,mathpartir,bussproofs}
-\EnableBpAbbreviations
-\usepackage[all,cmtip]{xy}
-
-\usepackage{subcaption,xfrac,xspace,xcolor,xspace}
-\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{mathpartir}
+%\usepackage{xfrac,xcolor}
+\usepackage{xspace}
+%\usepackage{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage[inline]{enumitem} % for environment enumerate*
-\setlist[enumerate]{mode=unboxed}
 
 \setlength {\marginparwidth }{2cm}
 \usepackage[color=yellow,textsize=small]{todonotes}
-\newcommand{\LT}[1]{\todo[author=LT,inline,color=green!40,caption={}]{{#1}}}
-\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=green!40,caption={}]{{#1}}}
 
 \usepackage{microtype}
 
 \citestyle{acmauthoryear}
-
 \AtEndPreamble{%
 \theoremstyle{acmdefinition}
 \newtheorem{remark}[theorem]{Remark}}
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
+
+\setlist[enumerate]{mode=unboxed}
+\newcommand{\LT}[1]{\todo[author=LT,inline,color=green!40,caption={}]{{#1}}}
+\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=green!40,caption={}]{{#1}}}
 
 \begin{document}
 

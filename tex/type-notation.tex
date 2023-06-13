@@ -152,7 +152,7 @@
 \makeatother
 
 % Other notations related to dependent sums
-\let\setof\Set    % from package 'braket', write \setof{ x:A | P(x) }.
+%\let\setof\Set    % from package 'braket', write \setof{ x:A | P(x) }.
 \newcommand{\pair}{\ensuremath{\mathsf{pair}}\xspace}
 \newcommand{\tup}[2]{(#1,#2)}
 \newcommand{\proj}[1]{\ensuremath{\mathsf{pr}_{#1}}\xspace}
@@ -297,8 +297,8 @@
 \let\ntypeU\typeleU
 \let\ntypep\typelep
 \let\ntypepU\typelepU
-\renewcommand{\set}{\ensuremath{\mathsf{Set}}\xspace}
-\newcommand{\setU}{\ensuremath{\mathsf{Set}_\UU}\xspace}
+%\renewcommand{\set}{\ensuremath{\mathsf{Set}}\xspace}
+%\newcommand{\setU}{\ensuremath{\mathsf{Set}_\UU}\xspace}
 \newcommand{\prop}{\ensuremath{\mathsf{Prop}}\xspace}
 \newcommand{\propU}{\ensuremath{\mathsf{Prop}_\UU}\xspace}
 %Pointed types
@@ -424,9 +424,9 @@
 \newcommand{\utype}{\ensuremath{\mathcal{T}\!ype}\xspace}
 
 % Pullback corner
-\newbox\pbbox
-\setbox\pbbox=\hbox{\xy \POS(65,0)\ar@{-} (0,0) \ar@{-} (65,65)\endxy}
-\def\pb{\save[]+<3.5mm,-3.5mm>*{\copy\pbbox} \restore}
+%\newbox\pbbox
+%\setbox\pbbox=\hbox{\xy \POS(65,0)\ar@{-} (0,0) \ar@{-} (65,65)\endxy}
+%\def\pb{\save[]+<3.5mm,-3.5mm>*{\copy\pbbox} \restore}
 
 % Macros for the categories chapter
 \newcommand{\inv}[1]{{#1}^{-1}}

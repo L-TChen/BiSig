@@ -1,0 +1,28 @@
+%! TEX root = BiSig.tex
+
+\section{Core Ideas with Bidirectional Simply Typed \texorpdfstring{$\lambda$}{lambda}-Calculus} \label{sec:key-ideas}
+\begin{figure}
+  \centering
+  \small
+  \begin{mathpar}
+    \boxed{\Gamma \vdash \isTerm{t} \Rightarrow A}
+    \quad\text{and}\quad \boxed{\Gamma \vdash \isTerm{t} \Leftarrow A}
+    \\
+    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \Rightarrow A}\;(\text{var}^\Rightarrow)
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Leftarrow B \\ A = B}{\Gamma \vdash \isTerm{t : B}\Rightarrow A}\;(\text{anno})
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow B \\ A = B}{\Gamma \vdash \isTerm{t\subsum} \Leftarrow A}\;(\text{sub})
+    \and
+    \inferrule{\Gamma \vdash \isTerm{t} \Rightarrow A \bto B \\ \Gamma \vdash \isTerm{u} \Leftarrow A}{\Gamma \vdash \isTerm{t\;u} \Rightarrow B}\;(\text{app})
+    \and
+    \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \Leftarrow B}{\Gamma \vdash \isTerm{\lam{x}t} \Leftarrow A \bto B}\;(\text{abs})
+  \end{mathpar}
+  \caption{Bidirectional simply typed $\lambda$-calculus $\Lambda^{\Leftrightarrow}_{\bto}$}
+  \label{fig:bi-stlc}
+\end{figure}
+\begin{remark}
+  We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.
+\end{remark}
+
+

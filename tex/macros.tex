@@ -15,8 +15,7 @@
 \newcommand{\Term}{\mathsf{Tm}}
 \newcommand{\Cxt}{\mathsf{Cxt}}
 \newcommand{\Mode}{\mathsf{Mode}}
-\newcommand{\var}{\mathsf{var}}
-\newcommand{\simsub}[2]{{#1}\!\left<{#2}\right>}
+
 \newcommand{\bto}{\mathbin{\bm{\supset}}}
 \newcommand{\btimes}{\mathbin{\bm{\wedge}}}
 
@@ -25,16 +24,23 @@
 \newcommand{\isCxt}[1]{{\textcolor{orange}{#1}}}
 \newcommand{\isDir}[1]{{\mathrel{\textcolor{purple}{#1}}}}
 
+\newcommand{\simsub}[2]{{#1}\!\left<{#2}\right>}
+
 \newcommand{\Identifier}{\mathsf{Id}}
 \newcommand{\annote}{\mathrel{\boldsymbol{:}}}
+\newcommand{\subsum}{\mathord{\uparrow}}
 \newcommand{\abs}{\mathsf{abs}}
 \newcommand{\app}{\mathsf{app}}
 
 \newcommand{\Sub}[2]{\mathsf{Sub}_{\Sigma}(#1,#2)}
 \newcommand{\PSub}[2]{\mathsf{PSub}_{\Sigma}(#1,#2)}
 \newcommand{\Ren}[2]{\mathsf{Ren}(#1, #2)}
+
 \newcommand{\chk}{\Leftarrow}
 \newcommand{\syn}{\Rightarrow}
+
 \newcommand{\ext}[1]{\bar{#1}}
 \newcommand{\erase}[1]{\left|#1\right|}
-\newcommand{\subsum}{\mathord{\uparrow}}
+
+\newcommand{\var}{\mathsf{var}}
+\newcommand{\synvar}{\var_{\syn}}

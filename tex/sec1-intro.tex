@@ -1,0 +1,67 @@
+%! TEX root = BiSig.tex
+
+\section{Introduction}\label{sec:intro}
+
+\begin{enumerate}
+  \item Type checking as a transition from (parsed) abstract syntax trees to well-typed terms.
+  \item Bidirectional typing is the only solution that works that scales well.
+  \item Not yet a general theory but by now a design principle.
+    No `type checker generator' as each type checker is still designed and implemented on a case-by-case basis, but can be derived from a syntax-directed type theory `easily'.
+  \item The existing work of bidirectional typing does not take account of missing annotations carefully enough. 
+  \item A meta-problem: existing work is based on (or at least left unspecified) classical logic.
+    One has to state soundness of completeness of their type checking algorithm in a less straightforward way.
+  \item A review of what has been done towards this line of research.
+  \item Finally, our responses (contributions of this paper).
+\end{enumerate}
+
+\subsection{Related work}
+
+\citep{Xie2018}
+\subsubsection{Language formalization and its frameworks}
+\cite{Wadler2022}
+PoplMark Challenge~\citep{Aydemir2005}
+
+\cite{Cimini2020,Cimini2022}
+
+\citep{Ahrens2018,Fiore2022,Gheri2020,Ahrens2022}
+\cite{Allais2021}
+
+\subsubsection{Theories of abstract syntax with variable binding}
+\cite{Fiore1999,Hirschowitz2010,Ahrens2018,Fiore2022,Ahrens2021,Arkor2020,Hirschowitz2022}
+\cite{Fiore2013,Hamana2011,Hamana2022}
+
+
+\subsubsection{Type checker generation}
+\cite{Gast2004,Grewe2015,Pacak2020,Cimini2020}
+
+\subsubsection{Bidirectional typing}
+
+\cite{Pierce2000}
+\cite{Dunfield2021}
+
+
+\subsection{Plan and Contributions of this paper}
+
+Our assumptions and contributions:
+\begin{enumerate}
+  \item Assumption: Syntax-directed typing rules
+  \item Practical: bidirectionalisation over annotatability, decidability over soundness and completeness.
+  \item Generic: Type checking once and for all bidirectional type systems for simple types.
+  \item Correct and Constructive: Fully formalised in Martin-Löf type theory (with Axiom K).
+    LEM is not assumed, so a decidable statement has both computational and non-trivial logical readings.
+\end{enumerate}
+
+Plan of this paper:
+\begin{enumerate}
+  \item Key ideas (\Cref{sec:key-ideas})
+  \item Definitions for simple type theories and for bidirectional type systems (signature erasure and mode annotation) (\Cref{sec:defs})
+  \item Soundness, completeness, bidirectionalisation, and annotatability (\Cref{sec:annotatability})
+    \Josh{Erasure from bidirectional typing derivation to raw terms with a mode}
+  \item Bidirectional type inference (\Cref{sec:type-synthesis})
+  \item Formalisation with further examples (\Cref{sec:formalisation})
+  \item Future work (\Cref{sec:future})
+\end{enumerate}
+  \LT{better title?}
+
+
+

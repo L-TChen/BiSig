@@ -1,0 +1,82 @@
+%! TEX root = BiSig.tex
+
+\section{Bidirectional Type Synthesis and Checking} \label{sec:type-synthesis}
+
+\subsection{Mode Correctness}
+
+\begin{theorem}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
+  Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
+  Then, for every raw term $t$ in synthesising mode and two derivations of 
+  \[
+    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow A
+    \quad\text{and}\quad
+    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow B
+  \]
+  for some types $A$ and $B$ respectively, the synthesised types must be equal, i.e.\ $A = B$.
+\end{theorem}
+ 
+
+\subsection{Trichotomy of Raw Terms by Type Synthesis}
+
+\begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
+  For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, the following two statements hold.
+
+  \begin{enumerate}
+    \item For every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode, it is decidable that there is a type~$A$ and a derivation of
+      \[
+        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A.
+      \]
+    \item For every context $\Gamma$, raw term $\isTerm{t}$ in checking mode, and type $A$, it is decidable that there is a derivation of
+      \[
+        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A.
+      \]
+  \end{enumerate}
+\end{theorem}
+
+\begin{corollary}[Trichotomy of Raw Terms]
+  Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
+  Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
+  \begin{enumerate}
+    \item $t$ is synthesising and there exists a typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
+    \item $t$ is synthesising but there is no typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
+    \item $t$ is not synthesising.
+  \end{enumerate}
+\end{corollary}
+\begin{proof}
+  Combine  \Cref{thm:term-soundness,thm:term-completeness,thm:bidirectionalisation} with \Cref{thm:bidirectional-type-synthesis}.
+  
+\end{proof}
+
+\subsection{Decidability of Bidirectional Type Synthesis}
+
+\begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
+  We prove this statement by induction on $t$.
+
+  \begin{description}
+    \item[(var)] If $x : A$ is in the context $\Gamma$, then there exists a type $A$ such that $\Gamma \vdash_{\Sigma, \Omega} x \Rightarrow A$.
+      Otherwise, if $\Gamma \vdash_{\Sigma, \Omega} x \Rightarrow A$ is derivable, then by inversion $(x : A)$ must be in $\Gamma$, a contradiction.
+    \item[(anno)]
+    \item[(sub)]
+%    \item For every mode-correct operation $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$, a context $\Gamma$, and a raw term
+%      \[
+%        \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)}, 
+%      \]
+%      with a mode $d$, it is decidable that there exists a substitution $\rho$ from $\Xi$ to $\emptyset$ and a typing derivation of
+%      \[
+%        \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^\isDir{d}.
+%      \]
+    \item For every set $\Xi$ of type variables, list of
+      \[
+        \left(\Delta_i, A_i, d_i\right) : \Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \Mode, 
+      \]
+      \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s in mode $d_i$,
+      \begin{enumerate}
+        \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that all     of following judgements are derivable
+          \[
+            \Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
+          \]
+
+        \item or there is no extension $\ext{\rho}$ such that all $\Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}$ has a typing derivation. 
+      \end{enumerate}
+  \end{description}
+\end{proof}

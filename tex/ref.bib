@@ -28,7 +28,7 @@
 @book{Wadler2022,
   author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
   month =         aug,
-  title =         {Programming Language Foundations in {Agda}},
+  title =         {Programming Language Foundations in \textsc{Agda}},
   year =          {2022},
   url =           {https://plfa.inf.ed.ac.uk/22.08/},
 }
@@ -159,47 +159,6 @@
   url =           {https://dl.acm.org/doi/10.1145/3498715},
 }
 
-@article{Allais2021,
-  author =        {Allais, Guillaume and Atkey, Robert and
-                   Chapman, James and McBride, Conor and McKinna, James},
-  journal =       {Journal of Functional Programming},
-  month =         oct,
-  number =        {1996},
-  pages =         {e22},
-  title =         {A type- and scope-safe universe of syntaxes with
-                   binding: their semantics and proofs},
-  volume =        {31},
-  year =          {2021},
-  abstract =      {The syntax of almost every programming language
-                   includes a notion of binder and corresponding bound
-                   occurrences, along with the accompanying notions of
-                   α-equivalence, capture-avoiding substitution, typing
-                   contexts, runtime environments, and so on. In the
-                   past, implementing and reasoning about programming
-                   languages required careful handling to maintain the
-                   correct behaviour of bound variables. Modern
-                   programming languages include features that enable
-                   constraints like scope safety to be expressed in
-                   types. Nevertheless, the programmer is still forced
-                   to write the same boilerplate over again for each new
-                   implementation of a scope-safe operation (e.g.,
-                   renaming, substitution, desugaring, printing), and
-                   then again for correctness proofs. We present an
-                   expressive universe of syntaxes with binding and
-                   demonstrate how to (1) implement scope-safe
-                   traversals once and for all by generic programming;
-                   and (2) how to derive properties of these traversals
-                   by generic proving. Our universe description, generic
-                   traversals and proofs, and our examples have all been
-                   formalised in Agda and are available in the
-                   accompanying material available online at
-                   https://github.com/gallais/generic-syntax .},
-  doi =           {10.1017/S0956796820000076},
-  issn =          {0956-7968},
-  url =           {https://www.cambridge.org/core/product/identifier/
-                  S0956796820000076/type/journal_article},
-}
-
 @article{Gheri2020,
   author =        {Gheri, Lorenzo and Popescu, Andrei},
   journal =       {Journal of Automated Reasoning},
@@ -277,6 +236,47 @@
   doi =           {10.1145/3497775.3503678},
   isbn =          {9781450391825},
   url =           {https://doi.org/10.1145/3497775.3503678},
+}
+
+@article{Allais2021,
+  author =        {Allais, Guillaume and Atkey, Robert and
+                   Chapman, James and McBride, Conor and McKinna, James},
+  journal =       {Journal of Functional Programming},
+  month =         oct,
+  number =        {1996},
+  pages =         {e22},
+  title =         {A type- and scope-safe universe of syntaxes with
+                   binding: their semantics and proofs},
+  volume =        {31},
+  year =          {2021},
+  abstract =      {The syntax of almost every programming language
+                   includes a notion of binder and corresponding bound
+                   occurrences, along with the accompanying notions of
+                   α-equivalence, capture-avoiding substitution, typing
+                   contexts, runtime environments, and so on. In the
+                   past, implementing and reasoning about programming
+                   languages required careful handling to maintain the
+                   correct behaviour of bound variables. Modern
+                   programming languages include features that enable
+                   constraints like scope safety to be expressed in
+                   types. Nevertheless, the programmer is still forced
+                   to write the same boilerplate over again for each new
+                   implementation of a scope-safe operation (e.g.,
+                   renaming, substitution, desugaring, printing), and
+                   then again for correctness proofs. We present an
+                   expressive universe of syntaxes with binding and
+                   demonstrate how to (1) implement scope-safe
+                   traversals once and for all by generic programming;
+                   and (2) how to derive properties of these traversals
+                   by generic proving. Our universe description, generic
+                   traversals and proofs, and our examples have all been
+                   formalised in Agda and are available in the
+                   accompanying material available online at
+                   https://github.com/gallais/generic-syntax .},
+  doi =           {10.1017/S0956796820000076},
+  issn =          {0956-7968},
+  url =           {https://www.cambridge.org/core/product/identifier/
+                  S0956796820000076/type/journal_article},
 }
 
 @inproceedings{Fiore1999,
@@ -371,13 +371,14 @@
 }
 
 @inproceedings{Hirschowitz2022,
+  address =       {Cham},
   author =        {Hirschowitz, Andr{\'{e}} and Hirschowitz, Tom and
                    Lafont, Ambroise and Maggesi, Marco},
   booktitle =     {Foundations of Software Science and Computation
                    Structures. FoSSaCS 2022},
   editor =        {Bouyer, Patricia and Schr{\"{o}}der, Lutz},
   pages =         {389--408},
-  publisher =     {Springer, Cham},
+  publisher =     {Springer},
   series =        {Lecture Notes in Computer Science},
   title =         {Variable binding and substitution for (nameless)
                    dummies},
@@ -577,6 +578,19 @@
   doi =           {10.1145/3450952},
   issn =          {0360-0300},
   url =           {https://doi.org/10.1145/3450952},
+}
+
+@article{Jones2007,
+  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
+                   Weirich, Stephanie and Shields, Mark},
+  journal =       {Journal of Functional Programming},
+  number =        {1},
+  pages =         {1--82},
+  publisher =     {Cambridge University Press},
+  title =         {Practical type inference for arbitrary-rank types},
+  volume =        {17},
+  year =          {2007},
+  doi =           {10.1017/S0956796806006034},
 }
 
 @unpublished{Aczel1978,

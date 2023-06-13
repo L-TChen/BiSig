@@ -69,14 +69,14 @@
       \[
         \left(\Delta_i, A_i, d_i\right) : \Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \Mode, 
       \]
-      \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s in mode $d_i$,
+      for $i = 1, \ldots, n$, \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s in mode $d_i$,
       \begin{enumerate}
         \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that all     of following judgements are derivable
           \[
             \Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
           \]
 
-        \item or there is no extension $\ext{\rho}$ such that all $\Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}$ has a typing derivation. 
+        \item or there is no extension $\sigma$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\sigma}^{d_i}$ has a typing derivation. 
       \end{enumerate}
   \end{description}
 \end{proof}

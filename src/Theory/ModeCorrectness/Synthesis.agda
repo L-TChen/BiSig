@@ -8,7 +8,7 @@ import Syntax.BiTyped.Description as B
 
 import Theory.ModeCorrectness.Description as MC
 
-module Theory.ModeCorrectness.Inference {SD : S.Desc}
+module Theory.ModeCorrectness.Synthesis {SD : S.Desc}
   (Id : Set) ⦃ decEqId : DecEq Id ⦄
   (D : B.Desc SD) (mc : MC.ModeCorrect SD D) where
 

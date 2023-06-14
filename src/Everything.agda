@@ -2,11 +2,11 @@
 
 import Prelude
 
-import Syntax.Context
-
 import Syntax.Simple.Description
 import Syntax.Simple.Term
 import Syntax.Simple.Properties
+
+import Syntax.Context
 
 import Syntax.Typed.Description
 import Syntax.Typed.Functor
@@ -30,6 +30,7 @@ import Theory.Erasure
 import Theory.Soundness
 import Theory.Pre.Term
 import Theory.Pre.Annotatability
+import Theory.Pre.TypingErasure
 import Theory.Bidirectionalisation
 import Theory.Completeness
 

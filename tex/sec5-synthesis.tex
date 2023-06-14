@@ -8,7 +8,7 @@
 
 
 \begin{theorem}[Uniqueness of the Synthesised Types]\label{thm:unique-syn}
-  Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
+  Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
   Then, for every raw term $t$ in synthesising mode and two derivations of 
   \[
     \Gamma |-_{\Sigma, \Omega} t \syn A
@@ -21,9 +21,9 @@
 
 \subsection{Trichotomy of Raw Terms by Type Synthesis}
 
-\begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
+\begin{theorem}[Decidability of Bidirectional Type Synthesis] \label{thm:bidirectional-type-synthesis}
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
-  For every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode, it is decidable whether
+  Then, every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode decide whether
   \[
     \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A
   \]
@@ -56,7 +56,7 @@
       \[
         \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A.
       \]
-    \item if $\isTerm{t}$ is checking, then for every type $A$ it is decidable whether there is a derivation of
+    \item if $\isTerm{t}$ is checking, then every type $A$ decides whether there is a derivation of
       \[
         \Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A.
       \]
@@ -66,24 +66,24 @@
   Assume \Cref{thm:bidirectional-type-synthesis}.
   Then, for every set $\Xi$ of type variables, list 
   \[
-    \mathit{as} = \left([\Delta_i] A_{i}^{d_i}\right)_{i = 1}^{n}
+    \mathit{as} = \left([\Delta_i] A_{i}^{\dir{d_i}}\right)_{i = 1}^{n}
   \]
   list of raw terms $t_i$'s in mode $d_i$, context $\Gamma$, and \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$
   \begin{enumerate}
     \item either there is a minimal extension $\ext{\rho}$ of $\rho$ defined on $\synvar(\mathit{as})$ such that all of following judgements are derivable
       \[
-        \Gamma, \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
+        \Gamma, \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
       \]
 
-    \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\sigma}^{d_i}$ has a typing derivation. 
+    \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\sigma}^{\dir{d_i}}$ has a typing derivation. 
   \end{enumerate}
 \end{lemma}
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
   We prove this statement by induction on the derivation of $|-_{\Sigma, \Omega} \isTerm{t}^{d}$ (instead of $t$ alone).
-  The first two cases (var) and (anno) are straightforward and have nothing to do with mode-correctness directly.
-  The third case (sub) invokes the uniqueness of synthesised types to refute the case that $\Gamma |- t \syn B$ but $A \neq B$ for a given type $A$ to check.
-  The last case (op) is the interesting part of this theorem, as we need \Cref{lem:args-induction}.
+  The first two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness directly.
+  The third case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- t \syn B$ but $A \neq B$ for a given type $A$ to check.
+  The last case \Rule{Op} is the interesting part of this theorem.
   \begin{description}
     \item[\SynRule{Var}:] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |-_{\Sigma, \Omega} x \syn A$.
       Otherwise, if $x$ is not in $\Gamma$ but $\Gamma |-_{\Sigma, \Omega} x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.

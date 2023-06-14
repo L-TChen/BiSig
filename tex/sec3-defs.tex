@@ -190,15 +190,15 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
     {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^\dir{d_1}, \ldots, [\Delta_{n}] A_{n}^\dir{d_n} \to A^\dir{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^{\dir{d}}$ in $\Omega$}
   \end{mathpar}
-  \caption{Preprocessed Raw terms}
+  \caption{Preprocessed raw terms}
 \end{figure}
 
 \begin{figure}
   \centering
   \small
-  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ in mode $d$ has a type $A$ under $\Gamma$}
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ in mode $d$ has a type $A$ (without type variables) under $\Gamma$}
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
@@ -210,7 +210,7 @@ This is not only for brevity but also necessary to compare the type equality dur
       \cdots \\
     \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
     {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} :^{\dir{d}} \simsub{A}{\rho}} \,\mathsf{Op}
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^\dir{d_1}, \ldots, [\Delta_{n}] A_{n}^\dir{d_n} \to A^\dir{d}$ in $\Omega$}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
   \begin{minipage}{.15\linewidth}
   Abbreviations: 

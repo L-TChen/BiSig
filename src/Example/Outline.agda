@@ -137,19 +137,19 @@ mutual
 
   data _⊢_[_]_ : (Γ : List Ty) → Raw (length Γ) → Mode → Ty → Set where
 
-    `_  : (i : A ∈ Γ)
+    var  : (i : A ∈ Γ) {x : Fin (length Γ)} → (x ≡ L.index i)
         → ---------------------
-          Γ ⊢ (` L.index i) ⇒ A
+          Γ ⊢ ` x ⇒ A
 
     _∋_ : (A : Ty)
         → Γ ⊢ r ⇐ A
         → ---------------
           Γ ⊢ (A ∋ r) ⇒ A
 
-    _↑_ : Γ ⊢ r ⇒ A
+    _↑_ : Γ ⊢ r ⇒ B
         → A ≡ B
         → ---------
-          Γ ⊢ r ⇐ B
+          Γ ⊢ r ⇐ A
 
     app : Γ ⊢ r ⇒ imp A B
         → Γ ⊢ s ⇐ A
@@ -164,6 +164,67 @@ TypeSynthesis⇔ : Set
 TypeSynthesis⇔ = (Γ : List Ty) {r : Raw (length Γ)}
                → Pre Syn r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⇒ A)
 
+module TypeSynthesis⇔ where
+  base≢imp : base ≢ imp A B
+  base≢imp ()
+
+  imp≡⁻ : {A A′ B B′ : Ty} → imp A B ≡ imp A′ B′ → A ≡ A′ × B ≡ B′
+  imp≡⁻ refl = refl , refl
+
+  _≟Ty_ : (A B : Ty) → Dec (A ≡ B)
+  base    ≟Ty base    = yes refl
+  base    ≟Ty imp A B = no λ ()
+  imp A B ≟Ty base    = no λ ()
+  imp A B ≟Ty imp C D with A ≟Ty C | B ≟Ty D
+  ... | yes A=C | yes B=D = yes (cong₂ imp A=C B=D)
+  ... | no  A≠C | _       = no λ where refl → A≠C refl
+  ... | _       | no B≠D  = no λ where refl → B≠D refl
+
+  uniq-⇒ : {Γ : List Ty} {r : Raw (length Γ)} {A B : Ty} → Pre Syn r
+    → Γ ⊢ r ⇒ A → Γ ⊢ r ⇒ B → A ≡ B
+  uniq-⇒ _         (var i eq) (var j eq′) = {!!}
+  uniq-⇒ _         (_ ∋ t)    (_ ∋ u)     = refl
+  uniq-⇒ (app r _) (app t u)  (app t′ u′) with uniq-⇒ r t t′
+  ... | refl = refl
+
+  ¬arg : {Γ : List Ty} {A B : Ty} {t u : Raw (length Γ)}
+    → Pre Syn t → Pre Chk u
+    → Γ ⊢ t ⇒ imp A B
+    → ¬ (Γ ⊢ u ⇐ A)
+    --------------------------
+    → ¬ (∃[ B′ ] Γ ⊢ app t u ⇒ B′)
+  ¬arg t _ ⊢t ¬⊢u (B′ , app ⊢t′ ⊢u′) rewrite imp≡⁻ (uniq-⇒ t ⊢t ⊢t′) .proj₁ = ¬⊢u ⊢u′ 
+
+  TypeChecking⇔ : Set
+  TypeChecking⇔ = (Γ : List Ty) (A : Ty) {r : Raw (length Γ)}
+               → Pre Chk r → Dec (Γ ⊢ r ⇐ A)
+
+  mutual
+    synthesise : TypeSynthesis⇔
+    synthesise Γ (` i)     = yes {!!}
+    synthesise Γ (A ∋ t)   with check Γ A t
+    ... | no ¬⊢t = no λ where (B , B ∋ ⊢t) → ¬⊢t ⊢t
+    ... | yes ⊢t = yes (A , (A ∋ ⊢t))
+    synthesise Γ (app t u) with synthesise Γ t
+    ... | no ¬∃        = no λ where (_ , app ⊢t ⊢u) → ¬∃ (_ , ⊢t) 
+    ... | yes (base    , ⊢t) = no λ where (A , app ⊢t′ ⊢u) → base≢imp (uniq-⇒ t ⊢t ⊢t′) 
+    ... | yes (imp A B , ⊢t) with check Γ A u
+    ... | no ¬⊢u = no (¬arg t u ⊢t ¬⊢u)
+    ... | yes ⊢u = yes (B , app ⊢t ⊢u)
+
+    check      : TypeChecking⇔
+    check Γ A (t ↑)            with synthesise Γ t
+    ... | no ¬∃ = no λ where
+      (⊢t ↑ _) → ¬∃ (_ , ⊢t)
+    ... | yes (B , ⊢t) with A ≟Ty B
+    ... | no  A≠B = no λ where (⊢u ↑ refl) → A≠B (uniq-⇒ t ⊢u ⊢t)
+    ... | yes A=B = yes (⊢t ↑ A=B)
+    check Γ base      (abs t) = no λ where (() ↑ _)
+    check Γ (imp A B) (abs t) with check (A ∷ Γ) B t
+    ... | no ¬⊢t = no λ where
+      (abs ⊢t) → ¬⊢t ⊢t
+    ... | yes ⊢t = yes (abs ⊢t)
+
 -- Eventually we want to perform ordinary type synthesis (the spec)
 -- using bidirectional type synthesis (the impl);
 -- the two type systems should be somehow related to make that possible
@@ -173,7 +234,7 @@ Soundness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
           → Γ ⊢ r [ d ] A  →  Γ ⊢ r ⦂ A
 
 soundness : Soundness
-soundness (` i)      = ` i
+soundness (var i refl)  = ` i
 soundness (A ∋ t)    = A ∋ soundness t
 soundness (t ↑ refl) = soundness t
 soundness (app t u)  = app (soundness t) (soundness u)
@@ -184,7 +245,7 @@ Completeness = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
              → Pre d r  →  Γ ⊢ r ⦂ A  →  Γ ⊢ r [ d ] A
 
 completeness : Completeness
-completeness (` ._)    (` i)     = ` i
+completeness (` ._)    (` i)     = var i refl
 completeness (._ ∋ p)  (A ∋ t)   = A ∋ completeness p t
 completeness (p ↑)     t         = completeness p t ↑ refl
 completeness (app p q) (app t u) = app (completeness p t) (completeness q u)
@@ -197,7 +258,7 @@ TypingErasure = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
               → Γ ⊢ r [ d ] A  →  Pre d r
 
 typingErasure : TypingErasure
-typingErasure (` i)     = ` (L.index i)
+typingErasure (var i refl) = ` L.index i
 typingErasure (A ∋ t)   = A ∋ typingErasure t
 typingErasure (t ↑ _)   = typingErasure t ↑
 typingErasure (app t u) = app (typingErasure t) (typingErasure u)
@@ -341,7 +402,7 @@ data _≤ᴬ_ : {n : ℕ} → Raw n → Raw n → Set where
          abs r ≤ᴬ abs r'
 
 annotatability : Pre? v e d r  →  Γ ⊢ r ⦂ A  →  ∃[ r' ]  r ≤ᴬ r'  ×  Γ ⊢ r' [ d ] A
-annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , ` i
+annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , var i refl
 annotatability (p ↑) t with annotatability p t
 ... | _ , r≤r' , t' = _ , r≤r' , t' ↑ refl
 annotatability (A ∋ p) (.A ∋ t) with annotatability p t

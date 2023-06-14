@@ -162,7 +162,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \]
   where $d$ and $d_i$'s indicate the modes of a construct and its arguments respectively.
 
-  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ to indicate an operation with its arity. 
+  For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A^{\dir{d_n}}_{n} \to A^{\dir{d}}$ to indicate an operation with its arity. 
 \end{definition}
 
 \begin{example}
@@ -198,7 +198,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
-  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ in mode $d$ has a type $A$ (without type variables) under $\Gamma$}
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ has a type $A$ (without type variables) under $\Gamma$}
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and

@@ -53,8 +53,7 @@ to¬Pre-Syn (op (_ , _ , _ , d≡Chk , _)) (op (d≡Syn , _)) = Chk≢Syn (trans
 mutual
 
   to¬Pre-Chk : Pre? false true Syn r → ¬ Pre Chk r
-  to¬Pre-Chk (A ∋ p) ((.A ∋ q) ↑) = to¬Pre p q
-  to¬Pre-Chk (op (_ , ps)) (op qs ↑) = to¬Preᶜ (BD .rules _) ps qs
+  to¬Pre-Chk p (q ↑) = to¬Pre p q
   to¬Pre-Chk (op (_ , _ , _ , d≡Syn , _)) (op (d≡Chk , _)) = Chk≢Syn (trans (sym d≡Chk) d≡Syn)
 
   to¬Pre : Pre? false e d r → ¬ Pre d r

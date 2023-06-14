@@ -192,16 +192,16 @@ completeness (abs p)   (abs t)   = abs (completeness p t)
 
 -- Completing the bijection between  Pre d r × Γ ⊢ r ⦂ A  and  Γ ⊢ r [ d ] A
 
-TypeErasure : Set
-TypeErasure = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
-            → Γ ⊢ r [ d ] A  →  Pre d r
+TypingErasure : Set
+TypingErasure = {Γ : List Ty} {r : Raw (length Γ)} {d : Mode} {A : Ty}
+              → Γ ⊢ r [ d ] A  →  Pre d r
 
-typeErasure : TypeErasure
-typeErasure (` i)     = ` (L.index i)
-typeErasure (A ∋ t)   = A ∋ typeErasure t
-typeErasure (t ↑ _)   = typeErasure t ↑
-typeErasure (app t u) = app (typeErasure t) (typeErasure u)
-typeErasure (abs t)   = abs (typeErasure t)
+typingErasure : TypingErasure
+typingErasure (` i)     = ` (L.index i)
+typingErasure (A ∋ t)   = A ∋ typingErasure t
+typingErasure (t ↑ _)   = typingErasure t ↑
+typingErasure (app t u) = app (typingErasure t) (typingErasure u)
+typingErasure (abs t)   = abs (typingErasure t)
 
 -- Implementing a type synthesiser using a bidirectional one
 

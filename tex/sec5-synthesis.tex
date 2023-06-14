@@ -11,9 +11,9 @@
   Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
   Then, for every raw term $t$ in synthesising mode and two derivations of 
   \[
-    \Gamma \vdash_{\Sigma, \Omega} t \syn A
+    \Gamma |-_{\Sigma, \Omega} t \syn A
     \quad\text{and}\quad
-    \Gamma \vdash_{\Sigma, \Omega} t \syn B
+    \Gamma |-_{\Sigma, \Omega} t \syn B
   \]
   for some types $A$ and $B$ respectively, the synthesised types must be equal, i.e.\ $A = B$.
 \end{theorem}
@@ -23,25 +23,19 @@
 
 \begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
-  For every context $\Gamma$ and raw term $\isTerm{t}$ in mode $d$, 
-  \begin{enumerate}
-    \item if $\isTerm{t}$ is synthesising, then it is decidable that there is a type~$A$ and a derivation of
-      \[
-        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A.
-      \]
-    \item if $\isTerm{t}$ is checking, then for every type $A$ it is decidable that there is a derivation of
-      \[
-        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A.
-      \]
-  \end{enumerate}
+  For every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode, it is decidable whether
+  \[
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A
+  \]
+  has a derivation for some type $A$.
 \end{theorem}
 
 \begin{corollary}[Trichotomy of Raw Terms]
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
   Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
   \begin{enumerate}
-    \item $t$ is synthesising and there is a typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
-    \item $t$ is synthesising but there exists no typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
+    \item $t$ is synthesising and the judgement $\Gamma |-_{\Sigma, \Omega} t : A$ has a derivation for some type $A$.
+    \item $t$ is synthesising but the judgement $\Gamma |-_{\Sigma, \Omega} t : A$ has no derivation for any type $A$.
     \item $t$ is not synthesising.
   \end{enumerate}
 \end{corollary}
@@ -50,8 +44,24 @@
   
 \end{proof}
 
-\subsection{Decidability of Bidirectional Type Synthesis}
+\subsection{Decidability of Bidirectional Type Synthesis and Checking}
 
+\LT{What induction principle are we using?}
+
+\begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis-checking}
+  Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
+  For every context $\Gamma$ and raw term $\isTerm{t}$ in mode $d$, 
+  \begin{enumerate}
+    \item if $\isTerm{t}$ is synthesising, then it is decidable whether there is a type~$A$ and a derivation of
+      \[
+        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A.
+      \]
+    \item if $\isTerm{t}$ is checking, then for every type $A$ it is decidable whether there is a derivation of
+      \[
+        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A.
+      \]
+  \end{enumerate}
+\end{theorem}
 \begin{lemma}\label{lem:args-induction}
   Assume \Cref{thm:bidirectional-type-synthesis}.
   Then, for every set $\Xi$ of type variables, list 
@@ -62,36 +72,36 @@
   \begin{enumerate}
     \item either there is a minimal extension $\ext{\rho}$ of $\rho$ defined on $\synvar(\mathit{as})$ such that all of following judgements are derivable
       \[
-        \Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
+        \Gamma, \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
       \]
 
-    \item or there is no extension $\sigma$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\sigma}^{d_i}$ has a typing derivation. 
+    \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\sigma}^{d_i}$ has a typing derivation. 
   \end{enumerate}
 \end{lemma}
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
-  We prove this statement by induction on the derivation of $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$ (instead of $t$ alone).
+  We prove this statement by induction on the derivation of $|-_{\Sigma, \Omega} \isTerm{t}^{d}$ (instead of $t$ alone).
   The first two cases (var) and (anno) are straightforward and have nothing to do with mode-correctness directly.
-  The third case (sub) invokes the uniqueness of synthesised types to refute the case that $\Gamma \vdash t \syn B$ but $A \neq B$ for a given type $A$ to check.
+  The third case (sub) invokes the uniqueness of synthesised types to refute the case that $\Gamma |- t \syn B$ but $A \neq B$ for a given type $A$ to check.
   The last case (op) is the interesting part of this theorem, as we need \Cref{lem:args-induction}.
   \begin{description}
-    \item[(var)] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma \vdash_{\Sigma, \Omega} x \syn A$.
-      Otherwise, if $x$ is not in $\Gamma$ but $\Gamma \vdash_{\Sigma, \Omega} x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.
-    \item[(anno)] For a raw term of the form $(t : A)$ in synthesising mode, it is decidable that $\Gamma \vdash t \chk A$ is derivable or not by induction hypothesis.
+    \item[\SynRule{Var}:] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |-_{\Sigma, \Omega} x \syn A$.
+      Otherwise, if $x$ is not in $\Gamma$ but $\Gamma |-_{\Sigma, \Omega} x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.
+    \item[\SynRule{Anno}:] For a raw term of the form $(t : A)$ in synthesising mode, it is decidable that $\Gamma |- t \chk A$ is derivable or not by induction hypothesis.
       \begin{enumerate}
-        \item If $\Gamma \vdash t \chk A$ is derivable, then $\Gamma \vdash (t : A) \syn A$ is derivable.
-        \item If $\Gamma \vdash t \chk A$ is not derivable but $\Gamma \vdash (t : A) \syn$ is derivable, then by inversion $\Gamma \vdash t \chk A$ is derivable, thus a contradiction.
+        \item If $\Gamma |- t \chk A$ is derivable, then $\Gamma |- (t : A) \syn A$ is derivable.
+        \item If $\Gamma |- t \chk A$ is not derivable but $\Gamma |- (t : A) \syn$ is derivable, then by inversion $\Gamma |- t \chk A$ is derivable, thus a contradiction.
       \end{enumerate}
       
-    \item[(sub)] If $t$ is of the form $t\subsum$ in checking mode, then similarly by induction it is decidable that $\Gamma \vdash t \syn B$ for some $B$:
+    \item[\ChkRule{Sub}:] If $t$ is in checking mode because of the subsumption rule, then by induction hypothesis it is decidable whether $\Gamma |- t \syn B$ for some $B$:
       \begin{enumerate}
-        \item If $\Gamma \vdash t \syn B$ is derivable for some $B$, then we have to consider any type $A$ and it is decidable if $A$ is equal to $B$:
+        \item If $\Gamma |- t \syn B$ is derivable for some $B$, then we have to consider any type $A$ and it is decidable if $A$ is equal to $B$:
           \begin{enumerate}
-            \item if $A = B$ then we have arrived a derivation of $\Gamma \vdash t\subsum \chk A$.
-            \item if $A \neq B$ but $\Gamma \vdash t \subsum \chk A$ is derivable, then by inversion $\Gamma \vdash t \syn A$.
+            \item if $A = B$ then we have arrived a derivation of $\Gamma |- t\subsum \chk A$.
+            \item if $A \neq B$ but $\Gamma |- t \subsum \chk A$ is derivable, then by inversion $\Gamma |- t \syn A$.
               However, by \Cref{thm:unique-syn}, synthesised types $A$ and $B$ must be equal, so it is a contradiction.
           \end{enumerate}
-        \item if $\Gamma \vdash t \syn C$ is not derivable for any type $C$ but $\Gamma \vdash t\subsum \chk A$ is derivable, then by inversion $\Gamma \vdash t \syn B$ for some $B = A$, thus a contradiction.
+        \item if $\Gamma |- t \syn C$ is not derivable for any type $C$ but $\Gamma |- t\subsum \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
       \end{enumerate}
       
 %    \item For every mode-correct operation $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$, a context $\Gamma$, and a raw term
@@ -100,9 +110,9 @@
 %      \]
 %      with a mode $d$, it is decidable that there exists a substitution $\rho$ from $\Xi$ to $\emptyset$ and a typing derivation of
 %      \[
-%        \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^\isDir{d}.
+%        \Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^{d}.
 %      \]
-    \item[(op)]
+    \item[\Rule{Op}:]
       Suppose that $t$ is of them $\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)$ for some mode-correct operation $o$ in $\Omega$.
       No matter $t$ is checking or synthesising, we need to build derivations for its arguments incrementally and maintain a set of unifiers, i.e.\ a partial substitution $\rho\colon \PSub(\Xi, \emptyset)$ incrementally which is defined nowhere initially if $t$ is synthesising or on variables of the target $A$ if $t$ is checking. 
 

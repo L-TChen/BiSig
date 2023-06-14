@@ -8,15 +8,15 @@
     \boxed{\Gamma \vdash \isTerm{t} \syn A}
     \quad\text{and}\quad \boxed{\Gamma \vdash \isTerm{t} \chk A}
     \\
-    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \syn A}\;(\text{var}^\syn)
+    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \syn A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \chk B \\ A = B}{\Gamma \vdash \isTerm{t : B}\syn A}\;(\text{anno})
+    \inferrule{\Gamma \vdash \isTerm{t} \chk B \\ A = B}{\Gamma \vdash \isTerm{t : B}\syn A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ A = B}{\Gamma \vdash \isTerm{t\subsum} \chk A}\;(\text{sub})
+    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ A = B}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \syn A \bto B \\ \Gamma \vdash \isTerm{u} \chk A}{\Gamma \vdash \isTerm{t\;u} \syn B}\;(\text{app})
+    \inferrule{\Gamma \vdash \isTerm{t} \syn A \bto B \\ \Gamma \vdash \isTerm{u} \chk A}{\Gamma \vdash \isTerm{t\;u} \syn B}\,\SynRule{App}
     \and
-    \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \chk B}{\Gamma \vdash \isTerm{\lam{x}t} \chk A \bto B}\;(\text{abs})
+    \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \chk B}{\Gamma \vdash \isTerm{\lam{x}t} \chk A \bto B}\,\ChkRule{Abs}
   \end{mathpar}
   \caption{Bidirectional simply typed $\lambda$-calculus $\Lambda^{\Leftrightarrow}_{\bto}$}
   \label{fig:bi-stlc}

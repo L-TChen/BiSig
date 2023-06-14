@@ -12,11 +12,14 @@
 \usepackage{bm}
 \usepackage{mathtools}
 \usepackage{mathpartir}
-%\usepackage{xfrac,xcolor}
+\input{mathlig}
+%\usepackage{xfrac}
 \usepackage{xspace}
 %\usepackage{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
-\usepackage[inline]{enumitem} % for environment enumerate*
+
+%\usepackage[inline]{enumitem} % for environment enumerate*
+%\setlist[enumerate]{mode=unboxed}
 
 \setlength {\marginparwidth }{2cm}
 \usepackage[color=yellow,textsize=small]{todonotes}
@@ -31,7 +34,6 @@
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
 
-\setlist[enumerate]{mode=unboxed}
 \newcommand{\LT}[1]{\todo[author=LT,inline,color=green!40,caption={}]{{#1}}}
 \newcommand{\Josh}[1]{\todo[author=Josh,inline,color=green!40,caption={}]{{#1}}}
 

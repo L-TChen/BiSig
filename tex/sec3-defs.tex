@@ -1,6 +1,6 @@
 %!TEX root = BiSig.tex
 
-\section{Definitions for Simple Type Theories and Bidirectional Type Systems}\label{sec:defs}
+\section{Simple Type Theories and Bidirectional Type Systems}\label{sec:defs}
 
 \subsection{Simple Types}
 \begin{definition}
@@ -8,30 +8,30 @@
   An inhabitant $i : I$ is meant to represent the \emph{$i$-th operation} $\tyOp_i$ and its \emph{number} $ \arity(i)$ of arguments.
 
   The judgements of \emph{$\Sigma$-types} and \emph{$\Sigma$-contexts} over a variable set $\Theta$ are defined inductively by \Cref{fig:simple-type,fig:simple-context} respectively.
-We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma \colon \Cxt_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} \Gamma$ to disambiguate $\Sigma$-types and $\Sigma$-contexts in the case of any confusion.
+We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \colon \Cxt_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} \Gamma$ to disambiguate $\Sigma$-types and $\Sigma$-contexts in the case of any confusion.
 \end{definition}
 
 \begin{figure}
   \begin{minipage}[b]{.55\textwidth}
     \centering
     \small
+    \judgbox{\Theta|-_{\Sigma} A}{$A$ is well-formed with type variables in $\Theta$}
     \begin{mathpar}
-      \boxed{\Theta\vdash_{\Sigma} A} \\
-      \inferrule{\Theta \ni X_i}{\Theta \vdash_\Sigma X_i} \and
-    \inferrule{\Theta \vdash_{\Sigma} A_1 \\ \cdots \\ \Theta \vdash_{\Sigma} A_{\arity(o)}}{\Theta \vdash_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
+      \inferrule{\Theta \ni X_i}{\Theta |-_\Sigma X_i} \and
+    \inferrule{\Theta |-_{\Sigma} A_1 \\ \cdots \\ \Theta |-_{\Sigma} A_{\arity(o)}}{\Theta |-_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
     \end{mathpar}
-    \caption{Type formation}
+    \caption{Type formation rules}
     \label{fig:simple-type}
   \end{minipage}
   \begin{minipage}[b]{.4\textwidth}
     \centering
     \small
+    \judgbox{\Theta |-_{\Sigma} \Gamma}{}
     \begin{mathpar}
-      \boxed{\Theta \vdash_{\Sigma} \Gamma} \\
-      \inferrule{ }{\Theta \vdash_{\Sigma} \cdot }\and
-      \inferrule{\Theta \vdash_{\Sigma} A \\ \Theta\vdash_{\Sigma} \Gamma}{\Theta \vdash_{\Sigma} \Gamma, A}
+      \inferrule{ }{\Theta |-_{\Sigma} \cdot }\and
+      \inferrule{\Theta |-_{\Sigma} A \\ \Theta|-_{\Sigma} \Gamma}{\Theta |-_{\Sigma} \Gamma, A}
     \end{mathpar}
-    \caption{Context formation}
+    \caption{Context formation rules}
   \label{fig:simple-context}
   \end{minipage}
 \end{figure}
@@ -68,7 +68,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta \vdash_{\Sigma} A$ and $\Gamma
   \begin{align*}
     \mathsf{app}\colon A, B \rhd (A \bto B), A \to B && \mathsf{abs}\colon A , B \rhd [A]B \to (A \bto B)
   \end{align*}
-    or, verbosely, the signature $\Lambda_{\bto}$ consists of the type $O_\Lambda = \{\app, \abs\}$ with arities
+  or, verbosely, the signature $\Lambda_{\bto}$ consists of the type $O_\Lambda = \{\abs, \app\}$ with arities
   \begin{align*}
     \arity(\app) = (\{A, B\}, [(\cdot; A \bto B), (\cdot; A)], B)
     && 
@@ -92,7 +92,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 
 %\subsection{Intrinsically Typed Terms}
 %
-%Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\Gamma \vdash_{\Sigma, \Omega} A$ constructed with only the rule $(\var)$ and the rule scheme $(\tmOp)$ displayed in \Cref{fig:intrinsic-typing}.
+%Intrinsically typed terms for a type signature $\Sigma$ and a term signature $\Omega$ are nothing more than derivations of the intrinsic typing judgement $\Gamma |-_{\Sigma, \Omega} A$ constructed with only the rule $(\var)$ and the rule scheme $(\tmOp)$ displayed in \Cref{fig:intrinsic-typing}.
 %
 %The substitution $\rho\colon \Sub{\Xi}{\emptyset}$ is used to instantiate variables in the local context $\Xi$ with concrete types.
 %Accordingly, $\rho$ has to be applied to types that appear in the arity to construct a term by $\tmOp$ to ensure all types are well-formed without any use of type variables.
@@ -101,50 +101,49 @@ This is not only for brevity but also necessary to compare the type equality dur
 %  \centering
 %  \small
 %  \begin{mathpar}
-%    \boxed{\Gamma \vdash_{\Sigma, \Omega} A} \\
-%    \inferrule{A \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} A}\;(\var)
+%    \boxed{\Gamma |-_{\Sigma, \Omega} A} \\
+%    \inferrule{A \in \Gamma}{\Gamma |-_{\Sigma, \Omega} A}\;(\var)
 %    \and
-%    \inferrule{\rho\colon \Sub{\Xi}{\emptyset}  \\ \Gamma, \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
-%    {\Gamma \vdash_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\tmOp)
+%    \inferrule{\rho\colon \Sub{\Xi}{\emptyset}  \\ \Gamma, \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \simsub{A_{n}}{\rho}}
+%    {\Gamma |-_{\Sigma, \Omega} \simsub{A}{\rho}}\;(\tmOp)
 %    \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
 %  \end{mathpar}
 %  \caption{Intrinsic typing rules for a simple type theory $(\Sigma, \Omega)$}
 %  \label{fig:intrinsic-typing}
 %\end{figure}
 
-\subsection{Simple Type Theory}
+\subsection{Simple Type Theories}
 
 \begin{figure}
   \centering
   \small
+  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}}{$t$ is a raw term for the signature $(\Sigma, \Omega)$}
   \begin{mathpar}
-    \boxed{\vdash_{\Sigma, \Omega} \isTerm{t}}
-    \\
-    \inferrule{x : \Identifier}{\vdash_{\Sigma, \Omega} \isTerm{x}}\;(\text{var})
+    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{\cdot \vdash_{\Sigma} A \\ \vdash_{\Sigma, \Omega}\isTerm{t}}{\vdash_{\Sigma, \Omega} \isTerm{t \annote A}}\;(\text{anno})
+    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annote A}}\,\Rule{Anno}
     \\
-    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}}
-    {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\;(\text{op}) 
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\,\Rule{Op}_o
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  \caption{Raw terms for $(\Sigma, \Omega)$ with annotation}
+  \caption{Raw term formation rules}
 \end{figure}
 
 \begin{figure}
   \centering
   \small
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{A raw term $t$ has a type $A$ (without type variables) under $\Gamma$ for the signature $(\Sigma, \Omega)$}
   \begin{mathpar}
-    \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A} \quad \text{where $\vdash_{\Sigma, \Omega} t$} \\
-    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A}\;(\var)
+    \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} : A}{\Gamma \vdash (\isTerm{t \annote A}) : A}\;(\text{anno})
+    \inferrule{\Gamma |- \isTerm{t} : A}{\Gamma |- (\isTerm{t \annote A}) : A}\,\Rule{Anno}
     \and
-    \inferrule{\rho : \Sub{\Xi}{\emptyset} \\ \Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
-    {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\;(\tmOp)
+    \inferrule{\rho : \Sub{\Xi}{\emptyset} \\ \Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
+    {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\,\Rule{Op}
     \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  \caption{Typing rules for a simple type theory $(\Sigma, \Omega)$ with annotation}
+  \caption{Typing rules}
   \label{fig:extrinsic-typing}
 \end{figure}
 
@@ -153,7 +152,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{definition}
   For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
   \[
-    \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \isDir{\Mode}\right)^* \times \Type_{\Sigma}(\Xi) \times \isDir{\Mode}.
+    \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times {\Mode}\right)^* \times \Type_{\Sigma}(\Xi) \times {\Mode}.
   \]
   where $\Mode$ consists of two inhabitants $\chk$ for checking and $\syn$ for synthesis.
   Bidirectional binding signatures are just binding signatures (\Cref{def:binding-signature}) augmented with a mode for each argument and its target of a construct $\tmOp_o$ in a bidirectional system, i.e.
@@ -167,7 +166,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \end{definition}
 
 \begin{example}
-  The term signature $\Lambda_{\bto}^{\leftrightarrows}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{subsec:binding-sig} can be specified by operations 
+  The term signature $\Lambda_{\bto}^{\Leftrightarrow}$ for bidirectional simply typed $\lambda$-calculus introduced in \Cref{subsec:binding-sig} can be specified by operations 
   \begin{align*}
     \mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn} &&
     \mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}
@@ -180,46 +179,49 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
+  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$t$ is a raw term for $(\Sigma, \erase{\Omega})$ in mode $d$ for  $(\Sigma, \Omega)$}
   \begin{mathpar}
-    \boxed{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}}
-    \quad\text{where $\vdash_{\Sigma, \erase{\Omega}} \isTerm{t}$}
-    \\
-    \inferrule{x : \Identifier}{\vdash_{\Sigma, \Omega} \isTerm{x}^\isDir{\syn}}\;(\text{var})
+    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
     \and
-    \inferrule{\cdot \vdash_{\Sigma} A \\ \vdash_{\Sigma, \Omega}\isTerm{t}^\isDir{\chk}}{\vdash_{\Sigma, \Omega} (\isTerm{t \annote A})^\isDir{\syn}}\;(\text{anno})
+    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}\,\SynRule{Anno}
     \and
-    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{\syn}}{\vdash_{\Sigma, \Omega} {\isTerm{t\subsum}}^\isDir{\chk}}\;(\text{sub})
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
   \end{mathpar}
   \begin{mathpar}
-    \inferrule{\vdash_{\Sigma, \Omega} \isTerm{t_1}^\isDir{d_1} \quad \cdots \quad \vdash_{\Sigma, \Omega} \isTerm{t_n}^\isDir{d_n}}
-    {\vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\isDir{d}}\;(\text{op})
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^\dir{d_1}, \ldots, [\Delta_{n}] A_{n}^\dir{d_n} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
-  \caption{Raw terms in mode $d$ for a bidirectional type system $(\Sigma, \Omega)$}
+  \caption{Preprocessed Raw terms}
 \end{figure}
 
 \begin{figure}
   \centering
   \small
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ in mode $d$ has a type $A$ under $\Gamma$}
   \begin{mathpar}
-    \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{d}}
-    \quad \text{where $\vdash_{\Sigma, \erase{\Omega}} \isTerm{t}$ and $\vdash_{\Sigma, \Omega} \isTerm{t}^\isDir{d}$} 
-    \\
-    \inferrule{(x : A) \in \Gamma}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{x} : A^\isDir{\syn}}\;(\var)
+    \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}{\Gamma \vdash_{\Sigma, \Omega} (\isTerm{t \annote B}):  A^\isDir{\syn}}\;(\text{anno})
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annote B}) :^{\syn}  A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : B^{\isDir{\syn}} \\ A = B}{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t\subsum} : A^\isDir{\chk}}\;(\text{sub})
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ A = B}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\
-    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_{1}} : \simsub{A_{1}}{\rho}^{\isDir{d_1}} \\
+    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
       \cdots \\
-    \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}^{\isDir{d_n}}}
-  {\Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} : \simsub{A}{\rho}^{\isDir{d}}} \; (\tmOp)
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$ in $\Omega$}
-    \\
-    \text{Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^\isDir{\chk}}$}
+    \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
+    {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} :^{\dir{d}} \simsub{A}{\rho}} \,\mathsf{Op}
+    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^\dir{d_1}, \ldots, [\Delta_{n}] A_{n}^\dir{d_n} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
-  \caption{Typing rules for a bidirectional system $(\Sigma, \Omega)$}
+  \begin{minipage}{.15\linewidth}
+  Abbreviations: 
+  \end{minipage}
+  \begin{minipage}{.8\linewidth}
+    \begin{flushleft}
+    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ \quad A raw term $t$ synthesises a type $A$ under $\Gamma$ \\
+    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$ \quad A raw term $t$ checks against a type $A$ under $\Gamma$
+    \end{flushleft}
+  \end{minipage}
+  \caption{Bidirectional typing rules}
 \end{figure}
 
 \begin{example}

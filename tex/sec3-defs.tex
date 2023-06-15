@@ -122,11 +122,13 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
     \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annote A}}\,\Rule{Anno}
-    \\
+    \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
     {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)}}\,\Rule{Op}
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
+  \begin{flushright}
+    for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$
+  \end{flushright}%
   \caption{Raw terms}
 \end{figure}
 

@@ -137,9 +137,11 @@ mutual
 
   data _⊢_[_]_ : (Γ : List Ty) → Raw (length Γ) → Mode → Ty → Set where
 
-    var  : (i : A ∈ Γ) {x : Fin (length Γ)} → (x ≡ L.index i)
-        → ---------------------
-          Γ ⊢ ` x ⇒ A
+    var : (j : A ∈ Γ)
+        → {i : Fin (length Γ)}
+        →  i ≡ L.index j
+        → --------------------
+          Γ ⊢ ` i ⇒ A
 
     _∋_ : (A : Ty)
         → Γ ⊢ r ⇐ A
@@ -165,6 +167,7 @@ TypeSynthesis⇔ = (Γ : List Ty) {r : Raw (length Γ)}
                → Pre Syn r → Dec (Σ[ A ∈ Ty ] Γ ⊢ r ⇒ A)
 
 module TypeSynthesis⇔ where
+
   base≢imp : base ≢ imp A B
   base≢imp ()
 
@@ -180,11 +183,18 @@ module TypeSynthesis⇔ where
   ... | no  A≠C | _       = no λ where refl → A≠C refl
   ... | _       | no B≠D  = no λ where refl → B≠D refl
 
+  uniq-⇒-var : (i : A ∈ Γ) (j : B ∈ Γ) → L.index i ≡ L.index j → A ≡ B
+  uniq-⇒-var (here refl) (here refl) _  = refl
+  uniq-⇒-var (there i)   (there j)   eq = uniq-⇒-var i j (deSuc eq)
+    where
+      deSuc : {x y : Fin n} → suc x ≡ suc y → x ≡ y
+      deSuc refl = refl
+
   uniq-⇒ : {Γ : List Ty} {r : Raw (length Γ)} {A B : Ty} → Pre Syn r
     → Γ ⊢ r ⇒ A → Γ ⊢ r ⇒ B → A ≡ B
-  uniq-⇒ _         (var i eq) (var j eq′) = {!!}
-  uniq-⇒ _         (_ ∋ t)    (_ ∋ u)     = refl
-  uniq-⇒ (app r _) (app t u)  (app t′ u′) with uniq-⇒ r t t′
+  uniq-⇒ _         (var i ieq) (var j jeq) = uniq-⇒-var i j (trans (sym ieq) jeq)
+  uniq-⇒ _         (_ ∋ t)     (_ ∋ u)     = refl
+  uniq-⇒ (app r _) (app t u)   (app t′ u′) with uniq-⇒ r t t′
   ... | refl = refl
 
   ¬arg : {Γ : List Ty} {A B : Ty} {t u : Raw (length Γ)}
@@ -193,27 +203,27 @@ module TypeSynthesis⇔ where
     → ¬ (Γ ⊢ u ⇐ A)
     --------------------------
     → ¬ (∃[ B′ ] Γ ⊢ app t u ⇒ B′)
-  ¬arg t _ ⊢t ¬⊢u (B′ , app ⊢t′ ⊢u′) rewrite imp≡⁻ (uniq-⇒ t ⊢t ⊢t′) .proj₁ = ¬⊢u ⊢u′ 
+  ¬arg t _ ⊢t ¬⊢u (B′ , app ⊢t′ ⊢u′) rewrite imp≡⁻ (uniq-⇒ t ⊢t ⊢t′) .proj₁ = ¬⊢u ⊢u′
 
   TypeChecking⇔ : Set
   TypeChecking⇔ = (Γ : List Ty) (A : Ty) {r : Raw (length Γ)}
-               → Pre Chk r → Dec (Γ ⊢ r ⇐ A)
+                → Pre Chk r → Dec (Γ ⊢ r ⇐ A)
 
   mutual
     synthesise : TypeSynthesis⇔
-    synthesise Γ (` i)     = yes {!!}
-    synthesise Γ (A ∋ t)   with check Γ A t
+    synthesise Γ (` i) = yes (L.lookup Γ i , var (L.∈-lookup i) (sym (L.index-∈-lookup Γ i)))
+    synthesise Γ (A ∋ t) with check Γ A t
     ... | no ¬⊢t = no λ where (B , B ∋ ⊢t) → ¬⊢t ⊢t
     ... | yes ⊢t = yes (A , (A ∋ ⊢t))
     synthesise Γ (app t u) with synthesise Γ t
-    ... | no ¬∃        = no λ where (_ , app ⊢t ⊢u) → ¬∃ (_ , ⊢t) 
-    ... | yes (base    , ⊢t) = no λ where (A , app ⊢t′ ⊢u) → base≢imp (uniq-⇒ t ⊢t ⊢t′) 
+    ... | no ¬∃              = no λ where (_ , app ⊢t ⊢u) → ¬∃ (_ , ⊢t)
+    ... | yes (base    , ⊢t) = no λ where (A , app ⊢t′ ⊢u) → base≢imp (uniq-⇒ t ⊢t ⊢t′)
     ... | yes (imp A B , ⊢t) with check Γ A u
     ... | no ¬⊢u = no (¬arg t u ⊢t ¬⊢u)
     ... | yes ⊢u = yes (B , app ⊢t ⊢u)
 
-    check      : TypeChecking⇔
-    check Γ A (t ↑)            with synthesise Γ t
+    check : TypeChecking⇔
+    check Γ A (t ↑) with synthesise Γ t
     ... | no ¬∃ = no λ where
       (⊢t ↑ _) → ¬∃ (_ , ⊢t)
     ... | yes (B , ⊢t) with A ≟Ty B

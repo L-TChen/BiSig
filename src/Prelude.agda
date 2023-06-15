@@ -2,9 +2,21 @@
 
 module Prelude where
 
+open import Prelude.Level                      public
+
 open import Axiom.UniquenessOfIdentityProofs   public
 open import Function                           public
   hiding (_∋_; id; Equivalence; _⇔_)
+open import Relation.Nullary                      public
+  using (Dec; yes; no; _because_; ¬_)
+open import Relation.Nullary.Decidable            public
+  using (map′)
+open import Relation.Binary                       public
+  using (Decidable; Rel; IsEquivalence)
+open import Relation.Binary.PropositionalEquality public
+  using (_≡_; _≗_; refl; sym; trans; cong; cong₂; subst; subst₂; _≢_; isPropositional; module ≡-Reasoning)
+  renaming (isEquivalence to ≡-isEquivalence)
+
 open import Data.Empty                         public
   using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
 open import Data.Empty.Polymorphic             public
@@ -49,11 +61,19 @@ module L where
 
   open import Data.List.Relation.Binary.Subset.Propositional public
     using (_⊆_)
+
+  index-∈-lookup
+    : {A : Set ℓ} (xs : List A) (i : Fin (length xs))
+    → index (∈-lookup {xs = xs} i) ≡ i
+  index-∈-lookup (x ∷ xs) zero    = refl
+  index-∈-lookup (x ∷ xs) (suc i) = cong suc (index-∈-lookup xs i)
 open L public using
   ( List; []; _∷_; length; _++_; zip
   ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
   ; All; Any; _⊆_; module A)
   renaming (_∈_ to infix 5 _∈_)
+
+
 
 open import Data.Bool                          public
   using (Bool; true; false)
@@ -86,16 +106,6 @@ open import Data.Sum                           public
   using (_⊎_; [_,_])
   renaming (inj₁ to inl; inj₂ to inr; map to ⊎-map)
 
-open import Relation.Nullary                      public
-  using (Dec; yes; no; _because_; ¬_)
-open import Relation.Nullary.Decidable            public
-  using (map′)
-open import Relation.Binary                       public
-  using (Decidable; Rel; IsEquivalence)
-open import Relation.Binary.PropositionalEquality public
-  using (_≡_; _≗_; refl; sym; trans; cong; cong₂; subst; subst₂; _≢_; isPropositional; module ≡-Reasoning)
-  renaming (isEquivalence to ≡-isEquivalence)
-
 module WF where
   open import Induction.WellFounded  public
 open WF public
@@ -103,7 +113,6 @@ open WF public
 
 -- open import Prelude.Prop                          public
 -- open import Prelude.Maybe                         public
-open import Prelude.Level                         public
 open import Prelude.Equivalence                   public
 open import Prelude.Logic                         public
 open import Prelude.Category                      public

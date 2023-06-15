@@ -57,10 +57,33 @@
 \title{A Theory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
-  This paper proposes a formal theory of bidirectional typing.
+%  Type checking (and inference) can be seen as the transition from parsed abstract syntax trees to well-typed programs.
+%  Many techniques and principles have been developed to type check advanced type theories and systems.
+%  However, as theory and practice of parsing are able to address common grammars uniformly and parser generators have existed, type checkers by now are still designed and implemented on a case-by-case basis, not to mention a general theory of type checking and a robust `type checker generator' that can handle languages uniformly.
+%
+%  This paper is a step towards a \emph{general theory} of type checking and inference.
+%  Inspired by recent language-formalisation frameworks, we theroise bidirectional typing---a design discipline of type synthesis mutually defining type checking and inference---for \emph{arbitrary} bidirectional type systems specified by a bidirectional binding signature and also formalise the theory in vanilla \Agda with Axiom K.
+%  Prominently, our theorems including decidability of type synthesis are sound and complete type synthesisers which are correct by construction.
+  Type checking and inference serve as the passage from parsed abstract syntax trees to well-typed programs.
+  While significant progress has been made in developing techniques for type checking advanced type systems on a case-by-case basis, the lack of a general theory and a robust `type checker generator' poses a challenge to achieving uniformity across diverse programming languages.
+
+  Motivated by this challenge, this paper contributes to the development of a general and practical theory of type checking and inference.
+  We present a \emph{theory} of bidirectional typing, which had only been a \emph{design discipline}, for synthesising types to handle \emph{syntax-directed} bidirectional type systems of simple types that can be specified by a bidirectional binding signature.
+  Here, \emph{type synthesis} refers to the mutual use of type checking and inference to synthesise a type from programs possibly with type annotations.
+
+  To establish the correctness and effectiveness of our proposal, we formalize our theory in vanilla \Agda.
+  We prove logical decidability of type synthesis, subsuming soundness and completeness of type synthesis algorithm.
+  By Curry-Howard correspondence, our theorems are actually correct-by-construction synthesisers.
+  We also discuss another essential characteristic of bidirectional typing called \emph{annotability} and propose a related but simpler and practical notion called \emph{bidirectionalisation}.
+  Combining with decidability of type synthesis, we derive the trichotomy of raw terms by type synthesis.
+  Put differently, the trichotomy is a type synthesiser which distinguishes programs with missing type annotations from programs that cannot be checked.
+
+  In summary, this paper represents a step towards a general and practical theory of type checking and inference.
+  By formalizing our theory of bidirectional type synthesise in \Agda, we provide a framework capable of handling bidirectional type systems of simple types.
+  Our work addresses the problem with existing methodologies, setting the stage for further advances towards a general theory of type synthesis.
 \end{abstract}
 
-\keywords{Bidirectional typing, type checking, type inference, language formalisation}
+\keywords{\Agda, abstract syntax, bidirectional typing, type synthesis, type checking, type inference, language formalisation}
 
 \maketitle
 

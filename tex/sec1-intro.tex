@@ -2,14 +2,17 @@
 
 \section{Introduction}\label{sec:intro}
 
+Points to elaborate:
 \begin{enumerate}
-  \item Type checking as a transition from (parsed) abstract syntax trees to well-typed terms.
-  \item Bidirectional typing is the only solution that works that scales well.
+  \item Type inference and checking as a transition from (parsed) abstract syntax trees to well-typed terms.
+  \item Bidirectional typing is by now the only solution that scales well.
   \item Not yet a general theory but by now a design principle.
-    No `type checker generator' as each type checker is still designed and implemented on a case-by-case basis, but can be derived from a syntax-directed type theory `easily'.
-  \item The existing work of bidirectional typing does not take account of missing annotations carefully enough. 
-  \item A meta-problem: existing work is based on (or at least left unspecified) classical logic.
-    One has to state soundness of completeness of their type checking algorithm in a less straightforward way.
+    No `type checker generator' as each type checker is implemented on a case-by-case basis, but an algorithm can usually be read off from syntax-directed typing rules.
+    A hint to a general pattern in syntax-directedness.
+  \item The existing work of bidirectional typing does not take account of practical aspects such as missing annotation.
+    Lightly or rarely discussed.
+  \item A meta-problem: existing work is based on classical logic (or left unspecified at least).
+    Soundness of completeness of a type checking algorithm in a less straightforward way.
   \item A review of what has been done towards this line of research.
   \item Finally, our responses (contributions of this paper).
 \end{enumerate}
@@ -62,7 +65,7 @@ Our assumptions and contributions:
 Plan of this paper:
 \begin{enumerate}
   \item Key ideas (\Cref{sec:key-ideas})
-  \item Definitions for simple type theories and for bidirectional type systems (signature erasure and mode annotation) (\Cref{sec:defs})
+  \item Definitions for bidirectional type systems (bidirectional binding signature, bidirectional type systems, signature erasure and mode annotation) (\Cref{sec:defs})
   \item Soundness, completeness, bidirectionalisation, and annotatability (\Cref{sec:annotatability})
     \Josh{Erasure from bidirectional typing derivation to raw terms with a mode}
   \item Bidirectional type inference (\Cref{sec:type-synthesis})

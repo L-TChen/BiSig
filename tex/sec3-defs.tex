@@ -12,10 +12,10 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \co
 \end{definition}
 
 \begin{figure}
-  \begin{minipage}[b]{.55\textwidth}
+  \begin{minipage}[b]{.6\textwidth}
     \centering
     \small
-    \judgbox{\Theta|-_{\Sigma} A}{$A$ is well-formed with type variables in $\Theta$}
+    \judgbox{\Theta|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Theta$}
     \begin{mathpar}
       \inferrule{\Theta \ni X_i}{\Theta |-_\Sigma X_i} \and
     \inferrule{\Theta |-_{\Sigma} A_1 \\ \cdots \\ \Theta |-_{\Sigma} A_{\arity(o)}}{\Theta |-_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
@@ -23,7 +23,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \co
     \caption{Type formation rules}
     \label{fig:simple-type}
   \end{minipage}
-  \begin{minipage}[b]{.4\textwidth}
+  \begin{minipage}[b]{.35\textwidth}
     \centering
     \small
     \judgbox{\Theta |-_{\Sigma} \Gamma}{}
@@ -124,7 +124,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annote A}}\,\Rule{Anno}
     \\
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
-    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\,\Rule{Op}_o
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\,\Rule{Op}
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
   \caption{Raw term formation rules}
@@ -224,9 +224,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \caption{Bidirectional typing rules}
 \end{figure}
 
-\begin{example}
+\LT{What induction principle are we using?}
+\begin{theorem}[Mutual Induction Principles]
   
-\end{example}
-
-
-
+\end{theorem}

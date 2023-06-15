@@ -46,7 +46,6 @@
 
 \subsection{Decidability of Bidirectional Type Synthesis and Checking}
 
-\LT{What induction principle are we using?}
 
 \begin{theorem}[Decidability of Bidirectional Type Synthesis and Checking] \label{thm:bidirectional-type-synthesis-checking}
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
@@ -85,8 +84,8 @@
   The third case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- t \syn B$ but $A \neq B$ for a given type $A$ to check.
   The last case \Rule{Op} is the interesting part of this theorem.
   \begin{description}
-    \item[\SynRule{Var}:] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |-_{\Sigma, \Omega} x \syn A$.
-      Otherwise, if $x$ is not in $\Gamma$ but $\Gamma |-_{\Sigma, \Omega} x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.
+    \item[\SynRule{Var}:] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |- x \syn A$.
+      Otherwise, if $x$ is not in $\Gamma$ but $\Gamma |- x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.
     \item[\SynRule{Anno}:] For a raw term of the form $(t : A)$ in synthesising mode, it is decidable that $\Gamma |- t \chk A$ is derivable or not by induction hypothesis.
       \begin{enumerate}
         \item If $\Gamma |- t \chk A$ is derivable, then $\Gamma |- (t : A) \syn A$ is derivable.
@@ -97,11 +96,11 @@
       \begin{enumerate}
         \item If $\Gamma |- t \syn B$ is derivable for some $B$, then we have to consider any type $A$ and it is decidable if $A$ is equal to $B$:
           \begin{enumerate}
-            \item if $A = B$ then we have arrived a derivation of $\Gamma |- t\subsum \chk A$.
-            \item if $A \neq B$ but $\Gamma |- t \subsum \chk A$ is derivable, then by inversion $\Gamma |- t \syn A$.
+            \item if $A = B$ then we have arrived a derivation of $\Gamma |- t \chk A$.
+            \item if $A \neq B$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn A$.
               However, by \Cref{thm:unique-syn}, synthesised types $A$ and $B$ must be equal, so it is a contradiction.
           \end{enumerate}
-        \item if $\Gamma |- t \syn C$ is not derivable for any type $C$ but $\Gamma |- t\subsum \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
+        \item if $\Gamma |- t \syn C$ is not derivable for any type $C$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
       \end{enumerate}
       
 %    \item For every mode-correct operation $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$, a context $\Gamma$, and a raw term
@@ -114,7 +113,7 @@
 %      \]
     \item[\Rule{Op}:]
       Suppose that $t$ is of them $\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)$ for some mode-correct operation $o$ in $\Omega$.
-      No matter $t$ is checking or synthesising, we need to build derivations for its arguments incrementally and maintain a set of unifiers, i.e.\ a partial substitution $\rho\colon \PSub(\Xi, \emptyset)$ incrementally which is defined nowhere initially if $t$ is synthesising or on variables of the target $A$ if $t$ is checking. 
+      No matter $t$ is checking or synthesising, we need to build derivations for its arguments incrementally and maintain a set of unifiers, i.e.\ a partial substitution $\rho\colon \PSub{\Xi}{\emptyset}$ is incrementally defined which is initially defined nowhere if $t$ is synthesising or on variables of the target $A$ if $t$ is checking. 
 
   \end{description}
 \end{proof}

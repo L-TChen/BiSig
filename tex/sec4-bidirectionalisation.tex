@@ -33,16 +33,16 @@
   \egroup
   \LT{Design a notation for \textsf{Pre?} so that a raw term without missing annotation or redundant casts is exactly the intersection of these two cases.}
   \begin{mathpar}
-    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
+    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}
     \and
-    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}\,\SynRule{Anno}
+    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}
     \and
     \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}\,\SynRule{Anno?}
     \and
-    \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
-    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}
   \end{mathpar}
   \caption{Preprocessed raw terms, II}
   \label{fig:raw-with-missing-annotations}

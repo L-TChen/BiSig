@@ -186,11 +186,9 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}\,\SynRule{Anno}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
-  \end{mathpar}
-  \begin{mathpar}
+    \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
     {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
-    \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^{\dir{d}}$ in $\Omega$}
   \end{mathpar}
   \caption{Preprocessed raw terms, I}
 \end{figure}

@@ -20,7 +20,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \co
       \inferrule{\Theta \ni X_i}{\Theta |-_\Sigma X_i} \and
     \inferrule{\Theta |-_{\Sigma} A_1 \\ \cdots \\ \Theta |-_{\Sigma} A_{\arity(o)}}{\Theta |-_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
     \end{mathpar}
-    \caption{Type formation rules}
+    \caption{Simple types}
     \label{fig:simple-type}
   \end{minipage}
   \begin{minipage}[b]{.35\textwidth}
@@ -31,7 +31,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \co
       \inferrule{ }{\Theta |-_{\Sigma} \cdot }\and
       \inferrule{\Theta |-_{\Sigma} A \\ \Theta|-_{\Sigma} \Gamma}{\Theta |-_{\Sigma} \Gamma, A}
     \end{mathpar}
-    \caption{Context formation rules}
+    \caption{Contexts}
   \label{fig:simple-context}
   \end{minipage}
 \end{figure}
@@ -124,10 +124,10 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annote A}}\,\Rule{Anno}
     \\
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
-    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(t_1, \ldots, t_n)}}\,\Rule{Op}
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)}}\,\Rule{Op}
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  \caption{Raw term formation rules}
+  \caption{Raw terms}
 \end{figure}
 
 \begin{figure}
@@ -192,13 +192,13 @@ This is not only for brevity but also necessary to compare the type equality dur
     {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^{\dir{d}}$ in $\Omega$}
   \end{mathpar}
-  \caption{Preprocessed raw terms}
+  \caption{Preprocessed raw terms, I}
 \end{figure}
 
 \begin{figure}
   \centering
   \small
-  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ has a type $A$ (without type variables) under $\Gamma$}
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ is of type $A$ (without type variables) in mode $d$ under $\Gamma$}
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
@@ -212,15 +212,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} :^{\dir{d}} \simsub{A}{\rho}} \,\mathsf{Op}
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
-  \begin{minipage}{.15\linewidth}
-  Abbreviations: 
-  \end{minipage}
-  \begin{minipage}{.8\linewidth}
-    \begin{flushleft}
-    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ \quad A raw term $t$ synthesises a type $A$ under $\Gamma$ \\
-    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$ \quad A raw term $t$ checks against a type $A$ under $\Gamma$
-    \end{flushleft}
-  \end{minipage}
+Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\chk}}$
   \caption{Bidirectional typing rules}
 \end{figure}
 

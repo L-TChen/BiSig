@@ -2,12 +2,16 @@
 
 \section{The Key Ideas} \label{sec:key-ideas}
 \begin{figure}
-  \centering
   \small
+  \bgroup
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{ r l }
+    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A}$ & A raw term $t$ synthesises a type $A$ under $\Gamma$ \\
+    $\boxed{\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A}$ &A raw term $t$ checks against a type $A$ under $\Gamma$
+  \end{tabular}
+  \egroup
+  \centering
   \begin{mathpar}
-    \boxed{\Gamma \vdash \isTerm{t} \syn A}
-    \quad\text{and}\quad \boxed{\Gamma \vdash \isTerm{t} \chk A}
-    \\
     \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \syn A}\,\SynRule{Var}
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \chk B \\ A = B}{\Gamma \vdash \isTerm{t : B}\syn A}\,\SynRule{Anno}

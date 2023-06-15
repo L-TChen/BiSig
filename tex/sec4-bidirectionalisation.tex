@@ -7,16 +7,62 @@
     
 \end{theorem}
 
-
-
 \begin{theorem}[Completeness]\label{thm:term-completeness}
     
 \end{theorem}
 
 \subsection{Bidirectionalisation}
+
+
 \begin{proposition}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
   It is decidable whether a raw term~$t$ is in mode~$d$ for any $t$ and $d$.
 \end{proposition}
 
 \subsection{Annotatability is not Completeness}
+
+\begin{figure}
+  \centering
+  \small
+  \bgroup
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{ r l }
+    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $t$ is a raw term possibly with missing annotation or redundant casts in mode $d$ \\
+    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $t$ is a raw term without missing annotation \\
+    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $t$ is a raw term without redundant casts \\
+  \end{tabular}
+  \egroup
+  \LT{Design a notation for \textsf{Pre?} so that a raw term without missing annotation or redundant casts is exactly the intersection of these two cases.}
+  \begin{mathpar}
+    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
+    \and
+    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}\,\SynRule{Anno}
+    \and
+    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}\,\SynRule{Anno?}
+    \and
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
+    \and
+    \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
+    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
+  \end{mathpar}
+  \caption{Preprocessed raw terms, II}
+  \label{fig:raw-with-missing-annotations}
+\end{figure}
+
+\begin{figure}
+  \centering\small
+  \judgbox{\isTerm{t} \sqsupseteq \isTerm{u}}{A raw term $t$ is more annotated than $u$ (for some bidirectional type system $(\Sigma, \Omega)$)}
+  \begin{mathpar}
+    \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}{(\isTerm{t} : A) \sqsupseteq \isTerm{u}}\;\Rule{More}
+    \and
+    \inferrule{\vphantom{x : \Identifier}}{\isTerm{x} \sqsupseteq \isTerm{x}}
+    \and
+    \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}{(\isTerm{t} : A) \sqsupseteq (\isTerm{u} : A)}
+    \and
+    \inferrule{\isTerm{t_1} \sqsupseteq \isTerm{u_1} \quad \cdots \quad \isTerm{t_n} \sqsupseteq{u_n}}
+    {\isTerm{\tmOp_o(\vec{x}_1. t_1; \ldots; \vec{x}_n. t_n)} \sqsupseteq \isTerm{\tmOp_o(\vec{x}_1.u_1; \ldots; \vec{x}_n.u_n)}}
+  \end{mathpar}
+  
+  \caption{Annotation ordering between raw terms}
+  \label{fig:annotation-order}
+\end{figure}
 

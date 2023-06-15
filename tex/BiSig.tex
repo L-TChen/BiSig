@@ -60,16 +60,16 @@
   Type checking and inference serve as the passage from parsed abstract syntax trees to well-typed programs.
   While significant progress has been made in developing techniques for typechecking advanced type systems on a case-by-case basis, the lack of a general theory poses a difficulty of achieving a robust `type checker generator' for diverse programming languages.
 
-  Motivated by this problem, this paper develops a \emph{general} and \emph{practical} theory of bidirectional type synthesis where type synthesis refers to the mutual use of type checking and inference for synthesising the type of a programs possibly with type annotations, based on bidirectional typing.
+  Motivated by this problem, this paper develops a \emph{general} and \emph{constructive} theory of bidirectional type synthesis where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing rules for synthesising the type of a programs possibly with type annotations.
 %  Bidirectional typing had only been a set of principles and characteristics to design typing rules so that a type synthesis algorithm can be `read off' easily
   First, our theory is general as it deals with any simple type theory and its bidirectional type system that can be specified by some bidirectional binding signature, similar to the role of grammar in parsing.
-  Second, our theory is practical not only because our results are formalised in Martin-L\"{o}f's type theory, \Agda, but also properties have been formulated from the practical aspect in order to compute by Curry-Howard correspondence.
+  Second, our theory is constructive not only because our results are formalised in Martin-L\"{o}f's type theory, \Agda, but also properties have been formulated from the practical aspect in order to compute by Curry-Howard correspondence.
   Specifically, we prove logical decidability of type synthesis for any mode-correct signature, subsuming soundness, completeness, and decidability of type synthesis algorithm.
   For a given (mode-correct) signature, its proof is instantiated to a synthesiser specific to a simple type theory, i.e.\ a type synthesiser generator.
   A simple notion called bidirectionalisation is proposed to refine an essential characteristic of bidirectional typing called annotability.
   This notion leads to the trichotomy of raw terms whose proof models a practical type synthesiser that handles ill-formed inputs, including raw terms with missing type annotations.
 
-  In short, this paper is a first step towards a general and practical theory of type checking and inference.
+  In short, this paper is a first step towards a general and constructive theory of type checking and inference.
   By formalizing our theory of bidirectional type synthesise in \Agda, we provide a framework capable of handling bidirectional type systems of simple types uniformly.
   Our work addresses the problem with existing methodologies, setting the stage for further advances towards a more general theory of type synthesis.
 \end{abstract}

@@ -58,20 +58,14 @@
 
 \begin{abstract}
   Type checking and inference serve as the passage from parsed abstract syntax trees to well-typed programs.
-  While significant progress has been made in developing techniques for typechecking advanced type systems on a case-by-case basis, the lack of a general theory poses a difficulty of achieving a robust `type checker generator' for diverse programming languages.
+  While progress has been made in developing techniques for typechecking type systems on a case-by-case basis, the lack of a general theory poses a difficulty of achieving a `type checker generator' for diverse languages.
 
-  Motivated by this problem, this paper develops a \emph{general} and \emph{constructive} theory of bidirectional type synthesis where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing rules for synthesising the type of a programs possibly with type annotations.
-%  Bidirectional typing had only been a set of principles and characteristics to design typing rules so that a type synthesis algorithm can be `read off' easily
-  First, our theory is general as it deals with any simple type theory and its bidirectional type system that can be specified by some bidirectional binding signature, similar to the role of grammar in parsing.
-  Second, our theory is constructive because properties are not only formalised in Martin-L\"{o}f's type theory, \Agda, but also formulated from the practical aspect in order to compute.
-  Specifically, we prove logical decidability of type synthesis for any mode-correct signature, subsuming soundness, completeness, and decidability of type synthesis algorithm.
-  For a given (mode-correct) signature, its proof is instantiated to a synthesiser specific to the corresponding simple type theory, similar to a parser generator.
-  A simple notion called bidirectionalisation is proposed to refine an essential characteristic of bidirectional typing called annotability.
-  This notion leads to the trichotomy of raw terms whose proof models a practical type synthesiser that handles ill-formed inputs, including raw terms with missing type annotations.
-
-  In short, this paper is a small but first step towards a general theory of type checking and inference.
-  By formalizing our theory of bidirectional type synthesise in \Agda, we provide a framework capable of handling bidirectional type systems of simple types uniformly.
-  Our work addresses the problem with existing methodologies, setting the stage for further advances towards a more general theory of type synthesis.
+  Motivated by this issue, this paper develops a \emph{simple} but \emph{general} and \emph{constructive} theory of bidirectional type synthesis where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing for synthesising the type of a program with type annotations.
+  First, our theory is simple but general as it deals with any simple type theory and its bidirectional type system that can be specified by a signature, similar to the role of grammar in parsing.
+  Second, our theory is constructive because it is formalised in \Agda and formulated positively in order to compute.
+  Specifically, for any mode-correct signature, logical decidability of type synthesis is proved and its proof is instantiated to a synthesiser specific to the corresponding simple type theory, similar to a parser generator.
+  The notion of bidirectionalisation is introduced to refine annotability in bidirectional typing and it leads to the trichotomy of raw terms which models a practical type synthesiser that triggers an exception when its input has missing annotations.
+%  By formalizing our theory in \Agda,
 \end{abstract}
 
 \begin{CCSXML}
@@ -104,7 +98,7 @@
 \ccsdesc[500]{Theory of computation~Type theory}
 \ccsdesc[300]{Software and its engineering~Formal software verification}
 
-\keywords{\Agda, abstract syntax, bidirectional typing, type synthesis, type checking, type inference, language formalisation}
+\keywords{\Agda, abstract syntax, bidirectional typing, type synthesis, type checking, type inference, language formalisation, datatype-generic programming}
 
 \maketitle
 

@@ -33,11 +33,11 @@
   \egroup
   \LT{Design a notation for \textsf{Pre?} so that a raw term without missing annotation or redundant casts is exactly the intersection of these two cases.}
   \begin{mathpar}
+    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}\,\SynRule{Anno?}
+    \and
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}
     \and
     \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}
-    \and
-    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}\,\SynRule{Anno?}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}
     \and

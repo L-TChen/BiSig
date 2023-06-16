@@ -8,7 +8,7 @@
 
   %In short, this paper is a small but first step towards a general theory of type checking and inference.
   %By formalizing our theory of bidirectional type synthesise in \Agda, we provide a framework capable of handling bidirectional type systems of simple types uniformly.
-  %Our work addresses the problem with existing methodologies, setting the stage for further advances towards a more general theory of type synthesis.
+  %Our work addresses the problem with existing methodologies, 
 Points to elaborate:
 \begin{enumerate}
   \item Type inference and checking as a transition from (parsed) abstract syntax trees to well-typed terms.
@@ -71,13 +71,21 @@ Our assumptions and contributions:
 
 Plan of this paper:
 \begin{enumerate}
+  \item Introduction (\Cref{sec:intro}) 
+    \LT{1+3 pp}
   \item Key ideas (\Cref{sec:key-ideas})
+    \Josh{2.5 pp}
   \item Definitions for bidirectional type systems (bidirectional binding signature, bidirectional type systems, signature erasure and mode annotation) (\Cref{sec:defs})
+    \LT{4 pp}
   \item Soundness, completeness, bidirectionalisation, and annotatability (\Cref{sec:annotatability})
     \Josh{Erasure from bidirectional typing derivation to raw terms with a mode}
+    \Josh{3 pp}
   \item Bidirectional type inference (\Cref{sec:type-synthesis})
+    \LT{4 pp}
   \item Formalisation and further examples (\Cref{sec:formalisation})
+    \LT{5.5pp}
   \item Concluding remarks (\Cref{sec:future})
+    \LT{1 p} \Josh{1p}
 \end{enumerate}
   \LT{better title?}
 

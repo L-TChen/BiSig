@@ -9,13 +9,14 @@
 \setdefaultlanguage{british}
 \fi
 
+\usepackage{bbold}
+\newcommand{\hmmax}{0}
+\newcommand{\bmmax}{0}
 \usepackage{bm}
 \usepackage{mathtools}
-\usepackage{mathpartir}
 \input{mathlig}
-%\usepackage{xfrac}
+\usepackage{mathpartir}
 \usepackage{xspace}
-%\usepackage{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 
 %\usepackage[inline]{enumitem} % for environment enumerate*
@@ -33,6 +34,7 @@
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
+
 
 \newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40,caption={}]{{#1}}}
 \newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40,caption={}]{{#1}}}

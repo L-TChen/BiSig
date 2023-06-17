@@ -121,7 +121,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annote A}}\,\Rule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annotate A}}\,\Rule{Anno}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
     {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)}}\,\Rule{Op}
@@ -139,7 +139,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
     \and
-    \inferrule{\Gamma |- \isTerm{t} : A}{\Gamma |- (\isTerm{t \annote A}) : A}\,\Rule{Anno}
+    \inferrule{\Gamma |- \isTerm{t} : A}{\Gamma |- (\isTerm{t \annotate A}) : A}\,\Rule{Anno}
     \and
     \inferrule{\rho : \Sub{\Xi}{\emptyset} \\ \Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
     {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\,\Rule{Op}
@@ -185,7 +185,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}\,\SynRule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
     \and
@@ -202,7 +202,7 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annote B}) :^{\syn}  A}\,\SynRule{Anno}
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate B}) :^{\syn}  A}\,\SynRule{Anno}
     \and
     \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ A = B}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\

@@ -37,7 +37,7 @@
     \and
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}
     \and
-    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annote A})^{\syn}}
+    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}
     \and
@@ -56,7 +56,7 @@
     \and
     \inferrule{\vphantom{x : \Identifier}}{\isTerm{x} \sqsupseteq \isTerm{x}}
     \and
-    \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}{(\isTerm{t} : A) \sqsupseteq (\isTerm{u} : A)}
+    \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}{(\isTerm{t} \annotate A) \sqsupseteq (\isTerm{u} \annotate A)}
     \and
     \inferrule{\isTerm{t_1} \sqsupseteq \isTerm{u_1} \quad \cdots \quad \isTerm{t_n} \sqsupseteq{u_n}}
     {\isTerm{\tmOp_o(\vec{x}_1. t_1; \ldots; \vec{x}_n. t_n)} \sqsupseteq \isTerm{\tmOp_o(\vec{x}_1.u_1; \ldots; \vec{x}_n.u_n)}}

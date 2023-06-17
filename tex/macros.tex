@@ -1,3 +1,7 @@
+% requires bbold package
+\DeclareSymbolFont{bbsymbol}{U}{bbold}{m}{n}
+\DeclareMathSymbol{\bbcolon}{\mathrel}{bbsymbol}{"3A}
+
 \newcommand{\mathsc}[1]{\textnormal{\textsc{#1}}}
 \newcommand{\Agda}{\textsc{Agda}\xspace}
 
@@ -23,7 +27,8 @@
 \newcommand{\simsub}[2]{{#1}\!\left<{#2}\right>}
 
 \newcommand{\Identifier}{\mathsf{Id}}
-\newcommand{\annote}{\mathrel{\boldsymbol{:}}}
+
+\newcommand{\annotate}{\bbcolon}
 \newcommand{\subsum}{\mathord{\uparrow}}
 
 \newcommand{\Sub}[2]{\mathsf{Sub}_{\Sigma}(#1,#2)}

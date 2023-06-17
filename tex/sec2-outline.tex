@@ -14,9 +14,9 @@
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \syn A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \chk B \\ A = B}{\Gamma \vdash \isTerm{t \annotate B}\syn A}\,\SynRule{Anno}
+    \inferrule{\Gamma \vdash \isTerm{t} \chk A}{\Gamma \vdash \isTerm{t \annotate A}\syn A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ A = B}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
+    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ B = A}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \syn A \bto B \\ \Gamma \vdash \isTerm{u} \chk A}{\Gamma \vdash \isTerm{t\;u} \syn B}\,\SynRule{App}
     \and

@@ -202,9 +202,9 @@ This is not only for brevity but also necessary to compare the type equality dur
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate B}) :^{\syn}  A}\,\SynRule{Anno}
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) :^{\syn}  A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ A = B}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\
     \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
       \cdots \\

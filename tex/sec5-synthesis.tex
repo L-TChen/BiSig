@@ -9,11 +9,11 @@
 
 \begin{theorem}[Uniqueness of the Synthesised Types]\label{thm:unique-syn}
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
-  Then, for every raw term $t$ in synthesising mode and two derivations of 
+  Then, for every raw term $\isTerm{t}$ in synthesising mode and two derivations of 
   \[
-    \Gamma |-_{\Sigma, \Omega} t \syn A
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A
     \quad\text{and}\quad
-    \Gamma |-_{\Sigma, \Omega} t \syn B
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B
   \]
   for some types $A$ and $B$ respectively, the synthesised types must be equal, i.e.\ $A = B$.
 \end{theorem}
@@ -32,11 +32,11 @@
 
 \begin{corollary}[Trichotomy of Raw Terms]
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.
-  Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
+  Then, for every context $\Gamma$ and raw term $\isTerm{t}$, exactly one of the following statements holds:
   \begin{enumerate}
-    \item $t$ is synthesising and the judgement $\Gamma |-_{\Sigma, \Omega} t : A$ has a derivation for some type $A$.
-    \item $t$ is synthesising but the judgement $\Gamma |-_{\Sigma, \Omega} t : A$ has no derivation for any type $A$.
-    \item $t$ is not synthesising.
+    \item $\isTerm{t}$ is synthesising and the judgement $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation for some type $A$.
+    \item $\isTerm{t}$ is synthesising but the judgement $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ has no derivation for any type $A$.
+    \item $\isTerm{t}$ is not synthesising.
   \end{enumerate}
 \end{corollary}
 \begin{proof}
@@ -71,25 +71,25 @@
   \begin{enumerate}
     \item either there is a minimal extension $\ext{\rho}$ of $\rho$ defined on $\synvar(\mathit{as})$ such that all of following judgements are derivable
       \[
-        \Gamma, \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
+        \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
       \]
 
-    \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\sigma}^{\dir{d_i}}$ has a typing derivation. 
+    \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\sigma}^{\dir{d_i}}$ has a typing derivation. 
   \end{enumerate}
 \end{lemma}
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
-  We prove this statement by induction on the derivation of $|-_{\Sigma, \Omega} \isTerm{t}^{d}$ (instead of $t$ alone).
+  We prove this statement by induction on the derivation of $|-_{\Sigma, \Omega} \isTerm{t}^{d}$ (instead of $\isTerm{t}$ alone).
   The first two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness directly.
-  The third case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- t \syn B$ but $A \neq B$ for a given type $A$ to check.
+  The third case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$ to check.
   The last case \Rule{Op} is the interesting part of this theorem.
   \begin{description}
-    \item[\SynRule{Var}:] If $t$ is a variable $x$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |- x \syn A$.
-      Otherwise, if $x$ is not in $\Gamma$ but $\Gamma |- x \syn A$ is derivable, then by inversion $x$ must be in $\Gamma$, a contradiction.
-    \item[\SynRule{Anno}:] For a raw term of the form $(t : A)$ in synthesising mode, it is decidable that $\Gamma |- t \chk A$ is derivable or not by induction hypothesis.
+    \item[\SynRule{Var}:] If $\isTerm{t}$ is a variable $\isTerm{x}$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |- \isTerm{x} \syn A$.
+      Otherwise, if $\isTerm{x}$ is not in $\Gamma$ but $\Gamma |- \isTerm{x} \syn A$ is derivable, then by inversion $\isTerm{x}$ must be in $\Gamma$, a contradiction.
+    \item[\SynRule{Anno}:] For a raw term of the form $\isTerm{t} \annotate A$ in synthesising mode, it is decidable that $\Gamma |- \isTerm{t} \chk A$ is derivable or not by induction hypothesis.
       \begin{enumerate}
-        \item If $\Gamma |- t \chk A$ is derivable, then $\Gamma |- (t : A) \syn A$ is derivable.
-        \item If $\Gamma |- t \chk A$ is not derivable but $\Gamma |- (t : A) \syn$ is derivable, then by inversion $\Gamma |- t \chk A$ is derivable, thus a contradiction.
+        \item If $\Gamma |- \isTerm{t} \chk A$ is derivable, then $\Gamma |- \isTerm{t \annotate A} \syn A$ is derivable.
+        \item If $\Gamma |- t \chk A$ is not derivable but $\Gamma |- \isTerm{t \annotate A} \syn$ is derivable, then by inversion $\Gamma |- t \chk A$ is derivable, thus a contradiction.
       \end{enumerate}
       
     \item[\ChkRule{Sub}:] If $t$ is in checking mode because of the subsumption rule, then by induction hypothesis it is decidable whether $\Gamma |- t \syn B$ for some $B$:
@@ -112,7 +112,7 @@
 %        \Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^{d}.
 %      \]
     \item[\Rule{Op}:]
-      Suppose that $t$ is of them $\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)$ for some mode-correct operation $o$ in $\Omega$.
+      Suppose that $t$ is of them $\tmOpts$ for some mode-correct operation $o$ in $\Omega$.
       No matter $t$ is checking or synthesising, we need to build derivations for its arguments incrementally and maintain a set of unifiers, i.e.\ a partial substitution $\rho\colon \PSub{\Xi}{\emptyset}$ is incrementally defined which is initially defined nowhere if $t$ is synthesising or on variables of the target $A$ if $t$ is checking. 
 
   \end{description}

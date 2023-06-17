@@ -18,7 +18,7 @@ We write $A : \Type_{\Sigma}(\Theta)$ for $\Theta |-_{\Sigma} A$ and $\Gamma \co
     \judgbox{\Theta|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Theta$}
     \begin{mathpar}
       \inferrule{\Theta \ni X_i}{\Theta |-_\Sigma X_i} \and
-    \inferrule{\Theta |-_{\Sigma} A_1 \\ \cdots \\ \Theta |-_{\Sigma} A_{\arity(o)}}{\Theta |-_{\Sigma} \tyOp_o(A_1, \ldots, A_{\arity(o)})}
+      \inferrule{\Theta |-_{\Sigma} A_1 \\ \cdots \\ \Theta |-_{\Sigma} A_n}{\Theta |-_{\Sigma} \tyOp_o(A_1, \ldots, A_n)}\;\text{where $n = \arity(o)$}
     \end{mathpar}
     \caption{Simple types}
     \label{fig:simple-type}
@@ -117,14 +117,14 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
-  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}}{$t$ is a raw term for the signature $(\Sigma, \Omega)$}
+  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}}{$\isTerm{t}$ is a raw term for the signature $(\Sigma, \Omega)$}
   \begin{mathpar}
-    \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
+    \inferrule{\isTerm{x} : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
     \inferrule{\cdot |-_{\Sigma} A \\ |-_{\Sigma, \Omega}\isTerm{t}}{|-_{\Sigma, \Omega} \isTerm{t \annotate A}}\,\Rule{Anno}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}}
-    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.t_1; \ldots; \vec{x}_n.t_n)}}\,\Rule{Op}
+    {|-_{\Sigma, \Omega} \tmOpts }\,\Rule{Op}
   \end{mathpar}
   \begin{flushright}
     for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$
@@ -135,14 +135,14 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
-  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{A raw term $t$ has a type $A$ (without type variables) under $\Gamma$ for the signature $(\Sigma, \Omega)$}
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{A raw term $\isTerm{t}$ has a type $A$ (without type variables) under $\Gamma$ for the signature $(\Sigma, \Omega)$}
   \begin{mathpar}
-    \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
+    \inferrule{(\isTerm{x} : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
     \and
     \inferrule{\Gamma |- \isTerm{t} : A}{\Gamma |- (\isTerm{t \annotate A}) : A}\,\Rule{Anno}
     \and
-    \inferrule{\rho : \Sub{\Xi}{\emptyset} \\ \Gamma, \isTerm{\vec{x}_1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \isTerm{\vec{x}_n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
-    {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\,t_1; \ldots; \vec{x}_n.\,t_n)} : \simsub{A}{\rho}}\,\Rule{Op}
+    \inferrule{\rho : \Sub{\Xi}{\emptyset} \\ \Gamma, \vec{\isTerm{x}}_\isTerm{1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \vec{\isTerm{x}}_\isTerm{n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
+    {\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A}{\rho}}\,\Rule{Op}
     \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
   \end{mathpar}
   \caption{Typing rules}
@@ -181,7 +181,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
-  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$t$ is a raw term for $(\Sigma, \erase{\Omega})$ in mode $d$ for  $(\Sigma, \Omega)$}
+  \judgbox{|-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$\isTerm{t}$ is a raw term for $(\Sigma, \erase{\Omega})$ in mode $d$ for  $(\Sigma, \Omega)$}
   \begin{mathpar}
     \inferrule{x : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
     \and
@@ -190,7 +190,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
     \and
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
-    {|-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1.\, t_1; \ldots;\vec{x}_n.\, t_n)}^\dir{d}}\,\Rule{Op}
+    {|-_{\Sigma, \Omega} \tmOpts^\dir{d}}\,\Rule{Op}
   \end{mathpar}
   \caption{Preprocessed raw terms, I}
 \end{figure}
@@ -198,7 +198,7 @@ This is not only for brevity but also necessary to compare the type equality dur
 \begin{figure}
   \centering
   \small
-  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $t$ is of type $A$ (without type variables) in mode $d$ under $\Gamma$}
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $\isTerm{t}$ is of type $A$ (without type variables) in mode $\dir{d}$ under $\Gamma$}
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
@@ -206,10 +206,10 @@ This is not only for brevity but also necessary to compare the type equality dur
     \and
     \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\
-    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\isTerm{\vec{x}_{1}} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
+    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\vars{x}_\isTerm{1} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
       \cdots \\
-    \Gamma, \simsub{\isTerm{\vec{x}_{n}} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
-    {\Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_o(\vec{x}_1 .\, t_{1}; \ldots; \vec{x}_{n}.\, t_{n})} :^{\dir{d}} \simsub{A}{\rho}} \,\mathsf{Op}
+    \Gamma, \simsub{\vars{x}_\isTerm{n} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
+    {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A}{\rho}} \,\mathsf{Op}
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
 Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\chk}}$

@@ -12,46 +12,35 @@ private variable
 
 -- every variable in A is contained in some As 
 Cover : Fins Ξ → TExps Ξ → Set
-Cover xs Δ = All (λ A → fv A ⊆ xs) Δ
+Cover xs Δ = fvs Δ ⊆ xs -- All (λ A → fv A ⊆ xs) Δ
 
 known : ArgsD Ξ → Fins Ξ
-known []                  = []
-known (_ ⊢[ Chk ] A ∷ Ds) =         known Ds
-known (_ ⊢[ Syn ] A ∷ Ds) = fv A ++ known Ds
+known []                = []
+known (_ ⊢[ d ] A ∷ Ds) = helper d A ++ known Ds
+  where
+    helper : Mode → TExp Ξ → Fins _
+    helper Chk A = []
+    helper Syn A = fv A
 
-module Chk (B : TExp Ξ) where
-  ModeCorrectᵃˢ : ArgsD Ξ → Set
-  ModeCorrectᵃˢ []       = ⊤
-  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) =
-    Cover (fv B ++ known Ds) (A ∷ Δ) × ModeCorrectᵃˢ Ds 
-  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) =
-    Cover (fv B ++ known Ds) Δ       × ModeCorrectᵃˢ Ds
+ModeCorrectᵃ : Fins Ξ → ArgD Ξ → Set
+ModeCorrectᵃ xs (Δ ⊢[ Chk ] A) = Cover xs (A ∷ Δ)
+ModeCorrectᵃ xs (Δ ⊢[ Syn ] A) = Cover xs Δ
 
-module Syn where 
-  ModeCorrectᵃˢ : ArgsD Ξ → Set
-  ModeCorrectᵃˢ []                  = ⊤
-  ModeCorrectᵃˢ (Δ ⊢[ Chk ] A ∷ Ds) =
-    Cover (known Ds) (A ∷ Δ) × ModeCorrectᵃˢ Ds
-  ModeCorrectᵃˢ (Δ ⊢[ Syn ] A ∷ Ds) =
-    Cover (known Ds) Δ       × ModeCorrectᵃˢ Ds
+ModeCorrectᵃˢ : Fins Ξ → ArgsD Ξ → Set
+ModeCorrectᵃˢ _  []       = ⊤
+ModeCorrectᵃˢ xs (D ∷ Ds) =
+  ModeCorrectᵃ (xs ++ known Ds) D × ModeCorrectᵃˢ xs Ds
 
 ModeCorrectᶜ : ConD → Set
-ModeCorrectᶜ (ι Chk A Ds) = Chk.ModeCorrectᵃˢ A Ds
-ModeCorrectᶜ (ι Syn A Ds) = Syn.ModeCorrectᵃˢ Ds × fv A ⊆ known Ds
+ModeCorrectᶜ (ι {Ξ} Chk A Ds) =
+  ((i : Fin Ξ) → i ∈ (fv A ++ known Ds)) × ModeCorrectᵃˢ (fv A) Ds
+ModeCorrectᶜ (ι {Ξ} Syn A Ds) =
+  ((i : Fin Ξ) → i ∈ known Ds) × ModeCorrectᵃˢ []     Ds × fv A ⊆ known Ds
+  -- Every i exsits in some variable of inferred types
 
 ModeCorrect : Desc → Set
 ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)
 
-Tightᶜ : ConD → Set
-Tightᶜ (ι {Ξ} Chk A Ds) =
-  (i : Fin Ξ) → i ∈ (fv A ++ known Ds)
-Tightᶜ (ι {Ξ} Syn A Ds) =
-  (i : Fin Ξ) → i ∈ known Ds
-  -- Every i exsits in some variable of inferred types
-
--- Cover-dec : (A : TExp Ξ) {As Δ : TExps Ξ}
---   → Cover As (A ∷ Δ) → Cover As Δ 
--- Cover-dec A (_ ∷ As⊆Δ) = As⊆Δ
 ------------------------------------------------------------------------
 -- Functors that take a partial substitution instead
 
@@ -71,23 +60,23 @@ module Functor (Id : Set) where
 
   ⟦_⟧ᵃ : (Δ : TExps Ξ) (xs : Fins Ξ) → Cover xs Δ
     → (X : Mode → Set ℓ) → (Cxt Θ → X d → Set ℓ′)
-    → ∈Sub xs Θ
+    → Sub⊆ xs Θ
     → Cxt Θ → R.⟦ Δ ⟧ᵃ (X d)
     → Set ℓ′
-  ⟦ []    ⟧ᵃ _  _             X P ρ Γ t       = P Γ t
-  ⟦ A ∷ Δ ⟧ᵃ xs (A⊆xs ∷ Δ⊆xs) X P ρ Γ (x , t) =
-    ⟦ Δ ⟧ᵃ xs Δ⊆xs X P ρ (x ⦂ ∈sub ρ A A⊆xs , Γ) t
+  ⟦ []    ⟧ᵃ _  _    X P ρ Γ t       = P Γ t
+  ⟦ A ∷ Δ ⟧ᵃ xs Δ⊆xs X P ρ Γ (x , t) =
+    ⟦ Δ ⟧ᵃ xs (Δ⊆xs ∘ L.++⁺ʳ _) X P ρ (x ⦂ sub⊆ ρ A (Δ⊆xs ∘ L.++⁺ˡ) , Γ) t
 
-  ⟦_⟧⇒ᵃˢ : (Ds : ArgsD Ξ) (xs : Fins Ξ) → known Ds ⊆ xs → (MC : Syn.ModeCorrectᵃˢ Ds)
+  ⟦_⟧⇒ᵃˢ : (Ds : ArgsD Ξ) (xs : Fins Ξ) → known Ds ⊆ xs → (MC : ModeCorrectᵃˢ [] Ds)
     → (X : Mode → Set ℓ) (P : Pred ℓ′ Θ X)
-    → ∈Sub xs Θ
+    → Sub⊆ xs Θ
     → Cxt Θ → R.⟦ Ds ⟧ᵃˢ X → Set ℓ′
-  ⟦ []                ⟧⇒ᵃˢ xs Ds⊆xs _           _ _ _ _ _        = ⊤
+  ⟦ []                ⟧⇒ᵃˢ _ _ _ _ _ _ _ _ = ⊤
 
-  ⟦ Δ ⊢[ Chk ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (A⊆Ds ∷ Δ⊆Ds , MC) X P ρ Γ (t , ts) =
-    ⟦ Δ ⟧ᵃ xs (A.map (λ {A} A⊆Ds {x} x∈ → Ds⊆xs (A⊆Ds x∈)) Δ⊆Ds) X (P Chk $ ∈sub ρ A (Ds⊆xs ∘ A⊆Ds)) ρ Γ t
+  ⟦ Δ ⊢[ Chk ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds , MC) X P ρ Γ (t , ts) =
+    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ʳ _) X (P Chk $ sub⊆ ρ A (Ds⊆xs ∘ Δ⊆Ds ∘ L.++⁺ˡ)) ρ Γ t
     × ⟦ Ds ⟧⇒ᵃˢ xs Ds⊆xs MC X P ρ Γ ts
     
-  ⟦ Δ ⊢[ Syn ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds        , MC) X P ρ Γ (t , ts) =
-    ⟦ Δ ⟧ᵃ xs (A.map (λ {A} A⊆Ds {x} x∈ → Ds⊆xs (L.++⁺ʳ _ (A⊆Ds x∈))) Δ⊆Ds) X (P Syn $ ∈sub ρ A (Ds⊆xs ∘ L.++⁺ˡ)) ρ Γ t
-      × ⟦ Ds ⟧⇒ᵃˢ xs (Ds⊆xs ∘ L.++⁺ʳ _) MC X P ρ Γ ts
+  ⟦ Δ ⊢[ Syn ] A ∷ Ds ⟧⇒ᵃˢ xs Ds⊆xs (Δ⊆Ds , MC) X P ρ Γ (t , ts) =
+    ⟦ Δ ⟧ᵃ xs (Ds⊆xs ∘ L.++⁺ʳ _ ∘ Δ⊆Ds) X (P Syn $ sub⊆ ρ A (Ds⊆xs ∘ L.++⁺ˡ)) ρ Γ t
+       × ⟦ Ds ⟧⇒ᵃˢ xs (Ds⊆xs ∘ L.++⁺ʳ _) MC X P ρ Γ ts

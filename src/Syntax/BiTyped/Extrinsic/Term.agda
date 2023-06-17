@@ -27,7 +27,6 @@ data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
     → ⊢⇆ Syn A Γ (` x)
   ⊢⦂
     : ⊢⇆ Chk A Γ t
-  --  → (eq : A ≡ B)
     → ⊢⇆ Syn A Γ (t ⦂ A)
   ⊢↑
     : (eq : A ≡ B)

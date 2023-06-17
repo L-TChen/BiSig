@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-}
+{-# OPTIONS  #-}
 
 open import Prelude
 open import Syntax.Simple.Description
@@ -165,31 +165,74 @@ Sub-⨟ σ₁ σ₂ i = sub σ₂ (σ₁ i) -- tabulate λ i → sub σ₂ (look
 ------------------------------------------------------------------------------
 -- Substitutio as Variable Assignment
 
-∈Sub : Fins Ξ → ℕ → Set
-∈Sub {Ξ} xs Θ = Σ ((i : Fin Ξ) → i ∈ xs → Tm Θ)
+Sub⊆ : Fins Ξ → ℕ → Set
+Sub⊆ {Ξ} xs Θ = Σ ((i : Fin Ξ) → i ∈ xs → Tm Θ)
   λ ρ → ∀ {i} → (x y : i ∈ xs) → ρ i x ≡ ρ i y
-  -- Liang-Ting (2023-06-08): I really want HIT to make a subset of Fin Ξ here.
+  -- [NOTE] I really want HIT to make a subset of Fin Ξ here.
 
-∈Sub₀ : Fins Ξ → Set
-∈Sub₀ xs = ∈Sub xs 0
+Sub⊆₀ : Fins Ξ → Set
+Sub⊆₀ xs = Sub⊆ xs 0
 
 Consistent : {xs ys : Fins Ξ}
-  → (ρ : ∈Sub xs Θ) (σ : ∈Sub ys Θ) → Set
+  → (ρ : Sub⊆ xs Θ) (σ : Sub⊆ ys Θ) → Set
 Consistent {Ξ} {_} {xs} {ys} (ρ , _) (σ , _) =
   {i : Fin _} (x : i ∈ xs) (y : i ∈ ys) → ρ i x ≡ σ i y
 
 _⊑_ : {xs ys : Fins Ξ}
-  → ∈Sub xs Θ → ∈Sub ys Θ → Set
+  → Sub⊆ xs Θ → Sub⊆ ys Θ → Set
 _⊑_ {_} {_} {xs} {ys} ρ σ = xs ⊆ ys × Consistent ρ σ
+  
+FamSub : (Ξ Θ : ℕ) → Set₁
+FamSub Ξ Θ = {xs : Fins Ξ} → Sub⊆ xs Θ → Set
 
-module _ {vs : Fins Ξ} ((ρ , p) : ∈Sub vs Θ) where mutual
-  ∈sub : (t : Tm Ξ) → fv t ⊆ vs → Tm Θ
-  ∈sub (` x)         ⊆vs = ρ x (⊆vs (here refl))
-  ∈sub (op (i , ts)) ⊆vs = op (i , ∈subⁿ ts ⊆vs)
+Ext : {xs : Fins Ξ} → Sub⊆ xs Θ → FamSub Ξ Θ
+  → FamSub Ξ Θ
+Ext {Ξ} {Θ} {xs} ρ P {ys} σ = (ρ ⊑ σ) × P σ
 
-  ∈subⁿ : (ts : Tm Ξ ^ n) → fvⁿ ts ⊆ vs → Tm Θ ^ n
-  ∈subⁿ []       ⊆vs = []
-  ∈subⁿ (t ∷ ts) ⊆vs = ∈sub t (⊆vs ∘ L.++⁺ˡ) ∷ ∈subⁿ ts (⊆vs ∘ L.++⁺ʳ _)
+Min : FamSub Ξ Θ → FamSub Ξ Θ
+Min {Ξ} {Θ} P ρ = P ρ ×
+  ({ys : Fins Ξ} (σ : Sub⊆ ys Θ) → P σ → ρ ⊑ σ)
 
-∅∈sub : ∈Sub {Ξ} [] Θ
-∅∈sub = (λ _ ()) , λ ()
+⊑-refl : {xs : Fins Ξ}
+  → (ρ : Sub⊆ xs Θ) → ρ ⊑ ρ
+⊑-refl ρ = (λ x → x) , ρ .proj₂
+
+P→MinExtP : (P : FamSub Ξ Θ) → {xs ys : Fins Ξ} (ρ : Sub⊆ xs Θ)
+  → P ρ → Min (Ext ρ P) ρ
+P→MinExtP P ρ Pρ = (⊑-refl ρ , Pρ) , λ σ (ρ⊑σ , _) → ρ⊑σ
+------------------------------------------------------------------------
+-- `Reflects` idiom.
+
+-- The truth value of P is reflected by a boolean value.
+-- `Reflects P b` is equivalent to `if b then P else ¬ P`.
+
+open import Data.Bool
+
+data MinReflects (P : FamSub Ξ Θ) : Bool → Set where
+  ofʸ :       (xs : Fins Ξ) (ρ : Sub⊆ xs Θ) (p : Min P ρ) → MinReflects P true
+  ofⁿ : (¬p : {zs : Fins Ξ} (σ : Sub⊆ zs Θ) → ¬ P σ)      → MinReflects P false
+
+record MinDec (P : FamSub Ξ Θ) : Set where
+  constructor _because_
+  field
+    does  : Bool
+    proof : MinReflects P does
+open MinDec public
+
+pattern yesₘ xs ρ p =  true because ofʸ xs ρ p
+pattern noₘ ¬p      = false because ofⁿ ¬p
+
+module _ {vs : Fins Ξ} ((ρ , p) : Sub⊆ vs Θ) where mutual
+  sub⊆ : (t : Tm Ξ) → fv t ⊆ vs → Tm Θ
+  sub⊆ (` x)         ⊆vs = ρ x (⊆vs (here refl))
+  sub⊆ (op (i , ts)) ⊆vs = op (i , sub⊆ⁿ ts ⊆vs)
+
+  sub⊆ⁿ : (ts : Tm Ξ ^ n) → fvⁿ ts ⊆ vs → Tm Θ ^ n
+  sub⊆ⁿ []       ⊆vs = []
+  sub⊆ⁿ (t ∷ ts) ⊆vs = sub⊆ t (⊆vs ∘ L.++⁺ˡ) ∷ sub⊆ⁿ ts (⊆vs ∘ L.++⁺ʳ _)
+
+none : Sub⊆ {Ξ} [] Θ
+none = (λ _ ()) , λ ()
+
+toSub : {xs : Fins Ξ} → ((i : Fin Ξ) → i ∈ xs) → Sub⊆ xs Θ  → Sub Ξ Θ
+toSub xs⊆Ξ (ρ , _) i = ρ i (xs⊆Ξ i)

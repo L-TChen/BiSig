@@ -29,6 +29,10 @@ Raw⇐ Raw⇒ : ℕ → Set
 Raw⇐ Θ = Raw Θ Chk
 Raw⇒ Θ = Raw Θ Syn
 
+Raw₀  = Raw 0
+Raw⇒₀ = Raw⇒ 0
+Raw⇐₀ = Raw⇐ 0
+
 module _ (ρ : TRen Θ₁ Θ₂) where mutual
   trename : Raw Θ₁ d → Raw Θ₂ d
   trename (` x)   = ` x

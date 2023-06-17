@@ -47,11 +47,11 @@ mutual
     → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
     → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
     → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
-  uniq-↑ᶜ (ι Syn A Ds) refl (SDs , C⊆xs) ⊢ts ⊢us =
+  uniq-↑ᶜ (ι Syn A Ds) refl (_ , SDs , C⊆xs) ⊢ts ⊢us =
     ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs (∈ᵥ→∈fv x))
 
   uniq-↑ⁿ
-    : (Ds : ArgsD Ξ) → Syn.ModeCorrectᵃˢ Ds
+    : (Ds : ArgsD Ξ) → ModeCorrectᵃˢ [] Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
@@ -72,10 +72,10 @@ mutual
     → (∀ {x} → x ∈ xs → ρ₁ x ≡ ρ₂ x) -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
     → ∀ {x} → x ∈ fv C
     → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
-  uniq-↑ᵃ C []      _  ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈fv→∈ᵥ x)
-  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs ∷ Δ⊆xs) ⊢t ⊢u f = 
-    uniq-↑ᵃ C Δ Δ⊆xs (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
-    where A₁=A₂ = ≡-fv A λ x∈ → f (A⊆xs (∈ᵥ→∈fv x∈))
+  uniq-↑ᵃ C []      _    ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈fv→∈ᵥ x)
+  uniq-↑ᵃ C (A ∷ Δ) Δ⊆xs ⊢t ⊢u f = 
+    uniq-↑ᵃ C Δ (Δ⊆xs ∘ L.++⁺ʳ _) (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+    where A₁=A₂ = ≡-fv A λ x∈ → f ((Δ⊆xs (L.++⁺ˡ (∈ᵥ→∈fv x∈))))
 
 ¬switch
   : {t : Raw⇒ Θ}

@@ -44,35 +44,35 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) (_≈_ : ∀ {X Y} →
       → (f : Mor C D) (g : Mor D E) (h : Mor E F)
       → ((f ⨟ g) ⨟ h) ≈ (f ⨟ (g ⨟ h))
 
-  𝐘 : Obj → Set₁
-  𝐘 C = (D : Obj) → Mor C D → Set
+--   𝐘 : Obj → Set₁
+--   𝐘 C = (D : Obj) → Mor C D → Set
+-- 
+--   private variable
+--     B C D E : Obj
+--     P Q     : 𝐘 C
 
-  private variable
-    B C D E : Obj
-    P Q     : 𝐘 C
-
-  infixl 5 _∧_
---  infix 4 _⊒_ _⊑_
-  infix  3 ¬′_
---  infix  2 _≗_
+--   infixl 5 _∧_
+--   infix 4 _⊒_ _⊑_
+--   infix  3 ¬′_
+--   infix  2 _≗_
   
---  _⊒_ _⊑_
---    : {C D E : Obj}
---    → Mor C D → Mor C E → Set
---  _⊒_ {C} {D} {E} f g = Σ[ h ∈ Mor E D ] (g ⨟ h) ≈ f
+--   _⊒_ _⊑_
+--     : {C D E : Obj}
+--     → Mor C D → Mor C E → Set
+--   _⊒_ {C} {D} {E} f g = Σ[ h ∈ Mor E D ] (g ⨟ h) ≈ f
+-- 
+--   _⊑_ f g = g ⊒ f
+-- 
 --
---  _⊑_ f g = g ⊒ f
-
-
-  _∧_ : (P Q : 𝐘 C) → 𝐘 C
-  (P ∧ Q) D f = P D f × Q D f
-
-  ⊥′ : 𝐘 C
-  ⊥′ _ _ = ⊥
-
-  ¬′_ : (X : 𝐘 C) → Set _
-  ¬′_  X = X ⇒ ⊥′
-  
+--  _∧_ : (P Q : 𝐘 C) → 𝐘 C
+--  (P ∧ Q) D f = P D f × Q D f
+--
+--  ⊥′ : 𝐘 C
+--  ⊥′ _ _ = ⊥
+--
+--  ¬′_ : (X : 𝐘 C) → Set _
+--  ¬′_  X = X ⇒ ⊥′
+--  
 --  _≗_ : (X Y : 𝐘 C) → Set _
 --  X ≗ Y = ∀ {i} j → X i j ⇔ Y i j
 --
@@ -82,14 +82,14 @@ record IsCategory (Obj : Set) (Mor : Obj → Obj → Set) (_≈_ : ∀ {X Y} →
 --    ; from = map₂ (map₂ (P=Q _ .from))
 --    }
 --    where open Equivalence
-
-  _[_⨟]
-    : (P : 𝐘 C) (f : Mor C D) 
-    → 𝐘 D
-  (P [ f ⨟]) _ g = P _ (f ⨟ g)
-
-  infixl 5 _[_⨟]
-  
+-- 
+--   _[_⨟]
+--     : (P : 𝐘 C) (f : Mor C D) 
+--     → 𝐘 D
+--   (P [ f ⨟]) _ g = P _ (f ⨟ g)
+-- 
+--   infixl 5 _[_⨟]
+--   
 --  Min : 𝐘 C → 𝐘 C
 --  Min {C} P D f = P D f ×
 --    (∀ {D} (g : Mor C D) → P D g → f ⊑ g)

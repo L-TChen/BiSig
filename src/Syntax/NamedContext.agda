@@ -9,6 +9,8 @@ open import Syntax.Simple            D
 Cxt : ℕ → Set
 Cxt m = Context (TExp m)
 
+Cxt₀  = Cxt 0
+
 cxtSub : {m n : ℕ} → TSub m n
   → Cxt m → Cxt n
 cxtSub σ []          = []

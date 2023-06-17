@@ -59,16 +59,16 @@
 \title{A Theory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
-  Type checking and inference serve as the passage from parsed abstract syntax trees to well-typed programs.
-  While progress has been made in developing techniques for type checking on a case-by-case basis, the lack of a general theory poses a difficulty of implementing a robust `type-checker generator' for diverse languages.
+  Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
+  While progress has been made in developing type-checking techniques on a case-by-case basis, the lack of a general theory poses a difficulty in implementing a robust `type-checker generator' for diverse languages.
 
-  Motivated by this issue, we develop a \emph{simple} but \emph{general} and \emph{constructive} theory of \emph{bidirectional type synthesis} where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing rules for synthesising the type of a program with type annotations.
+  In response to this difficulty, we develop a \emph{simple} yet \emph{general} and \emph{constructive} theory of bidirectional type synthesis where \emph{bidirectional type synthesis} refers to the mutual use of type checking and inference based on bidirectional typing rules to determine the type of a program with type annotations.
   First, our theory is simple but general as it deals with any simple type theory and its bidirectional type system that can be specified by a signature, analogous to the role of grammar in parsing.
   Second, our theory is constructive because it is not only formalised in a proof assistant based on constructive type theory but also formulated positively in order to compute.
-  Specifically, a type synthesiser for a simple type theory specified by some mode-correct signature is the proof of logical decidability of synthesis, analogous to a parser generator.
-  The notion of bidirectionalisation is introduced to refine annotatability in bidirectional typing.
-  Type synthesis and bidirectionalisation lead to the trichotomy of raw terms which models a practical type synthesiser that throws an exception when its input does not have enough annotations potentially with a proof to locate missing annotations.
-  Hence, by formalizing our general theory of bidirectional type synthesis constructively, we provide a provably correct `type-checker generator' for simple type theories, setting the stage for further advances towards a more general theory of type synthesis.
+  Specifically, `the proof' of logical decidability of type synthesis is instantiated to a type synthesiser for the simple type theory specified by a valid signature, analogous to a parser generator.
+  We introduce the notion of bidirectionalisation to refine annotatability in bidirectional typing.
+  Type synthesis and bidirectionalisation result in the trichotomy of raw terms, which models a practical type synthesiser that may throw an exception to locate missing annotations.
+  By formalizing our general theory of bidirectional type synthesis constructively, we provide a correct-by-construction `type-checker generator' for simple type theories, taking the first step towards a more general theory of bidirectional type synthesis.
 \end{abstract}
 
 \begin{CCSXML}

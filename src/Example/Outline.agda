@@ -185,10 +185,7 @@ module TypeSynthesis⇔ where
 
   uniq-⇒-var : (i : A ∈ Γ) (j : B ∈ Γ) → L.index i ≡ L.index j → A ≡ B
   uniq-⇒-var (here refl) (here refl) _  = refl
-  uniq-⇒-var (there i)   (there j)   eq = uniq-⇒-var i j (deSuc eq)
-    where
-      deSuc : {x y : Fin n} → suc x ≡ suc y → x ≡ y
-      deSuc refl = refl
+  uniq-⇒-var (there i)   (there j)   eq = uniq-⇒-var i j (F.suc-injective eq)
 
   uniq-⇒ : {Γ : List Ty} {r : Raw (length Γ)} {A B : Ty} → Pre Syn r
     → Γ ⊢ r ⇒ A → Γ ⊢ r ⇒ B → A ≡ B

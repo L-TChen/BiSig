@@ -7,18 +7,18 @@
   \bgroup
   \renewcommand{\arraystretch}{1.5}
   \begin{tabular}{ r l }
-    $\boxed{\Gamma' |- \isTerm{t}}$ & Given a list~$\Gamma'$ of variables, $t$~is a raw term with free variables in~$\Gamma'$
+    $\boxed{V |- \isTerm{t}}$ & Given a list~$V$ of variables, $t$~is a raw term with free variables in~$V$
   \end{tabular}
   \egroup
   \centering
   \begin{mathpar}
-    \inferrule{x \in \Gamma'}{\Gamma' \vdash \isTerm{x}}\,\Rule{Var}
+    \inferrule{x \in V}{V \vdash \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{\Gamma' \vdash \isTerm{t} \\ \isTerm{A}\text{ is a closed type}}{\Gamma' \vdash \isTerm{(t \annotate A)}}\,\Rule{Anno}
+    \inferrule{V \vdash \isTerm{t} \\ \isTerm{A}\text{ is a closed type}}{V \vdash \isTerm{(t \annotate A)}}\,\Rule{Anno}
     \and
-    \inferrule{\Gamma', \isTerm{x} \vdash \isTerm{t}}{\Gamma' \vdash \isTerm{\lam{x}t}}\,\Rule{Abs}
+    \inferrule{V, \isTerm{x} \vdash \isTerm{t}}{V \vdash \isTerm{\lam{x}t}}\,\Rule{Abs}
     \and
-    \inferrule{\Gamma' \vdash \isTerm{t} \\ \Gamma' \vdash \isTerm{u}}{\Gamma' \vdash \isTerm{t\;u}}\,\Rule{App}
+    \inferrule{V \vdash \isTerm{t} \\ V \vdash \isTerm{u}}{V \vdash \isTerm{t\;u}}\,\Rule{App}
   \end{mathpar}
   \caption{Raw terms for simply typed $\lambda$-calculus}
   \label{fig:STLC-raw-terms}
@@ -46,26 +46,30 @@
   \label{fig:STLC-typing-derivations}
 \end{figure}
 
-To start off, we give an overview of our theory by instantiating it to simply typed $\lambda$-calculus~($\Lambda_{\bto}$).
+We start with an overview of our theory by instantiating it to simply typed $\lambda$-calculus.
 Roughly speaking, the problem of type synthesis requires us to take an untyped abstract syntax tree ---which we call a \emph{raw term}--- as input, and produce a typing derivation for the term if possible.
 To give more precise definitions:
-The raw terms for~$\Lambda_{\bto}$ are defined in \cref{fig:STLC-raw-terms}; besides the standard constructs, there is an \textsc{Anno} rule that allows the user to insert type annotations to help with type synthesis.
-Correspondingly, the definition of typing derivations for~$\Lambda_{\bto}$ in \cref{fig:STLC-typing-derivations} also includes an \textsc{Anno} rule enforcing that the type of an annotated term does match the annotation.
+The raw terms for simply typed $\lambda$-calculus are defined in \cref{fig:STLC-raw-terms};%
+\footnote{We omit the usual conditions about named representations of variables throughout this paper.}
+besides the standard constructs, there is an \textsc{Anno} rule that allows the user to insert type annotations to help with type synthesis.
+Correspondingly, the definition of typing derivations in \cref{fig:STLC-typing-derivations} also includes an \textsc{Anno} rule enforcing that the type of an annotated term does match the annotation.
 Now we can define what it means to solve the type synthesis problem.
 
 \begin{definition}
-\label{def:STLC-type-synthesisers}
-Parametrised by a (possibly proof-relevant) predicate~$E$ on raw terms, a \emph{type synthesiser} (for $\Lambda_{\bto}$) takes a context~$\Gamma$ and a raw term $\Gamma' \vdash t$ (where $\Gamma'$~is the list of variables appearing in~$\Gamma$) as input, and establishes one of the following outcomes:
+\label{def:STLC-type-synthesiser}
+Parametrised by an `excuse' predicate~$E$ on raw terms, a \emph{type synthesiser} takes a context~$\Gamma$ and a raw term $|\Gamma| \vdash t$ (where $|\Gamma|$~is the list of variables appearing in~$\Gamma$) as input, and establishes one of the following outcomes:
 \begin{enumerate}
-\item a derivation of $\Gamma \vdash t : A$ for some type~$A$,
+\item there exists a derivation of $\Gamma \vdash t : A$ for some type~$A$,
 \item there does not exist a derivation $\Gamma \vdash t : A$ for any type~$A$, or
 \item $E$~holds for~$t$.
 \end{enumerate}
 \end{definition}
 
 It is crucial to allow the third outcome, without which we would be requiring the type synthesis problem to be decidable, but this requirement would quickly become impossible to meet when the theory is extended to handle more complex types.
-If a type synthesiser cannot decide whether there is a typing derivation, it is allowed to give an `excuse' instead of an answer.
-Acceptable excuses are captured by the predicate~$E$, which describes what is wrong with an input term, for example not having enough type annotations.
+If a type synthesiser cannot decide whether there is a typing derivation, it is allowed to give an excuse instead of an answer.
+Acceptable excuses are defined by the predicate~$E$, which describes what is wrong with an input term, for example not having enough type annotations.
+
+\Josh{Checking is subsumed by synthesis because of type annotations}
 
 \begin{figure}
   \small
@@ -82,7 +86,7 @@ Acceptable excuses are captured by the predicate~$E$, which describes what is wr
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \chk A}{\Gamma \vdash \isTerm{(t \annotate A)}\syn A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ B = A}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
+    \inferrule{\Gamma \vdash \isTerm{t} \syn A \\ A = B}{\Gamma \vdash \isTerm{t} \chk B}\,\ChkRule{Sub}
     \and
     \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \chk B}{\Gamma \vdash \isTerm{\lam{x}t} \chk A \bto B}\,\ChkRule{Abs}
     \and
@@ -92,23 +96,85 @@ Acceptable excuses are captured by the predicate~$E$, which describes what is wr
   \label{fig:STLC-bidirectional-typing-derivations}
 \end{figure}
 
-Now our goal is to use \cref{def:STLC-type-synthesisers} as a specification and implement it using a \emph{bidirectional} type synthesiser, which attempts to produce \emph{bidirectional} typing derivations defined in \cref{fig:STLC-bidirectional-typing-derivations}.
-While type synthesis is not decidable in general, for certain kinds of terms it is still possible to synthesise their types (for example, the type of a variable can be looked up in the context), and for other kinds of terms we can switch to the simpler problem of type \emph{checking}, where the expected type of a term is also given so that the type checker has more information to work with.
-If a bidirectional type system is designed well, then synthesised type information will be enough for figuring out the expected types for checking.
+Now our goal is to use \cref{def:STLC-type-synthesiser} as a specification and implement it using a \emph{bidirectional} type synthesiser, which attempts to produce \emph{bidirectional} typing derivations defined in \cref{fig:STLC-bidirectional-typing-derivations}.
+Here we briefly recap the basic ideas of bidirectional type synthesis.
+While the problem of type synthesis is not decidable in general, for certain kinds of terms it is still possible to synthesise their types --- for example, the $\SynRule{Var}$ rule says that the type of a variable can be looked up in the context.
+For other kinds of terms, we can switch to the simpler problem of type \emph{checking}, where the expected type of a term is given as input so that the type checker has more information to work with.
+A bidirectional type synthesiser switches between the two \emph{modes}: synthesising wherever possible, and checking otherwise.
+If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which will be defined in \cref{sec:type-synthesis}), then there will be a flow of type information in each rule that allows us to determine unknown types (e.g.~types to be checked) from known ones (e.g.~types previously synthesised), and suggests how bidirectional type synthesis is performed --- for example, the $\SynRule{App}$ rule says that to synthesise the type of an application $\isTerm{t\;u}$, we first synthesise the type of~$\isTerm{t}$, which should be an implication $A \bto B$, from which we can extract the expected type of~$\isTerm{u}$, namely~$A$, and perform checking; then the type of the whole application, namely~$B$, can also be extracted from the previously synthesised type $A \bto B$.
+%The $\ChkRule{Abs}$ rule checks whether the type of an abstraction $\isTerm{\lam{x}t}$ is $A \bto B$ by checking whether $\isTerm{t}$~has type~$B$ assuming $\isTerm{x}$~has type~$A$ in the context, where both types $A$~and~$B$ can be determined from the type $A \bto B$ given initially.
+%For an annotated term $t \bbcolon A$, the $\SynRule{Anno}$ rule simply synthesises~$A$ as its type, provided that $t$~can be successfully checked to have type~$A$.
+%Finally, the subsumption rule $\ChkRule{Sub}$ says that a term synthesising a type~$A$ can be checked to have type~$B$ if $A = B$ --- in general this type equality can be replaced by some subtyping relation.
 
-\begin{remark}
-  We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.
-\end{remark}
+\Josh{There are other ways to correctly bidirectionalise the type system}
 
-\Josh{
+\begin{figure}
+  \centering
+  \small
+  \judgbox{|- \isTerm{t}^\dir{d}}{A raw term~$\isTerm{t}$ is in mode~$d$}
+  \begin{mathpar}
+    \inferrule{x \in V}{V |- \isTerm{x}^{\syn}}\,\SynRule{Var}
+    \and
+    \inferrule{V |- \isTerm{t}^{\chk}}{V |- (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
+    \and
+    \inferrule{V |- \isTerm{t}^{\syn}}{V |- \isTerm{t}^{\chk}}\,\ChkRule{Sub}
+    \\
+    \inferrule{V, x |- \isTerm{t}^{\chk}}
+    {V |- (\isTerm{\lam{x}t})^{\chk}}\,\ChkRule{Abs}
+    \and
+    \inferrule{V |- \isTerm{t}^{\syn} \quad V |- \isTerm{u}^{\chk}}
+    {V |- (\isTerm{t\;u})^{\syn}}\,\SynRule{App}
+  \end{mathpar}
+  \caption{Mode derivations for simply typed $\lambda$-calculus}
+  \label{fig:STLC-mode-derivations}
+\end{figure}
 
-• Figures: raw terms, standard typing, bidirectional typing, and mode derivations ($\frac{2}{3}$~pages)
+While it is possible for a bidirectional type synthesiser to do its job in one go, which can be thought of as adding both mode and typing information to a raw term and arriving at a bidirectional typing derivation, it is beneficial to have a preprocessing step which adds only mode information, based on which the synthesiser then continues to add typing information.
+More precisely, the preprocessing step attempts to produce \emph{mode derivations} as defined in \cref{fig:STLC-mode-derivations}, where the rules are exactly the mode part of the bidirectional typing rules~(\cref{fig:STLC-bidirectional-typing-derivations}).
 
-• Bidirectional typing (general idea and specific STLC rules); the goal is to implement a type synthesiser using a bidirectional one
+\begin{definition}
+\label{def:STLC-mode-preprocessor}
+A \emph{mode preprocessor} decides for any raw term~$V \vdash \isTerm{t}$ and mode~$\dir{d}$ whether $V \vdash \isTerm{t}^\dir{d}$.
+\end{definition}
 
-• Beneficial to separate \emph{bidirectionalisation} from type synthesis (syntactic characterisation of the domain of type synthesis; making type synthesisers syntax- (or more precisely, derivation-) directed)
+One (smaller) benefit of mode preprocessing is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
+More importantly, whether there is a mode derivation for a term is actually very useful information to the user, because it corresponds to whether the term has enough type annotations:
+Observe that the $\SynRule{Anno}$ and $\ChkRule{Sub}$ rules allow us to switch between the synthesising and checking modes;
+the switch from synthesising to checking is free, whereas the opposite direction requires a type annotation.
+That is, any term in synthesising mode is also in checking mode, but not necessarily vice versa.
+A type annotation is required wherever a term that can only be in checking mode is required to be in synthesising mode, and a term does not have a mode derivation if and only if type annotations are missing in such places.
+(We will give a more rigorous treatment in \cref{sec:pre-synthesis}.)
+For example, an abstraction is strictly in checking mode, but the left sub-term of an application has to be synthesising, so the term $\isTerm{(\lam{x}t)\;u}$ does not have a mode derivation unless we annotate the abstraction.
 
-• Definitions of mode derivations, bidirectionalisers, and bidirectional type synthesisers
+\Josh{Determining whether there is enough type annotation with mode information only (not involving typing)}
 
-• Back to the goal; soundness and completeness ($1\frac{1}{2}$~pages)
-}
+Perhaps most importantly, mode derivations enable us to give bidirectional type synthesisers a tight definition: if we restrict the domain of a synthesiser to terms in synthesising mode (i.e.~having enough type annotations for synthesis), then it is possible for the synthesiser to \emph{decide} whether there is a suitable bidirectional typing derivation.
+
+\begin{definition}
+\label{def:STLC-bidirectional-type-synthesiser}
+A \emph{bidirectional type synthesiser} decides for any context~$\Gamma$ and raw term $|\Gamma| \vdash \isTerm{t}$ such that $|\Gamma| \vdash \isTerm{t}^{\syn}$ whether $\Gamma \vdash \isTerm{t} \syn A$ for some type~$A$.
+\end{definition}
+
+Now we can get back to our goal of implementing a type synthesiser~(\cref{def:STLC-type-synthesiser}).
+
+\begin{theorem}
+A type synthesiser that uses `not in synthesising mode' as its excuse can be constructed from a mode preprocessor and a bidirectional type synthesiser.
+\end{theorem}
+
+The construction is straightforward:
+Run the mode preprocessor on the input term~$|\Gamma| \vdash t$.
+If there is no synthesising mode derivation, report that $t$~is not in synthesising mode (the third outcome).
+Otherwise $|\Gamma| \vdash t^{\syn}$, and we can run the bidirectional type synthesiser.
+If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}).
+
+\begin{lemma}[Soundness]
+If\/ $\Gamma \vdash t :^\dir{d} A$, then $\Gamma \vdash t : A$.
+\end{lemma}
+
+If there is no derivation of $\Gamma \vdash t \syn A$ for any type~$A$, report that there is no derivation of $\Gamma \vdash t : A$ for any~$A$ either (the second outcome), because the bidirectional typing is \emph{complete} with respect to the original typing.
+
+\begin{lemma}[Completeness]
+If\/ $|\Gamma| \vdash t^\dir{d}$ and\/ $\Gamma \vdash t : A$, then $\Gamma \vdash t :^\dir{d} A$.
+\end{lemma}
+
+\LT{We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.}

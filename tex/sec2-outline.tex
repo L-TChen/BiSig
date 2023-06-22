@@ -14,7 +14,7 @@
   \begin{mathpar}
     \inferrule{x \in V}{V \vdash \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{V \vdash \isTerm{t} \\ \isTerm{A}\text{ is a closed type}}{V \vdash \isTerm{(t \annotate A)}}\,\Rule{Anno}
+    \inferrule{V \vdash \isTerm{t}}{V \vdash \isTerm{(t \annotate A)}}\,\Rule{Anno}
     \and
     \inferrule{V, \isTerm{x} \vdash \isTerm{t}}{V \vdash \isTerm{\lam{x}t}}\,\Rule{Abs}
     \and
@@ -49,10 +49,13 @@
 We start with an overview of our theory by instantiating it to simply typed $\lambda$-calculus.
 Roughly speaking, the problem of type synthesis requires us to take an untyped abstract syntax tree ---which we call a \emph{raw term}--- as input, and produce a typing derivation for the term if possible.
 To give more precise definitions:
-The raw terms for simply typed $\lambda$-calculus are defined in \cref{fig:STLC-raw-terms};%
+The raw terms%
 \footnote{We omit the usual conditions about named representations of variables throughout this paper.}
+for simply typed $\lambda$-calculus are defined in \cref{fig:STLC-raw-terms};
 besides the standard constructs, there is an \textsc{Anno} rule that allows the user to insert type annotations to help with type synthesis.
-Correspondingly, the definition of typing derivations in \cref{fig:STLC-typing-derivations} also includes an \textsc{Anno} rule enforcing that the type of an annotated term does match the annotation.
+Correspondingly, the definition of typing derivations%
+\footnote{We write~`$\bto$' instead of~`$\to$' for the function types of simply typed $\lambda$-calculus to avoid confusion with the function types in our type-theoretic meta-language.}
+in \cref{fig:STLC-typing-derivations} also includes an \textsc{Anno} rule enforcing that the type of an annotated term does match the annotation.
 %\footnote{The presence of type annotations allows type synthesis to subsume type checking: to check whether a term~$t$ has type~$A$, synthesise the type of $t \bbcolon A$.}
 Now we can define what it means to solve the type synthesis problem.
 
@@ -100,7 +103,7 @@ Here we briefly recap the basic ideas of bidirectional type synthesis.
 While the problem of type synthesis is not decidable in general, for certain kinds of terms it is still possible to synthesise their types --- for example, the $\SynRule{Var}$ rule says that the type of a variable can be looked up in the context.
 For other kinds of terms, we can switch to the simpler problem of type \emph{checking}, where the expected type of a term is given as input so that there is more information to work with.
 When a bidirectional type synthesiser traverses a raw term, it switches between the two \emph{modes}, synthesising wherever possible, and checking otherwise.
-If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which will be defined in \cref{sec:type-synthesis}), then there will be a flow of type information in each rule that allows us to determine unknown types (e.g.~types to be checked) from known ones (e.g.~types previously synthesised), and suggests how bidirectional type synthesis is performed --- for example, the $\SynRule{App}$ rule says that to synthesise the type of an application $\isTerm{t\;u}$, we first synthesise the type of~$\isTerm{t}$, which should be an implication $A \bto B$, from which we can extract the expected type of~$\isTerm{u}$, namely~$A$, and perform checking; then the type of the whole application, namely~$B$, can also be extracted from the previously synthesised type $A \bto B$.
+If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which will be defined in \cref{sec:type-synthesis}), then there will be a flow of type information in each rule that allows us to determine unknown types (e.g.~types to be checked) from known ones (e.g.~types previously synthesised), and suggests how bidirectional type synthesis is performed --- for example, the $\SynRule{App}$ rule says that to synthesise the type of an application $\isTerm{t\;u}$, we first synthesise the type of~$\isTerm{t}$, which should have the form $A \bto B$, from which we can extract the expected type of~$\isTerm{u}$, namely~$A$, and perform checking; then the type of the whole application, namely~$B$, can also be extracted from the previously synthesised type $A \bto B$.
 
 %The $\ChkRule{Abs}$ rule checks whether the type of an abstraction $\isTerm{\lam{x}t}$ is $A \bto B$ by checking whether $\isTerm{t}$~has type~$B$ assuming $\isTerm{x}$~has type~$A$ in the context, where both types $A$~and~$B$ can be determined from the type $A \bto B$ given initially.
 %For an annotated term $t \bbcolon A$, the $\SynRule{Anno}$ rule simply synthesises~$A$ as its type, provided that $t$~can be successfully checked to have type~$A$.
@@ -120,7 +123,7 @@ If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which
     \inferrule{V, x |- \isTerm{t}^{\chk}}
     {V |- (\isTerm{\lam{x}t})^{\chk}}\,\ChkRule{Abs}
     \and
-    \inferrule{V |- \isTerm{t}^{\syn} \quad V |- \isTerm{u}^{\chk}}
+    \inferrule{V |- \isTerm{t}^{\syn} \\ V |- \isTerm{u}^{\chk}}
     {V |- (\isTerm{t\;u})^{\syn}}\,\SynRule{App}
   \end{mathpar}
   \caption{Mode derivations for simply typed $\lambda$-calculus}
@@ -175,5 +178,3 @@ If\/ $|\Gamma| \vdash t^\dir{d}$ and\/ $\Gamma \vdash t : A$, then $\Gamma \vdas
 
 We will construct a mode preprocessor~(\cref{sec:mode-preprocessing}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
 To quantify over all such systems, we need their generic definitions, which we formulate in \cref{sec:defs}.
-
-\LT{We avoid using the term `function type' and its conventional notation $\to$ at the object level on purpose, as it may be confused with function types in our type-theoretic meta-language.}

@@ -19,7 +19,7 @@
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
 
-%\usepackage[inline]{enumitem} % for environment enumerate*
+\usepackage[inline]{enumitem} % for environment enumerate*
 %\setlist[enumerate]{mode=unboxed}
 
 \setlength {\marginparwidth }{2cm}
@@ -35,8 +35,8 @@
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
 
-\newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40,caption={}]{{#1}}}
-\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40,caption={}]{{#1}}}
+\newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40]{{#1}}}
+\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40]{{#1}}}
 
 \begin{document}
 
@@ -59,7 +59,7 @@
   Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
   While progress has been made in developing type-checking techniques on a case-by-case basis, the lack of a general theory poses a difficulty in implementing a robust `type-checker generator' for diverse languages.
 
-  In response to this difficulty, we develop a \emph{simple} yet \emph{general} and \emph{constructive} theory of bidirectional type synthesis where \emph{bidirectional type synthesis} refers to the mutual use of type checking and inference based on bidirectional typing rules to determine the type of a program with type annotations.
+  In response to this difficulty, we develop a simple yet general and constructive theory of bidirectional type synthesis where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing rules to determine the type of a program with type annotations.
   First, our theory is simple yet general as it deals with any simple type theory and its bidirectional type system that can be specified by a signature, analogous to the role of grammar in parsing.
   Second, our theory is constructive because it is not only formalised in a proof assistant based on constructive type theory but also formulated positively in order to compute.
   Specifically, the `proof' of logical decidability of type synthesis is instantiated to a synthesiser for the simple type theory specified by a valid signature, analogous to a parser generator.

@@ -72,21 +72,17 @@ In short, soundness and completeness are no more than the separation and combina
   \caption{Generalised mode derivations}
 \end{figure}
 
-\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
-For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
-\end{theorem}
+\begin{lemma}\label{thm:adjustment}
+For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
+\[ V |- t^{\syn\,\True\,\True} ~~\vee~~ V |- t^{\chk\,\True\,\True} ~~\vee~~ \exists e.~V |- t^{\chk\,\False\,e} \]
+then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+\end{lemma}
 
-\begin{proof}
-By induction on~$t$, we prove the rest of the theorem statement
-\begin{equation}\label{eq:preprocess}
-\forall d.~\exists v, e.~V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}
-\end{equation}
-in conjunction with
-\begin{equation}\label{eq:preprocess'}
-V |- t^{\syn\,\True\,\True} ~~\vee~~ V |- t^{\chk\,\True\,\True} ~~\vee~~ \exists e.~V |- t^{\chk\,\False\,e}
-\end{equation}
-Intuitively, statement~(\ref{eq:preprocess'}) gives a precise classification of a term as either a `real' synthesising term (i.e.~without missing annotations or an outermost mode cast), a `real' checking term, or a term that has missing annotations.
-After a derivation is constructed for statement~(\ref{eq:preprocess'}), we can perform some slight adjustment to obtain a desired derivation for statement~(\ref{eq:preprocess}) depending on~$d$:
+Intuitively, the antecedent gives a precise classification of a term as either a `real' synthesising term (i.e.~without missing annotations or an outermost mode cast), a `real' checking term, or a term that has missing annotations.
+The lemma only performs some slight adjustment to obtain a derivation with any required mode.
+
+\begin{proof}[Proof of \cref{thm:adjustment}]
+Case analysis on the antecedent and~$\dir{d}$.
 \begin{itemize}
 \item For the first disjunct with $\dir{d} = {\syn}$, the second disjunct with $\dir{d} = {\chk}$, and the third disjunct with $\dir{d} = {\chk}$:
 The mode we have matches the mode to be established, so no adjustment is needed.
@@ -97,16 +93,26 @@ Apply $\SynRule{Missing}$.
 \item For the third disjunct with $\dir{d} = {\syn}$:
 If $e = \False$, then the outermost rule of the derivation must be $\ChkRule{Sub}$, removing which we get a derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$;
 otherwise $e = \True$, in which case we can apply $\SynRule{Missing}$.
+\vspace{-\topsep-\baselineskip}
 \end{itemize}
-Now we prove statement~(\ref{eq:preprocess'}) with a case analysis on~$t$.
+\end{proof}
+
+\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
+For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+\end{theorem}
+
+\begin{proof}
+The conclusion is the same as that of \cref{thm:adjustment}, so it suffices to prove the antecedent of \cref{thm:adjustment} by induction on~$t$.
 \begin{itemize}
 \item $\Rule{Var}$:
 Establish the first disjunct using $\SynRule{Var}$.
 \item $\Rule{Anno}$ ($t \bbcolon A$):
-By statement~(\ref{eq:preprocess}) in the induction hypothesis, there is a derivation of $V |-_{\Sigma,\Omega} t^{\chk\,v\,e}$ for some boolean $v$~and~$e$.
+By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\chk\,v\,e}$ for some boolean $v$~and~$e$.
 If $v = \False$, establish the third conjunct using $\SynRule{Anno}$ and $\ChkRule{Sub}$; otherwise, establish the first conjunct using $\ChkRule{Sub}$.
-\item $\Rule{Op}$:
-By statement~(\ref{eq:preprocess}) in the induction hypothesis, there is a derivation of $V |-_{\Sigma,\Omega} t_i^{\dir{d_i}\,v_i\,e_i}$ for all the sub-terms~$t_i$.
+\item $\Rule{Op}$ ($\tmOpts$):
+By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} t_i^{\dir{d_i}\,v_i\,e_i}$ for each sub-term~$t_i$, and by applying $\Rule{Op}$ we get a derivation of $V |-_{\Sigma,\Omega} \tmOpts^{\dir d\,v\,\True}$ where $v = \bigwedge_i v_i$.
+If $v = \True$, establish the first or second disjunct depending on~$\dir d$; otherwise, establish the third disjunct, applying $\ChkRule{Sub}$ if $\dir d = {\syn}$.
+\vspace{-\topsep-\baselineskip}
 \end{itemize}
 \end{proof}
 

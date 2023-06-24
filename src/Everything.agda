@@ -31,7 +31,7 @@ import Theory.Soundness
 import Theory.Pre.Term
 import Theory.Pre.Annotatability
 import Theory.Pre.TypingErasure
-import Theory.Bidirectionalisation
+import Theory.ModePreprocessing
 import Theory.Completeness
 
 import Example.Outline

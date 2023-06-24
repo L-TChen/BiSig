@@ -120,8 +120,8 @@ data Pre : Mode → {n : ℕ} → Raw n → Set where
 -- Wherever a checked term needs to be used as an synthesised term,
 -- a type annotation is necessary, e.g., app (abs t ∋ imp B A) u
 
-Bidirectionalisation : Set
-Bidirectionalisation = ∀ {n} (r : Raw n) → Dec (Pre Syn r)
+ModePreprocessing : Set
+ModePreprocessing = (d : Mode) {n : ℕ} (r : Raw n) → Dec (Pre d r)
 
 -- Second step: bidirectional type synthesis
 -- If a bidirectional type system is designed well (i.e., mode-correct),
@@ -274,10 +274,10 @@ typingErasure (abs t)   = abs (typingErasure t)
 -- Implementing a type synthesiser using a bidirectional one
 
 synthesise
-  : Bidirectionalisation → TypeSynthesis⇔
+  : ModePreprocessing → TypeSynthesis⇔
   → Soundness → Completeness
   → TypeSynthesis (¬_ ∘ Pre Syn)
-synthesise bidir syn⇔ s c Γ r with bidir r
+synthesise pre syn⇔ s c Γ r with pre Syn r
 ... | yes p = inl (map′ (map₂ s) (map₂ (c p)) (syn⇔ Γ p))
 ... | no ¬p = inr ¬p
 
@@ -344,42 +344,45 @@ mutual
   to¬Pre (app p p' (tl hd)) (app q q') = to¬Pre p' q'
   to¬Pre (abs p)            (abs q)    = to¬Pre p q
 
-Bidirectionalisation? : Set
-Bidirectionalisation? = ∀ {n} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e Syn r
+ModePreprocessing? : Set
+ModePreprocessing? =
+  (d : Mode) {n : ℕ} (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
 
-Bidirectionalisation-lemma : Bidirectionalisation? → Bidirectionalisation
-Bidirectionalisation-lemma bidir? r with bidir? r
+ModePreprocessing-lemma : ModePreprocessing? → ModePreprocessing
+ModePreprocessing-lemma pre? d r with pre? d r
 ... | false , _ , p = no (to¬Pre p)
 ... | true  , _ , p = yes (toPre p)
 
-mutual
+Classification : ∀ {n} → Raw n → Set
+Classification r = Pre? true  true Syn r
+          ⊎        Pre? true  true Chk r
+          ⊎ ∃[ e ] Pre? false e    Chk r
 
-  bidirectionalise : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
-  bidirectionalise d   r with bidirectionalise' r
-  bidirectionalise Chk r | inl               p     = _ , _ ,    p ↑
-  bidirectionalise Syn r | inl               p     = _ , _ ,    p
-  bidirectionalise Chk r | inr (inl          p   ) = _ , _ ,    p
-  bidirectionalise Syn r | inr (inl          p   ) = _ , _ , ?∋ p
-  bidirectionalise Chk r | inr (inr (_     , p  )) = _ , _ ,    p
-  bidirectionalise Syn r | inr (inr (false , p ↑)) = _ , _ ,    p
-  bidirectionalise Syn r | inr (inr (true  , p  )) = _ , _ , ?∋ p
+adjustMode : (d : Mode) {r : Raw n}
+           → Classification r → ∃[ v ] ∃[ e ] Pre? v e d r
+adjustMode Chk (inl               p    ) = _ , _ ,    p ↑
+adjustMode Syn (inl               p    ) = _ , _ ,    p
+adjustMode Chk (inr (inl          p   )) = _ , _ ,    p
+adjustMode Syn (inr (inl          p   )) = _ , _ , ?∋ p
+adjustMode Chk (inr (inr (_     , p  ))) = _ , _ ,    p
+adjustMode Syn (inr (inr (false , p ↑))) = _ , _ ,    p
+adjustMode Syn (inr (inr (true  , p  ))) = _ , _ , ?∋ p
 
-  bidirectionalise'
-    : (r : Raw n)
-    →        Pre? true  true Syn r
-    ⊎        Pre? true  true Chk r
-    ⊎ ∃[ e ] Pre? false e    Chk r
-  bidirectionalise' (` i) = inl (` i)
-  bidirectionalise' (A ∋ r) with bidirectionalise Chk r
-  ... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
-  ... | true  , _ , p = inl (          A ∋ p    )
-  bidirectionalise' (app r s) with bidirectionalise Syn r | bidirectionalise Chk s
-  ... | false , _ , p | v     , _ , q = inr (inr (_ , app p q  hd        ↑))
-  ... | true  , _ , p | false , _ , q = inr (inr (_ , app p q (tl  hd)   ↑))
-  ... | true  , _ , p | true  , _ , q = inl (         app p q (tl (tl nil)))
-  bidirectionalise' (abs r) with bidirectionalise Chk r
-  ... | false , _ , p = inr (inr (_ , abs p))
-  ... | true  , _ , p = inr (inl (    abs p))
+preprocess' : (r : Raw n) → Classification r
+preprocess' (` i) = inl (` i)
+preprocess' (A ∋ r) with adjustMode Chk (preprocess' r)
+... | false , _ , p = inr (inr (_ , (A ∋ p) ↑))
+... | true  , _ , p = inl (          A ∋ p    )
+preprocess' (app r s) with adjustMode Syn (preprocess' r) | adjustMode Chk (preprocess' s)
+... | false , _ , p | v     , _ , q = inr (inr (_ , app p q  hd        ↑))
+... | true  , _ , p | false , _ , q = inr (inr (_ , app p q (tl  hd)   ↑))
+... | true  , _ , p | true  , _ , q = inl (         app p q (tl (tl nil)))
+preprocess' (abs r) with adjustMode Chk (preprocess' r)
+... | false , _ , p = inr (inr (_ , abs p))
+... | true  , _ , p = inr (inl (    abs p))
+
+preprocess? : ModePreprocessing?
+preprocess? d = adjustMode d ∘ preprocess'
 
 infix 3 _≤ᴬ_
 

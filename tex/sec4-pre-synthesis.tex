@@ -5,67 +5,157 @@
 \subsection{Soundness and Completeness}
 \label{sec:soundness-and-completeness}
 
-\Josh{$\frac{2}{3}$~pages}
+\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
-\begin{theorem}[Soundness]\label{thm:term-soundness}
-    
-\end{theorem}
+Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation.
 
-\begin{theorem}[Completeness]\label{thm:term-completeness}
-    
-\end{theorem}
+\begin{lemma}[Soundness]\label{thm:term-soundness}
+If\/ $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, then $\Gamma \vdash_{\Sigma, \erase\Omega} t : A$.
+\end{lemma}
 
-\begin{theorem}[Typing Erasure]\label{thm:typing-erasure}
-    
-\end{theorem}
+\begin{proof}
+Induction on the given derivation, mapping every bidirectional typing rule to its mode-less counterpart except $\ChkRule{Sub}$, in which case the induction hypothesis $\Gamma |-_{\Sigma,\erase\Omega} t : B$ suffices due to the premise $B = A$.
+\end{proof}
+
+We can also remove typing and retain mode information, arriving at a mode derivation instead.
+
+\begin{proposition}\label{thm:typing-removal}
+If\/ $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, then $\erase\Gamma \vdash_{\Sigma, \Omega} t^\dir{d}$.
+\end{proposition}
+
+\begin{proof}
+Induction on the given derivation, mapping every rule to its counterpart.
+\end{proof}
+
+Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation.
+
+\begin{lemma}[Completeness]\label{thm:term-completeness}
+If\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$, then $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$.
+\end{lemma}
+
+\begin{proof}
+Induction on the given mode derivation.
+For \SynRule{Var}, \SynRule{Anno}, and \Rule{Op}, the outermost rule used in the given typing derivation must be the corresponding typing rule, so by the induction hypotheses we have bidirectional typing derivations for all the sub-terms, to which we can then apply the corresponding bidirectional typing rule.
+The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis directly gives us a derivation of $\Gamma |-_{\Sigma,\Omega} t \syn A$, to which we apply $\ChkRule{Sub}$.
+\end{proof}
+
+In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
 
 \subsection{Mode Preprocessing}
 \label{sec:mode-preprocessing}
+
+\newcommand{\True}{\mathbf{T}}
+\newcommand{\False}{\mathbf{F}}
+
+\begin{figure}
+  \centering
+  \small
+  \begin{tabular}{ r r l }
+    & & is in (generalised) mode~$d$, \\
+    $\smash{\boxed{V |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}\,v\,e}}}$
+    & The raw term~$\isTerm{t}$\hspace{-.6em}
+    & misses some type annotation iff $v = \False$, and \\
+    & & has an outermost mode cast iff $e = \False$
+  \end{tabular}
+  \begin{mathpar}
+    \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn\,\True\,\True}}\,\SynRule{Var}
+    \and
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,v\,e}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn\,v\,\True}}\,\SynRule{Anno}
+    \and
+    \inferrule{V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,v\,\True}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,\False\,\False}}\,\SynRule{Missing}
+    \and
+    \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,v\,\True}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk\,v\,\False}}\,\ChkRule{Sub}
+    \and
+    \inferrule{V, \vec x_1 |-_{\Sigma, \Omega} \isTerm{t_1}^{\dir{d_1}\,v_1\,e_1} \\ \cdots \\ V, \vec x_n |-_{\Sigma, \Omega} \isTerm{t_n}^{\dir{d_n}\,v_n\,e_n}}
+    {V |-_{\Sigma, \Omega} \tmOpts^{\dir{d}\,(\bigwedge_i v_i)\,\True}}\,\Rule{Op}
+  \end{mathpar}
+  \caption{Generalised mode derivations}
+\end{figure}
+
+\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
+For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+\end{theorem}
+
+\begin{proof}
+By induction on~$t$, we prove the rest of the theorem statement
+\begin{equation}\label{eq:preprocess}
+\forall d.~\exists v, e.~V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}
+\end{equation}
+in conjunction with
+\begin{equation}\label{eq:preprocess'}
+V |- t^{\syn\,\True\,\True} ~~\vee~~ V |- t^{\chk\,\True\,\True} ~~\vee~~ \exists e.~V |- t^{\chk\,\False\,e}
+\end{equation}
+Intuitively, statement~(\ref{eq:preprocess'}) gives a precise classification of a term as either a `real' synthesising term (i.e.~without missing annotations or an outermost mode cast), a `real' checking term, or a term that has missing annotations.
+After a derivation is constructed for statement~(\ref{eq:preprocess'}), we can perform some slight adjustment to obtain a desired derivation for statement~(\ref{eq:preprocess}) depending on~$d$:
+\begin{itemize}
+\item For the first disjunct with $\dir{d} = {\syn}$, the second disjunct with $\dir{d} = {\chk}$, and the third disjunct with $\dir{d} = {\chk}$:
+The mode we have matches the mode to be established, so no adjustment is needed.
+\item For the first disjunct with $\dir{d} = {\chk}$:
+Apply $\ChkRule{Sub}$.
+\item For the second disjunct with $\dir{d} = {\syn}$:
+Apply $\SynRule{Missing}$.
+\item For the third disjunct with $\dir{d} = {\syn}$:
+If $e = \False$, then the outermost rule of the derivation must be $\ChkRule{Sub}$, removing which we get a derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$;
+otherwise $e = \True$, in which case we can apply $\SynRule{Missing}$.
+\end{itemize}
+Now we prove statement~(\ref{eq:preprocess'}) with a case analysis on~$t$.
+\begin{itemize}
+\item $\Rule{Var}$:
+Establish the first disjunct using $\SynRule{Var}$.
+\item $\Rule{Anno}$ ($t \bbcolon A$):
+By statement~(\ref{eq:preprocess}) in the induction hypothesis, there is a derivation of $V |-_{\Sigma,\Omega} t^{\chk\,v\,e}$ for some boolean $v$~and~$e$.
+If $v = \False$, establish the third conjunct using $\SynRule{Anno}$ and $\ChkRule{Sub}$; otherwise, establish the first conjunct using $\ChkRule{Sub}$.
+\item $\Rule{Op}$:
+By statement~(\ref{eq:preprocess}) in the induction hypothesis, there is a derivation of $V |-_{\Sigma,\Omega} t_i^{\dir{d_i}\,v_i\,e_i}$ for all the sub-terms~$t_i$.
+\end{itemize}
+\end{proof}
+
+\begin{lemma}\label{thm:Pre?-true}
+If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,e}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
+\end{lemma}
+
+\begin{lemma}\label{thm:Pre?-false}
+If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,e}$, then $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
+\end{lemma}
+
+\begin{corollary}[Mode Preprocessing]\label{thm:mode-preprocessing}
+  It is decidable for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$ whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.
+\end{corollary}
+
+\begin{proof}
+By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+If $v = \True$, then $V |-_{\Sigma,\Omega} t^\dir{d}$ by \cref{thm:Pre?-true}; otherwise $V \not|-_{\Sigma,\Omega} t^\dir{d}$ by \cref{thm:Pre?-false}.
+\end{proof}
+
+\begin{corollary}
+If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,e}$ for some boolean~$e$.
+\end{corollary}
+
+\begin{corollary}
+If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,e}$ for some boolean~$e$.
+\end{corollary}
+
+\begin{proof}
+By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+Either $v = \True$ or $v = \False$.
+If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $v$ has to be $\True$ since $v = \False$ leads to a contradiction with \cref{thm:Pre?-false}.
+Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $v$ has to be $\False$ so as not to contradict \cref{thm:Pre?-true}.
+\end{proof}
 
 \Josh{($1\frac{1}{2}$~pages)
 
 • Generalised mode derivations and bidirectionalisation
 
+• Intuitive meaning of $v$~and~$e$
+
 • Decidability of the original mode judgements
 
 }
 
-\begin{proposition}[Decidability for Bidirectionalisation] \label{thm:bidirectionalisation}
-  It is decidable whether a raw term~$\isTerm{t}$ is in mode~$d$ for any $\isTerm{t}$ and $d$.
-\end{proposition}
-
-\subsection{Annotatability is not Completeness}
+\subsection{Annotatability Is Not Completeness}
 \label{sec:annotatability}
 
 \Josh{$\frac{1}{2}$~pages}
-
-\begin{figure}
-  \centering
-  \small
-  \bgroup
-  \renewcommand{\arraystretch}{1.5}
-  \begin{tabular}{ r l }
-    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $\isTerm{t}$ is a raw term possibly with missing annotation or redundant casts in mode $d$ \\
-    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $\isTerm{t}$ is a raw term without missing annotation \\
-    $\boxed{|-_{\Sigma, \Omega} \isTerm{t}\;\dir{d}}$ & $\isTerm{t}$ is a raw term without redundant casts \\
-  \end{tabular}
-  \egroup
-  \LT{Design a notation for \textsf{Pre?} so that a raw term without missing annotation or redundant casts is exactly the intersection of these two cases.}
-  \begin{mathpar}
-    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}\,\SynRule{Anno?}
-    \and
-    \inferrule{\isTerm{x} : \Identifier}{|-_{\Sigma, \Omega} \isTerm{x}^{\syn}}
-    \and
-    \inferrule{|-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{|-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}
-    \and
-    \inferrule{|-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{|-_{\Sigma, \Omega} \isTerm{t}^{\chk}}
-    \and
-    \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
-    {|-_{\Sigma, \Omega} \tmOpts^\dir{d}}
-  \end{mathpar}
-  \caption{Preprocessed raw terms, II}
-  \label{fig:raw-with-missing-annotations}
-\end{figure}
 
 \begin{figure}
   \centering\small

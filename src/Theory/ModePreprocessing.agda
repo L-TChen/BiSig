@@ -22,32 +22,22 @@ open import Theory.Pre.Term                     BD
 private variable
   n Ξ : ℕ
 
-Classification : ∀ {n} → Raw n → Set
-Classification r = ∃[ d ] (Pre? true true d r ⊎ ∃[ e ] Pre? false e d r)
-
 adjustMode : (d : Mode) {r : Raw n}
-           → Classification r → ∃[ v ] ∃[ e ] Pre? v e d r
-adjustMode Chk (Chk , inl             p   ) = _ , _ ,    p
-adjustMode Syn (Chk , inl             p   ) = _ , _ , ?∋ p
-adjustMode Chk (Syn , inl             p   ) = _ , _ ,    p ↑
-adjustMode Syn (Syn , inl             p   ) = _ , _ ,    p
-adjustMode Chk (Chk , inr (e     ,    p  )) = _ , _ ,    p
-adjustMode Syn (Chk , inr (false ,    p ↑)) = _ , _ ,    p
-adjustMode Syn (Chk , inr (true  ,    p  )) = _ , _ , ?∋ p
-adjustMode Chk (Syn , inr (false , ?∋ p  )) = _ , _ ,    p
-adjustMode Chk (Syn , inr (true  ,    p  )) = _ , _ ,    p ↑
-adjustMode Syn (Syn , inr (e     ,    p  )) = _ , _ ,    p
+           → ∃[ v ] ∃[ d' ] Pre? v true d' r
+           → ∃[ v ] ∃[ e  ] Pre? v e    d  r
+adjustMode Chk (_ , Chk , p) = _ , _ ,    p
+adjustMode Chk (_ , Syn , p) = _ , _ ,    p ↑
+adjustMode Syn (_ , Chk , p) = _ , _ , ?∋ p
+adjustMode Syn (_ , Syn , p) = _ , _ ,    p
 
 mutual
 
-  preprocess' : (r : Raw n) → Classification r
-  preprocess' (` i)   = _ , inl (` i)
+  preprocess' : (r : Raw n) → ∃[ v ] ∃[ d ] Pre? v true d r
+  preprocess' (` i) = _ , _ , ` i
   preprocess' (A ∋ r) with adjustMode Chk (preprocess' r)
-  ... | false , _ , p = _ , inr (_ , A ∋ p)
-  ... | true  , _ , p = _ , inl (    A ∋ p)
+  ... | _ , _ , p = _ , _ , A ∋ p
   preprocess' (op (i , rs)) with preprocessᶜ (BD .rules i) rs
-  ... | false , _ , p = _ , inr (_ , op (refl , p))
-  ... | true  , _ , p = _ , inl (    op (refl , p))
+  ... | _ , _ , p = _ , _ , op (refl , p)
 
   preprocessᶜ
     : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)

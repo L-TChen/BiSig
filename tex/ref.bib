@@ -1,5 +1,179 @@
 
 
+@article{Wells1999,
+  author =        {Wells, Joe B.},
+  journal =       {Annals of Pure and Applied Logic},
+  month =         jun,
+  number =        {1-3},
+  pages =         {111--156},
+  title =         {Typability and type checking in {System F} are
+                   equivalent and undecidable},
+  volume =        {98},
+  year =          {1999},
+  abstract =      {Girard and Reynolds independently invented System F
+                   (a.k.a. the second-order polymorphically typed lambda
+                   calculus) to handle problems in logic and computer
+                   programming language design, respectively. Viewing F
+                   in the Curry style, which associates types with
+                   untyped lambda terms, raises the questions of
+                   typability and type checking. Typability asks for a
+                   term whether there exists some type it can be given.
+                   Type checking asks, for a particular term and type,
+                   whether the term can be given that type. The
+                   decidability of these problems has been settled for
+                   restrictions and extensions of F and related systems
+                   and complexity lower-bounds have been determined for
+                   typability in F, but this report is the first to
+                   resolve whether these problems are decidable for
+                   System F. This report proves that type checking in F
+                   is undecidable, by a reduction from semi-unification,
+                   and that typability in F is undecidable, by a
+                   reduction from type checking. Because there is an
+                   easy reduction from typability to type checking, the
+                   two problems are equivalent. The reduction from type
+                   checking to typability uses a novel method of
+                   constructing lambda terms that simulate arbitrarily
+                   chosen type environments. All of the results also
+                   hold for the λI-calculus. {\copyright} 1999
+                   Published by Elsevier Science B.V. All rights
+                   reserved.},
+  doi =           {10.1016/S0168-0072(98)00047-5},
+  issn =          {01680072},
+  url =           {https://linkinghub.elsevier.com/retrieve/pii/
+                  S0168007298000475},
+}
+
+@inproceedings{Dowek1993,
+  address =       {Berlin, Heidelberg},
+  author =        {Dowek, Gilles},
+  booktitle =     {Typed Lambda Calculi and Applications. TLCA 1993},
+  editor =        {Bezem, Marc and Groote, Jan Friso},
+  pages =         {139--145},
+  publisher =     {Springer},
+  series =        {Lecture Notes in Computer Science},
+  title =         {The undecidability of typability in the
+                   Lambda-Pi-calculus},
+  volume =        {664},
+  year =          {1993},
+  abstract =      {The set of pure terms which are typable in the
+                   $\lambda$II-calculus in a given context is not
+                   recursive. So there is no general type inference
+                   algorithm for the programming language Elf and, in
+                   some cases, some type information has to be mentioned
+                   by the programmer.},
+  doi =           {10.1007/BFb0037103},
+  isbn =          {978-3-540-47586-6},
+}
+
+@article{Dunfield2021,
+  address =       {New York, NY, USA},
+  author =        {Dunfield, Jana and Krishnaswami, Neel},
+  journal =       {ACM Computing Surveys},
+  month =         may,
+  number =        {5},
+  pages =         {98:1--98:38},
+  publisher =     {Association for Computing Machinery},
+  title =         {Bidirectional typing},
+  volume =        {54},
+  year =          {2021},
+  abstract =      {Bidirectional typing combines two modes of typing:
+                   type checking, which checks that a program satisfies
+                   a known type, and type synthesis, which determines a
+                   type from the program. Using checking enables
+                   bidirectional typing to support features for which
+                   inference is undecidable; using synthesis enables
+                   bidirectional typing to avoid the large annotation
+                   burden of explicitly typed languages. In addition,
+                   bidirectional typing improves error locality. We
+                   highlight the design principles that underlie
+                   bidirectional type systems, survey the development of
+                   bidirectional typing from the prehistoric period
+                   before Pierce and Turner's local type inference to
+                   the present day, and provide guidance for future
+                   investigations.},
+  doi =           {10.1145/3450952},
+  issn =          {0360-0300},
+  url =           {https://doi.org/10.1145/3450952},
+}
+
+@article{Pierce2000,
+  address =       {New York, NY, USA},
+  author =        {Pierce, Benjamin C. and Turner, David N.},
+  journal =       {ACM Transactions on Programming Languages and
+                   Systems},
+  month =         {jan},
+  number =        {1},
+  pages =         {1--44},
+  publisher =     {Association for Computing Machinery},
+  title =         {Local type inference},
+  volume =        {22},
+  year =          {2000},
+  abstract =      {We study two partial type inference methods for a
+                   language combining subtyping and impredicative
+                   polymorphism. Both methods are local in the sense
+                   that missing annotations are recovered using only
+                   information from adjacent nodes in the syntax tree,
+                   without long-distance constraints such as unification
+                   variables. One method infers type arguments in
+                   polymorphic applications using a local constraint
+                   solver. The other infers annotations on bound
+                   variables in function abstractions by propagating
+                   type constraints downward from enclosing application
+                   nodes. We motivate our design choices by a
+                   statistical analysis of the uses of type inference in
+                   a sizable body of existing ML code.},
+  doi =           {10.1145/345099.345100},
+  issn =          {0164-0925},
+  url =           {https://doi.org/10.1145/345099.345100},
+}
+
+@article{Peyton-Jones2007,
+  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
+                   Weirich, Stephanie and Shields, Mark},
+  journal =       {Journal of Functional Programming},
+  number =        {1},
+  pages =         {1--82},
+  publisher =     {Cambridge University Press},
+  title =         {Practical type inference for arbitrary-rank types},
+  volume =        {17},
+  year =          {2007},
+  doi =           {10.1017/S0956796806006034},
+}
+
+@inproceedings{Dunfield2013,
+  address =       {New York, NY, USA},
+  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
+  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
+                   Conference on Functional Programming},
+  pages =         {429--442},
+  publisher =     {Association for Computing Machinery},
+  series =        {ICFP '13},
+  title =         {Complete and easy bidirectional typechecking for
+                   higher-rank polymorphism},
+  year =          {2013},
+  abstract =      {Bidirectional typechecking, in which terms either
+                   synthesize a type or are checked against a known
+                   type, has become popular for its scalability (unlike
+                   Damas-Milner type inference, bidirectional typing
+                   remains decidable even for very expressive type
+                   systems), its error reporting, and its relative ease
+                   of implementation. Following design principles from
+                   proof theory, bidirectional typing can be applied to
+                   many type constructs. The principles underlying a
+                   bidirectional approach to polymorphism, however, are
+                   less obvious. We give a declarative, bidirectional
+                   account of higher-rank polymorphism, grounded in
+                   proof theory; this calculus enjoys many properties
+                   such as eta-reduction and predictability of
+                   annotations. We give an algorithm for implementing
+                   the declarative system; our algorithm is remarkably
+                   simple and well-behaved, despite being both sound and
+                   complete.},
+  doi =           {10.1145/2500365.2500582},
+  isbn =          {9781450323260},
+  url =           {https://doi.org/10.1145/2500365.2500582},
+}
+
 @inproceedings{Xie2018,
   address =       {Cham},
   author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
@@ -25,14 +199,6 @@
   isbn =          {978-3-319-89884-1},
 }
 
-@book{Wadler2022,
-  author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
-  month =         aug,
-  title =         {Programming Language Foundations in \textsc{Agda}},
-  year =          {2022},
-  url =           {https://plfa.inf.ed.ac.uk/22.08/},
-}
-
 @inproceedings{Aydemir2005,
   address =       {Berlin, Heidelberg},
   author =        {Aydemir, Brian E. and Bohannon, Aaron and
@@ -56,70 +222,41 @@
   isbn =          {978-3-540-31820-0},
 }
 
-@inproceedings{Cimini2020,
-  address =       {New York, NY, USA},
-  author =        {Cimini, Matteo and Miller, Dale and Siek, Jeremy G.},
-  booktitle =     {Proceedings of the 13th ACM SIGPLAN International
-                   Conference on Software Language Engineering},
-  pages =         {108--125},
-  publisher =     {Association for Computing Machinery},
-  series =        {SLE 2020},
-  title =         {Extrinsically typed operational semantics for
-                   functional languages},
-  year =          {2020},
-  abstract =      {We present a type system over language definitions
-                   that classifies parts of the operational semantics of
-                   a language in input, and models a common language
-                   design organization. The resulting typing discipline
-                   guarantees that the language at hand is automatically
-                   type sound. Thanks to the use of types to model
-                   language design, our type checker has a high-level
-                   view on the language being analyzed and can report
-                   messages using the same jargon of language designers.
-                   We have implemented our type system in the
-                   lang-n-check tool, and we have applied it to derive
-                   the type soundness of several functional languages,
-                   including those with recursive types, polymorphism,
-                   exceptions, lists, sums, and several common types and
-                   operators.},
-  doi =           {10.1145/3426425.3426936},
-  isbn =          {9781450381765},
-  url =           {https://doi.org/10.1145/3426425.3426936},
+@book{Wadler2022,
+  author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
+  month =         aug,
+  title =         {Programming Language Foundations in \textsc{Agda}},
+  year =          {2022},
+  url =           {https://plfa.inf.ed.ac.uk/22.08/},
 }
 
-@inproceedings{Cimini2022,
-  address =       {New York, NY, USA},
-  author =        {Cimini, Matteo},
-  booktitle =     {Proceedings of the 15th ACM SIGPLAN International
-                   Conference on Software Language Engineering},
-  pages =         {16--29},
-  publisher =     {Association for Computing Machinery},
-  series =        {SLE 2022},
-  title =         {{Lang-n-Prove}: {A} {DSL} for language proofs},
-  year =          {2022},
-  abstract =      {Proofs of language properties often follow a schema
-                   that does not apply just to one language but, rather,
-                   applies to many languages of a certain class. In this
-                   paper, we present Lang-n-Prove, a domain-specific
-                   language for expressing theorems and proofs in such a
-                   way that they apply to many languages. The main
-                   characteristic of Lang-n-Prove is that it contains
-                   linguistic features that are specific to the domain
-                   of language design. We have used Lang-n-Prove to
-                   express the theorems and proofs of canonical forms
-                   lemmas, the progress theorem, and the type
-                   preservation theorem for a restricted class of
-                   functional languages. We have applied our
-                   Lang-n-Prove proofs to several functional languages,
-                   including languages with polymorphism, exceptions,
-                   recursive types, list operations, and other common
-                   types and operators. Our tool has generated the proof
-                   code in Abella that machine-checks the type safety of
-                   all these languages, when the correct code for
-                   substitution lemmas is provided.},
-  doi =           {10.1145/3567512.3567514},
-  isbn =          {9781450399197},
-  url =           {https://doi.org/10.1145/3567512.3567514},
+@inproceedings{Altenkirch1993,
+  address =       {Berlin, Heidelberg},
+  author =        {Altenkirch, Thorsten},
+  booktitle =     {Typed Lambda Calculi and Applications. TLCA 1993},
+  editor =        {Bezem, Marc and Groote, Jan Friso},
+  pages =         {13--28},
+  publisher =     {Springer},
+  series =        {Lecture Notes in Computer Science},
+  title =         {A formalization of the strong normalization proof for
+                   {System F} in {LEGO}},
+  volume =        {664},
+  year =          {1993},
+  abstract =      {We describe a complete formalization of a strong
+                   normalization proof for the Curry style presentation
+                   of System F in LEGO. The underlying type theory is
+                   the Calculus of Constructions enriched by inductive
+                   types. The proof follows Girard et al [GLT89], i.e.
+                   we use the notion of candidates of reducibility, but
+                   we make essential use of general inductive types to
+                   simplify the presentation. We discuss extensions and
+                   variations of the proof: the extraction of a
+                   normalization function, the use of saturated sets
+                   instead of candidates, and the extension to a Church
+                   Style presentation. We conclude with some general
+                   observations about Computer Aided Formal Reasoning.},
+  doi =           {10.1007/BFb0037095},
+  isbn =          {978-3-540-47586-6},
 }
 
 @article{Ahrens2018,
@@ -281,6 +418,44 @@
                   S0956796820000076/type/journal_article},
 }
 
+@inproceedings{Chapman2010,
+  address =       {New York, NY, USA},
+  author =        {Chapman, James and Dagand, Pierre-\'{E}variste and
+                   McBride, Conor and Morris, Peter},
+  booktitle =     {Proceedings of the 15th ACM SIGPLAN International
+                   Conference on Functional Programming},
+  pages =         {3--14},
+  publisher =     {Association for Computing Machinery},
+  series =        {ICFP '10},
+  title =         {The gentle art of levitation},
+  year =          {2010},
+  abstract =      {We present a closed dependent type theory whose
+                   inductive types are given not by a scheme for
+                   generative declarations, but by encoding in a
+                   universe. Each inductive datatype arises by
+                   interpreting its description - a first-class value in
+                   a datatype of descriptions. Moreover, the latter
+                   itself has a description. Datatype-generic
+                   programming thus becomes ordinary programming. We
+                   show some of the resulting generic operations and
+                   deploy them in particular, useful ways on the
+                   datatype of datatype descriptions itself. Simulations
+                   in existing systems suggest that this apparently
+                   self-supporting setup is achievable without paradox
+                   or infinite regress.},
+  doi =           {10.1145/1863543.1863547},
+  url =           {https://doi.org/10.1145/1863543.1863547},
+}
+
+@unpublished{Aczel1978,
+  author =        {Aczel, Peter},
+  note =          {Unpublished note},
+  title =         {A general {Church}--{Rosser} theorem},
+  year =          {1978},
+  url =           {http://www.ens-lyon.fr/LIP/REWRITING/MISC/AGeneralChurch-
+                  RosserTheorem.pdf},
+}
+
 @inproceedings{Fiore1999,
   address =       {Trento, Italy},
   author =        {Fiore, Marcelo P. and Plotkin, Gordon D. and
@@ -295,48 +470,6 @@
   isbn =          {0-7695-0158-3},
   url =           {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?
                   arnumber=782615},
-}
-
-@article{Hirschowitz2010,
-  author =        {Hirschowitz, Andr{\'e} and Maggesi, Marco},
-  journal =       {Information and Computation},
-  note =          {Special Issue: 14th Workshop on Logic, Language,
-                   Information and Computation (WoLLIC 2007)},
-  number =        {5},
-  pages =         {545--564},
-  title =         {Modules over monads and initial semantics},
-  volume =        {208},
-  year =          {2010},
-  abstract =      {Inspired by the classical theory of modules over a
-                   monoid, we introduce the natural notion of module
-                   over a monad. The associated notion of morphism of
-                   left modules (``linear'' natural transformations)
-                   captures an important property of compatibility with
-                   substitution, not only in the so-called homogeneous
-                   case but also in the heterogeneous case where
-                   ``terms'' and variables therein could be of different
-                   types. In this paper, we present basic constructions
-                   of modules and we show how modules allow a new point
-                   of view concerning higher-order syntax and
-                   semantics.},
-  doi =           {https://doi.org/10.1016/j.ic.2009.07.003},
-  issn =          {0890-5401},
-  url =           {https://www.sciencedirect.com/science/article/pii/
-                  S0890540109002405},
-}
-
-@article{Ahrens2021,
-  author =        {Ahrens, Benedikt and Hirschowitz, Andr{\'e} and
-                   Lafont, Ambroise and Maggesi, Marco},
-  journal =       {Logical Methods in Computer Science},
-  month =         may,
-  number =        {2},
-  pages =         {17:1--17:28},
-  title =         {Presentable signatures and initial semantics},
-  volume =        {17},
-  year =          {2021},
-  doi =           {10.23638/LMCS-17(2:17)2021},
-  url =           {https://lmcs.episciences.org/7511},
 }
 
 @inproceedings{Arkor2020,
@@ -373,25 +506,6 @@
   url =           {https://doi.org/10.1145/3373718.3394771},
 }
 
-@inproceedings{Hirschowitz2022,
-  address =       {Cham},
-  author =        {Hirschowitz, Andr{\'{e}} and Hirschowitz, Tom and
-                   Lafont, Ambroise and Maggesi, Marco},
-  booktitle =     {Foundations of Software Science and Computation
-                   Structures. FoSSaCS 2022},
-  editor =        {Bouyer, Patricia and Schr{\"{o}}der, Lutz},
-  pages =         {389--408},
-  publisher =     {Springer},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Variable binding and substitution for (nameless)
-                   dummies},
-  volume =        {13242},
-  year =          {2022},
-  doi =           {10.1007/978-3-030-99253-8_20},
-  isbn =          {9783030992521},
-  issn =          {16113349},
-}
-
 @inproceedings{Fiore2013,
   address =       {New Orleans, LA, USA},
   author =        {Fiore, Marcelo and Hamana, Makoto},
@@ -423,18 +537,74 @@
   doi =           {10.1007/978-3-642-19805-2_26},
 }
 
-@article{Hamana2022,
-  author =        {Hamana, Makoto},
-  journal =       {Mathematical Structures in Computer Science},
-  number =        {4},
-  pages =         {542--573},
-  publisher =     {Cambridge University Press},
-  title =         {Complete algebraic semantics for second-order
-                   rewriting systems based on abstract syntax with
-                   variable binding},
+@article{Cartmell1986,
+  author =        {Cartmell, John},
+  journal =       {Annals of Pure and Applied Logic},
+  pages =         {209-243},
+  title =         {Generalised algebraic theories and contextual
+                   categories},
   volume =        {32},
-  year =          {2022},
-  doi =           {10.1017/S0960129522000287},
+  year =          {1986},
+  doi =           {10.1016/0168-0072(86)90053-9},
+  issn =          {0168-0072},
+  url =           {https://www.sciencedirect.com/science/article/pii/
+                  0168007286900539},
+}
+
+@article{Bezem2021,
+  author =        {Bezem, Marc and Coquand, Thierry and Dybjer, Peter and
+                   Escard{\'o}, Mart{\'\i}n H{\"o}tzel},
+  journal =       {Mathematical Structures in Computer Science},
+  month =         oct,
+  number =        {9},
+  pages =         {1--18},
+  title =         {On generalized algebraic theories and categories with
+                   families},
+  volume =        {31},
+  year =          {2021},
+  abstract =      {We give a syntax independent formulation of finitely
+                   presented generalized algebraic theories as initial
+                   objects in categories of categories with families
+                   (cwfs) with extra structure. To this end, we
+                   simultaneously define the notion of a presentation Σ
+                   of a generalized algebraic theory and the associated
+                   category CwF Σ of small cwfs with a Σ-structure and
+                   cwf-morphisms that preserve Σ-structure on the nose.
+                   Our definition refers to the purely semantic notion
+                   of uniform family of contexts, types, and terms in
+                   CwF Σ . Furthermore, we show how to syntactically
+                   construct an initial cwf with a Σ-structure. This
+                   result can be viewed as a generalization of
+                   Birkhoff's completeness theorem for equational logic.
+                   It is obtained by extending Castellan, Clairambault,
+                   and Dybjer's construction of an initial cwf. We
+                   provide examples of generalized algebraic theories
+                   for monoids, categories, categories with families,
+                   and categories with families with extra structure for
+                   some type formers of Martin-L{\"o}f type theory. The
+                   models of these are internal monoids, internal
+                   categories, and internal categories with families
+                   (with extra structure) in a small category with
+                   families. Finally, we show how to extend our
+                   definition to some generalized algebraic theories
+                   that are not finitely presented, such as the theory
+                   of contextual cwfs.},
+  doi =           {10.1017/S0960129521000268},
+  issn =          {0960-1295},
+  url =           {https://www.cambridge.org/core/product/identifier/
+                  S0960129521000268/type/journal_article},
+}
+
+@phdthesis{Valliappan2023,
+  address =       {Gothenburg, Sweden},
+  author =        {Valliappan, Nachiappan},
+  publisher =     {Chalmers},
+  school =        {Department of Computer Science \& Engineering,
+                   Chalmers University of Technology},
+  title =         {Modular Normalization with Types},
+  year =          {2023},
+  isbn =          {978-91-7905-850-0},
+  url =           {https://research.chalmers.se/en/publication/535726},
 }
 
 @phdthesis{Gast2004,
@@ -499,7 +669,6 @@
                    checkers},
   volume =        {4},
   year =          {2020},
-  numpages =      {28},
   abstract =      {Static typing can guide programmers if feedback is
                    immediate. Therefore, all major IDEs incrementalize
                    type checking in some way. However, prior approaches
@@ -522,88 +691,35 @@
   url =           {https://doi.org/10.1145/3428195},
 }
 
-@article{Pierce2000,
+@inproceedings{Cimini2020,
   address =       {New York, NY, USA},
-  author =        {Pierce, Benjamin C. and Turner, David N.},
-  journal =       {ACM Transactions on Programming Languages and
-                   Systems},
-  month =         {jan},
-  number =        {1},
-  pages =         {1--44},
+  author =        {Cimini, Matteo and Miller, Dale and Siek, Jeremy G.},
+  booktitle =     {Proceedings of the 13th ACM SIGPLAN International
+                   Conference on Software Language Engineering},
+  pages =         {108--125},
   publisher =     {Association for Computing Machinery},
-  title =         {Local type inference},
-  volume =        {22},
-  year =          {2000},
-  abstract =      {We study two partial type inference methods for a
-                   language combining subtyping and impredicative
-                   polymorphism. Both methods are local in the sense
-                   that missing annotations are recovered using only
-                   information from adjacent nodes in the syntax tree,
-                   without long-distance constraints such as unification
-                   variables. One method infers type arguments in
-                   polymorphic applications using a local constraint
-                   solver. The other infers annotations on bound
-                   variables in function abstractions by propagating
-                   type constraints downward from enclosing application
-                   nodes. We motivate our design choices by a
-                   statistical analysis of the uses of type inference in
-                   a sizable body of existing ML code.},
-  doi =           {10.1145/345099.345100},
-  issn =          {0164-0925},
-  url =           {https://doi.org/10.1145/345099.345100},
-}
-
-@article{Peyton-Jones2007,
-  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
-                   Weirich, Stephanie and Shields, Mark},
-  journal =       {Journal of Functional Programming},
-  number =        {1},
-  pages =         {1--82},
-  publisher =     {Cambridge University Press},
-  title =         {Practical type inference for arbitrary-rank types},
-  volume =        {17},
-  year =          {2007},
-  doi =           {10.1017/S0956796806006034},
-}
-
-@article{Dunfield2021,
-  address =       {New York, NY, USA},
-  author =        {Dunfield, Jana and Krishnaswami, Neel},
-  journal =       {ACM Computing Surveys},
-  month =         may,
-  number =        {5},
-  pages =         {98:1--98:38},
-  publisher =     {Association for Computing Machinery},
-  title =         {Bidirectional typing},
-  volume =        {54},
-  year =          {2021},
-  abstract =      {Bidirectional typing combines two modes of typing:
-                   type checking, which checks that a program satisfies
-                   a known type, and type synthesis, which determines a
-                   type from the program. Using checking enables
-                   bidirectional typing to support features for which
-                   inference is undecidable; using synthesis enables
-                   bidirectional typing to avoid the large annotation
-                   burden of explicitly typed languages. In addition,
-                   bidirectional typing improves error locality. We
-                   highlight the design principles that underlie
-                   bidirectional type systems, survey the development of
-                   bidirectional typing from the prehistoric period
-                   before Pierce and Turner's local type inference to
-                   the present day, and provide guidance for future
-                   investigations.},
-  doi =           {10.1145/3450952},
-  issn =          {0360-0300},
-  url =           {https://doi.org/10.1145/3450952},
-}
-
-@unpublished{Aczel1978,
-  author =        {Aczel, Peter},
-  note =          {Unpublished note},
-  title =         {A general {Church}--{Rosser} theorem},
-  year =          {1978},
-  url =           {http://www.ens-lyon.fr/LIP/REWRITING/MISC/AGeneralChurch-
-                  RosserTheorem.pdf},
+  series =        {SLE 2020},
+  title =         {Extrinsically typed operational semantics for
+                   functional languages},
+  year =          {2020},
+  abstract =      {We present a type system over language definitions
+                   that classifies parts of the operational semantics of
+                   a language in input, and models a common language
+                   design organization. The resulting typing discipline
+                   guarantees that the language at hand is automatically
+                   type sound. Thanks to the use of types to model
+                   language design, our type checker has a high-level
+                   view on the language being analyzed and can report
+                   messages using the same jargon of language designers.
+                   We have implemented our type system in the
+                   lang-n-check tool, and we have applied it to derive
+                   the type soundness of several functional languages,
+                   including those with recursive types, polymorphism,
+                   exceptions, lists, sums, and several common types and
+                   operators.},
+  doi =           {10.1145/3426425.3426936},
+  isbn =          {9781450381765},
+  url =           {https://doi.org/10.1145/3426425.3426936},
 }
 
 @inproceedings{Fiore2010,
@@ -635,5 +751,19 @@
   year =          {2022},
   doi =           {10.1145/3547629},
   url =           {https://doi.org/10.1145/3547629},
+}
+
+@article{Hamana2022,
+  author =        {Hamana, Makoto},
+  journal =       {Mathematical Structures in Computer Science},
+  number =        {4},
+  pages =         {542--573},
+  publisher =     {Cambridge University Press},
+  title =         {Complete algebraic semantics for second-order
+                   rewriting systems based on abstract syntax with
+                   variable binding},
+  volume =        {32},
+  year =          {2022},
+  doi =           {10.1017/S0960129522000287},
 }
 

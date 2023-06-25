@@ -2,10 +2,12 @@
 
 \section{Soundness, Completeness, and Mode Preprocessing}\label{sec:pre-synthesis}
 
+\Josh{Overview of the section}
+
 \subsection{Soundness and Completeness}
 \label{sec:soundness-and-completeness}
 
-\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
+%\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
 Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation.
 
@@ -55,7 +57,7 @@ In short, soundness and completeness are no more than the separation and combina
     $\smash{\boxed{V |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}\,v\,e}}}$
     & The raw term~$\isTerm{t}$\hspace{-.6em}
     & misses some type annotation iff $v = \False$, and \\
-    & & has an outermost mode cast iff $e = \False$
+    & & is in (generalised) mode~$d$ due to an outermost mode cast iff $e = \False$
   \end{tabular}
   \begin{mathpar}
     \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn\,\True\,\True}}\,\SynRule{Var}
@@ -74,76 +76,107 @@ In short, soundness and completeness are no more than the separation and combina
 
 \begin{lemma}\label{thm:adjustment}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
-\[ V |- t^{\syn\,\True\,\True} ~~\vee~~ V |- t^{\chk\,\True\,\True} ~~\vee~~ \exists e.~V |- t^{\chk\,\False\,e} \]
-then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+\begin{equation}\label{eq:classification}
+V |- t^{\syn\,\True\,\True} ~~\vee~~ V |- t^{\chk\,\True\,\True} ~~\vee~~ \exists e.~V |- t^{\chk\,\False\,e}
+\end{equation}
+then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some booleans $v$~and~$e$.
 \end{lemma}
 
-Intuitively, the antecedent gives a precise classification of a term as either a `real' synthesising term (i.e.~without missing annotations or an outermost mode cast), a `real' checking term, or a term that has missing annotations.
-The lemma only performs some slight adjustment to obtain a derivation with any required mode.
-
-\begin{proof}[Proof of \cref{thm:adjustment}]
-Case analysis on the antecedent and~$\dir{d}$.
-\begin{itemize}
-\item For the first disjunct with $\dir{d} = {\syn}$, the second disjunct with $\dir{d} = {\chk}$, and the third disjunct with $\dir{d} = {\chk}$:
-The mode we have matches the mode to be established, so no adjustment is needed.
-\item For the first disjunct with $\dir{d} = {\chk}$:
-Apply $\ChkRule{Sub}$.
-\item For the second disjunct with $\dir{d} = {\syn}$:
-Apply $\SynRule{Missing}$.
-\item For the third disjunct with $\dir{d} = {\syn}$:
-If $e = \False$, then the outermost rule of the derivation must be $\ChkRule{Sub}$, removing which we get a derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$;
-otherwise $e = \True$, in which case we can apply $\SynRule{Missing}$.
-\vspace{-\topsep-\baselineskip}
-\end{itemize}
+\begin{proof}
+Case analysis on statement~(\ref{eq:classification}) and~$\dir{d}$.
+%\begin{itemize}
+%\item For the first disjunct with $\dir{d} = {\syn}$, the second disjunct with $\dir{d} = {\chk}$, and the third disjunct with $\dir{d} = {\chk}$:
+%The mode we have matches the mode to be established, so no adjustment is needed.
+%\item For the first disjunct with $\dir{d} = {\chk}$:
+%Apply $\ChkRule{Sub}$.
+%\item For the second disjunct with $\dir{d} = {\syn}$:
+%Apply $\SynRule{Missing}$.
+%\item For the third disjunct with $\dir{d} = {\syn}$:
+%If $e = \False$, then the outermost rule of the derivation must be $\ChkRule{Sub}$, removing which we get a derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$;
+%otherwise $e = \True$, in which case we can apply $\SynRule{Missing}$.
+%\vspace{-\topsep-\baselineskip}
+%\end{itemize}
 \end{proof}
 
+Intuitively, statement~(\ref{eq:classification}) gives a precise classification of a term as either a `real' synthesising term (i.e.~without missing annotations or an outermost mode cast), a real checking term, or a term that has missing annotations.
+The lemma performs some slight adjustment that involves only outermost mode casts to switch an input derivation to any required mode.
+
 \begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
-For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
+For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some booleans $v$~and~$e$.
 \end{theorem}
 
 \begin{proof}
-The conclusion is the same as that of \cref{thm:adjustment}, so it suffices to prove the antecedent of \cref{thm:adjustment} by induction on~$t$.
+It suffices to prove statement~(\ref{eq:classification}) by induction on~$t$ and then apply \cref{thm:adjustment}.
 \begin{itemize}
 \item $\Rule{Var}$:
-Establish the first disjunct using $\SynRule{Var}$.
-\item $\Rule{Anno}$ ($t \bbcolon A$):
-By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\chk\,v\,e}$ for some boolean $v$~and~$e$.
-If $v = \False$, establish the third conjunct using $\SynRule{Anno}$ and $\ChkRule{Sub}$; otherwise, establish the first conjunct using $\ChkRule{Sub}$.
-\item $\Rule{Op}$ ($\tmOpts$):
-By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} t_i^{\dir{d_i}\,v_i\,e_i}$ for each sub-term~$t_i$, and by applying $\Rule{Op}$ we get a derivation of $V |-_{\Sigma,\Omega} \tmOpts^{\dir d\,v\,\True}$ where $v = \bigwedge_i v_i$.
-If $v = \True$, establish the first or second disjunct depending on~$\dir d$; otherwise, establish the third disjunct, applying $\ChkRule{Sub}$ if $\dir d = {\syn}$.
+A variable is a real synthesising term, so we establish the first disjunct using $\SynRule{Var}$.
+\item $\Rule{Anno}$:
+Let $t = (t' \bbcolon A)$.
+By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,v\,e}$ for some booleans $v$~and~$e$.
+If $v = \False$, then $t'$, and therefore~$t$, have missing annotations, and we establish the third disjunct using $\SynRule{Anno}$ and $\ChkRule{Sub}$; otherwise, $t$~is a real synthesising term, and we establish the first disjunct using $\ChkRule{Sub}$.
+\item $\Rule{Op}$:
+Let $t = \tmOpts$.
+By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,v_i\,e_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ and we get a derivation of $V |-_{\Sigma,\Omega} t^{\dir d\,v\,\True}$ where $v = \bigwedge_i v_i$.
+If $v = \True$, then $t$~is a real synthesising or checking term, and we establish the first or second disjunct depending on~$\dir d$; otherwise, some~$t_i$, and therefore~$t$, have missing annotations, and we establish the third disjunct, applying $\ChkRule{Sub}$ to get the mode right if $\dir d = {\syn}$.
 \vspace{-\topsep-\baselineskip}
 \end{itemize}
 \end{proof}
+
+\Josh{Separating generalised mode preprocessing into a lemma and a theorem to simplify the case analyses}
 
 \begin{lemma}\label{thm:Pre?-true}
 If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,e}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
+\begin{proof}
+Induction on the given derivation.
+The $\SynRule{Missing}$ rule cannot appear, and the other rules are mapped to their counterparts.
+\end{proof}
+
 \begin{lemma}\label{thm:Pre?-false}
 If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,e}$, then $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
+
+\begin{proof}
+Induction on the generalised mode derivation, in each case analysing an arbitrary mode derivation and showing that it cannot exist.
+The key case is $\SynRule{Missing}$, where we have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\chk\,v\,\True}$ for some boolean~$v$.
+We do not have an induction hypothesis and seem to get stuck, because $v$~is not necessarily~$\False$ --- indeed, $t$~may well be a real checking term, and this is where it is required to (but cannot) be synthesising.
+But all that matters here is that $t$~is \emph{exactly} in checking mode: if we continue to analyse the sub-derivation, the outermost rule must be $\Rule{Op}$ with $\dir d = {\chk}$, implying that $t$~has to be an operation in checking mode.
+Then a case analysis shows that it is impossible to have a (synthesising) mode derivation of $V |-_{\Sigma,\Omega} t^{\syn}$.
+%\begin{itemize}
+%\item $\SynRule{Anno}$:
+%Any mode derivation must also use $\SynRule{Anno}$ as the outermost rule, and then the induction hypothesis suffices.
+%\item $\ChkRule{Sub}$:
+%We have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$.
+%Any mode derivation of $V |-_{\Sigma,\Omega} t^{\chk}$ must use $\ChkRule{Chk}$ as the outermost rule.
+%(The $\Rule{Op}$ rule with $\dir d = {\chk}$ is impossible because the sub-derivation shows that $t$~is exactly a synthesising term.)
+%We then have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\syn}$, and can use the induction hypothesis.
+%\end{itemize}
+\end{proof}
 
 \begin{corollary}[Mode Preprocessing]\label{thm:mode-preprocessing}
   It is decidable for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$ whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.
 \end{corollary}
 
 \begin{proof}
-By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
-If $v = \True$, then $V |-_{\Sigma,\Omega} t^\dir{d}$ by \cref{thm:Pre?-true}; otherwise $V \not|-_{\Sigma,\Omega} t^\dir{d}$ by \cref{thm:Pre?-false}.
+By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,v\,e}$ for some booleans $v$~and~$e$, and then simply check~$v$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
 \end{proof}
 
-\begin{corollary}
+\begin{corollary}\label{thm:toPre?-true}
 If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,e}$ for some boolean~$e$.
 \end{corollary}
 
-\begin{corollary}
+\begin{corollary}\label{thm:toPre?-false}
 If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,e}$ for some boolean~$e$.
 \end{corollary}
 
-\begin{proof}
-By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,v\,e}$ for some boolean $v$~and~$e$.
-Either $v = \True$ or $v = \False$.
+Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} does not provide useful information.
+To prove \cref{thm:toPre?-false}, basically we have to construct a generalised mode derivation from scratch for a raw term, but this is exactly generalised mode preprocessing, so we can simply reuse \cref{thm:generalised-mode-preprocessing}.
+And \cref{thm:toPre?-true} can also be proved easily in the same way.
+
+\begin{proof}[Proofs of \cref{thm:toPre?-true,thm:toPre?-false}]
+
+By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,v\,e}$ for some booleans $v$~and~$e$.
 If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $v$ has to be $\True$ since $v = \False$ leads to a contradiction with \cref{thm:Pre?-false}.
 Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $v$ has to be $\False$ so as not to contradict \cref{thm:Pre?-true}.
 \end{proof}

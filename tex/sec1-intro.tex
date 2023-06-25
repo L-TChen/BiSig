@@ -76,9 +76,9 @@ Constructing the initial algebra of syntax trees can be as simple as defining an
 \end{remark}
 
 \begin{remark} \label{re:type-signature}
-The majority of existing theories treat types independently of terms, thereby excluding them from binding signatures.
-To the best of our knowledge, the only exception to this approach is found in the work of~\citet{Arkor2020}, which incorporates signatures and equations for both terms and types.
-Interestingly, this inclusion is critical for type synthesis when comparing a concrete type $N \bto N$ with an abstract type $A \bto B$, where $A$ and $B$ are type variables in a typing rule.
+Most of existing theories treat types independently of terms, thereby excluding them from signatures.
+To the best of our knowledge, the only exception to this approach is found in the work of~\citet{Arkor2020}, which incorporates signatures for both terms and types.
+Interestingly, this inclusion is critical for type synthesis for comparing a concrete type $N \bto N$ with an abstract type $A \bto B$, where $A$ and $B$ are type variables in a typing rule.
 \end{remark}
 
 While algebraic approaches for polymorphic type theories have been developed~\citep{Fiore2013,Hamana2011}, these approaches do not take subtyping into account.
@@ -90,8 +90,7 @@ Normalisation in its generic form remains elusive and recent advances in this li
 
 \paragraph{Type Checker Generation}
 While there have been some efforts to generate type checkers grounded in unification~\citep{Gast2004,Grewe2015}, it should be noted that approaches solely based on unification are not suited to handling more complex type theories.
-
-\cite{Pacak2020,Cimini2020}. 
+\LT{Check literature \cite{Pacak2020,Cimini2020}.} 
 
 \subsection{Plan and Contributions of this paper}
 

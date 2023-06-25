@@ -111,7 +111,7 @@ The `strictness' boolean~$s$ can be thought of as disrupting the formation of su
 Every rule other than the mode casts sets~$s$ to~$\True$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\False$.
 Furthermore, the sub-derivation of a mode cast has to be strict, so it is impossible to have consecutive mode casts.
 Another way to understand the role of~$s$ is that it makes the $\SynRule{Missing}$ rule precise: an annotation is truly missing only when a term is \emph{strictly} in checking mode but is required to be in synthesising mode.
-Now we can show that non-genuine derivations are `truly non-genuine'.
+With strictness coming into play, non-genuine derivations are now `truly non-genuine'.
 
 \begin{proof}[Proof of \cref{thm:Pre?-false}]
 Induction on the generalised mode derivation, in each case analysing an arbitrary mode derivation and showing that it cannot exist.
@@ -136,37 +136,40 @@ Now we are almost ready to construct a generalised mode preprocessor.
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{theorem}
 
-The theorem could be proved directly, but that would take some messy case analyses that inspect the input term and apply mode casts depending on what modes are required all at once.
-Instead, we distill the case analysis that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:classification}) is then established by induction in the proof of \cref{thm:generalised-mode-preprocessing}, which does not need to deal with mode casts anymore.
+The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term and apply mode casts depending on what modes are required.
+Instead, we distill the case analysis that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:strict-derivation}) is then established by induction on the input term in the proof of \cref{thm:generalised-mode-preprocessing}.
 
 \begin{lemma}\label{thm:adjustment}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
-\begin{equation}\label{eq:classification}
-\exists\dir{d'}.\quad V |- t^{\dir{d'}\,\True\,\True} ~~\vee~~ \exists s.~V |- t^{\dir{d'}\,\False\,s}
+\begin{equation}\label{eq:strict-derivation}
+V |-_{\Sigma,\Omega} t^{\dir{d'}\,g'\,\True} \quad\text{for some mode~$\dir{d'}$ and boolean~$g'$}
 \end{equation}
 then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{lemma}
 
 \begin{proof}
-Exhaustive case analysis on $\dir{d}$, $\dir{d'}$, the disjunction, and~$s$, adding or removing an outermost mode cast to change the given derivation to a different mode if required.
+Case analysis on $\dir{d}$ and $\dir{d'}$, adding an outermost mode cast to change the given derivation to a different mode if $d \neq d'$.
+Note that it is permissible to add an outermost mode cast because the antecedent~(\ref{eq:strict-derivation}) requires the given derivation to be strict.
 \end{proof}
 
-Statement~(\ref{eq:classification}) is a slightly strengthened classification of a generalised mode derivation based on its genuineness: when the derivation is genuine, the mode~$\dir{d'}$ should be strict.
+
 
 \begin{proof}[Proof of \cref{thm:generalised-mode-preprocessing}]
-By \cref{thm:adjustment}, it suffices to prove statement~(\ref{eq:classification}) by induction on~$t$.
+By \cref{thm:adjustment}, it suffices to prove statement~(\ref{eq:strict-derivation}) by induction on~$t$.
+
 \begin{itemize}
-\item $\Rule{Var}$:
-A variable is valid, so we establish the first disjunct using $\SynRule{Var}$.
+\item $\Rule{Var}$ is mapped to $\SynRule{Var}$.
 \item $\Rule{Anno}$:
 Let $t = (t' \bbcolon A)$.
-By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some booleans $g$~and~$s$, to which we can apply $\Rule{Anno}$, and then we establish the first or second disjunct depending on whether $g$~is $\True$~or~$\False$ (that is, whether $t'$, and therefore~$t$, are valid).
+By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some booleans $g$~and~$s$, to which we apply $\SynRule{Anno}$.
 \item $\Rule{Op}$:
 Let $t = \tmOpts$.
-By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ and we get a derivation of $V |-_{\Sigma,\Omega} t^{\dir d\,g\,\True}$ where $g = \bigwedge_i g_i$, depending on which we establish the appropriate disjunct.
+By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ to all the derivations.
 \vspace{-\topsep-\baselineskip}
 \end{itemize}
 \end{proof}
+
+Finally, having constructed a generalised mode preprocessor, it is easy to derive an ordinary one.
 
 \begin{corollary}[Mode Preprocessing]\label{thm:mode-preprocessing}
   It is decidable for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$ whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.
@@ -176,24 +179,26 @@ By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of 
 By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$, and then simply check~$g$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
 \end{proof}
 
-\begin{corollary}\label{thm:toPre?-true}
-If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,s}$ for some boolean~$s$.
-\end{corollary}
-
-\begin{corollary}\label{thm:toPre?-false}
-If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,s}$ for some boolean~$s$.
-\end{corollary}
-
-Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} provides little information for constructing a required derivation, and basically we have to construct such a derivation from scratch for a raw term.
-But this is exactly what generalised mode preprocessing does, so we can simply reuse \cref{thm:generalised-mode-preprocessing}.
-And \cref{thm:toPre?-true} can also be proved easily in the same way.
-
-\begin{proof}[Proofs of \cref{thm:toPre?-true,thm:toPre?-false}]
-
-By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
-If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\True$ since $g = \False$ leads to a contradiction with \cref{thm:Pre?-false}.
-Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\False$ so as not to contradict \cref{thm:Pre?-true}.
-\end{proof}
+%We can also establish the converse of \cref{thm:Pre?-true,thm:Pre?-false}.
+%
+%\begin{corollary}\label{thm:toPre?-true}
+%If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,s}$ for some boolean~$s$.
+%\end{corollary}
+%
+%\begin{corollary}\label{thm:toPre?-false}
+%If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,s}$ for some boolean~$s$.
+%\end{corollary}
+%
+%Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} provides little information for constructing a required derivation, and basically we have to construct such a derivation from scratch for a raw term.
+%But this is exactly what generalised mode preprocessing does, so we can simply reuse \cref{thm:generalised-mode-preprocessing}.
+%And \cref{thm:toPre?-true} can also be proved easily in the same way.
+%
+%\begin{proof}[Proofs of \cref{thm:toPre?-true,thm:toPre?-false}]
+%
+%By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
+%If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\True$ since $g = \False$ leads to a contradiction with \cref{thm:Pre?-false}.
+%Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\False$ so as not to contradict \cref{thm:Pre?-true}.
+%\end{proof}
 
 \subsection{Annotatability Is Not Completeness}
 \label{sec:annotatability}

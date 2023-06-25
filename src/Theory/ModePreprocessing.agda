@@ -23,34 +23,31 @@ private variable
   n Ξ : ℕ
 
 Classification : ∀ {n} → Raw n → Set
-Classification r = Pre? true  true Syn r
-   ⊎               Pre? true  true Chk r
-   ⊎ ∃[ e ] ∃[ d ] Pre? false e    d   r
+Classification r = ∃[ d ] (Pre? true true d r ⊎ ∃[ e ] Pre? false e d r)
 
 adjustMode : (d : Mode) {r : Raw n}
            → Classification r → ∃[ v ] ∃[ e ] Pre? v e d r
-adjustMode Chk (inl                        p    ) = _ , _ ,    p ↑
-adjustMode Syn (inl                        p    ) = _ , _ ,    p
-adjustMode Chk (inr (inl                   p   )) = _ , _ ,    p
-adjustMode Syn (inr (inl                   p   )) = _ , _ , ?∋ p
-adjustMode Chk (inr (inr (e     , Chk ,    p  ))) = _ , _ ,    p
-adjustMode Chk (inr (inr (false , Syn , ?∋ p  ))) = _ , _ ,    p
-adjustMode Chk (inr (inr (true  , Syn ,    p  ))) = _ , _ ,    p ↑
-adjustMode Syn (inr (inr (e     , Syn ,    p  ))) = _ , _ ,    p
-adjustMode Syn (inr (inr (false , Chk ,    p ↑))) = _ , _ ,    p
-adjustMode Syn (inr (inr (true  , Chk ,    p  ))) = _ , _ , ?∋ p
+adjustMode Chk (Chk , inl             p   ) = _ , _ ,    p
+adjustMode Syn (Chk , inl             p   ) = _ , _ , ?∋ p
+adjustMode Chk (Syn , inl             p   ) = _ , _ ,    p ↑
+adjustMode Syn (Syn , inl             p   ) = _ , _ ,    p
+adjustMode Chk (Chk , inr (e     ,    p  )) = _ , _ ,    p
+adjustMode Syn (Chk , inr (false ,    p ↑)) = _ , _ ,    p
+adjustMode Syn (Chk , inr (true  ,    p  )) = _ , _ , ?∋ p
+adjustMode Chk (Syn , inr (false , ?∋ p  )) = _ , _ ,    p
+adjustMode Chk (Syn , inr (true  ,    p  )) = _ , _ ,    p ↑
+adjustMode Syn (Syn , inr (e     ,    p  )) = _ , _ ,    p
 
 mutual
 
   preprocess' : (r : Raw n) → Classification r
-  preprocess' (` i)   = inl (` i)
+  preprocess' (` i)   = _ , inl (` i)
   preprocess' (A ∋ r) with adjustMode Chk (preprocess' r)
-  ... | false , _ , p = inr (inr (_ , _ , A ∋ p))
-  ... | true  , _ , p = inl (             A ∋ p )
+  ... | false , _ , p = _ , inr (_ , A ∋ p)
+  ... | true  , _ , p = _ , inl (    A ∋ p)
   preprocess' (op (i , rs)) with preprocessᶜ (BD .rules i) rs
-  ... | false , d   , p = inr (inr (_ , _ , op (refl , p)))
-  ... | true  , Chk , p = inr (inl (        op (refl , p)))
-  ... | true  , Syn , p = inl (             op (refl , p) )
+  ... | false , _ , p = _ , inr (_ , op (refl , p))
+  ... | true  , _ , p = _ , inl (    op (refl , p))
 
   preprocessᶜ
     : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)

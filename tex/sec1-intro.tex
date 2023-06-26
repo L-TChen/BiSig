@@ -34,18 +34,18 @@ We introduce the notion of bidirectional binding signatures to specify bidirecti
 For simplicity, we confine our discussion to bidirectional simple type systems that have \emph{syntax-directed} typing rules and leave the problem of presenting bidirectional typing for more advanced type theories in general as future work.
 
 \subsection{Related work}\label{sec:related-work}
-As we will formalise our theory for not only simple type theories but also in a manner distinct from conventional formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing, in order to articulate our contributions.
+As we will formalise our theory for not only simple type theories but also in a manner distinct from typical formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing, in order to articulate our contributions.
 
 \subsubsection{Language formalisation and its frameworks} \label{sec:language-formalisation}
 The vision of formalising the metatheory of every programming language was initiated by the \PoplMark challenge~\citep{Aydemir2005}.
-This is has been further exemplified in a textbook by~\citet{Wadler2022}, where language concepts are formally addressed using the proof assistant~\Agda, including bidirectional type synthesis for~\PCF.
+This is has been exemplified in a textbook by~\citet{Wadler2022}, where language concepts are formally addressed using the proof assistant~\Agda, including bidirectional type synthesis for~\PCF.
 
 \begin{remark}\label{re:type-synthesis-as-decidability-proof}
-The algorithm of bidirectional type synthesis formulated by~\citeauthor{Wadler2022} differs from existing literature:
+The bidirectional type synthesis formulated by~\citeauthor{Wadler2022} differs from existing literature:
 \begin{enumerate*}
-  \item The algorithm is presented as a proof of \emph{(logical) decidability} as to whether a `bidirectionally decorated' raw term~$\isTerm{t}$ can be bidirectionally typed, equivalent to a program that returns a typing derivation for $\isTerm{t}$, if one exists, or the evidence of a contradiction otherwise.
+  \item Its algorithm is presented as a proof of \emph{logical decidability} as to whether a `bidirectionally decorated' raw term~$\isTerm{t}$ can be bidirectionally typed, equivalent to a program that returns a typing derivation for $\isTerm{t}$ or otherwise the proof that such derivation is impossible.
   \item In contrast, an algorithm typically found in the literature is presented as \emph{algorithmic system} relations such as $\Gamma |- \isTerm{t} \syn A \mapsto \isTerm{t}'$, denoting that annotations can be added to $\isTerm{t}$ in the external language to produce $\isTerm{t}'$ of type $A$ in the internal language.
-    Such an algorithm is often accompanied with \emph{soundness} and \emph{completeness} assertions such that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised if there are enough annotations.
+    Such an algorithm is then accompanied with \emph{soundness} and \emph{completeness} assertions such that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised if there are enough annotations.
 \end{enumerate*}
 \end{remark}
 
@@ -90,15 +90,15 @@ Our theory is based on Martin-L\"of type theory and formalised in \Agda (\Cref{s
 Moreover, we exploit the nature of constructive logic to formulate algorithmic soundness, completeness, and decidability. 
 Recall that the law of excluded middle does not hold universally as an axiom in Martin-L\"of type theory, thus making a \emph{decidable statement} $P \vee \neg P$ non-trivial to prove.
 Given that all proofs as programs terminate, logical decidability implies \emph{algorithmic decidability}.
-Further, a proof of the following decidable statement:
+Further, suppose that we have a proof of the following statement:
 \begin{quote}
   `For a context $\Gamma$ and a raw term $t$, either a typing derivation of\, $\Gamma |- t : A$ exists for some $A$ or any derivation of\, $\Gamma |- t : A$ for some $A$ leads to a contradiction'
 \end{quote}
 or rephrased succinctly as 
 \begin{quote}
-  `A context $\Gamma$ and a raw term $t$ \emph{decide} whether $\Gamma |- t : A$ has a derivation for some $A$'
+  `A context $\Gamma$ and a raw term $t$ \emph{decide} whether $\Gamma |- t : A$ has a derivation for some $A$',
 \end{quote}
-computes a type and a derivation from a context and a raw term, echoing the algorithm given by \citeauthor{Wadler2022} as noted in \Cref{re:type-synthesis-as-decidability-proof}.
+echoing the algorithm given by \citeauthor{Wadler2022} as noted in \Cref{re:type-synthesis-as-decidability-proof}.
 Both algorithmic soundness and completeness are implied:
 the proof either yields a typing derivation for the given raw term~$t$ or a proof that such a derivation is impossible where the former case is algorithmic soundness and the latter is the contrapositive form of completeness.
 That is, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-type-synthesis-checking}) provides algorithmic soundness, completeness, and decidability all at once.

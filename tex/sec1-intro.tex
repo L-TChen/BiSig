@@ -32,7 +32,7 @@ To tackle these challenges, this paper presents a theory of bidirectional typing
 There are many ways and extensions for designing bidirectional typing rules, such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}.
 Yet, once the definition of a bidirectional type system is in place, deriving an algorithm becomes straightforward.
 Accordingly, our theory's objective is not to formulate rules for various language features, but to introduce a formalism for bidirectional typing, analogous to grammar in parsing.
-We introduce the notion of bidirectional binding signatures to specify bidirectional type systems and characterise essential criteria including \emph{completeness}, \emph{annotatability}, and \emph{mode-correctness} that are sufficient to derive a type synthesis algorithm, as informally outlined by~\citet{Dunfield2021}.
+We introduce the notion of bidirectional binding signatures to specify bidirectional type systems and characterise essential criteria including \emph{soundness}, \emph{completeness}, and \emph{mode-correctness} that are sufficient to derive a type synthesis algorithm, as informally outlined by~\citet{Dunfield2021}.
 For simplicity, we confine our discussion to bidirectional simple type systems that have \emph{syntax-directed} typing rules and leave the problem of presenting bidirectional typing for more advanced type theories in general as future work.
 
 \subsection{Related work}\label{sec:related-work}

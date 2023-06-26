@@ -99,7 +99,7 @@ Instead, our focus is on:
 Our theory is based on Martin-L\"of type theory and formalised in \Agda (\Cref{sec:formalisation}), akin to those frameworks in \Cref{sec:language-formalisation}.
 Moreover, we exploit the nature of constructive logic to formulate algorithmic soundness, completeness, and decidability. 
 To be more specific, recall that the law of excluded middle does not hold universally as an axiom, thus making a \emph{decidable statement} $P \vee \neg P$ non-trivial to prove.
-Given that all proofs as programs terminate, logical decidability inherently implies algorithmic decidability.
+Given that all proofs as programs terminate, \emph{logical decidability} inherently implies \emph{algorithmic decidability}.
 Further, a proof of the following decidable statement:
 \begin{quote}
   `For a context $\Gamma$ and a raw term $t$, either a typing derivation of\, $\Gamma |- t : A$ exists for some $A$ or any derivation of\, $\Gamma |- t : A$ for some $A$ leads to a contradiction'
@@ -112,13 +112,13 @@ computes a type and a typing derivation for a context and a raw term, echoing th
 Both algorithmic soundness and completeness are implicitly stated:
 the proof either yields a typing derivation for the given raw term~$t$ or a proof that such a derivation is impossible.
 Accordingly, the former case is algorithmic soundness, while the latter is computationally stronger than completeness.
-Hence, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-type-synthesis-checking}) encapsulates algorithmic soundness, completeness, and decidability simultaneously. 
+Hence, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-type-synthesis-checking}) encapsulates algorithmic soundness, completeness, and decidability \emph{simultaneously}. 
 
 In contrast to \citeauthor{Wadler2022}, our theory starts with raw terms and a general type synthesis problem, independent of bidirectional typing.
-This angle uncovers nuances regarding the lack of enough type annotations in bidirectional typing, generally overlooked in literature, and distinguishes completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
-To clarify the difference (\Cref{sec:annotatability}), we propose \emph{mode preprocessing} (\Cref{sec:mode-preprocessing}), which assigns a mode to a raw term with enough annotations, or pinpoints missing type annotations otherwise.
-By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we arrive our main result (\Cref{cor:trichotomy}) modelling a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory, instead of its bidirectional type system.
-Our bidirectional type synthesis works for any mode-correct signature and allows us to instantiate it to any specified system, effectively a verified type-checker generator. 
+This angle uncovers nuances regarding the lack of enough type annotations in bidirectional typing, often overlooked in literature, and distinguishes completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
+To clarify the difference (\Cref{sec:annotatability}), we propose \emph{mode derivations} (\Cref{fig:mode-derivations,fig:generalised-mode-derivations}) and \emph{mode preprocessing} (\Cref{sec:mode-preprocessing}) assigning a mode to a raw term with enough annotations or otherwise pinpoints missing annotations.
+By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we arrive our main result (\Cref{cor:trichotomy}) modelling a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory---a \emph{trichotomy} of raw terms.
+Our bidirectional type synthesis can be instantiated for any system specified by a mode-correct signature, effectively a verified type-checker generator. 
 
 In summary, we contribute a theory of bidirectional type synthesis that is:
 \begin{enumerate}
@@ -129,12 +129,12 @@ In summary, we contribute a theory of bidirectional type synthesis that is:
       \item preferring mode preprocessing over annotatability.
     \end{enumerate*}
 \end{enumerate}
-Moreover, all these concepts have been formally proved in \Agda.
+Moreover, all these concepts have been formally developed in \Agda.
 
 Plan of this paper:
 \begin{enumerate}
   \item Introduction (\Cref{sec:intro}) 
-    \LT{1+3 pp}
+    \LT{4.5 pp}
   \item Key ideas (\Cref{sec:key-ideas})
     \Josh{2.5 pp}
   \item Definitions for bidirectional type systems (bidirectional binding signature, bidirectional type systems, signature erasure and mode annotation) (\Cref{sec:defs})

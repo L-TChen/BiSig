@@ -87,7 +87,7 @@ Moreover, their algorithms are not proved complete.
 \subsection{Contributions and Plan of this paper}
 The major contributions of paper, extending upon previous discussions, are explained as follows.
 
-First, our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax} and is tailored towards \emph{extrinsically-typed}, \emph{syntax-directed} bidirectional type systems of simple types (\Cref{fig:raw-terms,fig:bidirectional-typing-derivations}) specified by a \emph{signature} for simple types and a \emph{bidirectional binding signature} for terms (\Cref{def:bidirectional-binding-signature}). 
+First, our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax} and is tailored towards \emph{extrinsically-typed}, \emph{syntax-directed} bidirectional type systems of simple types (\Cref{fig:raw-terms,fig:bidirectional-typing-derivations}) specified by a \emph{signature} for simple types (c.f.\ \Cref{re:type-signature}) and a \emph{bidirectional binding signature} for terms (\Cref{def:bidirectional-binding-signature}). 
 The extrinsic typing is needed for type synthesis and our adherence to syntax-directed systems aligns with the standard idea of re-casting non-syntax-directed typing rules into their syntax-directed form to derive type synthesis algorithm~\citep{Peyton-Jones2007}.
 As operational semantics are not needed for synthesising simple types, we do not address substitution.
 Instead, our focus is on:
@@ -115,7 +115,7 @@ Accordingly, the former case is algorithmic soundness, while the latter is compu
 Hence, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-type-synthesis-checking}) encapsulates algorithmic soundness, completeness, and decidability simultaneously. 
 
 In contrast to \citeauthor{Wadler2022}, our theory starts with raw terms and a general type synthesis problem, independent of bidirectional typing.
-This angle uncovers nuances regarding the lack of enough type annotations in bidirectional typing, generally overlooked in literature, and distinguishes proof-theoretic completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
+This angle uncovers nuances regarding the lack of enough type annotations in bidirectional typing, generally overlooked in literature, and distinguishes completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
 To clarify the difference (\Cref{sec:annotatability}), we propose \emph{mode preprocessing} (\Cref{sec:mode-preprocessing}), which assigns a mode to a raw term with enough annotations, or pinpoints missing type annotations otherwise.
 By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we arrive our main result (\Cref{cor:trichotomy}) modelling a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory, instead of its bidirectional type system.
 Our bidirectional type synthesis works for any mode-correct signature and allows us to instantiate it to any specified system, effectively a verified type-checker generator. 

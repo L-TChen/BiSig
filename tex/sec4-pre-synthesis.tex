@@ -11,7 +11,7 @@
 
 Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation.
 
-\begin{lemma}[Soundness]\label{thm:term-soundness}
+\begin{lemma}[Soundness]\label{thm:soundness}
 If\/ $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, then $\Gamma \vdash_{\Sigma, \erase\Omega} t : A$.
 \end{lemma}
 
@@ -31,7 +31,7 @@ Induction on the given derivation, mapping every rule to its counterpart.
 
 Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation.
 
-\begin{lemma}[Completeness]\label{thm:term-completeness}
+\begin{lemma}[Completeness]\label{thm:completeness}
 If\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$, then $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$.
 \end{lemma}
 
@@ -42,10 +42,16 @@ The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis
 \end{proof}
 
 In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
-Formulating the notion of mode derivation helps to complete this clean picture.
+%Formulating the notion of mode derivation helps to complete this clean picture.
 
 \subsection{Mode Preprocessing}
 \label{sec:mode-preprocessing}
+
+The goal of this sub-section is to construct a mode preprocessor, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
+In fact we will do better:
+If a mode preprocessor returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
+It will be more helpful if a preprocessor can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
+We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:generalised-mode-preprocessing}), which can be weakened to an ordinary mode preprocessor~(\cref{thm:mode-preprocessing}) if the additional explanation is not needed.
 
 \newcommand{\True}{\mathbf{T}}
 \newcommand{\False}{\mathbf{F}}
@@ -75,12 +81,6 @@ Formulating the notion of mode derivation helps to complete this clean picture.
   \caption{Generalised mode derivations}
   \label{fig:generalised-mode-derivations}
 \end{figure}
-
-The goal of this sub-section is to construct a mode preprocessor, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
-In fact we will do better:
-If a mode preprocessor returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
-It will be more helpful if a preprocessor can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
-We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:generalised-mode-preprocessing}), which can be weakened to an ordinary mode preprocessor~(\cref{thm:mode-preprocessing}) if the additional explanation is not needed.
 
 Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations.
 To formulate this more concretely, we can point out the places in the term that require annotations.
@@ -130,7 +130,7 @@ Then a case analysis shows that it is impossible to have a (synthesising) mode d
 %\end{itemize}
 \end{proof}
 
-Now we are almost ready to construct a generalised mode preprocessor.
+Now we are ready to construct a generalised mode preprocessor.
 
 \begin{theorem}\label{thm:generalised-mode-preprocessing}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
@@ -200,10 +200,8 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\False$ so as not to contradict \cref{thm:Pre?-true}.
 %\end{proof}
 
-\subsection{Annotatability Is Not Completeness}
+\subsection{Annotatability}
 \label{sec:annotatability}
-
-\Josh{$\frac{1}{2}$~pages}
 
 \begin{figure}
   \centering\small
@@ -223,6 +221,35 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
   \end{mathpar}
   
   \caption{Annotation ordering between raw terms}
-  \label{fig:annotation-order}
+  \label{fig:annotation-ordering}
 \end{figure}
 
+\citet{Dunfield2021} formulated completeness differently from ours (\cref{thm:completeness}) and proposed \emph{annotatability} as a more suitable name.
+Here we reformulate annotatability in our theory and discuss its relationship with our completeness and generalised mode preprocessing.
+
+\begin{proposition}[Annotatability]\label{thm:annotatability}
+If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
+\end{proposition}
+
+Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
+In a sense, annotatability is a reasonable form of completeness: if a term is typable in $(\Sigma, \erase\Omega)$, it may not be typable in $(\Sigma, \Omega)$ directly, but will be if some annotations are added.
+Indeed, \cref{thm:annotatability} can be easily proved in our theory from generalised mode preprocessing.
+
+\begin{proof}[Proof of \cref{thm:annotatability}]
+By \cref{thm:generalised-mode-preprocessing}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
+Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are straightforward and omitted here).
+\begin{itemize}
+\item $\SynRule{Var}$, $\SynRule{Anno}$, and $\Rule{Op}$:
+The outermost rule of the given typing derivation must be the corresponding one; apply the corresponding bidirectional typing rule to the induction hypotheses.
+\item $\ChkRule{Sub}$:
+Apply $\ChkRule{Sub}$ to the induction hypothesis.
+\item $\SynRule{Missing}$:
+This is the interesting case where we map a $\SynRule{Missing}$ rule to an $\SynRule{Anno}$ rule and add to the term a type annotation, which comes from the given typing derivation.
+\vspace{-\topsep-\baselineskip}
+\end{itemize}
+\end{proof}
+
+On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), annotatability cannot replace our completeness since it relates typing derivations for possibly differently annotated terms, but a bidirectional type synthesiser is concerned about properties of \emph{one} given term throughout the process.
+Annotatability also does not help the user to deal with missing annotations like generalised mode preprocessing does: even though annotatability seems to construct a term with missing annotations filled in, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
+It seems that as we focus on properties that serve practical purposes, it becomes unclear how annotatability comes into the picture.
+In particular, annotatability mixes up the aspects of annotating and typing, and therefore does not fit into our theory, where the two aspects are separated for better usability.

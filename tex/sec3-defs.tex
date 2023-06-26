@@ -3,7 +3,7 @@
 \section{Simple Type Theories and Bidirectional Type Systems}\label{sec:defs}
 
 \subsection{Simple Types}
-\begin{definition}
+\begin{definition} \label{def:simple-signature}
   A \emph{(simple type) signature} $\Sigma$ consists of a set $I$ and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
   An inhabitant $i : I$ is meant to represent the \emph{$i$-th operation} $\tyOp_i$ and its \emph{number} $ \arity(i)$ of arguments.
 
@@ -130,6 +130,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$
   \end{flushright}%
   \caption{Raw terms}
+  \label{fig:raw-terms}
 \end{figure}
 
 \begin{figure}
@@ -145,13 +146,13 @@ This is not only for brevity but also necessary to compare the type equality dur
     {\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A}{\rho}}\,\Rule{Op}
     \and \text{for $o\colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A$ in $\Omega$}
   \end{mathpar}
-  \caption{Typing rules}
+  \caption{Typing derivations}
   \label{fig:extrinsic-typing}
 \end{figure}
 
-\subsection{Bidirectional Binding Signatures and Bidirectional Type Systems}
+\subsection{Bidirectional Binding Signatures and Bidirectional Type Systems} \label{sec:bidirectional-system}
 
-\begin{definition}
+\begin{definition} \label{def:bidirectional-binding-signature}
   For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
   \[
     \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times {\Mode}\right)^* \times \Type_{\Sigma}(\Xi) \times {\Mode}.
@@ -192,7 +193,7 @@ This is not only for brevity but also necessary to compare the type equality dur
     \inferrule{|-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \quad \cdots \quad |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
     {|-_{\Sigma, \Omega} \tmOpts^\dir{d}}\,\Rule{Op}
   \end{mathpar}
-  \caption{Preprocessed raw terms, I}
+  \caption{Mode derivations}
 \end{figure}
 
 \begin{figure}
@@ -213,7 +214,8 @@ This is not only for brevity but also necessary to compare the type equality dur
     \and \text{for $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}} \to A^\dir{d}$ in $\Omega$}
   \end{mathpar}
 Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\syn}}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A^{\chk}}$
-  \caption{Bidirectional typing rules}
+  \caption{Bidirectional typing derivations}
+  \label{fig:bidirectional-typing-derivations}
 \end{figure}
 
 \LT{What induction principle are we using?}

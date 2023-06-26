@@ -32,19 +32,19 @@ To tackle these challenges, this paper presents a theory of bidirectional typing
 There are many ways and extensions for designing bidirectional typing rules, such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}.
 Yet, once the definition of a bidirectional type system is in place, deriving an algorithm becomes straightforward.
 Accordingly, our theory's objective is not to formulate rules for various language features, but to introduce a formalism for bidirectional typing, analogous to grammar in parsing.
-We introduce the notion of \emph{bidirectional binding signatures} to specify bidirectional type systems and characterise essential criteria including \emph{completeness}, \emph{annotatability}, and \emph{mode-correctness} that are sufficient to derive a type synthesis algorithm, as informally outlined by~\citet{Dunfield2021}.
+We introduce the notion of bidirectional binding signatures to specify bidirectional type systems and characterise essential criteria including \emph{completeness}, \emph{annotatability}, and \emph{mode-correctness} that are sufficient to derive a type synthesis algorithm, as informally outlined by~\citet{Dunfield2021}.
 For simplicity, we confine our discussion to bidirectional simple type systems that have \emph{syntax-directed} typing rules and leave the problem of presenting bidirectional typing for more advanced type theories in general as future work.
 
-\subsection{Related work}
-As we will formalise our theory for not only simple type theories but also in a manner distinct from conventional formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing.
+\subsection{Related work}\label{sec:related-work}
+As we will formalise our theory for not only simple type theories but also in a manner distinct from conventional formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing, in order to articulate our contributions.
 
 \subsubsection{Language formalisation and its frameworks} \label{sec:language-formalisation}
 The vision of formalising the metatheory of every programming language was initiated by the \PoplMark challenge~\citep{Aydemir2005}.
 This is has been further exemplified in a textbook by~\citet{Wadler2022}, where language concepts are formally addressed using the proof assistant~\Agda, including bidirectional type synthesis for~\PCF.
 
-Earlier than the \PoplMark challenge, \citet{Altenkirch1993} already commented that rudimentary meta-operations and meta-properties for substitution constitute the bulk of language formalisation, motivating a number of language-formalisation frameworks~\citep{Ahrens2018,Fiore2022,Gheri2020,Ahrens2022,Allais2021} to establish substitution, term traversal, and their meta-properties universally. % once and for a range of abstract syntax with variable binding.
-One of the core gadgets of these frameworks is the concept of \emph{descriptions} (coined by~\citet{Chapman2010} for datatype-generic programming) or \emph{binding signatures} (coined by~\citet{Aczel1978} in line with the term \emph{signature} in universal algebra) for specifying typing rules of a language.
-It is noteworthy that these state-of-the-art frameworks cannot fully define polymorphic type theories or dependent type theories yet.
+Earlier than the \PoplMark challenge already, \citet{Altenkirch1993} commented that rudimentary meta-operations and meta-properties for substitution constitute the bulk of language formalisation, motivating a number of language-formalisation frameworks~\citep{Ahrens2018,Fiore2022,Gheri2020,Ahrens2022,Allais2021} to define the type of well-scoped/typed terms, substitution, term traversal and their meta-properties universally.
+One of the core gadgets of these frameworks is the concept of \emph{descriptions} or \emph{binding signatures} (coined by~\citet{Aczel1978} in line with the term \emph{signature} in universal algebra) for specifying typing rules of a language.
+It is noteworthy that these state-of-the-art frameworks cannot specify polymorphic type theories or dependent type theories yet and only \citeauthor{Allais2021} discussed generic programs beyond substitution.
 
 \begin{remark}\label{re:type-synthesis-as-decidability-proof}
 The algorithm of bidirectional type synthesis formulated by~\citeauthor{Wadler2022} differs from existing literature:
@@ -56,15 +56,15 @@ The algorithm of bidirectional type synthesis formulated by~\citeauthor{Wadler20
 \end{remark}
 
 \subsubsection{Theories of abstract syntax with variable binding}\label{sec:theory-of-syntax}
-The aforementioned frameworks except \citeauthor{Gheri2020}'s are based on or inspired by the categorical analysis of initial semantics for abstract syntax with variable binding~\cite{Fiore1999}.
-Its main idea is that the set of (untyped) abstract syntax trees for a given language can be interpreted as the \emph{initial algebra} for its \emph{signature endofunctor} over a family $\Term_{\Gamma}$ of well-scoped terms under the context~$\Gamma$.
-Variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acts as a functorial map from $X_{\Gamma}$ to $X_{\Delta}$, giving rise to a presheaf.
-The signature (endofunctor) encapsulates the collection of language constructs while the initiality amounts to structural recursion, i.e.\ \emph{term traversal}.
+The aforementioned frameworks except \citeauthor{Gheri2020}'s are at least inspired by \citet{Fiore1999}'s initial semantics for abstract syntax with variable binding using category theory.
+The main idea is that the set of (untyped) abstract syntax trees for a language can be interpreted as the initial algebra for its signature endofunctor $\mathbb{\Sigma}$ on a family $\Term_{\Gamma}$ of well-scoped terms under the context~$\Gamma$ with
+variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $X_{\Gamma}$ to $X_{\Delta}$, equivalently a free $\mathbb{\Sigma}$-algebra on the presheaf of variables $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$.
+The endofunctor $\mathbb{\Sigma}$ encapsulates language constructs (except variables) while the initiality amounts to structural recursion, i.e.\ \emph{term traversal}.
 
 Substitution can also be modelled categorically, but it does not play a role in this paper, though.
 
 \begin{remark}
-Constructing the initial algebra of syntax trees boils down to defining an inductive type with a few constructors that align with the variable rule and the rule scheme for language constructs specified by a signature~\citep{Allais2021,Fiore2022} (without explicitly taking the colimit of a sequence of objects iteratively defined by the signature functor).
+Constructing the initial algebra of terms boils down to defining an inductive type with a few constructors that align with the variable rule and the rule scheme for language constructs specified by a signature~\citep{Allais2021,Fiore2022}, without the need to explicitly define the colimit of a sequence of objects iteratively defined by the signature functor.
 \end{remark}
 
 \begin{remark} \label{re:type-signature}
@@ -85,41 +85,51 @@ While there are some efforts to generate type checkers grounded in unification~\
 Moreover, their algorithms are not proved complete.
 
 \subsection{Contributions and Plan of this paper}
-The core contributions of our theory of bidirectional typing, extending upon discussions in previous sections, are as follows.
-First, our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax}, with the difference being its specific design for \emph{extrinsically-typed} and \emph{syntax-directed} bidirectional type systems of simple types specified by a \emph{type signature} and a \emph{bidirectional binding signature} for terms.
-The assumption of being syntax-directed is motivated by the standard idea of re-casting non-syntax-directed typing rules of a system into syntax-directed form for deriving a type synthesis algorithm~\cite{Peyton-Jones2007}.
-Since operational semantics are not needed for type synthesis for simple types, we do not address substitution. Instead, our focus is on:
+The major contributions of paper, extending upon previous discussions, are explained as follows.
+
+First, our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax} and is tailored towards \emph{extrinsically-typed}, \emph{syntax-directed} bidirectional type systems of simple types (\Cref{fig:raw-terms,fig:bidirectional-typing-derivations}) specified by a \emph{signature} for simple types and a \emph{bidirectional binding signature} for terms (\Cref{def:bidirectional-binding-signature}). 
+The extrinsic typing is needed for type synthesis and our adherence to syntax-directed systems aligns with the standard idea of re-casting non-syntax-directed typing rules into their syntax-directed form to derive type synthesis algorithm~\citep{Peyton-Jones2007}.
+As operational semantics are not needed for synthesising simple types, we do not address substitution.
+Instead, our focus is on:
 \begin{enumerate*}
-  \item establishing the connection between the specified bidirectional type system and its associated simple type theory, i.e.\ soundness and completeness; 
-  \item formulating the mode-correctness condition on signatures, sufficient to derive a decidable bidirectional type synthesis.
+  \item establishing the connection between the specified bidirectional type system and its simple type theory, i.e.\ \emph{soundness} and \emph{completeness} (\Cref{sec:soundness-and-completeness}); 
+  \item formulating the \emph{mode-correctness} condition (\Cref{def:mode-correctness}) which suffices to establish the uniqueness of synthesised types (\Cref{thm:unique-syn}) and a decidable bidirectional type synthesis and checking (\Cref{thm:bidirectional-type-synthesis-checking}).
 \end{enumerate*}
 
-Our theory is based on Martin-L\"of type theory and has been formalised using the proof assistant \Agda, akin to those language-formalisation frameworks in \Cref{sec:language-formalisation}.
-The natural of constructive logic implies that the law of excluded middle does not stand as an axiom, thus making the proof of a \emph{decidable statement} $P \vee \neg P$ non-trivial.
-Given that all proofs as programs terminate, the notion of algorithmic decidability is implied by the notion of logical decidability.
-The algorithm of our bidirectional type synthesis can be (roughly) understood as a proof of the statement:
+Our theory is based on Martin-L\"of type theory and formalised in \Agda (\Cref{sec:formalisation}), akin to those frameworks in \Cref{sec:language-formalisation}.
+Moreover, we exploit the nature of constructive logic to formulate algorithmic soundness, completeness, and decidability. 
+To be more specific, recall that the law of excluded middle does not hold universally as an axiom, thus making a \emph{decidable statement} $P \vee \neg P$ non-trivial to prove.
+Given that all proofs as programs terminate, logical decidability inherently implies algorithmic decidability.
+Further, a proof of the following decidable statement:
 \begin{quote}
-  \emph{For a given raw term $t$, a typing derivation of $t$ either exists or it does not}
+  `For a context $\Gamma$ and a raw term $t$, either a typing derivation of\, $\Gamma |- t : A$ exists for some $A$ or any derivation of\, $\Gamma |- t : A$ for some $A$ leads to a contradiction'
 \end{quote}
-This follows from the Curry-Howard correspondence and echoes the algorithm formulated by \citet{Wadler2022} as noted in \Cref{re:type-synthesis-as-decidability-proof}.
-It is important to mention that both algorithmic soundness and completeness are also implied: the proof either returns a typing derivation, if any, for the given raw term~$t$ or a proof that such a derivation cannot exist.
-In essence, the former case is algorithmic soundness, while the latter is computationally stronger than algorithmic completeness.
-Therefore, our algorithm of bidirectional type synthesis, posed as a proof of logical decidability, encapsulates algorithmic soundness, completeness, and decidability all at once.
+or rephrased succinctly as 
+\begin{quote}
+  `A context $\Gamma$ and a raw term $t$ \emph{decide} whether $\Gamma |- t : A$ has a derivation for some $A$'
+\end{quote}
+computes a type and a typing derivation for a context and a raw term, echoing the algorithm given by \citeauthor{Wadler2022} as noted in \Cref{re:type-synthesis-as-decidability-proof}.
+Both algorithmic soundness and completeness are implicitly stated:
+the proof either yields a typing derivation for the given raw term~$t$ or a proof that such a derivation is impossible.
+Accordingly, the former case is algorithmic soundness, while the latter is computationally stronger than completeness.
+Hence, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-type-synthesis-checking}) encapsulates algorithmic soundness, completeness, and decidability simultaneously. 
 
-However, diverging from \citet{Wadler2022}, our methodology does not begin with `bidirectionally decorated' raw terms, but rather with raw terms and a \emph{general type synthesis problem} that is independent of bidirectional type synthesis.
-This divergence enables us to uncover subtleties concerning missing annotations that have been largely overlooked in the literature, and to differentiate between completeness (with respect to a type assignment system) and the concept of annotatability, which have been conflated by \citet{Dunfield2021}.
-We propose the concept of \emph{mode preprocessing} to allocate a mode to a raw term, clarifying the aforementioned difference.
+In contrast to \citeauthor{Wadler2022}, our theory starts with raw terms and a general type synthesis problem, independent of bidirectional typing.
+This angle uncovers nuances regarding the lack of enough type annotations in bidirectional typing, generally overlooked in literature, and distinguishes proof-theoretic completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
+To clarify the difference (\Cref{sec:annotatability}), we propose \emph{mode preprocessing} (\Cref{sec:mode-preprocessing}), which assigns a mode to a raw term with enough annotations, or pinpoints missing type annotations otherwise.
+By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we arrive our main result (\Cref{cor:trichotomy}) modelling a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory, instead of its bidirectional type system.
+Our bidirectional type synthesis works for any mode-correct signature and allows us to instantiate it to any specified system, effectively a verified type-checker generator. 
 
 In summary, we contribute a theory of bidirectional type synthesis that is:
 \begin{enumerate}
-  \item \emph{generic}, applicable to all bidirectional type systems that can be specified by some signature;
-  \item \emph{computationally significant}, in terms of: 
+  \item \emph{simple yet general} for any system that can be specified by a bidirectional binding signature;
+  \item \emph{constructive}, in terms of: 
     \begin{enumerate*}
-      \item prioritising logical decidability over algorithmic soundness and completeness,
-      \item preferring mode preprocessing over annotatability; 
+      \item prioritising logical decidability over algorithmic soundness, completeness, and decidability,
+      \item preferring mode preprocessing over annotatability.
     \end{enumerate*}
 \end{enumerate}
-Moreover, all these concepts have been rigorously proved in the proof assistant \Agda.
+Moreover, all these concepts have been formally proved in \Agda.
 
 Plan of this paper:
 \begin{enumerate}

@@ -266,7 +266,7 @@
   number =        {2},
   pages =         {1--34},
   publisher =     {Springer Netherlands},
-  title =         {From signatures to monads in {UniMath}},
+  title =         {From signatures to monads in \textsf{UniMath}},
   volume =        {63},
   year =          {2018},
   doi =           {10.1007/s10817-018-9474-4},
@@ -418,35 +418,6 @@
                   S0956796820000076/type/journal_article},
 }
 
-@inproceedings{Chapman2010,
-  address =       {New York, NY, USA},
-  author =        {Chapman, James and Dagand, Pierre-\'{E}variste and
-                   McBride, Conor and Morris, Peter},
-  booktitle =     {Proceedings of the 15th ACM SIGPLAN International
-                   Conference on Functional Programming},
-  pages =         {3--14},
-  publisher =     {Association for Computing Machinery},
-  series =        {ICFP '10},
-  title =         {The gentle art of levitation},
-  year =          {2010},
-  abstract =      {We present a closed dependent type theory whose
-                   inductive types are given not by a scheme for
-                   generative declarations, but by encoding in a
-                   universe. Each inductive datatype arises by
-                   interpreting its description - a first-class value in
-                   a datatype of descriptions. Moreover, the latter
-                   itself has a description. Datatype-generic
-                   programming thus becomes ordinary programming. We
-                   show some of the resulting generic operations and
-                   deploy them in particular, useful ways on the
-                   datatype of datatype descriptions itself. Simulations
-                   in existing systems suggest that this apparently
-                   self-supporting setup is achievable without paradox
-                   or infinite regress.},
-  doi =           {10.1145/1863543.1863547},
-  url =           {https://doi.org/10.1145/1863543.1863547},
-}
-
 @unpublished{Aczel1978,
   author =        {Aczel, Peter},
   note =          {Unpublished note},
@@ -504,6 +475,87 @@
   doi =           {10.1145/3373718.3394771},
   isbn =          {9781450371049},
   url =           {https://doi.org/10.1145/3373718.3394771},
+}
+
+@phdthesis{Gast2004,
+  author =        {Gast, Holger},
+  school =        {Universit{\"a}t T{\"u}bingen},
+  title =         {A generator for type checkers},
+  year =          {2004},
+  url =           {http://hdl.handle.net/10900/48845},
+}
+
+@inproceedings{Grewe2015,
+  address =       {New York, NY, USA},
+  author =        {Grewe, Sylvia and Erdweg, Sebastian and
+                   Wittmann, Pascal and Mezini, Mira},
+  booktitle =     {2015 ACM International Symposium on New Ideas, New
+                   Paradigms, and Reflections on Programming and
+                   Software (Onward!)},
+  pages =         {137--150},
+  publisher =     {Association for Computing Machinery},
+  series =        {Onward! 2015},
+  title =         {Type systems for the masses: {Deriving} soundness
+                   proofs and efficient checkers},
+  year =          {2015},
+  abstract =      {The correct definition and implementation of
+                   non-trivial type systems is difficult and requires
+                   expert knowledge, which is not available to
+                   developers of domain-specific languages (DSLs) in
+                   practice. We propose Veritas, a workbench that
+                   simplifies the development of sound type systems.
+                   Veritas provides a single, high-level specification
+                   language for type systems, from which it
+                   automatically tries to derive soundness proofs and
+                   efficient and correct type-checking algorithms. For
+                   verification, Veritas combines off-the-shelf
+                   automated first-order theorem provers with automated
+                   proof strategies specific to type systems. For
+                   deriving efficient type checkers, Veritas provides a
+                   collection of optimization strategies whose
+                   applicability to a given type system is checked
+                   through verification on a case-by-case basis. We have
+                   developed a prototypical implementation of Veritas
+                   and used it to verify type soundness of the
+                   simply-typed lambda calculus and of parts of typed
+                   SQL. Our experience suggests that many of the
+                   individual verification steps can be automated and,
+                   in particular, that a high degree of automation is
+                   possible for type systems of DSLs.},
+  doi =           {10.1145/2814228.2814239},
+  isbn =          {9781450336888},
+  url =           {https://doi.org/10.1145/2814228.2814239},
+}
+
+@inproceedings{Fiore2010,
+  address =       {Berlin, Heidelberg},
+  author =        {Fiore, Marcelo and Hur, Chung-Kil},
+  booktitle =     {Computer Science Logic. CSL 2010},
+  editor =        {Dawar, Anuj and Veith, Helmut},
+  pages =         {320--335},
+  publisher =     {Springer Berlin Heidelberg},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Second-order equational logic (Extended Abstract)},
+  volume =        {6247},
+  year =          {2010},
+  abstract =      {We extend universal algebra and its equational logic
+                   from first to second order as follows.},
+  doi =           {10.1007/978-3-642-15205-4_26},
+  isbn =          {978-3-642-15205-4},
+}
+
+@article{Ko2022,
+  author =        {Ko, Hsiang-Shang and Chen, Liang-Ting and
+                   Lin, Tzu-Chi},
+  journal =       {Proceedings of the ACM on Programming Languages},
+  number =        {ICFP},
+  pages =         {1--29},
+  title =         {Datatype-generic programming meets elaborator
+                   reflection},
+  volume =        {6},
+  year =          {2022},
+  doi =           {10.1145/3547629},
+  url =           {https://doi.org/10.1145/3547629},
 }
 
 @inproceedings{Fiore2013,
@@ -605,165 +657,5 @@
   year =          {2023},
   isbn =          {978-91-7905-850-0},
   url =           {https://research.chalmers.se/en/publication/535726},
-}
-
-@phdthesis{Gast2004,
-  author =        {Gast, Holger},
-  school =        {Universit{\"a}t T{\"u}bingen},
-  title =         {A generator for type checkers},
-  year =          {2004},
-  url =           {http://hdl.handle.net/10900/48845},
-}
-
-@inproceedings{Grewe2015,
-  address =       {New York, NY, USA},
-  author =        {Grewe, Sylvia and Erdweg, Sebastian and
-                   Wittmann, Pascal and Mezini, Mira},
-  booktitle =     {2015 ACM International Symposium on New Ideas, New
-                   Paradigms, and Reflections on Programming and
-                   Software (Onward!)},
-  pages =         {137--150},
-  publisher =     {Association for Computing Machinery},
-  series =        {Onward! 2015},
-  title =         {Type systems for the masses: {Deriving} soundness
-                   proofs and efficient checkers},
-  year =          {2015},
-  abstract =      {The correct definition and implementation of
-                   non-trivial type systems is difficult and requires
-                   expert knowledge, which is not available to
-                   developers of domain-specific languages (DSLs) in
-                   practice. We propose Veritas, a workbench that
-                   simplifies the development of sound type systems.
-                   Veritas provides a single, high-level specification
-                   language for type systems, from which it
-                   automatically tries to derive soundness proofs and
-                   efficient and correct type-checking algorithms. For
-                   verification, Veritas combines off-the-shelf
-                   automated first-order theorem provers with automated
-                   proof strategies specific to type systems. For
-                   deriving efficient type checkers, Veritas provides a
-                   collection of optimization strategies whose
-                   applicability to a given type system is checked
-                   through verification on a case-by-case basis. We have
-                   developed a prototypical implementation of Veritas
-                   and used it to verify type soundness of the
-                   simply-typed lambda calculus and of parts of typed
-                   SQL. Our experience suggests that many of the
-                   individual verification steps can be automated and,
-                   in particular, that a high degree of automation is
-                   possible for type systems of DSLs.},
-  doi =           {10.1145/2814228.2814239},
-  isbn =          {9781450336888},
-  url =           {https://doi.org/10.1145/2814228.2814239},
-}
-
-@article{Pacak2020,
-  address =       {New York, NY, USA},
-  author =        {Pacak, Andr\'{e} and Erdweg, Sebastian and
-                   Szab\'{o}, Tam\'{a}s},
-  journal =       {Proc. ACM Program. Lang.},
-  month =         {nov},
-  number =        {OOPSLA},
-  publisher =     {Association for Computing Machinery},
-  title =         {A systematic approach to deriving incremental type
-                   checkers},
-  volume =        {4},
-  year =          {2020},
-  abstract =      {Static typing can guide programmers if feedback is
-                   immediate. Therefore, all major IDEs incrementalize
-                   type checking in some way. However, prior approaches
-                   to incremental type checking are often specialized
-                   and hard to transfer to new type systems. In this
-                   paper, we propose a systematic approach for deriving
-                   incremental type checkers from textbook-style type
-                   system specifications. Our approach is based on
-                   compiling inference rules to Datalog, a carefully
-                   limited logic programming language for which
-                   incremental solvers exist. The key contribution of
-                   this paper is to discover an encoding of the infinite
-                   typing relation as a finite Datalog relation in a way
-                   that yields efficient incremental updates. We
-                   implemented the compiler as part of a type system DSL
-                   and show that it supports simple types, some local
-                   type inference, operator overloading, universal
-                   types, and iso-recursive types.},
-  doi =           {10.1145/3428195},
-  url =           {https://doi.org/10.1145/3428195},
-}
-
-@inproceedings{Cimini2020,
-  address =       {New York, NY, USA},
-  author =        {Cimini, Matteo and Miller, Dale and Siek, Jeremy G.},
-  booktitle =     {Proceedings of the 13th ACM SIGPLAN International
-                   Conference on Software Language Engineering},
-  pages =         {108--125},
-  publisher =     {Association for Computing Machinery},
-  series =        {SLE 2020},
-  title =         {Extrinsically typed operational semantics for
-                   functional languages},
-  year =          {2020},
-  abstract =      {We present a type system over language definitions
-                   that classifies parts of the operational semantics of
-                   a language in input, and models a common language
-                   design organization. The resulting typing discipline
-                   guarantees that the language at hand is automatically
-                   type sound. Thanks to the use of types to model
-                   language design, our type checker has a high-level
-                   view on the language being analyzed and can report
-                   messages using the same jargon of language designers.
-                   We have implemented our type system in the
-                   lang-n-check tool, and we have applied it to derive
-                   the type soundness of several functional languages,
-                   including those with recursive types, polymorphism,
-                   exceptions, lists, sums, and several common types and
-                   operators.},
-  doi =           {10.1145/3426425.3426936},
-  isbn =          {9781450381765},
-  url =           {https://doi.org/10.1145/3426425.3426936},
-}
-
-@inproceedings{Fiore2010,
-  address =       {Berlin, Heidelberg},
-  author =        {Fiore, Marcelo and Hur, Chung-Kil},
-  booktitle =     {Computer Science Logic. CSL 2010},
-  editor =        {Dawar, Anuj and Veith, Helmut},
-  pages =         {320--335},
-  publisher =     {Springer Berlin Heidelberg},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Second-order equational logic (Extended Abstract)},
-  volume =        {6247},
-  year =          {2010},
-  abstract =      {We extend universal algebra and its equational logic
-                   from first to second order as follows.},
-  doi =           {10.1007/978-3-642-15205-4_26},
-  isbn =          {978-3-642-15205-4},
-}
-
-@article{Ko2022,
-  author =        {Ko, Hsiang-Shang and Chen, Liang-Ting and
-                   Lin, Tzu-Chi},
-  journal =       {Proceedings of the ACM on Programming Languages},
-  number =        {ICFP},
-  pages =         {1--29},
-  title =         {Datatype-generic programming meets elaborator
-                   reflection},
-  volume =        {6},
-  year =          {2022},
-  doi =           {10.1145/3547629},
-  url =           {https://doi.org/10.1145/3547629},
-}
-
-@article{Hamana2022,
-  author =        {Hamana, Makoto},
-  journal =       {Mathematical Structures in Computer Science},
-  number =        {4},
-  pages =         {542--573},
-  publisher =     {Cambridge University Press},
-  title =         {Complete algebraic semantics for second-order
-                   rewriting systems based on abstract syntax with
-                   variable binding},
-  volume =        {32},
-  year =          {2022},
-  doi =           {10.1017/S0960129522000287},
 }
 

@@ -5,7 +5,7 @@
 Type checking and inference serve as the transition to type-checked programs, also known as \emph{well-typed terms}, from parsed abstract syntax trees, referred as \emph{raw terms} by contrast.
 Type inference algorithms were conceived to ascertain the type of any raw term without any type annotations.
 However, it was later found that full parametric polymorphism leads to undecidability in type inference, as do dependent types~\citep{Wells1999,Dowek1993}.
-In light of these limitations, bidirectional type synthesis emerged as a viable alternative, providing decidable algorithms for determining the types of \emph{suitably annotated} programs in languages with simple types, polymorphic types, dependent types, among others. 
+In light of these limitations, bidirectional type synthesis emerged as a viable alternative, providing decidable algorithms for determining the types of \emph{suitably annotated} programs in languages with simple types, polymorphic types, dependent types, gradual types, among others. 
 \citet{Dunfield2021} summarised its design principles and applications that we know so far. 
 
 The idea of bidirectional type synthesis begins with extending typing judgements with two modes that direct the flow of types:
@@ -20,7 +20,7 @@ Then, a type synthesis algorithm can be `read off' from a bidirectional type sys
 Contrary to the classic Damas--Milner type inference, bidirectional type synthesis does \emph{not} require unification.
 \citet{Pierce2000} noted that bidirectional type synthesis propagates annotations locally within adjacent nodes of a syntax tree, so introducing long-distance unification constraints undermines the essence of locality in bidirectional type synthesis.
 Further, annotations for, say, top-level definitions improve clarity, making the purpose of a program easier to understand, so they should not be considered redundant.
-In light of these considerations, bidirectional type synthesis can be deemed as a technique that is more fundamental than unification and is a general design paradigm capable of handling a broad spectrum of programming languages.
+In light of these considerations, bidirectional type synthesis can be deemed as a technique that is more fundamental than unification and is a design paradigm capable of handling a broad spectrum of programming languages.
 
 Unlike parsing, nevertheless, which has a comprehensive theory and widely applicable practical techniques, bidirectional typing has only been developed on a case-by-case basis without a theory.
 While it is straightforward to derive a type synthesis algorithm, a general theory providing logical specifications and rigorously proven properties for a class of systems is still lacking.
@@ -35,7 +35,7 @@ We introduce the notion of bidirectional binding signatures to specify bidirecti
 For simplicity, we confine our discussion to bidirectional simple type systems that have \emph{syntax-directed} typing rules and leave the problem of presenting bidirectional typing for more general and advanced type theories as future work.
 
 \subsection{Related work}\label{sec:related-work}
-As our theory is developed formally not only for a class of simple type theories but also in a manner distinct from typical formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing, in order to explain our contributions.
+As our theory is developed formally not only for simple type theories but also in a manner distinct from typical formulations in bidirectional typing, it is pertinent to discuss related work upon which this work is built, apart from bidirectional typing, in order to explain our contributions.
 
 \subsubsection{Language formalisation and its frameworks} \label{sec:language-formalisation}
 The vision of formalising the metatheory of every programming language was initiated by the \PoplMark challenge~\citep{Aydemir2005}.
@@ -82,7 +82,7 @@ Moreover, their algorithms are not proved complete.
 \subsection{Contributions and Plan of this paper}
 The major contributions of paper, extending upon previous discussions, are explained as follows.
 
-First, our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax} and is tailored towards \emph{extrinsically-typed}, \emph{syntax-directed} bidirectional type systems of simple types (\Cref{fig:raw-terms,fig:bidirectional-typing-derivations}) specified by a \emph{signature} for simple types and a \emph{bidirectional binding signature} for terms (\Cref{def:bidirectional-binding-signature} and c.f.\ \Cref{re:type-signature}). 
+Our theory can be viewed as a counterpart to those theories in \Cref{sec:theory-of-syntax} and is tailored towards \emph{extrinsically-typed}, \emph{syntax-directed} bidirectional type systems of simple types (\Cref{fig:raw-terms,fig:bidirectional-typing-derivations}) specified by a \emph{signature} for simple types and a \emph{bidirectional binding signature} for terms (\Cref{def:bidirectional-binding-signature} and c.f.\ \Cref{re:type-signature}). 
 The extrinsic typing is needed for type synthesis and our adherence to syntax-directed systems aligns with the standard idea of re-casting non-syntax-directed typing rules into their syntax-directed form to derive type synthesis algorithm~\citep{Peyton-Jones2007}.
 As substitution is not needed for synthesising simple types, it is not addressed.
 Instead, our focus is on:
@@ -101,7 +101,7 @@ Further, suppose that we have a proof of the following statement:
 \end{quote}
 or rephrased succinctly as 
 \begin{quote}
-  `A context $\Gamma$ and a raw term $t$ \emph{decide} whether $\Gamma |- t : A$ has a derivation for some $A$',
+  `A context $\Gamma$ and a raw term $t$ \underline{\emph{decide}} whether $\Gamma |- t : A$ has a derivation for some $A$',
 \end{quote}
 echoing the algorithm given by \citeauthor{Wadler2022} as noted in \Cref{re:type-synthesis-as-decidability-proof}.
 Both algorithmic soundness and completeness are implied:
@@ -119,13 +119,14 @@ In summary, we contribute a theory of bidirectional type synthesis that is:
   \item \emph{simple yet general} for any system that can be specified by a bidirectional binding signature;
   \item \emph{constructive}, based on Martin-L\"of theory and preferring logical decidability over algorithmic soundness, completeness, and decidability; mode preprocessing over annotatability.
 \end{enumerate}
-Moreover, all these concepts have been formally developed in \Agda.
+Moreover, all these concepts have been formally developed with \Agda.
 
 This paper is structured in logical order as follows.
 We first present an overview of our theory using simply typed $\lambda$-calculus in \Cref{sec:key-ideas}, prior to developing a general framework for specifying bidirectional type systems in \Cref{sec:defs}.
 Following this, we discuss the connection between a specified bidirectional type system and its associated simple type theory in \Cref{sec:pre-synthesis}.
 In \Cref{sec:type-synthesis}, we introduce mode-correctness and bidirectional type synthesis.
-We conclude by reflecting on related topics and potential challenges in extending our theory to a more general setting.
+In \Cref{sec:formalisation}, we sketch the formalisation of our theory in \Agda and some examples other than simply typed $\lambda$-calculus.
+We conclude in \Cref{sec:future}, where we reflect on related techniques that can be used to improve the formal development and potential challenges in extending our theory to a more general setting.
 
 \todo[inline,caption={}]{
 \begin{enumerate}

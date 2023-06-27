@@ -225,19 +225,19 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 \end{figure}
 
 \citet{Dunfield2021} formulated completeness differently from ours (\cref{thm:completeness}) and proposed \emph{annotatability} as a more suitable name.
-Here we reformulate annotatability in our theory and discuss its relationship with our completeness and generalised mode preprocessing.
+Here we formulate annotatability in our theory and discuss its relationship with our completeness and generalised mode preprocessing.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
 If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
 \end{proposition}
 
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
-In a sense, annotatability is a reasonable form of completeness: if a term is typable in $(\Sigma, \erase\Omega)$, it may not be typable in $(\Sigma, \Omega)$ directly, but will be if some annotations are added.
-Indeed, \cref{thm:annotatability} can be easily proved in our theory from generalised mode preprocessing.
+In a sense, annotatability is a reasonable form of completeness: if a term is typable in $(\Sigma, \erase\Omega)$, it may not be typable in $(\Sigma, \Omega)$ directly due to some missing annotations, but will be if those annotations are added correctly.
+In our theory, \cref{thm:annotatability} can be easily proved from generalised mode preprocessing.
 
 \begin{proof}[Proof of \cref{thm:annotatability}]
 By \cref{thm:generalised-mode-preprocessing}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
-Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are straightforward and omitted here).
+Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are determined by the derivations and omitted here).
 \begin{itemize}
 \item $\SynRule{Var}$, $\SynRule{Anno}$, and $\Rule{Op}$:
 The outermost rule of the given typing derivation must be the corresponding one; apply the corresponding bidirectional typing rule to the induction hypotheses.
@@ -249,7 +249,6 @@ This is the interesting case where we map a $\SynRule{Missing}$ rule to an $\Syn
 \end{itemize}
 \end{proof}
 
-On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), annotatability cannot replace our completeness since it relates typing derivations for possibly differently annotated terms, but a bidirectional type synthesiser is concerned about properties of \emph{one} given term throughout the process.
-Annotatability also does not help the user to deal with missing annotations like generalised mode preprocessing does: even though annotatability seems to construct a term with missing annotations filled in, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
-It seems that as we focus on properties that serve practical purposes, it becomes unclear how annotatability comes into the picture.
-In particular, annotatability mixes up the aspects of annotating and typing, and therefore does not fit into our theory, where the two aspects are separated for better usability.
+On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), our completeness is much simpler to use than annotatability, which requires the bidirectional type synthesiser to produce more complex evidence when the synthesis fails.
+Annotatability also does not help the user to deal with missing annotations like (generalised) mode preprocessing does: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
+Therefore we believe that the notion of annotatability is too complex for what it achieves, and our theory offers simpler and more useful alternatives.

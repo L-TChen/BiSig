@@ -178,3 +178,22 @@ If\/ $|\Gamma| \vdash t^\dir{d}$ and\/ $\Gamma \vdash t : A$, then $\Gamma \vdas
 
 We will construct a mode preprocessor~(\cref{sec:mode-preprocessing}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
 To quantify over all such systems, we need their generic definitions, which we formulate in \cref{sec:defs}.
+
+\begin{figure}
+  \begin{tikzpicture}
+  \matrix (m) [matrix of math nodes, row sep=3em, column sep=10em]
+  {
+    \boxed{\erase{\Gamma} \vdash \isTerm{t}}   & \boxed{\erase{\Gamma} \vdash \isTerm{t}^{\syn}} \\
+    \boxed{\Gamma \vdash \isTerm{t} : A} & \boxed{\Gamma \vdash \isTerm{t} \syn A} \\
+  };
+  \path[->]
+      (m-1-1) edge node [above,align=center] {mode preprocessing} (m-1-2)
+              edge node [left,align=left]  {type\\synthesis} (m-2-1)
+      (m-1-2) edge node [right,align=right] {bidirectional\\type synthesis} (m-2-2)
+      (m-2-1) edge[bend right=8] node [below] {completeness} (m-2-2);
+  \path[->]
+      (m-2-2) edge[bend right=8] node [above] {soundness} (m-2-1);
+  \end{tikzpicture}
+  \caption{An implementation of type synthesis via bidirectional typing}
+\end{figure}
+

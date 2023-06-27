@@ -14,7 +14,7 @@ The idea of bidirectional type synthesis begins with extending typing judgements
   \item $\Gamma |- \isTerm{t} \chk A$ for checking.
 \end{enumerate*}
 The former means that the type of a term is synthesised, using both the term and its context as input, while for the latter a term is to be checked against a given type.
-Then, a type synthesis algorithm can be `read off' from a bidirectional type system, provided that a conditional called \emph{mode-correctness} -- every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking --- is satisfied for every bidirectional typing rule.
+Then, a type synthesis algorithm can be `read off' from a bidirectional type system, provided that a conditional called \emph{mode-correctness} --- every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking --- is satisfied for every bidirectional typing rule.
 
 
 Contrary to the classic Damas--Milner type inference, bidirectional type synthesis does \emph{not} require unification.

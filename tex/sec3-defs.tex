@@ -126,11 +126,11 @@ We define raw terms specified by a type signature $\Sigma$ and a binding signatu
   \caption{Raw terms}
   \label{fig:raw-terms}
 \end{figure}
-  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{raw terms} under a context~$V$ of variables consists of
+  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of variables consists of
   \begin{enumerate}
     \item variables in $V$,
     \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ and a type $A$, and
-    \item a construct $\tmOpts$ for some $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A_0$ in $O$, where $t_i$'s are raw terms and $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$,
+    \item a construct $\tmOpts$ for some $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A_0$ in $O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$ and $t_i$'s are raw terms under the context $V, \vars{x}_i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
 \end{definition}
@@ -155,7 +155,7 @@ Hence we choose to include a substitution as part of its typing derivation expli
     \caption{Typing derivations}
     \label{fig:extrinsic-typing}
   \end{figure}
-  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ for a context $\Gamma$ of typed variables, a raw term under $\erase{\Gamma}$, and a type $A$ consists of 
+  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$ of typed variables, a raw term under $\erase{\Gamma}$, and a type $A$ consists of 
   \begin{enumerate}
     \item a derivation of $\Gamma |- x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |- (t \annotate A) : A$ if $\Gamma \vdash \isTerm{t} : A$ is derivable, and
@@ -240,10 +240,10 @@ We generalise bidirectional typing rules as well as model derivations for simply
     \caption{Mode derivations}
     \label{fig:mode-derivations}
   \end{figure}
-  In a bidirectional type system specified $(\Sigma, \Omega)$,
+  In a bidirectional type system specified by $(\Sigma, \Omega)$,
   \begin{itemize}
-    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash t :^\dir{d} A$ for a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$ is defined by \Cref{fig:bidirectional-typing-derivations};
-    \item the set of \emph{mode derivations} of $V |- t^\dir{d}$ for a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and mode $d$ is defined by \Cref{fig:mode-derivations}.
+    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash t :^\dir{d} A$ indexed by a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$ is defined by \Cref{fig:bidirectional-typing-derivations};
+    \item the set of \emph{mode derivations} of $V |- t^\dir{d}$ indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$ is defined by \Cref{fig:mode-derivations}.
   \end{itemize}
   The subscript $(\Sigma, \Omega)$ in judgements above is suppressed.
 \end{definition}

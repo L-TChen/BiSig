@@ -88,7 +88,7 @@ Acceptable excuses are defined by the predicate~$E$, which describes what is wro
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \chk A}{\Gamma \vdash \isTerm{(t \annotate A)}\syn A}\,\SynRule{Anno}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \syn A \\ A = B}{\Gamma \vdash \isTerm{t} \chk B}\,\ChkRule{Sub}
+    \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ B = A}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
     \and
     \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} \chk B}{\Gamma \vdash \isTerm{\lam{x}t} \chk A \bto B}\,\ChkRule{Abs}
     \and
@@ -180,18 +180,18 @@ We will construct a mode preprocessor~(\cref{sec:mode-preprocessing}) and a bidi
 To quantify over all such systems, we need their generic definitions, which we formulate in \cref{sec:defs}.
 
 \begin{figure}
-  \begin{tikzpicture}[thick]
+  \begin{tikzpicture}
   \matrix (m) [matrix of math nodes, row sep=3em, column sep=10em]
   {
     \boxed{\erase{\Gamma} \vdash \isTerm{t}}   & \boxed{\erase{\Gamma} \vdash \isTerm{t}^{\syn}} \\
     \boxed{\Gamma \vdash \isTerm{t} : A} & \boxed{\Gamma \vdash \isTerm{t} \syn A} \\
   };
-  \path[->]
+  \path[->, line width=0.7pt]
       (m-1-1) edge node [above] {mode preprocessing} (m-1-2)
       (m-1-2) edge node [right,align=center] {bidirectional\\type synthesis} (m-2-2)
       (m-2-1) edge[bend right=8] node [below] {completeness} (m-2-2)
-      (m-2-2) edge[bend right=7] node [above] {soundness}    (m-2-1);
-  \path[dashed,->]
+      (m-2-2) edge[bend right=8] node [above] {soundness}    (m-2-1);
+  \path[dashed,->,line width=0.7pt]
       (m-1-1) edge node [left,align=center]  {type\\synthesis} (m-2-1);
   \end{tikzpicture}
   \caption{An implementation of type synthesis via bidirectional typing}

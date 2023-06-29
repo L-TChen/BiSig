@@ -126,11 +126,11 @@ We define raw terms specified by a type signature $\Sigma$ and a binding signatu
   \caption{Raw terms}
   \label{fig:raw-terms}
 \end{figure}
-  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of variables consists of
+  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of free variables consists of
   \begin{enumerate}
     \item variables in $V$,
-    \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ and a type $A$, and
-    \item a construct $\tmOpts$ for some $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A_0$ in $O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$ and $t_i$'s are raw terms under the context $V, \vars{x}_i$,
+    \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ in $V$ and a type $A$, and
+    \item a construct $\tmOpts$ for some $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A_0$ in $O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$ and $t_i$'s are raw terms in the list $V, \vars{x}_i$ of variables,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
 \end{definition}
@@ -155,11 +155,11 @@ Hence we choose to include a substitution as part of its typing derivation expli
     \caption{Typing derivations}
     \label{fig:extrinsic-typing}
   \end{figure}
-  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$ of typed variables, a raw term under $\erase{\Gamma}$, and a type $A$ consists of 
+  In a simple type theory specified by $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$, a raw term with free variables in $\erase{\Gamma}$, and a type $A$ consists of 
   \begin{enumerate}
     \item a derivation of $\Gamma |- x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |- (t \annotate A) : A$ if $\Gamma \vdash \isTerm{t} : A$ is derivable, and
-    \item a derivation of $\Gamma |- \tmOpts : A$ for $o \colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A_0$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ such that $A = \simsub{A_0}{\rho}$ and $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash \isTerm{t_i} : \simsub{A_i}{\rho}$ is derivable for all $i$,
+    \item a derivation of $\Gamma |- \tmOpts : \simsub{A_0}{\rho}$ for $o \colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A_0$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing} respectively.
   For better readability, the subscript $(\Sigma, \Omega)$ in the above typing judgements is suppressed.
@@ -168,7 +168,7 @@ Note that, by definition, our simple type theory is always syntax-directed, sinc
 The $\Rule{Op}$ in both figures is a rule schema and gives rise to as many rules as there are operations in $o : O$.
 
 \begin{example}
-  Raw terms and typing derivations for simply typed $\lambda$-calculus (\Cref{fig:STLC-raw-terms,fig:STLC-typing-derivations}) can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the binding signature consisting of 
+  Raw terms (\Cref{fig:STLC-raw-terms}) and typing derivations (\Cref{fig:STLC-typing-derivations}) for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the binding signature consisting of 
  \[
    \mathsf{app}\colon A, B \rhd A \bto B, A \to B
    \quad\text{and}\quad
@@ -201,7 +201,7 @@ Similarly, the $\SynRule{App}$ rule can be specified by $\mathsf{app}\colon A, B
 \end{remark}
 
 
-We generalise bidirectional typing rules as well as model derivations for simply typed $\lambda$-calculus in \Cref{fig:STLC-bidirectional-typing-derivations,fig:STLC-mode-derivations} to derivations for a bidirectional type system specified by $(\Sigma, \Omega)$ where $\Sigma$ is still a type signature and $\Omega$ is a bidirectional binding signature, similar to \Cref{def:typing-derivations} for typing derivations but with an additional $\ChkRule{Sub}$ rule:
+We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-derivations}) as well as model derivations (\Cref{fig:STLC-mode-derivations}) for simply typed $\lambda$-calculus to derivations for a bidirectional type system specified by $(\Sigma, \Omega)$ where $\Sigma$ is still a type signature and $\Omega$ is a bidirectional binding signature, similar to \Cref{def:typing-derivations} for typing derivations but with an additional $\ChkRule{Sub}$ rule:
 \begin{definition}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
   \begin{figure}
     \centering
@@ -249,7 +249,7 @@ We generalise bidirectional typing rules as well as model derivations for simply
 \end{definition}
 
 \begin{example}
-  Bidirectional typing derivations and mode derivations for simply typed $\lambda$-calculus (\Cref{fig:STLC-bidirectional-typing-derivations,fig:STLC-mode-derivations}) can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the bidirectional binding signature consisting of $\mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}$ and $\mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn}$.
+  Bidirectional typing derivations and mode derivations for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the bidirectional binding signature consisting of $\mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}$ and $\mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn}$.
 \end{example}
 
 After developing these generic definitions, we are now able to reason about any bidirectional simple type system specified by a pair of signatures $(\Sigma, \Omega)$ in the following two sections.

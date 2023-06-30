@@ -180,7 +180,7 @@ The $\Rule{Op}$ in both figures is a rule schema and gives rise to as many rules
 \subsection{Bidirectional Binding Signatures and Bidirectional Type Systems} \label{subsec:bidirectional-system}
 Finally, for a bidirectional type system, we have raw terms and typing derivations like a simple type theory, but its typing judgements come in two forms $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$.
 Observe that these two typing judgements are just one typing judgement $\Gamma |- t :^\dir{d} A$ indexed additionally by a \emph{mode} $d : \Mode$---which is either $\syn$ or $\chk$---so that $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$ are just abbreviations of $\Gamma |- t :^{\syn} A$ and $\Gamma |- t :^{\chk} A$ respectively.
-Hence, to specify a bidirectional type system, we need further enrich the notion of binding signatures with modes as follows.
+Hence, to specify a bidirectional type system, we need further enrich the notion of binding signature with modes as follows.
 
 \begin{definition} \label{def:bidirectional-binding-signature}
   For a type signature $\Sigma$, a \emph{bidirectional binding signature} $\Omega$ is a set $O$ with a function
@@ -199,11 +199,11 @@ We also say a bidirectional type system $(\Sigma, \Omega)$ referring the bidirec
 
 \begin{remark}
   Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, so a bidirectional binding signature $\Omega$ also specifies a simple type theory, including its raw terms and typing derivations.
-  For this notion, we call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
+  We call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
 \end{remark}
 
 
-We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-derivations}) as well as model derivations (\Cref{fig:STLC-mode-derivations}) for simply typed $\lambda$-calculus to derivations for a bidirectional type system $(\Sigma, \Omega)$ where $\Omega$ is some bidirectional binding signature, similar to \Cref{def:typing-derivations} but with an additional $\ChkRule{Sub}$ rule:
+We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-derivations}) as well as mode derivations (\Cref{fig:STLC-mode-derivations}) for simply typed $\lambda$-calculus to derivations for a bidirectional type system $(\Sigma, \Omega)$ where $\Omega$ is some bidirectional binding signature, similar to \Cref{def:typing-derivations} but with an additional $\ChkRule{Sub}$ rule:
 \begin{definition}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
   \begin{figure}
     \centering
@@ -253,4 +253,4 @@ We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-de
   Bidirectional typing derivations and mode derivations for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the bidirectional binding signature consisting of $\mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}$ and $\mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn}$.
 \end{example}
 
-After developing these generic definitions, we are now able to reason about any bidirectional simple type system specified by a pair of signatures $(\Sigma, \Omega)$ in the following two sections.
+After developing these generic definitions, we are now able to reason about constructions and properties that hold for any bidirectional simple type system $(\Sigma, \Omega)$.

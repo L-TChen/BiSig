@@ -14,7 +14,7 @@ The idea of bidirectional type synthesis begins with extending typing judgements
   \item $\Gamma |- \isTerm{t} \chk A$ for checking.
 \end{enumerate*}
 The former means that the type of a term is synthesised, using both the term and its context as input, while for the latter a term is to be checked against a given type.
-Then, a type synthesis algorithm can be `read off' from a bidirectional type system, provided that a condition called \emph{mode-correctness} --- every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking --- is satisfied for every bidirectional typing rule.
+Then, a type synthesis algorithm can be `read off' from a bidirectional type system, provided that a condition called \emph{mode-correctness}---every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking---is satisfied for every bidirectional typing rule.
 
 
 Contrary to Damas--Milner type inference, unification is not required for bidirectional type synthesis.
@@ -111,7 +111,7 @@ That is, our decidable bidirectional type synthesis (\Cref{thm:bidirectional-typ
 In contrast to \citeauthor{Wadler2022}, our theory starts with raw terms and a general type synthesis problem, independent of bidirectional typing.
 This starting point uncovers nuances regarding the case of not having enough annotations, often overlooked in literature, and thus distinguishes completeness (with respect to a type assignment system) from annotatability, concepts conflated by \citet{Dunfield2021}. 
 To clarify the difference (\Cref{sec:annotatability}), we propose \emph{mode derivations} (\Cref{fig:mode-derivations,fig:generalised-mode-derivations}) and \emph{mode preprocessing} (\Cref{sec:mode-preprocessing}) assigning a mode first to a raw term with enough annotations or otherwise pinpoints missing annotations.
-By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we achieve our main result (\Cref{cor:trichotomy}) --- a \emph{trichotomy} of raw terms: a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory.
+By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we achieve our main result (\Cref{cor:trichotomy})---a \emph{trichotomy} of raw terms: a type synthesiser which checks if a given raw term is \emph{suitably annotated} and if a suitably annotated raw term has a typing derivation with respect to the specified simple type theory.
 Our bidirectional type synthesis can be instantiated for any system specified by a mode-correct signature, effectively a verified type-checker generator. 
 
 In summary, we contribute a theory of bidirectional type synthesis that is:

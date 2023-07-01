@@ -3,15 +3,9 @@
 \documentclass[BiSig.tex]{subfiles}
 
 %include agda.fmt
-%format → = "\mathop\to"
+
 %format ⦃ = "\{\kern-.9pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-1.5pt"
 %format ⦄ = "\kern-1.5pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-.9pt\}"
-%format ℕ = "\mathbb{N}"
-%format Ξ = "\Xi"
-%format ⊢ = "\vdash"
-%format ι = "\iota"
-%format Set₁ = Set "_1"
-%format constructor = "\Keyword{constructor}"
 
 \begin{document}
 

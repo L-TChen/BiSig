@@ -1,5 +1,4 @@
 \documentclass[acmsmall,screen]{acmart}
-
 \ifPDFTeX
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -8,7 +7,6 @@
 \usepackage{polyglossia}
 \setdefaultlanguage{british}
 \fi
-
 
 \usepackage{bbold}
 \newcommand{\hmmax}{0}
@@ -21,26 +19,26 @@
 \usepackage{mathpartir}
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
-
-
 \usepackage[inline]{enumitem} % for environment enumerate*
-%\setlist[enumerate]{mode=unboxed}
 
 \setlength {\marginparwidth }{2cm}
 \usepackage[obeyFinal,color=yellow,textsize=small]{todonotes}
 
 \usepackage{microtype}
+\usepackage{subfiles}
 
 \citestyle{acmauthoryear}
 \AtEndPreamble{%
 \theoremstyle{acmdefinition}
-\newtheorem{remark}[theorem]{Remark}}
-
-\input{type-notation} %% for type theory notation copied from HoTT Book
-\input{macros}
+\newtheorem{remark}[theorem]{Remark}
+}
 
 \newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40]{{#1}}}
 \newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40]{{#1}}}
+
+\input{type-notation} %% for type theory notation copied from HoTT Book
+\input{macros}
+\usepackage{mylhs2tex}
 
 \begin{document}
 
@@ -113,7 +111,7 @@
 \input{sec3-defs.tex}
 \input{sec4-pre-synthesis.tex}
 \input{sec5-synthesis.tex}
-\input{sec6-formalisation.tex}
+\subfile{sec6-formalisation}
 \input{sec7-future.tex}
 
 \begin{acks}

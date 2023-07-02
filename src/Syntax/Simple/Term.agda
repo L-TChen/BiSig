@@ -9,6 +9,8 @@ private variable
   Ξ Θ Θ₁ Θ₂ Θ₃ : ℕ
   n k i        : ℕ
   A B          : Set
+  x  : Fin Ξ
+  xs : Fins# Ξ
 
 infix 9 `_
 data Tm (Θ : ℕ) : Set where
@@ -44,6 +46,15 @@ fvs []       = []
 fvs (t ∷ ts) = fv t ++ fvs ts
 
 mutual
+  vars : Tm Ξ → Fins# Ξ
+  vars (` x)         = x ∷# []
+  vars (op (i , ts)) = varsⁿ ts
+
+  varsⁿ : Tm Ξ ^ n → Fins# Ξ
+  varsⁿ []       = []
+  varsⁿ (t ∷ ts) = vars t ∪ varsⁿ ts
+  
+mutual
   size : Tm Θ → ℕ
   size (` x)         = 1
   size (op (_ , ts)) = suc (sizeⁿ ts)
@@ -73,7 +84,6 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _∷_ p q)
 
--- [TODO] Generalise it to an Any predicate
 infix 4 _∈ᵥ_ _∈ᵥₛ_ _∈ᵥ?_ _∈ᵥₛ?_ _∉ᵥ_ _∉ᵥₛ_
 
 mutual 
@@ -154,85 +164,83 @@ module _ (σ : Sub Θ n) where mutual
   subⁿ (t ∷ ts) = sub t ∷ subⁿ ts
 
 Sub-id : Sub Θ Θ
-Sub-id = `_ -- tabulate `_
+Sub-id = `_
 
 RenToSub : Ren Θ n → Sub Θ n
-RenToSub σ = `_ ∘ σ -- tabulate (`_ ∘ σ)
+RenToSub σ = `_ ∘ σ
 
 Sub-⨟ : Sub Θ₁ Θ₂ → Sub Θ₂ Θ₃ → Sub Θ₁ Θ₃
-Sub-⨟ σ₁ σ₂ i = sub σ₂ (σ₁ i) -- tabulate λ i → sub σ₂ (lookup σ₁ i)
+Sub-⨟ σ₁ σ₂ i = sub σ₂ (σ₁ i)
 
-------------------------------------------------------------------------------
--- Substitutio as Variable Assignment
-
-Sub⊆ : Fins Ξ → ℕ → Set
-Sub⊆ {Ξ} xs Θ = Σ ((i : Fin Ξ) → i ∈ xs → Tm Θ)
-  λ ρ → ∀ {i} → (x y : i ∈ xs) → ρ i x ≡ ρ i y
-  -- [NOTE] I really want HIT to make a subset of Fin Ξ here.
-
-Sub⊆₀ : Fins Ξ → Set
-Sub⊆₀ xs = Sub⊆ xs 0
-
-Consistent : {xs ys : Fins Ξ}
-  → (ρ : Sub⊆ xs Θ) (σ : Sub⊆ ys Θ) → Set
-Consistent {Ξ} {_} {xs} {ys} (ρ , _) (σ , _) =
-  {i : Fin _} (x : i ∈ xs) (y : i ∈ ys) → ρ i x ≡ σ i y
-
-_⊑_ : {xs ys : Fins Ξ}
-  → Sub⊆ xs Θ → Sub⊆ ys Θ → Set
-_⊑_ {_} {_} {xs} {ys} ρ σ = xs ⊆ ys × Consistent ρ σ
-  
-FamSub : (Ξ Θ : ℕ) → Set₁
-FamSub Ξ Θ = {xs : Fins Ξ} → Sub⊆ xs Θ → Set
-
-Ext : {xs : Fins Ξ} → Sub⊆ xs Θ → FamSub Ξ Θ
-  → FamSub Ξ Θ
-Ext {Ξ} {Θ} {xs} ρ P {ys} σ = (ρ ⊑ σ) × P σ
-
-Min : FamSub Ξ Θ → FamSub Ξ Θ
-Min {Ξ} {Θ} P ρ = P ρ ×
-  ({ys : Fins Ξ} (σ : Sub⊆ ys Θ) → P σ → ρ ⊑ σ)
-
-⊑-refl : {xs : Fins Ξ}
-  → (ρ : Sub⊆ xs Θ) → ρ ⊑ ρ
-⊑-refl ρ = (λ x → x) , ρ .proj₂
-
-P→MinExtP : (P : FamSub Ξ Θ) → {xs ys : Fins Ξ} (ρ : Sub⊆ xs Θ)
-  → P ρ → Min (Ext ρ P) ρ
-P→MinExtP P ρ Pρ = (⊑-refl ρ , Pρ) , λ σ (ρ⊑σ , _) → ρ⊑σ
 ------------------------------------------------------------------------
--- `Reflects` idiom.
+-- Partial Substitution
 
--- The truth value of P is reflected by a boolean value.
--- `Reflects P b` is equivalent to `if b then P else ¬ P`.
+Sub⊆ : (Ξ : ℕ) → Fins# Ξ → Set
+Sub⊆ Ξ xs = ∀ {x} → x #∈ xs → Tm 0
 
-open import Data.Bool
+∃Sub⊆ : ℕ → Set
+∃Sub⊆ Ξ = ∃ (Sub⊆ Ξ)
 
-data MinReflects (P : FamSub Ξ Θ) : Bool → Set where
-  ofʸ :       (xs : Fins Ξ) (ρ : Sub⊆ xs Θ) (p : Min P ρ) → MinReflects P true
-  ofⁿ : (¬p : {zs : Fins Ξ} (σ : Sub⊆ zs Θ) → ¬ P σ)      → MinReflects P false
+empty : Sub⊆ Ξ []
+empty ()
 
-record MinDec (P : FamSub Ξ Θ) : Set where
-  constructor _because_
+module _ (ρ : Sub⊆ Ξ xs) where
+  extend : (x# : x # xs) (t : Tm 0)
+    → Sub⊆ Ξ (cons x xs x#)
+  extend x# t (here x)   = t
+  extend x# t (there x∈) = ρ x∈
+
+  mutual
+    sub⊆
+      : (t : Tm Ξ) → vars t #⊆ xs
+      → Tm 0
+    sub⊆ (` x)         t⊆ = ρ (t⊆ (here refl))
+    sub⊆ (op (i , ts)) t⊆ = op (i , sub⊆ⁿ ts t⊆)
+
+    sub⊆ⁿ
+      : (ts : Tm Ξ ^ n) → varsⁿ ts #⊆ xs
+      → Tm 0 ^ n
+    sub⊆ⁿ []       ts⊆ = []
+    sub⊆ⁿ (t ∷ ts) ts⊆ = sub⊆ t (ts⊆ ∘ ∪⁺ˡ) ∷ sub⊆ⁿ ts (ts⊆ ∘ ∪⁺ʳ (vars t))
+
+Sub⊆-Prop : ℕ → Set₁
+Sub⊆-Prop Ξ = ∃Sub⊆ Ξ → Set
+
+infixr 3 _∧_
+_∧_ : (P Q : Sub⊆-Prop Ξ) → Sub⊆-Prop Ξ
+(P ∧ Q) ρ = P ρ × Q ρ
+
+record _≤_ (ρ σ : ∃Sub⊆ Ξ) : Set where
+  constructor ≤-con
   field
-    does  : Bool
-    proof : MinReflects P does
-open MinDec public
+    domain-ext  : ρ .proj₁ #⊆ σ .proj₁
+    consistency : ∀ {x} (x∈ : x #∈ ρ .proj₁)
+      → ρ .proj₂ x∈ ≡ σ .proj₂ (domain-ext x∈)
+      
+record Min (P : Sub⊆-Prop Ξ) (ρ : ∃Sub⊆ Ξ) : Set where
+  constructor min-con
+  field
+    proof      : P ρ
+    minimality : ∀ σ → P σ → ρ ≤ σ
+open Min
 
-pattern yesₘ xs ρ p =  true because ofʸ xs ρ p
-pattern noₘ ¬p      = false because ofⁿ ¬p
+record Ext (ρ : ∃Sub⊆ Ξ) (P : Sub⊆-Prop Ξ) (ρ̅ : ∃Sub⊆ Ξ) : Set where
+  constructor ext-con
+  field
+    ext     : ρ ≤ ρ̅
+    witness : P ρ̅
+open Ext
 
-module _ {vs : Fins Ξ} ((ρ , p) : Sub⊆ vs Θ) where mutual
-  sub⊆ : (t : Tm Ξ) → fv t ⊆ vs → Tm Θ
-  sub⊆ (` x)         ⊆vs = ρ x (⊆vs (here refl))
-  sub⊆ (op (i , ts)) ⊆vs = op (i , sub⊆ⁿ ts ⊆vs)
+data MinDec (P : Sub⊆-Prop Ξ) : Set where
+  yesₘ : (ρ : ∃Sub⊆ Ξ) → (Pρ : Min P ρ) → MinDec P
+  noₘ  : (¬Pσ : ((σ : ∃Sub⊆ Ξ) → P σ → ⊥₀)) → MinDec P
 
-  sub⊆ⁿ : (ts : Tm Ξ ^ n) → fvⁿ ts ⊆ vs → Tm Θ ^ n
-  sub⊆ⁿ []       ⊆vs = []
-  sub⊆ⁿ (t ∷ ts) ⊆vs = sub⊆ t (⊆vs ∘ L.++⁺ˡ) ∷ sub⊆ⁿ ts (⊆vs ∘ L.++⁺ʳ _)
+↑-closed : Sub⊆-Prop Ξ → Set
+↑-closed P = ∀ {ρ ρ̅} → ρ ≤ ρ̅ → P ρ → P ρ̅
 
-none : Sub⊆ {Ξ} [] Θ
-none = (λ _ ()) , λ ()
+infix 4 _≈_ _≈ⁿ_
+_≈_ : Tm Ξ → Tm 0 → Sub⊆-Prop Ξ
+(t ≈ t₀) (xs , ρ) = Σ[ t⊆ ∈ vars t #⊆ xs ] sub⊆ ρ t t⊆ ≡ t₀
 
-toSub : {xs : Fins Ξ} → ((i : Fin Ξ) → i ∈ xs) → Sub⊆ xs Θ  → Sub Ξ Θ
-toSub xs⊆Ξ (ρ , _) i = ρ i (xs⊆Ξ i)
+_≈ⁿ_ : Tm Ξ ^ n → Tm 0 ^ n → Sub⊆-Prop Ξ
+(ts ≈ⁿ ts₀) (xs , ρ) = Σ[ ts⊆ ∈ varsⁿ ts #⊆ xs ] sub⊆ⁿ ρ ts ts⊆ ≡ ts₀

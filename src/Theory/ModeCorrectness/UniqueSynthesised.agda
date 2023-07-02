@@ -22,7 +22,7 @@ open import Syntax.BiTyped.Extrinsic.Term           Id D
 
 private variable
   Ξ Θ : ℕ
-  xs    : Fins Ξ
+  xs    : Fins# Ξ
   Γ     : Cxt  Θ
   A B   : TExp Ξ
   As    : TExps Ξ
@@ -48,19 +48,19 @@ mutual
     → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
     → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
   uniq-↑ᶜ (ι Syn A Ds) refl (_ , SDs , C⊆xs) ⊢ts ⊢us =
-    ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs (∈ᵥ→∈fv x))
+    ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs (∈ᵥ→∈vars x))
 
   uniq-↑ⁿ
     : (Ds : ArgsD Ξ) → ModeCorrectᵃˢ [] Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
     → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
     → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
-    → ∀ {x} → x ∈ (known Ds)
-    → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
+    → ∀ {x} → x #∈ (known Ds)
+    → ρ₁ x ≡ ρ₂ x
   uniq-↑ⁿ []                  _         _         _         ()
   uniq-↑ⁿ (_ ⊢[ Chk ] _ ∷ Ds) (_ , SDs) (_ , ⊢ts) (_ , ⊢us) =
     uniq-↑ⁿ Ds SDs ⊢ts ⊢us
-  uniq-↑ⁿ (Δ ⊢[ Syn ] A ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) x∈ with L.++⁻ (fv A) x∈
+  uniq-↑ⁿ (Δ ⊢[ Syn ] A ∷ Ds) (SD , SDs) (⊢t , ⊢ts) (⊢u , ⊢us) x∈ with ∈-∪⁻ (vars A) x∈
   ... | inl x∈A  = uniq-↑ᵃ A Δ SD ⊢t ⊢u (uniq-↑ⁿ Ds SDs ⊢ts ⊢us) x∈A
   ... | inr x∈Ds = uniq-↑ⁿ Ds SDs ⊢ts ⊢us x∈Ds
 
@@ -69,13 +69,13 @@ mutual
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
     → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
     → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
-    → (∀ {x} → x ∈ xs → ρ₁ x ≡ ρ₂ x) -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x)
-    → ∀ {x} → x ∈ fv C
-    → ρ₁ x ≡ ρ₂ x -- V.lookup ρ₁ x ≡ V.lookup ρ₂ x
-  uniq-↑ᵃ C []      _    ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈fv→∈ᵥ x)
-  uniq-↑ᵃ C (A ∷ Δ) Δ⊆xs ⊢t ⊢u f = 
-    uniq-↑ᵃ C Δ (Δ⊆xs ∘ L.++⁺ʳ _) (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
-    where A₁=A₂ = ≡-fv A λ x∈ → f ((Δ⊆xs (L.++⁺ˡ (∈ᵥ→∈fv x∈))))
+    → (∀ {x} → x #∈ xs → ρ₁ x ≡ ρ₂ x)
+    → ∀ {x} → x #∈ vars C
+    → ρ₁ x ≡ ρ₂ x
+  uniq-↑ᵃ C []      _    ⊢t ⊢u f x = ≡-fv-inv C (uniq-↑ ⊢t ⊢u) (∈vars→∈ᵥ x)
+  uniq-↑ᵃ C (A ∷ Δ) (A⊆xs ∷ Δ⊆xs) ⊢t ⊢u f =  
+    uniq-↑ᵃ C Δ Δ⊆xs (subst (λ A → (⟦ Δ ⟧ᵃ _ _) _ (_ ⦂ A , _) _) A₁=A₂ ⊢t) ⊢u f
+    where A₁=A₂ = ≡-fv A λ x∈ → f (A⊆xs (∈ᵥ→∈vars x∈))
 
 ¬switch
   : {t : Raw⇒ Θ}

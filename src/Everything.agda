@@ -11,6 +11,8 @@ import Syntax.NamedContext
 import Syntax.Simple.Description
 import Syntax.Simple.Term
 import Syntax.Simple.Properties
+import Syntax.Simple.Unif
+import Syntax.Simple
 
 import Syntax.Typed.Description
 import Syntax.Typed.Intrinsic.Functor
@@ -50,6 +52,7 @@ import Theory.Ontologisation.Context
 import Theory.Ontologisation.Term
 
 import Theory.ModeCorrectness.Description
+import Theory.ModeCorrectness.Functor
 import Theory.ModeCorrectness.UniqueSynthesised
 -- import Theory.ModeCorrectness.Term -- [TODO] not finished yet
 

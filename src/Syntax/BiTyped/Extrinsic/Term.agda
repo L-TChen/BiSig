@@ -21,26 +21,26 @@ private variable
   A B : TExp Θ
   t   : Raw Θ d
 
-data ⊢⇆ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
+data ⊢⇔ {Θ : ℕ} : Pred₀ Θ (Raw Θ) where
   ⊢`
     : x ⦂ A ∈ Γ
-    → ⊢⇆ Syn A Γ (` x)
+    → ⊢⇔ Syn A Γ (` x)
   ⊢⦂
-    : ⊢⇆ Chk A Γ t
-    → ⊢⇆ Syn A Γ (t ⦂ A)
+    : ⊢⇔ Chk A Γ t
+    → ⊢⇔ Syn A Γ (t ⦂ A)
   ⊢↑
     : (eq : A ≡ B)
-    → ⊢⇆ Syn B Γ t
-    → ⊢⇆ Chk A Γ (t ↑)
+    → ⊢⇔ Syn B Γ t
+    → ⊢⇔ Chk A Γ (t ↑)
   ⊢op
     : (t : R.⟦ D ⟧ (Raw Θ) d)
-    → (⊢t : ⟦ D ⟧ ⊢⇆ d A Γ t)
-    → ⊢⇆ d A Γ (op t)
+    → (⊢t : ⟦ D ⟧ ⊢⇔ d A Γ t)
+    → ⊢⇔ d A Γ (op t)
 
 infix 6 _⊢_⇒_ _⊢_⇐_
 
 _⊢_⇒_ : Cxt Θ → Raw Θ Syn → TExp Θ → Set
-Γ ⊢ t ⇒ A = ⊢⇆ Syn A Γ t
+Γ ⊢ t ⇒ A = ⊢⇔ Syn A Γ t
 
 _⊢_⇐_ : Cxt Θ → Raw Θ Chk → TExp Θ → Set
-Γ ⊢ t ⇐ A = ⊢⇆ Chk A Γ t
+Γ ⊢ t ⇐ A = ⊢⇔ Chk A Γ t

@@ -48,14 +48,14 @@ mutual
 
   ∥-∥map : (D : ArgsD Ξ)
     → {t : R.⟦ D ⟧ᵃˢ (Raw Θ)}
-    → E.⟦ D ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ Γ t
+    → E.⟦ D ⟧ᵃˢ (Raw Θ) ⊢⇔ ρ Γ t
     → I.⟦ D ⟧ᵃˢ (Tm  Θ)    ρ ∥ Γ ∥cxt
   ∥-∥map []                _        = tt
   ∥-∥map (Δ ⊢[ d ] _ ∷ Ds) (p , ps) = ∥-∥mapᵃ Δ p , ∥-∥map Ds ps
 
   ∥-∥mapᵃ : (Δ : TExps Ξ)
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ d)}
-    → E.⟦ Δ ⟧ᵃ (Raw Θ)    (⊢⇆ d A) ρ Γ t
+    → E.⟦ Δ ⟧ᵃ (Raw Θ)    (⊢⇔ d A) ρ Γ t
     → I.⟦ Δ ⟧ᵃ (Tm Θ d A)          ρ ∥ Γ ∥cxt
   ∥-∥mapᵃ {d = Chk} []      p = ∥ p ∥⇐
   ∥-∥mapᵃ {d = Syn} []      p = ∥ p ∥⇒

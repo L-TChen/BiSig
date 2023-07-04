@@ -181,8 +181,8 @@ Sub⊆ Ξ xs = ∀ {x} → x #∈ xs → Tm 0
 ∃Sub⊆ : ℕ → Set
 ∃Sub⊆ Ξ = ∃ (Sub⊆ Ξ)
 
-empty : Sub⊆ Ξ []
-empty ()
+empty : ∃Sub⊆ Ξ
+empty = ([] , λ ())
 
 module _ (ρ : Sub⊆ Ξ xs) where
   extend : (x# : x # xs) (t : Tm 0)
@@ -216,6 +216,7 @@ record _≤_ (ρ σ : ∃Sub⊆ Ξ) : Set where
     domain-ext  : ρ .proj₁ #⊆ σ .proj₁
     consistency : ∀ {x} (x∈ : x #∈ ρ .proj₁)
       → ρ .proj₂ x∈ ≡ σ .proj₂ (domain-ext x∈)
+open _≤_ public
       
 record Min (P : Sub⊆-Prop Ξ) (ρ : ∃Sub⊆ Ξ) : Set where
   constructor min-con

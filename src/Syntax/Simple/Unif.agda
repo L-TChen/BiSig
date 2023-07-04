@@ -38,7 +38,7 @@ insert x t (xs , ρ) with fresh? x xs
       } 
   }
 ... | inr x∈xs with ρ x∈xs ≟ t
-... | yes eq = yesₘ (_ , ρ) (Pρ→MinExtP (_ , ρ) ((λ { (here refl) → x∈xs }) , eq))
+... | yes eq = yesₘ (_ , ρ) (Pρ→MinExtP ((λ { (here refl) → x∈xs }) , eq))
 ... | no neq = noₘ λ where
   (zs , σ) (ext-con (≤-con xs⊆zs con) (x∈zs , eq)) → neq (begin
     ρ x∈xs
@@ -61,7 +61,7 @@ mutual
 
   acmpⁿ : (ts : Tm Ξ ^ n) (us : Tm 0 ^ n) (ρ : ∃Sub⊆ Ξ)
     → MinDec (Ext ρ (ts ≈ⁿ us))
-  acmpⁿ []       []       ρ = yesₘ ρ (Pρ→MinExtP ρ ((λ ()) , refl))
+  acmpⁿ []       []       ρ = yesₘ ρ (Pρ→MinExtP ((λ ()) , refl))
   acmpⁿ (t ∷ ts) (u ∷ us) ρ with acmpⁿ ts us ρ
   ... | noₘ ¬σ      = noₘ λ σ (ext-con ρ≤σ (t∷ts⊆ , eq)) →
     ¬σ σ (ext-con ρ≤σ ((λ x∈ → t∷ts⊆ (∪⁺ʳ (vars t) x∈)) , V.∷-injectiveʳ eq))

@@ -69,6 +69,8 @@ xs #⊆ ys = ∀ {x} → x #∈ xs → x #∈ ys
 ≡→⊆ : xs ≡ ys → xs #⊆ ys
 ≡→⊆ refl x = x
 
+[]⊆xs : [] #⊆ xs
+[]⊆xs ()
 #⊆-refl : xs #⊆ xs
 #⊆-refl x = x
 
@@ -176,8 +178,8 @@ module Decidable {A : Set} ⦃ _ : DecEq A ⦄ where
   ∪-⊆⁻ʳ : ∀ xs → xs ∪ ys #⊆ zs → ys #⊆ zs
   ∪-⊆⁻ʳ  xs xs∪ys⊆zs x∈xs = xs∪ys⊆zs (∪⁺ʳ xs x∈xs)
 
-  ∪-monotoneʳ : ys #⊆ zs → xs ∪ ys #⊆ xs ∪ zs
-  ∪-monotoneʳ {xs = xs} ys⊆zs x∈ with ∈-∪⁻ xs x∈
+  ∪-monotoneʳ : ∀ xs → ys #⊆ zs → xs ∪ ys #⊆ xs ∪ zs
+  ∪-monotoneʳ xs ys⊆zs x∈ with ∈-∪⁻ xs x∈
   ... | inj₁ x∈xs = ∪⁺ˡ x∈xs 
   ... | inj₂ x∈ys = ∪⁺ʳ xs (ys⊆zs x∈ys)
 open Decidable public

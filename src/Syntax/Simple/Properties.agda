@@ -309,8 +309,6 @@ module _ (ρ : Sub⊆ Ξ xs) where
     sub⊆ⁿ-⊆-irrelevant []       t⊆ t⊆′ = refl
     sub⊆ⁿ-⊆-irrelevant (t ∷ ts) t⊆ t⊆′ = cong₂ _∷_
       (sub⊆-⊆-irrelevant t _ _) (sub⊆ⁿ-⊆-irrelevant ts _ _) 
--- Partial substitutions that have different domains
--- but defined the same on vars t
 
 mutual
   ρ=σ→subρ=subσ : (t : Tm Ξ) (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys)
@@ -329,12 +327,19 @@ mutual
   ρ=σ→subρ=subσⁿ (t ∷ ts) ρ σ ⊆xs ⊆ys ρ=σ = cong₂ _∷_
     (ρ=σ→subρ=subσ  t  ρ σ (∪-⊆⁻ˡ ⊆xs)          (∪-⊆⁻ˡ ⊆ys)          (λ x∈ → ρ=σ (∪⁺ˡ x∈)))
     (ρ=σ→subρ=subσⁿ ts ρ σ (∪-⊆⁻ʳ (vars t) ⊆xs) (∪-⊆⁻ʳ (vars t) ⊆ys) λ x∈ → ρ=σ (∪⁺ʳ (vars t) x∈))
+-- 
+-- ρ≤γ→subρ=subγ
+--   : (t : Tm Ξ) ((xs , ρ) : ∃Sub⊆ Ξ) ((ys , σ) : ∃Sub⊆ Ξ)
+--   → (⊆xs : vars t #⊆ xs)
+--   → ((≤-con xs⊆ys _) : (xs , ρ) ≤ (ys , σ))
+--   → sub⊆ ρ t ⊆xs ≡ sub⊆ σ t (xs⊆ys ∘ ⊆xs)
+-- ρ≤γ→subρ=subγ t (xs , ρ) (ys , σ) ⊆xs ρ≤σ = {!ρ=σ→subρ=subσⁿ!}
 ------------------------------------------------------------------------
 -- Constructions regarding partial substitution properties
 
 open Equivalence
-Pρ→MinExtP : {P : Sub⊆-Prop Ξ} (ρ : ∃Sub⊆ Ξ) → P ρ → Min (Ext ρ P) ρ
-Pρ→MinExtP ρ Pρ = min-con (ext-con (≤-refl ρ) Pρ) λ σ (ext-con ρ≤σ _) → ρ≤σ
+Pρ→MinExtP : {P : Sub⊆-Prop Ξ} {ρ : ∃Sub⊆ Ξ} → P ρ → Min (Ext ρ P) ρ
+Pρ→MinExtP {Ξ} {P} {ρ} Pρ = min-con (ext-con (≤-refl ρ) Pρ) λ σ (ext-con ρ≤σ _) → ρ≤σ
 
 Ext⇔ : {P Q : Sub⊆-Prop Ξ}
   → ((ρ : ∃Sub⊆ Ξ) → P ρ ⇔ Q ρ)

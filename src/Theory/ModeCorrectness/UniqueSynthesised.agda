@@ -20,6 +20,8 @@ open import Syntax.BiTyped.Raw.Term                 Id D
 open import Syntax.BiTyped.Extrinsic.Functor     SD Id
 open import Syntax.BiTyped.Extrinsic.Term           Id D
 
+import Theory.ModeCorrectness.Functor SD Id as M
+
 private variable
   Ξ Θ : ℕ
   xs    : Fins# Ξ
@@ -44,8 +46,8 @@ mutual
   uniq-↑ᶜ
     : (D@(ι d A Ds) : ConD) → d ≡ Syn → ModeCorrectᶜ D
     → ∀ {ts ρ₁ ρ₂}
-    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts
-    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts
+    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇔ ρ₁ Γ ts
+    → ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇔ ρ₂ Γ ts
     → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
   uniq-↑ᶜ (ι Syn A Ds) refl (_ , SDs , C⊆xs) ⊢ts ⊢us =
     ≡-fv A λ x → uniq-↑ⁿ Ds SDs ⊢ts ⊢us (C⊆xs (∈ᵥ→∈vars x))
@@ -53,8 +55,8 @@ mutual
   uniq-↑ⁿ
     : (Ds : ArgsD Ξ) → ModeCorrectᵃˢ [] Ds
     → {ts : R.⟦ Ds ⟧ᵃˢ (Raw Θ)}
-    → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₁ Γ ts)
-    → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇆ ρ₂ Γ ts)
+    → (⊢ts : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇔ ρ₁ Γ ts)
+    → (⊢us : ⟦ Ds ⟧ᵃˢ (Raw Θ) ⊢⇔ ρ₂ Γ ts)
     → ∀ {x} → x #∈ (known Ds)
     → ρ₁ x ≡ ρ₂ x
   uniq-↑ⁿ []                  _         _         _         ()
@@ -67,8 +69,8 @@ mutual
   uniq-↑ᵃ
     : (C : TExp Ξ) (Δ : TExps Ξ) → Cover xs Δ
     → {t : R.⟦ Δ ⟧ᵃ (Raw Θ Syn)}
-    → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
-    → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇆ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
+    → (⊢t : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇔ Syn (C ⟨ ρ₁ ⟩)) ρ₁ Γ t)
+    → (⊢u : ⟦ Δ ⟧ᵃ (Raw Θ) (⊢⇔ Syn (C ⟨ ρ₂ ⟩)) ρ₂ Γ t)
     → (∀ {x} → x #∈ xs → ρ₁ x ≡ ρ₂ x)
     → ∀ {x} → x #∈ vars C
     → ρ₁ x ≡ ρ₂ x
@@ -83,3 +85,34 @@ mutual
   → B ≢ A
   → ¬ Γ ⊢ t ↑ ⇐ B
 ¬switch ⊢t B≠A (⊢↑ B=A ⊢t′) rewrite uniq-↑ ⊢t ⊢t′ = B≠A B=A
+
+{-
+ M.⟦ Δ ⟧ᵃ (ys , ρ̅)
+      (All.map (λ {B = x} B⊆ {x = x₁} x∈ → Ds⊆ (B⊆ x∈)) Δ⊆Ds)
+      (Syntax.BiTyped.Raw.Term.Raw Id D 0) (⊢⇔ Syn A) Γ t
+-}
+
+uniqᵐ-↑
+  : (Δ : TExps Ξ) {(xs , ρ) (xs′ , ρ′): ∃Sub⊆ Ξ} {Δ⊆ : Cover xs Δ} {Δ⊆′ : Cover xs′ Δ}
+  → (xs , ρ) ≤ (xs′ , ρ′)
+  → {Γ : Cxt 0}
+  → {t : R.⟦ Δ ⟧ᵃ (Raw⇒ 0)} → ∀ {B C}
+  → M.⟦ Δ ⟧ᵃ (xs  , ρ)  Δ⊆  (Raw 0) (_⊢_⇒ B) Γ t
+  → M.⟦ Δ ⟧ᵃ (xs′ , ρ′) Δ⊆′ (Raw 0) (_⊢_⇒ C) Γ t
+  → B ≡ C
+uniqᵐ-↑ []    _  ⊢t ⊢t′ =
+  uniq-↑ ⊢t ⊢t′
+uniqᵐ-↑ (A ∷ Δ) {xs , ρ} {xs′ , ρ′} {A⊆ ∷ Δ⊆} {A⊆′ ∷ Δ⊆′} p@(≤-con xs⊆xs′ ρ≤ρ′) {Γ} {x , t} ⊢t ⊢t′ =
+  uniqᵐ-↑ Δ {_} {_} {_} {Δ⊆′} p ⊢t
+    $ subst (λ A → M.⟦ Δ ⟧ᵃ (xs′ , ρ′) Δ⊆′ (Raw 0) (_⊢_⇒ _) (x ⦂ A , Γ) t)
+      (ρ=σ→subρ=subσ A ρ′ ρ A⊆′ A⊆ (sym ∘ helper)) ⊢t′
+    where
+      open ≡-Reasoning
+      helper : ∀ {x} (x∈ : x #∈ vars A) → ρ (A⊆ x∈) ≡ ρ′ (A⊆′ x∈)
+      helper x∈ = begin
+        ρ  (A⊆ x∈)
+          ≡⟨ ρ≤ρ′ (A⊆ x∈) ⟩
+        ρ′  (xs⊆xs′ (A⊆ x∈))
+          ≡⟨ cong ρ′ (#∈-uniq _ _) ⟩
+        ρ′ (A⊆′ x∈)
+          ∎

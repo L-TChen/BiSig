@@ -1,5 +1,4 @@
 open import Prelude
-  hiding (lookup)
 
 module Syntax.NamedContext.Decidable (Id : Set) ⦃ DecEqId : DecEq Id ⦄ where 
 

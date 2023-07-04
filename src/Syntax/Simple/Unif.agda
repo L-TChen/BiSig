@@ -70,3 +70,6 @@ mutual
   ... | yesₘ ρ′ minρ′ = yesₘ ρ′ (Min⇔ (Ext⇔ (t≈u×ts≈us⇔tts≈uus t u ts us) ρ) ρ′ .to
     (optimist ρ ρ̅ ρ′ (↑≈ⁿ ts us) minρ̅ minρ′))
 
+cmp : (t : Tm Ξ) (u : Tm 0)
+  → MinDec (t ≈ u)
+cmp t u = MinDecExt∅⇔MinDec .to (acmp t u empty)

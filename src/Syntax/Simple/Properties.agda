@@ -209,36 +209,6 @@ mutual
   ... | inl x∈t  = head (∈vars→∈ᵥ x∈t)
   ... | inr x∈ts = tail (∈varsⁿ→∈ᵥₛ x∈ts)
 
---mutual
---  ∈ᵥ→∈fv : x ∈ᵥ t → x ∈ fv t
---  ∈ᵥ→∈fv (here p) = here p
---  ∈ᵥ→∈fv (op   p) = ∈ᵥ→∈fvⁿ p
---
---  ∈ᵥ→∈fvⁿ : x ∈ᵥₛ ts → x ∈ fvⁿ ts
---  ∈ᵥ→∈fvⁿ (head x∈)         = ∈-++⁺ˡ        (∈ᵥ→∈fv x∈)
---  ∈ᵥ→∈fvⁿ (tail {_} {t} x∈) = ∈-++⁺ʳ (fv t) (∈ᵥ→∈fvⁿ x∈)
---
---mutual 
---  ∈fv→∈ᵥ : {t : Tm Ξ} {x : Fin Ξ} → x ∈ fv t → x ∈ᵥ t
---  ∈fv→∈ᵥ {_} {` x}  (here px) = here px
---  ∈fv→∈ᵥ {_} {op _} x∈        = op (∈fv→∈ᵥⁿ x∈)
---
---  ∈fv→∈ᵥⁿ : {x : Fin Ξ} {ts : Tm Ξ ^ n} → x ∈ fvⁿ ts → x ∈ᵥₛ ts
---  ∈fv→∈ᵥⁿ  {_} {suc l} {x} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
---  ... | inl x∈t  = head (∈fv→∈ᵥ x∈t)
---  ... | inr x∈ts = tail (∈fv→∈ᵥⁿ x∈ts)
---
---module _ {Ξ : ℕ} where
---  Any∈ᵥ→Any∈ : {ts : Tms Ξ} {i : Fin Ξ}
---    → L.Any (_∈ᵥ_ i) ts → L.Any (_≡_ i) (fvs ts)
---  Any∈ᵥ→Any∈ {t ∷ ts} (here px) = L.++⁺ˡ (∈ᵥ→∈fv px)
---  Any∈ᵥ→Any∈ {t ∷ ts} (there x) = L.++⁺ʳ (fv t) (Any∈ᵥ→Any∈ x)
---
---  Any∈→Any∈ᵥ : {ts : Tms Ξ} {i : Fin Ξ}
---    → L.Any (_≡_ i) (fvs ts) → L.Any (_∈ᵥ_ i) ts
---  Any∈→Any∈ᵥ {t ∷ ts} x∈ with L.++⁻ (fv t) x∈
---  ... | inl x∈t  = here (∈fv→∈ᵥ x∈t)
---  ... | inr x∈ts = there (Any∈→Any∈ᵥ x∈ts)
 
 module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
   ≡-fv-inv : (A : Tm Θ₁) 
@@ -273,6 +243,11 @@ module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
 ------------------------------------------------------------------------
 -- Properties regarding Partial Substitution
 
+∅≤ρ : {ρ : ∃Sub⊆ Ξ} → empty ≤ ρ
+∅≤ρ = record
+  { domain-ext  = λ ()
+  ; consistency = λ ()
+  }
 -- ≤ is a preorder
 ≤-refl : (ρ : ∃Sub⊆ Ξ) → ρ ≤ ρ
 ≤-refl ρ = record
@@ -327,13 +302,97 @@ mutual
   ρ=σ→subρ=subσⁿ (t ∷ ts) ρ σ ⊆xs ⊆ys ρ=σ = cong₂ _∷_
     (ρ=σ→subρ=subσ  t  ρ σ (∪-⊆⁻ˡ ⊆xs)          (∪-⊆⁻ˡ ⊆ys)          (λ x∈ → ρ=σ (∪⁺ˡ x∈)))
     (ρ=σ→subρ=subσⁿ ts ρ σ (∪-⊆⁻ʳ (vars t) ⊆xs) (∪-⊆⁻ʳ (vars t) ⊆ys) λ x∈ → ρ=σ (∪⁺ʳ (vars t) x∈))
+
+------------------------------------------------------------------------
+-- Substitution ⇒ Partial substitution
+x≠y→sucx≠sucy
+  : {x y : Fin Ξ}
+  → x ≢ y → suc x ≢ suc y
+x≠y→sucx≠sucy neq = neq ∘ F.suc-injective
+
+0#suc : (xs : Fins# Ξ)
+  → zero # map suc x≠y→sucx≠sucy xs
+0#suc []            = tt
+0#suc (cons a xs x) = F.0≢1+n , 0#suc xs
+
+enumerate : (Ξ : ℕ) → List# (Fin Ξ) 
+enumerate zero    = []
+enumerate (suc i) =
+  cons zero (map suc x≠y→sucx≠sucy  (enumerate i)) (0#suc (enumerate i))
+
+x∈xs→1+x∈1+xs
+  : x #∈ xs
+  → suc x #∈ map suc x≠y→sucx≠sucy xs
+x∈xs→1+x∈1+xs (here eq)  = here (cong suc eq)
+x∈xs→1+x∈1+xs (there x∈) = there (x∈xs→1+x∈1+xs x∈)
+
+Sub⇒Sub⊆ : Sub Ξ 0 → Sub⊆ Ξ (enumerate Ξ)
+Sub⇒Sub⊆ ρ {x} x∈ = ρ x
+
+⊆enum : (x : Fin Ξ) → x #∈ enumerate Ξ
+⊆enum zero    = here refl
+⊆enum (suc x) = there (x∈xs→1+x∈1+xs (⊆enum x))
+
+t⊆Ξ : (t : Tm Ξ) → vars t #⊆ enumerate Ξ
+t⊆Ξ t {x} x∈ = ⊆enum x
+
+mutual
+  Sub⇒Sub⊆-=
+    : (σ : Sub Ξ 0)
+    → (t : Tm Ξ)
+    → sub⊆ (Sub⇒Sub⊆ σ) t (t⊆Ξ t) ≡ sub σ t
+  Sub⇒Sub⊆-= σ (` x)         = refl
+  Sub⇒Sub⊆-= σ (op (i , ts)) =
+    cong (λ ts → op (i , ts)) (Sub⇒Sub⊆-=ⁿ σ ts)
+  
+  Sub⇒Sub⊆-=ⁿ
+    : (σ : Sub Ξ 0)
+    → (t : Tm Ξ ^ n)
+    → sub⊆ⁿ (Sub⇒Sub⊆ σ) t (λ {x} _ → ⊆enum x) ≡ subⁿ σ t
+  Sub⇒Sub⊆-=ⁿ σ []       = refl
+  Sub⇒Sub⊆-=ⁿ σ (t ∷ ts) = cong₂ _∷_ (Sub⇒Sub⊆-= σ t) (Sub⇒Sub⊆-=ⁿ σ ts)
+  
+------------------------------------------------------------------------
+-- Partial Substitution to Substitution
+Sub⊆⇒Sub
+  : Sub⊆ Ξ xs → ((x : Fin Ξ) → x #∈ xs)
+  → Sub Ξ 0
+Sub⊆⇒Sub σ ∀x∈xs x = σ (∀x∈xs x)
+
+module _ (ρ : Sub⊆ Ξ xs) (∀x∈xs : (x : Fin Ξ) → x #∈ xs) where mutual
+  Sub⊆⇒Sub-≡
+    : (t : Tm Ξ)
+    → sub (Sub⊆⇒Sub ρ ∀x∈xs) t ≡ sub⊆ ρ t (λ {x} _ → ∀x∈xs x)
+  Sub⊆⇒Sub-≡ (` x)         = refl
+  Sub⊆⇒Sub-≡ (op (i , ts)) = cong (λ ts → op (i , ts)) (Sub⊆⇒Sub-≡ⁿ ts)
+
+  Sub⊆⇒Sub-≡ⁿ
+    : (ts : Tm Ξ ^ n)
+    → subⁿ ((Sub⊆⇒Sub ρ ∀x∈xs)) ts ≡ sub⊆ⁿ ρ ts λ {x} _ → ∀x∈xs x
+  Sub⊆⇒Sub-≡ⁿ []       = refl
+  Sub⊆⇒Sub-≡ⁿ (t ∷ ts) = cong₂ _∷_ (Sub⊆⇒Sub-≡ t) (Sub⊆⇒Sub-≡ⁿ ts)
+    
+------------------------------------------------------------------------
 -- 
--- ρ≤γ→subρ=subγ
---   : (t : Tm Ξ) ((xs , ρ) : ∃Sub⊆ Ξ) ((ys , σ) : ∃Sub⊆ Ξ)
---   → (⊆xs : vars t #⊆ xs)
---   → ((≤-con xs⊆ys _) : (xs , ρ) ≤ (ys , σ))
---   → sub⊆ ρ t ⊆xs ≡ sub⊆ σ t (xs⊆ys ∘ ⊆xs)
--- ρ≤γ→subρ=subγ t (xs , ρ) (ys , σ) ⊆xs ρ≤σ = {!ρ=σ→subρ=subσⁿ!}
+
+module _ (σ : Sub Ξ 0) (ρ : Sub⊆ Ξ xs) where mutual
+  σ=ρ|A
+    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+    → sub σ t ≡ sub⊆ ρ t t⊆
+    → ∀ {x} (x∈ : x #∈ vars t)
+    → ρ (t⊆ x∈) ≡ σ x
+  σ=ρ|A (` x)         t⊆ eq (here refl) = sym eq
+  σ=ρ|A (op (i , ts)) t⊆ eq {y} y∈ = σ=ρ|Aⁿ ts t⊆ (op-inj₃ eq) y∈
+
+  σ=ρ|Aⁿ
+    : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
+    → subⁿ σ ts ≡ sub⊆ⁿ ρ ts ts⊆
+    → ∀ {x} (x∈ : x #∈ varsⁿ ts)
+    → ρ (ts⊆ x∈) ≡ σ x
+  σ=ρ|Aⁿ (t ∷ ts) ts⊆ eq x∈ with ∈-∪⁻ (vars t) x∈
+  ... | inl x∈t  = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|A t (∪-⊆⁻ˡ ts⊆) (V.∷-injectiveˡ eq) x∈t) 
+  ... | inr x∈ts = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|Aⁿ ts (∪-⊆⁻ʳ (vars t) ts⊆) (V.∷-injectiveʳ eq) x∈ts)
+
 ------------------------------------------------------------------------
 -- Constructions regarding partial substitution properties
 
@@ -371,6 +430,15 @@ MinDec⇔ P⇔Q = record
     (noₘ ¬Qσ)     → noₘ λ σ Pσ → ¬Qσ σ (P⇔Q σ .to Pσ)
   }
 
+MinDecExt∅⇔MinDec
+  : {P : Sub⊆-Prop Ξ}
+  → MinDec (Ext empty P) ⇔ MinDec P
+MinDecExt∅⇔MinDec = MinDec⇔ λ ρ → record
+  { to   = λ where
+    (ext-con _ Pρ) → Pρ
+  ; from = λ Pρ → ext-con ∅≤ρ Pρ
+  }
+ 
 optimist
   : {P Q : Sub⊆-Prop Ξ}
   → (ρ ρ̅₁ ρ̅₂ : ∃Sub⊆ Ξ)

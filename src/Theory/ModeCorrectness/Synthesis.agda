@@ -37,14 +37,8 @@ open B SD
 open ≡-Reasoning
 
 private variable
-  d   : Mode
-  Ξ Θ : ℕ
-  A B : TExp Θ
-  As  : TExps Θ
+  Ξ     : ℕ
   xs ys : Fins# Ξ
-  Γ   : Cxt
-  ρ   : TSub Ξ Θ
-  t u : Raw d
 
 module _ where mutual
   synthesise
@@ -81,7 +75,7 @@ module _ where mutual
     : (D : ConD) → ConD.mode D ≡ Chk → ModeCorrectᶜ D
     → (Γ : Cxt) (t : R.⟦ D ⟧ᶜ Raw Chk) (A : Ty)
     → Dec (⟦ D ⟧ᶜ ⊢⇔ Chk A Γ t)
-  checkᶜ (ι Chk A₀ Ds) refl (⊆A∪Ds , mc) Γ (refl , ts) A with cmp A₀ A
+  checkᶜ (ι Chk A₀ Ds) refl (⊆A∪Ds , SDs) Γ (refl , ts) A with cmp A₀ A
   ... | noₘ   A₀≉A = no λ where
     (σ , eq , ⊢t) → A₀≉A (_ , Sub⇒Sub⊆ σ) ((λ {x} x∈ → ⊆enum x) , (begin
       sub⊆ _ A₀ _
@@ -90,16 +84,24 @@ module _ where mutual
         ≡⟨ eq ⟩
       A
         ∎))
-  ... | yesₘ (_ , ρ) (min-con (A₀⊆ , refl) minρ) with synthesiseⁿ Ds mc Γ ts (_ , ρ) A₀⊆
-  ... | noₘ ¬Pσ   = no λ where
-    (σ , eq , ⊢t) → ¬Pσ (_ , Sub⇒Sub⊆ σ) (ext-con (≤-con (λ {x} _ → ⊆enum x) {!!}) ((λ {x} _ → ⊆enum x) , {!⊢t!}))
-  ... | yesₘ (_ , ρ̅) (min-con (ext-con (≤-con ρ⊆ρ̅ ρ≤ρ̅) (A₀∪Ds⊆ , ⊢t)) minρ̅) =
+  ... | yesₘ (_ , ρ) A₀≈A@(min-con (A₀⊆ , A₀=A) minρ) with synthesiseⁿ Ds SDs Γ ts (_ , ρ) A₀⊆
+  ... | noₘ ¬Pσ   = let ⊆A₀ = domain-cmp A₀ A _ ρ A₀≈A in no λ where
+    (σ , eq , ⊢ts) → ¬Pσ (_ , Sub⇒Sub⊆ σ) (ext-con (≤-con (λ {x} _ → ⊆enum x) (λ {x} x∈ → begin
+      ρ x∈
+        ≡⟨ cong ρ (#∈-uniq _ _) ⟩
+      ρ _
+        ≡⟨ sub-σ=sub⊆-ρ→σ=ρ ρ σ A₀ A₀⊆ (trans A₀=A (sym eq)) (⊆A₀ x∈) ⟩
+      σ x
+        ∎)) ((λ {x} _ → ⊆enum x) , ⊢ᵃˢ→Sub⊆⊢ᵃˢ ⊢ts))
+  ... | yesₘ (_ , ρ̅) (min-con (ext-con (≤-con ρ⊆ρ̅ ρ≤ρ̅) (A₀∪Ds⊆ , ⊢ts)) minρ̅) =
     yes (Sub⊆⇒Sub ρ̅ (A₀∪Ds⊆ ∘ ⊆A∪Ds) ,
       (begin _ ≡⟨ Sub⊆⇒Sub-≡ ρ̅ (A₀∪Ds⊆ ∘ ⊆A∪Ds) A₀ ⟩
-         sub⊆ ρ̅ A₀ (λ {x} _ → A₀∪Ds⊆ (⊆A∪Ds x))
+        sub⊆ ρ̅ A₀ (λ {x} _ → A₀∪Ds⊆ (⊆A∪Ds x))
          ≡⟨ sym (ρ=σ→subρ=subσ A₀ ρ ρ̅ _ _ λ x∈ → trans (ρ≤ρ̅ (A₀⊆ x∈)) (cong ρ̅ (#∈-uniq _ _))) ⟩
-         sub⊆ ρ A₀ A₀⊆ 
-         ∎) , {!⊢t!})
+        sub⊆ ρ A₀ A₀⊆ 
+           ≡⟨ A₀=A ⟩
+        A
+         ∎) , Sub⊆⊢ᵃˢ→⊢ᵃˢ ⊢ts)
 
   synthesiseᶜ
     : (D : ConD) → ConD.mode D ≡ Syn → ModeCorrectᶜ D
@@ -108,10 +110,10 @@ module _ where mutual
   synthesiseᶜ (ι Syn A Ds) refl (Ds⊆Ξ , SDs , A⊆Ds) Γ (refl , ts)
     with synthesiseⁿ Ds SDs Γ ts empty (λ ())
   ... | noₘ   ¬Pσ = no λ where
-    (A , σ , refl , ⊢ts) → ¬Pσ (_ , Sub⇒Sub⊆ σ) (ext-con ∅≤ρ ((λ {x} x∈ → ⊆enum x) , {!⊢ts!}))
+    (A , σ , refl , ⊢ts) → ¬Pσ (_ , Sub⇒Sub⊆ σ) (ext-con ∅≤ρ ((λ {x} x∈ → ⊆enum x) , ⊢ᵃˢ→Sub⊆⊢ᵃˢ ⊢ts))
   ... | yesₘ ρ (min-con (ext-con []≤ρ (Ds⊆ , ⊢ts)) minρ) =
     let ρ′ = Sub⊆⇒Sub (ρ .proj₂) (Ds⊆ ∘ Ds⊆Ξ) in
-    yes (A ⟨ ρ′ ⟩ , ρ′ , refl , {!⊢ts!})
+    yes (A ⟨ ρ′ ⟩ , ρ′ , refl , Sub⊆⊢ᵃˢ→⊢ᵃˢ ⊢ts)
 
   synthesiseⁿ
     : (Ds : ArgsD Ξ) (mc : ModeCorrectᵃˢ ys Ds)
@@ -119,6 +121,7 @@ module _ where mutual
     → ((xs , ρ) : ∃Sub⊆ Ξ) (ys⊆ : ys #⊆ xs)
     → MinDec (Ext (_ , ρ) λ ρ̅ →
         Σ[ Ds⊆ ∈ ys ∪ known Ds #⊆ _ ] M.⟦ Ds ⟧ᵃˢ ρ̅ ys Ds⊆ mc Raw ⊢⇔ Γ ts)
+
   synthesiseⁿ []       _        _ _        ρ ys⊆ = yesₘ ρ (Pρ→MinExtP (ys⊆ ∘ ∪-⊆⁺ #⊆-refl []⊆xs , _))
 
   synthesiseⁿ {ys = ys} (Δ ⊢[ Syn ] Aₙ ∷ Ds) (Δ⊆Ds , mc) Γ (t , ts) ρ ys⊆ with synthesiseⁿ Ds mc Γ ts ρ ys⊆

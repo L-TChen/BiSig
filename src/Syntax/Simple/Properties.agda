@@ -375,23 +375,24 @@ module _ (ρ : Sub⊆ Ξ xs) (∀x∈xs : (x : Fin Ξ) → x #∈ xs) where mutu
 ------------------------------------------------------------------------
 -- 
 
-module _ (σ : Sub Ξ 0) (ρ : Sub⊆ Ξ xs) where mutual
-  σ=ρ|A
-    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
-    → sub σ t ≡ sub⊆ ρ t t⊆
-    → ∀ {x} (x∈ : x #∈ vars t)
-    → ρ (t⊆ x∈) ≡ σ x
-  σ=ρ|A (` x)         t⊆ eq (here refl) = sym eq
-  σ=ρ|A (op (i , ts)) t⊆ eq {y} y∈ = σ=ρ|Aⁿ ts t⊆ (op-inj₃ eq) y∈
+module _ (σ : Sub Ξ 0) (ρ : Sub⊆ Ξ xs) where
+  mutual
+    σ=ρ|A
+      : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+      → sub σ t ≡ sub⊆ ρ t t⊆
+      → ∀ {x} (x∈ : x #∈ vars t)
+      → ρ (t⊆ x∈) ≡ σ x
+    σ=ρ|A (` x)         t⊆ eq (here refl) = sym eq
+    σ=ρ|A (op (i , ts)) t⊆ eq {y} y∈ = σ=ρ|Aⁿ ts t⊆ (op-inj₃ eq) y∈
 
-  σ=ρ|Aⁿ
-    : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
-    → subⁿ σ ts ≡ sub⊆ⁿ ρ ts ts⊆
-    → ∀ {x} (x∈ : x #∈ varsⁿ ts)
-    → ρ (ts⊆ x∈) ≡ σ x
-  σ=ρ|Aⁿ (t ∷ ts) ts⊆ eq x∈ with ∈-∪⁻ (vars t) x∈
-  ... | inl x∈t  = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|A t (∪-⊆⁻ˡ ts⊆) (V.∷-injectiveˡ eq) x∈t) 
-  ... | inr x∈ts = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|Aⁿ ts (∪-⊆⁻ʳ (vars t) ts⊆) (V.∷-injectiveʳ eq) x∈ts)
+    σ=ρ|Aⁿ
+      : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
+      → subⁿ σ ts ≡ sub⊆ⁿ ρ ts ts⊆
+      → ∀ {x} (x∈ : x #∈ varsⁿ ts)
+      → ρ (ts⊆ x∈) ≡ σ x
+    σ=ρ|Aⁿ (t ∷ ts) ts⊆ eq x∈ with ∈-∪⁻ (vars t) x∈
+    ... | inl x∈t  = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|A t (∪-⊆⁻ˡ ts⊆) (V.∷-injectiveˡ eq) x∈t) 
+    ... | inr x∈ts = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|Aⁿ ts (∪-⊆⁻ʳ (vars t) ts⊆) (V.∷-injectiveʳ eq) x∈ts)
 
 ------------------------------------------------------------------------
 -- Constructions regarding partial substitution properties
@@ -533,3 +534,68 @@ t≈u×ts≈us⇔tts≈uus t u ts us ρ@(xs , ρf) = record
           ≡⟨ t≈u ⟩
         u
           ∎)
+
+⊆→Sub⊆
+  : ys #⊆ xs → Sub⊆ Ξ xs
+  → Sub⊆ Ξ ys
+⊆→Sub⊆ ys⊆xs ρ = ρ ∘ ys⊆xs
+
+module _ (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys) where mutual
+  sub⊆-cong
+    : (t : Tm Ξ) (t⊆xs : vars t #⊆ xs)  (t⊆ys : vars t #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ vars t) → ρ (t⊆xs x∈) ≡ σ (t⊆ys x∈))
+    → sub⊆ ρ t t⊆xs ≡ sub⊆ σ t t⊆ys
+  sub⊆-cong (` x)         t⊆xs t⊆ys eq = eq (here refl)
+  sub⊆-cong (op (i , ts)) t⊆xs t⊆ys eq = cong (λ ts → op (i , ts))
+    (sub⊆-congⁿ ts _ _ eq)
+
+  sub⊆-congⁿ
+    : (ts : Tm Ξ ^ n) (⊆xs : varsⁿ ts #⊆ xs)  (⊆ys : varsⁿ ts #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ varsⁿ ts) → ρ (⊆xs x∈) ≡ σ (⊆ys x∈))
+    → sub⊆ⁿ ρ ts ⊆xs ≡ sub⊆ⁿ σ ts ⊆ys
+  sub⊆-congⁿ []       ⊆xs ⊆ys eq = refl
+  sub⊆-congⁿ (t ∷ ts) ⊆xs ⊆ys eq = cong₂ _∷_
+    (sub⊆-cong t _ _ (eq ∘ ∪⁺ˡ)) (sub⊆-congⁿ ts _ _ (eq ∘ ∪⁺ʳ (vars t)))
+
+domain-cmp : (t : Tm Ξ) (u : Tm 0)
+  → (xs : Fins# Ξ) (ρ : Sub⊆ Ξ xs)
+  → Min (t ≈ u) (xs , ρ)
+  → xs #⊆ vars t
+domain-cmp {Ξ} t u xs ρ (min-con (t⊆xs , eq) minσ) x∈ =
+  minσ (_ , ⊆→Sub⊆ t⊆xs ρ) ((λ y∈ → y∈) ,
+    (begin
+      sub⊆ (⊆→Sub⊆ t⊆xs ρ) t (λ y∈ → y∈)
+        ≡⟨ sub⊆-cong (ρ ∘ t⊆xs) ρ t _ t⊆xs (λ _ → refl) ⟩
+      sub⊆ ρ t t⊆xs
+        ≡⟨ eq ⟩
+      u ∎)) .domain-ext x∈ 
+
+module _ (ρ : Sub⊆ Ξ xs) (σ : Sub Ξ 0) where mutual
+  sub-σ=sub⊆-ρ→σ=ρ
+    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+    → sub⊆ ρ t t⊆ ≡ sub σ t
+    → ∀ {x} (x∈ : x #∈ vars t)
+    → ρ (t⊆ x∈) ≡ σ x
+  sub-σ=sub⊆-ρ→σ=ρ (` x)         t⊆ eq (here refl) = eq
+  sub-σ=sub⊆-ρ→σ=ρ (op (i , ts)) t⊆ eq y∈ =
+    sub-σ=sub⊆-ρ→σ=ρⁿ ts t⊆ (op-inj₃ eq) y∈
+
+  sub-σ=sub⊆-ρ→σ=ρⁿ
+    : (ts : Tm Ξ ^ n) (⊆xs : varsⁿ ts #⊆ xs)
+    → sub⊆ⁿ ρ ts ⊆xs ≡ subⁿ σ ts
+    → ∀ {x} (x∈ : x #∈ varsⁿ ts)
+    → ρ (⊆xs x∈) ≡ σ x
+  sub-σ=sub⊆-ρ→σ=ρⁿ (t ∷ ts) ⊆xs eq {x} x∈ with ∈-∪⁻ (vars t) x∈
+  ... | inl ∈t  = begin
+    ρ (⊆xs x∈)
+      ≡⟨ cong ρ (#∈-uniq _ _) ⟩
+    ρ _
+      ≡⟨ sub-σ=sub⊆-ρ→σ=ρ t _ (V.∷-injectiveˡ eq) ∈t ⟩
+    σ x
+      ∎
+  ... | inr ∈ts = begin
+    ρ (⊆xs x∈)
+      ≡⟨ cong ρ (#∈-uniq _ _) ⟩
+    ρ _
+      ≡⟨ sub-σ=sub⊆-ρ→σ=ρⁿ ts _ (V.∷-injectiveʳ eq) ∈ts ⟩
+    σ x ∎

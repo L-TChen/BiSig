@@ -28,7 +28,7 @@ open import Syntax.BiTyped.Extrinsic.Functor      SD Id
 open import Syntax.BiTyped.Extrinsic.Term            Id D
 
 open import Theory.ModeCorrectness.UniqueSynthesised Id D mc
-open import Theory.ModeCorrectness.Functor        SD Id as M
+import Theory.ModeCorrectness.Functor        SD Id as M
 
 open MC SD
 open B SD
@@ -37,11 +37,8 @@ open ≡-Reasoning
 private variable
   d   : Mode
   Ξ Θ : ℕ
-  A B : TExp Θ
-  As  : TExps Θ
-  xs  : Fins Ξ
+  xs ys : Fins# Ξ
   Γ   : Cxt
-  ρ   : TSub Ξ Θ
   t u : Raw d
 
 ρ≤σ→⊢tᵃ
@@ -69,3 +66,26 @@ private variable
   → M.⟦ Ds ⟧ᵃˢ ρ ys Ds⊆  mc Raw ⊢⇔ Γ ts 
   → M.⟦ Ds ⟧ᵃˢ σ ys Ds⊆′ mc Raw ⊢⇔ Γ ts 
 ρ≤σ→⊢tⁿ′ = {!!}
+
+------------------------------------------------------------------------
+-- Typing derivations with substitution
+-- to derivatios with partial substitution
+
+⊢ᵃˢ→Sub⊆⊢ᵃˢ
+  : {Ds : ArgsD Ξ} {σ : TSub Ξ 0}
+  → {mc : ModeCorrectᵃˢ ys Ds}
+  → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+  → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ σ Γ ts
+  → M.⟦ Ds ⟧ᵃˢ (_ , Sub⇒Sub⊆ σ) ys (λ {x} _ → ⊆enum x) mc Raw ⊢⇔ Γ ts
+⊢ᵃˢ→Sub⊆⊢ᵃˢ {Ds = Ds} {ρ} {⊆xs} {mc} {Γ} ⊢ts = {!!}
+------------------------------------------------------------------------
+-- Typing derivations with partial substitution
+-- to derivatios with substitution
+
+Sub⊆⊢ᵃˢ→⊢ᵃˢ
+  : {Ds : ArgsD Ξ} {ρ : Sub⊆ Ξ xs}
+  → {⊆xs : (x : Fin Ξ) → x #∈ xs} {ys∪Ds⊆ : ys ∪ known Ds #⊆ xs} {mc : ModeCorrectᵃˢ ys Ds}
+  → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+  → M.⟦ Ds ⟧ᵃˢ (_ , ρ) ys ys∪Ds⊆ mc Raw ⊢⇔ Γ ts
+  → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ (Sub⊆⇒Sub ρ ⊆xs) Γ ts
+Sub⊆⊢ᵃˢ→⊢ᵃˢ {Ds = Ds} {ρ} {⊆xs} {ys∪Ds⊆} {mc} {Γ} ⊢ts = {!!}

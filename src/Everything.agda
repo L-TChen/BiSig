@@ -54,7 +54,8 @@ import Theory.Ontologisation.Term
 import Theory.ModeCorrectness.Description
 import Theory.ModeCorrectness.Functor
 import Theory.ModeCorrectness.UniqueSynthesised
--- import Theory.ModeCorrectness.Term -- [TODO] not finished yet
+import Theory.ModeCorrectness.Properties -- [TODO] not finished yet
+import Theory.ModeCorrectness.Synthesis 
 
 -- Examples
 

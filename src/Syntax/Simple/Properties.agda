@@ -557,6 +557,35 @@ module _ (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys) where mutual
   sub⊆-congⁿ (t ∷ ts) ⊆xs ⊆ys eq = cong₂ _∷_
     (sub⊆-cong t _ _ (eq ∘ ∪⁺ˡ)) (sub⊆-congⁿ ts _ _ (eq ∘ ∪⁺ʳ (vars t)))
 
+module _ (σ : Sub Ξ 0) where mutual
+  sub⊆=sub
+    : (t : Tm Ξ)
+    → sub σ t ≡ sub⊆ (Sub⇒Sub⊆ σ) t λ {x} _ → ⊆enum x
+  sub⊆=sub (` x)         = refl
+  sub⊆=sub (op (i , ts)) =
+    cong (λ ts → op (i , ts)) (sub⊆=subⁿ ts)
+
+  sub⊆=subⁿ
+    : (ts : Tm Ξ ^ n)
+    → subⁿ σ ts ≡ sub⊆ⁿ (Sub⇒Sub⊆ σ) ts λ {x} _ → ⊆enum x
+  sub⊆=subⁿ []       = refl
+  sub⊆=subⁿ (t ∷ ts) = cong₂ _∷_ (sub⊆=sub t) (sub⊆=subⁿ ts)
+
+module _ (ρ : Sub⊆ Ξ xs) (⊆xs : ∀ x → x #∈ xs) where mutual
+  sub⊆=sub′
+    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+    → sub (ρ ∘ ⊆xs) t ≡ sub⊆ ρ t t⊆
+  sub⊆=sub′ (` x)         t⊆ = cong ρ (#∈-uniq _ _) -- refl
+  sub⊆=sub′ (op (i , ts)) t⊆ = 
+    cong (λ ts → op (i , ts)) (sub⊆=subⁿ′ ts _)
+
+  sub⊆=subⁿ′
+    : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
+    → subⁿ (ρ ∘ ⊆xs) ts ≡ sub⊆ⁿ ρ ts ts⊆
+  sub⊆=subⁿ′ []       ts⊆ = refl
+  sub⊆=subⁿ′ (t ∷ ts) ts⊆ = cong₂ _∷_
+   (sub⊆=sub′ t _) (sub⊆=subⁿ′ ts _)
+
 domain-cmp : (t : Tm Ξ) (u : Tm 0)
   → (xs : Fins# Ξ) (ρ : Sub⊆ Ξ xs)
   → Min (t ≈ u) (xs , ρ)

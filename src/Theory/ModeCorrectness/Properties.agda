@@ -71,21 +71,52 @@ private variable
 -- Typing derivations with substitution
 -- to derivatios with partial substitution
 
-⊢ᵃˢ→Sub⊆⊢ᵃˢ
-  : {Ds : ArgsD Ξ} {σ : TSub Ξ 0}
-  → {mc : ModeCorrectᵃˢ ys Ds}
-  → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
-  → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ σ Γ ts
-  → M.⟦ Ds ⟧ᵃˢ (_ , Sub⇒Sub⊆ σ) ys (λ {x} _ → ⊆enum x) mc Raw ⊢⇔ Γ ts
-⊢ᵃˢ→Sub⊆⊢ᵃˢ {Ds = Ds} {ρ} {⊆xs} {mc} {Γ} ⊢ts = {!!}
+module _ {σ : TSub Ξ 0} where
+  ⊢ᵃ→Sub⊆⊢ᵃ
+    : ∀ Δ {Γ} A {t}
+    → {Δ⊆ : Cover (enumerate Ξ) Δ}
+    → ⟦ Δ ⟧ᵃ Raw (⊢⇔ d (A ⟨ σ ⟩)) σ Γ t
+    → M.⟦ Δ ⟧ᵃ (_ , Sub⇒Sub⊆ σ) Δ⊆ Raw (⊢⇔ d (sub⊆ (Sub⇒Sub⊆ σ) A λ {x} _ → ⊆enum x)) Γ t
+  ⊢ᵃ→Sub⊆⊢ᵃ []      {Γ} B ⊢t rewrite sub⊆=sub σ B = ⊢t
+  ⊢ᵃ→Sub⊆⊢ᵃ (A ∷ Δ) {Γ} B {x , t} {A⊆ ∷ Δ⊆} ⊢t
+    rewrite sub⊆=sub σ A rewrite sub⊆-⊆-irrelevant (Sub⇒Sub⊆ σ) A  (λ {x = x₁} _ → ⊆enum x₁) A⊆ =  
+    ⊢ᵃ→Sub⊆⊢ᵃ Δ B ⊢t
+
+  ⊢ᵃˢ→Sub⊆⊢ᵃˢ
+    : {Ds : ArgsD Ξ} 
+    → {mc : ModeCorrectᵃˢ ys Ds}
+    → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+    → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ σ Γ ts
+    → M.⟦ Ds ⟧ᵃˢ (_ , Sub⇒Sub⊆ σ) ys (λ {x} _ → ⊆enum x) mc Raw ⊢⇔ Γ ts
+  ⊢ᵃˢ→Sub⊆⊢ᵃˢ {Ds = []}                                  _          = tt
+  ⊢ᵃˢ→Sub⊆⊢ᵃˢ {Ds = Δ B.⊢[ Chk ] Aₙ ∷ Ds} {A⊆ ∷ Δ⊆ , mc} {ts = t , ts} (⊢t , ⊢ts) =
+     ⊢ᵃ→Sub⊆⊢ᵃ Δ Aₙ ⊢t  , ⊢ᵃˢ→Sub⊆⊢ᵃˢ ⊢ts
+  ⊢ᵃˢ→Sub⊆⊢ᵃˢ {Ds = Δ ⊢[ Syn ] Aₙ ∷ Ds}   {Δ⊆ , mc}      (⊢t , ⊢ts) =
+    ⊢ᵃ→Sub⊆⊢ᵃ Δ Aₙ ⊢t , ⊢ᵃˢ→Sub⊆⊢ᵃˢ ⊢ts
 ------------------------------------------------------------------------
 -- Typing derivations with partial substitution
 -- to derivatios with substitution
 
-Sub⊆⊢ᵃˢ→⊢ᵃˢ
-  : {Ds : ArgsD Ξ} {ρ : Sub⊆ Ξ xs}
-  → {⊆xs : (x : Fin Ξ) → x #∈ xs} {ys∪Ds⊆ : ys ∪ known Ds #⊆ xs} {mc : ModeCorrectᵃˢ ys Ds}
-  → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
-  → M.⟦ Ds ⟧ᵃˢ (_ , ρ) ys ys∪Ds⊆ mc Raw ⊢⇔ Γ ts
-  → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ (Sub⊆⇒Sub ρ ⊆xs) Γ ts
-Sub⊆⊢ᵃˢ→⊢ᵃˢ {Ds = Ds} {ρ} {⊆xs} {ys∪Ds⊆} {mc} {Γ} ⊢ts = {!!}
+module _ {ρ : Sub⊆ Ξ xs} where
+  Sub⊆⊢ᵃ→⊢ᵃ
+    : ∀ Δ {Γ} A {t}
+    → (Δ⊆ : Cover xs Δ)
+    → (A⊆ : vars A #⊆ xs)
+    → (⊆xs : ∀ x → x #∈ xs)
+    → M.⟦ Δ ⟧ᵃ (_ , ρ) Δ⊆ Raw (⊢⇔ d (sub⊆ ρ A A⊆)) Γ t
+    → ⟦ Δ ⟧ᵃ Raw (⊢⇔ d (sub (ρ ∘ ⊆xs) A)) (ρ ∘ ⊆xs) Γ t
+  Sub⊆⊢ᵃ→⊢ᵃ []      B _         B⊆ ⊆xs ⊢t rewrite sub⊆=sub′ ρ ⊆xs B B⊆ = ⊢t
+  Sub⊆⊢ᵃ→⊢ᵃ (A ∷ Δ) B (A⊆ ∷ Δ⊆) B⊆ ⊆xs ⊢t rewrite sub⊆=sub′ ρ ⊆xs A A⊆ =
+    Sub⊆⊢ᵃ→⊢ᵃ Δ B Δ⊆ B⊆ ⊆xs ⊢t
+
+  Sub⊆⊢ᵃˢ→⊢ᵃˢ
+    : {Ds : ArgsD Ξ} {ys : Fins# Ξ}
+    → {⊆xs : (x : Fin Ξ) → x #∈ xs} {ys∪Ds⊆ : ys ∪ known Ds #⊆ xs} {mc : ModeCorrectᵃˢ ys Ds}
+    → {Γ  : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+    → M.⟦ Ds ⟧ᵃˢ (_ , ρ) ys ys∪Ds⊆ mc Raw ⊢⇔ Γ ts
+    → ⟦ Ds ⟧ᵃˢ Raw ⊢⇔ (Sub⊆⇒Sub ρ ⊆xs) Γ ts
+  Sub⊆⊢ᵃˢ→⊢ᵃˢ {[]}                              tt = tt
+  Sub⊆⊢ᵃˢ→⊢ᵃˢ {Δ ⊢[ Chk ] Aₙ ∷ Ds} {ys} {⊆xs} {ys∪Ds⊆} {A⊆ ∷ Ds⊆ , mc} {Γ} {t , ts} (⊢t , ⊢ts) =
+     Sub⊆⊢ᵃ→⊢ᵃ Δ Aₙ _ _ _ ⊢t  , Sub⊆⊢ᵃˢ→⊢ᵃˢ ⊢ts
+  Sub⊆⊢ᵃˢ→⊢ᵃˢ {Δ ⊢[ Syn ] Aₙ ∷ Ds} {ys} {⊆xs} {ys∪Ds⊆} {mc} {Γ} {t , ts} (⊢t , ⊢ts) =
+    Sub⊆⊢ᵃ→⊢ᵃ Δ Aₙ _ _ _ ⊢t , Sub⊆⊢ᵃˢ→⊢ᵃˢ ⊢ts

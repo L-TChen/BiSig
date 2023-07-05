@@ -1,4 +1,11 @@
 \documentclass[acmsmall,screen]{acmart}
+
+\acmJournal{PACMPL}
+\acmVolume{0}
+\acmNumber{0}
+\acmArticle{0}
+\acmMonth{7}
+
 \ifPDFTeX
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -19,10 +26,14 @@
 \usepackage{mathpartir}
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
+
+\usepackage{xifthen}
+\newcommand{\varcitet}[3][]{\citeauthor{#2}#3~[\ifthenelse{\isempty{#1}}{\citeyear{#2}}{\citeyear[#1]{#2}}]}
+
 \usepackage[inline]{enumitem} % for environment enumerate*
 
-\setlength {\marginparwidth }{2cm}
-\usepackage[obeyFinal,color=yellow,textsize=small]{todonotes}
+\setlength{\marginparwidth}{1.25cm}
+\usepackage[obeyFinal,color=yellow,textsize=scriptsize]{todonotes}
 
 \usepackage{microtype}
 \usepackage{subfiles}
@@ -59,16 +70,16 @@
 \title{A Theory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
-  Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
-  While progress has been made in developing type-checking techniques on a case-by-case basis, the lack of a general theory poses a difficulty in implementing a robust `type-checker generator' for diverse languages.
-
-  In response to this difficulty, we develop a simple yet general and constructive theory of bidirectional type synthesis where bidirectional type synthesis refers to the mutual use of type checking and inference based on bidirectional typing rules to determine the type of a program with type annotations.
-  First, our theory is simple yet general as it deals with any simple type theory and its bidirectional type system that can be specified by a signature, analogous to the role of grammar in parsing.
-  Second, our theory is constructive because it is not only formalised in a proof assistant based on constructive type theory but also formulated towards computation.
-  Specifically, the `proof' of logical decidability of type synthesis is instantiated to a synthesiser for the simple type theory specified by a valid signature, analogous to a parser generator.
-  We introduce the notion of mode preprocessing to refine annotatability in bidirectional typing.
-  Type synthesis and mode preprocessing result in the trichotomy of raw terms, which models a practical type synthesiser that may throw an exception and locate missing annotations.
-  By formalising our general theory of bidirectional type synthesis constructively, we provide a correct-by-construction `type-checker generator' for simple type theories, taking the first step towards a more general theory of bidirectional type synthesis.
+%  Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
+  While there is much progress in designing bidirectional type systems and associated type synthesis algorithms on a case-by-case basis, the lack of a general theory makes it difficult to study the common principles and develop widely applicable techniques and practical tools such as a `type-synthesiser generator'.
+  In response to this difficulty, we propose a simple yet general and constructive theory of bidirectional type synthesis.
+%  which refers to the mutual use of type checking and synthesis based on bidirectional typing rules to determine the type of a program with type annotations.
+  First, our theory is simple yet general as it applies to any syntax-directed bidirectional simple type system that can be specified by a signature.
+%  which is analogous to a grammar in parsing.
+  Second, our theory is constructive because it is not only formalised in a proof assistant based on Martin-L\"of type theory, but also formulated in a way that unifies computation and proof, resulting in a compact and practical theory---for example, a proof of the decidability of the type synthesis problem is also computationally a type synthesiser.
+  Moreover, we introduce `mode preprocessing' to deal with missing type annotations, an aspect often overlooked in the literature.
+  The main theorem is logically a trichotomy on parsed syntax trees and computationally a type synthesiser that may throw an exception due to missing type annotations.
+  Being parametrised by a signature, our theory works as a verified type-synthesiser generator overall.
 \end{abstract}
 
 \begin{CCSXML}

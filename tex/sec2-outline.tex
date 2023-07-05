@@ -47,7 +47,7 @@
 \end{figure}
 
 We start with an overview of our theory by instantiating it to simply typed $\lambda$-calculus.
-Roughly speaking, the problem of type synthesis requires us to take an untyped abstract syntax tree---which we call a \emph{raw term}---as input, and produce a typing derivation for the term if possible.
+Roughly speaking, the problem of type synthesis requires us to take a raw term (i.e.~an untyped abstract syntax tree) as input, and produce a typing derivation for the term if possible.
 To give more precise definitions:
 The raw terms%
 \footnote{We omit the usual conditions about named representations of variables throughout this paper.}
@@ -99,11 +99,9 @@ Acceptable excuses are defined by the predicate~$E$, which describes what is wro
 \end{figure}
 
 Now our goal is to use \cref{def:STLC-type-synthesiser} as a specification and implement it using a \emph{bidirectional} type synthesiser, which attempts to produce \emph{bidirectional} typing derivations defined in \cref{fig:STLC-bidirectional-typing-derivations}.
-Here we briefly recap the basic ideas of bidirectional type synthesis.
-While the problem of type synthesis is not decidable in general, for certain kinds of terms it is still possible to synthesise their types --- for example, the $\SynRule{Var}$ rule says that the type of a variable can be looked up in the context.
-For other kinds of terms, we can switch to the simpler problem of type \emph{checking}, where the expected type of a term is given as input so that there is more information to work with.
-When a bidirectional type synthesiser traverses a raw term, it switches between the two \emph{modes}, synthesising wherever possible, and checking otherwise.
-If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which will be defined in \cref{sec:type-synthesis}), then there will be a flow of type information in each rule that allows us to determine unknown types (e.g.~types to be checked) from known ones (e.g.~types previously synthesised), and suggests how bidirectional type synthesis is performed --- for example, the $\SynRule{App}$ rule says that to synthesise the type of an application $\isTerm{t\;u}$, we first synthesise the type of~$\isTerm{t}$, which should have the form $A \bto B$, from which we can extract the expected type of~$\isTerm{u}$, namely~$A$, and perform checking; then the type of the whole application, namely~$B$, can also be extracted from the previously synthesised type $A \bto B$.
+
+\Josh{Here we briefly recap the basic ideas of bidirectional type synthesis.
+If a bidirectional type system is designed well (i.e.~\emph{mode-correct}, which will be defined in \cref{sec:type-synthesis}), then there will be a flow of type information in each rule that allows us to determine unknown types (e.g.~types to be checked) from known ones (e.g.~types previously synthesised), and suggests how bidirectional type synthesis is performed --- for example, the $\SynRule{App}$ rule says that to synthesise the type of an application $\isTerm{t\;u}$, we first synthesise the type of~$\isTerm{t}$, which should have the form $A \bto B$, from which we can extract the expected type of~$\isTerm{u}$, namely~$A$, and perform checking; then the type of the whole application, namely~$B$, can also be extracted from the previously synthesised type $A \bto B$.}
 
 %The $\ChkRule{Abs}$ rule checks whether the type of an abstraction $\isTerm{\lam{x}t}$ is $A \bto B$ by checking whether $\isTerm{t}$~has type~$B$ assuming $\isTerm{x}$~has type~$A$ in the context, where both types $A$~and~$B$ can be determined from the type $A \bto B$ given initially.
 %For an annotated term $t \bbcolon A$, the $\SynRule{Anno}$ rule simply synthesises~$A$ as its type, provided that $t$~can be successfully checked to have type~$A$.
@@ -138,7 +136,7 @@ More precisely, the preprocessing step attempts to produce \emph{mode derivation
 A \emph{mode preprocessor} decides for any raw term~$V \vdash \isTerm{t}$ and mode~$\dir{d}$ whether $V \vdash \isTerm{t}^\dir{d}$.
 \end{definition}
 
-One (smaller) benefit of mode preprocessing is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
+One (less important) benefit of mode preprocessing is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
 More importantly, whether there is a mode derivation for a term is actually very useful information to the user, because it corresponds to whether the term has enough type annotations:
 Observe that the $\SynRule{Anno}$ and $\ChkRule{Sub}$ rules allow us to switch between the synthesising and checking modes;
 the switch from synthesising to checking is free, whereas the opposite direction requires a type annotation.
@@ -164,7 +162,9 @@ The construction is straightforward:
 Run the mode preprocessor on the input term~$|\Gamma| \vdash t$.
 If there is no synthesising mode derivation, report that $t$~is not in synthesising mode (the third outcome).
 Otherwise $|\Gamma| \vdash t^{\syn}$, and we can run the bidirectional type synthesiser.
-If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}).
+If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound}%
+\todo{Explain the notation `$:^\dir{d}$'}
+with respect to the original typing~(\cref{fig:STLC-typing-derivations}).
 
 \begin{lemma}[Soundness]
 If\/ $\Gamma \vdash t :^\dir{d} A$, then $\Gamma \vdash t : A$.

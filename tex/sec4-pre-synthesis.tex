@@ -1,6 +1,6 @@
 %!TEX root = BiSig.tex
 
-\section{Soundness, Completeness, and Mode Preprocessing}\label{sec:pre-synthesis}
+\section{Mode Preprocessing and Related Properties}\label{sec:pre-synthesis}
 
 \Josh{Overview of the section}
 
@@ -8,6 +8,8 @@
 \label{sec:soundness-and-completeness}
 
 %\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
+
+\Josh{One theorem to rule them all}
 
 Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation.
 
@@ -44,7 +46,7 @@ The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis
 In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
 %Formulating the notion of mode derivation helps to complete this clean picture.
 
-\subsection{Mode Preprocessing}
+\subsection{Generalised Mode Preprocessing}
 \label{sec:mode-preprocessing}
 
 The goal of this sub-section is to construct a mode preprocessor, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
@@ -82,8 +84,9 @@ We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:general
   \label{fig:generalised-mode-derivations}
 \end{figure}
 
-Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations.
-To formulate this more concretely, we can point out the places in the term that require annotations.
+Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations, but such negative formulations convey little information.%
+\todo{still default in the rest of the paper}
+Instead, we can provide more information by pointing out the places in the term that require annotations.
 For a bidirectional type system, an annotation is required wherever a term is `strictly' (which we will explain shortly) in checking mode but required to be in synthesising mode, in which case there is no rule for switching from checking to synthesising, and thus there is no way to construct a mode derivation.
 We can, however, consider \emph{generalised mode derivations} defined in \cref{fig:generalised-mode-derivations} that allow the use of an additional $\SynRule{Missing}$ rule for such switching, so that a derivation can always be constructed.
 Given a generalised mode derivation, if it uses $\SynRule{Missing}$ in some places, then those places are exactly where annotations should be supplied, which is helpful information to the user; if it does not use $\SynRule{Missing}$, then the derivation is \emph{genuine} in the sense that it corresponds directly to an original mode derivation.
@@ -132,7 +135,7 @@ Then a case analysis shows that it is impossible to have a (synthesising) mode d
 
 Now we are ready to construct a generalised mode preprocessor.
 
-\begin{theorem}\label{thm:generalised-mode-preprocessing}
+\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{theorem}
 

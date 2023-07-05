@@ -15,3 +15,28 @@ On the other hand, in the realm of dependent types, \citeauthor{Cartmell1986}'s 
 \citet{Bezem2021} investigate the notion of presentation (extending the notion of signature) in the context of generalized algebraic theories.
 Nonetheless, type synthesis for dependent types requires normalisation or some form of conversion to check type equality.
 Normalisation in its generic form still remains out of reach and recent advances in this topic are discussed in the doctoral thesis by~\citet{Valliappan2023}.
+
+\todo[inline]{We leave the problem of presenting bidirectional typing for more general and advanced language features as future work (such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}), which requires advancement in language formalisation~(\cref{sec:language-formalisation}) that is orthogonal to our work.}
+
+%\subsubsection{Theories of abstract syntax with variable binding}
+%\label{sec:theory-of-syntax}
+%
+%The aforementioned frameworks except \citeauthor{Gheri2020}'s are at least inspired by \varcitet{Fiore1999}{'s} initial semantics for abstract syntax with variable binding using category theory.
+%The main idea is that the set of (untyped) abstract syntax trees for a language consists of
+%\begin{enumerate*}
+%  \item a family of sets $\Term_{\Gamma}$ of well-scoped terms under a context~$\Gamma$ with
+%  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, and
+%  \item an initial algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf~$V$ of variables (i.e.\ the embedding $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$) to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts, the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the arities of constructs, and the initiality amounts to structural recursion, i.e.\ \emph{term traversal}.
+%\end{enumerate*}
+%To put it succinctly, it is the free $\mathbb{\Sigma}$-algebra over the presheaf~$V$ of variables.
+%
+%Fortunately, constructing the initial algebra of terms in type theory boils down to defining an inductive type with a few constructors that align with the variable rule and a rule schema for language constructs specified by a signature~\citep{Fiore2022}.
+
+%Substitution is also modelled categorically, but it does not play a role in this paper.%
+%\todo{Reveal a bit about this paper?}
+
+%\begin{remark} \label{re:type-signature}
+%Most of existing theories treat types independently of terms, thereby excluding them from signatures.
+%To the best of our knowledge, the only exception to this approach is found in the work of~\citet{Arkor2020}, which incorporates signatures for both terms and types.
+%Interestingly, this inclusion is also critical for type synthesis for comparing a concrete type $N \bto N$ with an abstract type $A \bto B$, where $A$ and $B$ are type variables in a typing rule.
+%\end{remark}

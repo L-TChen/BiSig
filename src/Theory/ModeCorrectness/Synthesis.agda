@@ -134,7 +134,7 @@ module _ where mutual
   ... | no  ¬⊢t = noₘ λ where
     (zs , σ) (ext-con ρ≤σ (Ds⊆′ , ⊢t , ⊢ts)) →
       let ρ̅≤σ = minρ̅ (_ , σ) (ext-con ρ≤σ (Ds⊆′ ∘ ∪-monotoneʳ ys (∪⁺ʳ (vars Aₙ)) , ⊢ts)) in
-      ¬⊢t (sub⊆ σ Aₙ (Ds⊆′ ∘ λ x∈ → ∪⁺ʳ ys (∪⁺ˡ x∈)) , ρ≤σ→⊢tᵃ ρ̅≤σ Δ t ⊢t)
+      ¬⊢t (sub⊆ σ Aₙ (Ds⊆′ ∘ λ x∈ → ∪⁺ʳ ys (∪⁺ˡ x∈)) , ρ≤σ→⊢tᵃ ρ̅≤σ Δ ⊢t)
 
   ... | yes (A , ⊢t) with acmp Aₙ A (_ , ρ̅)
 
@@ -150,8 +150,8 @@ module _ where mutual
     { proof      = record
       { ext     = ≤-trans ρ≤ρ̅ ρ̅≤σ
       ; witness =  ∪-⊆⁺ {xs = ys} ((ys⊆zs ∘ ρ≤ρ̅ .domain-ext) ∘ ys⊆) (∪-⊆⁺ Aₙ⊆ (ys⊆zs ∘ Ds⊆ ∘ ∪⁺ʳ ys))  , subst (λ A →
-        M.⟦ Δ ⟧ᵃ (_ , σ) (L.A.map (λ {A} A⊆ {x} x∈ → _ ) Δ⊆Ds) Raw (⊢⇔ Syn A) Γ t) (sub⊆-⊆-irrelevant σ Aₙ _ _) (ρ≤σ→⊢tᵃ′ ρ̅≤σ Δ t ⊢t) ,
-        ρ≤σ→⊢tⁿ′ ρ̅≤σ  Ds ys mc _ _ ts ⊢ts
+        M.⟦ Δ ⟧ᵃ (_ , σ) (L.A.map (λ {A} A⊆ {x} x∈ → _ ) Δ⊆Ds) Raw (⊢⇔ Syn A) Γ t) (sub⊆-⊆-irrelevant σ Aₙ _ _) (ρ≤σ→⊢tᵃ′ ρ̅≤σ Δ ⊢t) ,
+        ρ≤σ→⊢tⁿ′ ρ̅≤σ  Ds ys mc ⊢ts
       }
     ; minimality = λ where
       (zs′ , γ) (ext-con ρ≤γ (Ds⊆′ , ⊢t′ , ⊢ts′)) →
@@ -189,7 +189,7 @@ module _ where mutual
             sub⊆ ρ̅ Aₙ (λ x → Ds⊆ (A⊆Ds x))
               ∎
       in
-      ¬⊢t (ρ≤σ→⊢tᵃ ρ̅≤σ Δ t (subst (λ A → M.⟦ Δ ⟧ᵃ (_ , σ) _ Raw (⊢⇔ Chk A) Γ t) eq ⊢t′))
+      ¬⊢t (ρ≤σ→⊢tᵃ ρ̅≤σ Δ (subst (λ A → M.⟦ Δ ⟧ᵃ (_ , σ) _ Raw (⊢⇔ Chk A) Γ t) eq ⊢t′))
 
   ... | yes ⊢t = yesₘ (_ , ρ̅) (min-con (ext-con ρ≤ρ̅ (Ds⊆ , ⊢t , ⊢ts))
     λ σ (ext-con ρ≤σ (Ds⊆′ , ⊢t , ⊢ts)) → minρ̅ σ (ext-con ρ≤σ (Ds⊆′ , ⊢ts)))

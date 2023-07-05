@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 import Prelude
 import Prelude.Level      
 import Prelude.Equivalence

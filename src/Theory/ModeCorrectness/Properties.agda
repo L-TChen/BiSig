@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 open import Prelude
 
 import Syntax.Simple.Description  as S
@@ -41,31 +39,66 @@ private variable
   Γ   : Cxt
   t u : Raw d
 
-ρ≤σ→⊢tᵃ
-  : {ρ σ : ∃Sub⊆ Ξ} → ρ ≤ σ
-  → (Δ : TExps Ξ) {Δ⊆xs : Cover _ Δ} {Δ⊆xs′ : Cover _ Δ}
-  → {Γ : Cxt} (t : R.⟦ Δ ⟧ᵃ (Raw d)) {A : Ty}
-  → M.⟦ Δ ⟧ᵃ σ Δ⊆xs  Raw (⊢⇔ d A) Γ t
-  → M.⟦ Δ ⟧ᵃ ρ Δ⊆xs′ Raw (⊢⇔ d A) Γ t
-ρ≤σ→⊢tᵃ = {!!}
+module _ {ρ σ : ∃Sub⊆ Ξ} (ρ≤σ : ρ ≤ σ) where
+  ρ≤σ→⊢tᵃ
+    : (Δ : TExps Ξ) {Δ⊆xs : Cover _ Δ} {Δ⊆xs′ : Cover _ Δ}
+    → {Γ : Cxt} {t : R.⟦ Δ ⟧ᵃ (Raw d)} {B : Ty}
+    → M.⟦ Δ ⟧ᵃ σ Δ⊆xs  Raw (⊢⇔ d B) Γ t
+    → M.⟦ Δ ⟧ᵃ ρ Δ⊆xs′ Raw (⊢⇔ d B) Γ t
+  ρ≤σ→⊢tᵃ []                ⊢t = ⊢t
+  ρ≤σ→⊢tᵃ (A ∷ Δ) {A⊆ ∷ Δ⊆} {A⊆′ ∷ Δ⊆′} ⊢t
+    rewrite sub⊆-cong (ρ .proj₂) (σ .proj₂) A A⊆′ A⊆ (λ x∈ → begin
+        ρ .proj₂ _
+          ≡⟨ ρ≤σ .consistency _  ⟩
+        σ .proj₂ _
+          ≡⟨ cong (σ .proj₂) (#∈-uniq _ _) ⟩
+        σ .proj₂ _
+          ∎) = ρ≤σ→⊢tᵃ Δ ⊢t
 
-ρ≤σ→⊢tᵃ′
-  : {ρ σ : ∃Sub⊆ Ξ} → ρ ≤ σ
-  → (Δ : TExps Ξ) {Δ⊆xs : Cover _ Δ} {Δ⊆xs′ : Cover _ Δ}
-  → {Γ : Cxt} (t : R.⟦ Δ ⟧ᵃ (Raw d)) {A : Ty}
-  → M.⟦ Δ ⟧ᵃ ρ Δ⊆xs′ Raw (⊢⇔ d A) Γ t
-  → M.⟦ Δ ⟧ᵃ σ Δ⊆xs  Raw (⊢⇔ d A) Γ t
-ρ≤σ→⊢tᵃ′ = {!!}
+module _ {ρ σ : ∃Sub⊆ Ξ} (ρ≤σ : ρ ≤ σ) where
+  ρ≤σ→⊢tᵃ′
+    : (Δ : TExps Ξ) {Δ⊆xs : Cover _ Δ} {Δ⊆xs′ : Cover _ Δ}
+    → {Γ : Cxt} {t : R.⟦ Δ ⟧ᵃ (Raw d)} {B : Ty}
+    → M.⟦ Δ ⟧ᵃ ρ Δ⊆xs′ Raw (⊢⇔ d B) Γ t
+    → M.⟦ Δ ⟧ᵃ σ Δ⊆xs  Raw (⊢⇔ d B) Γ t
+  ρ≤σ→⊢tᵃ′ []      ⊢t = ⊢t
+  ρ≤σ→⊢tᵃ′ (A ∷ Δ) {A⊆xs ∷ ⊆xs} {A⊆xs′ ∷ ⊆xs′} ⊢t
+    rewrite sub⊆-cong (ρ .proj₂) (σ .proj₂) A A⊆xs′ A⊆xs λ x∈ →
+      begin
+        ρ .proj₂ (A⊆xs′ x∈)
+          ≡⟨ ρ≤σ .consistency (A⊆xs′ x∈)  ⟩
+        σ .proj₂ _
+          ≡⟨ cong (σ .proj₂) (#∈-uniq _ _) ⟩
+        σ .proj₂ (A⊆xs x∈)
+          ∎ = ρ≤σ→⊢tᵃ′ Δ ⊢t
 
-ρ≤σ→⊢tⁿ′
-  : {ρ σ : ∃Sub⊆ Ξ} → ρ ≤ σ
-  → (Ds : ArgsD Ξ) (ys : Fins# Ξ) (mc : ModeCorrectᵃˢ ys Ds)
-  → (Ds⊆  : ys ∪ known Ds #⊆ _)
-  → (Ds⊆′ : ys ∪ known Ds #⊆ _)
-  → {Γ : Cxt} (ts : R.⟦ Ds ⟧ᵃˢ Raw)
-  → M.⟦ Ds ⟧ᵃˢ ρ ys Ds⊆  mc Raw ⊢⇔ Γ ts 
-  → M.⟦ Ds ⟧ᵃˢ σ ys Ds⊆′ mc Raw ⊢⇔ Γ ts 
-ρ≤σ→⊢tⁿ′ = {!!}
+  ρ≤σ→⊢tⁿ′
+    : (Ds : ArgsD Ξ) (ys : Fins# Ξ) (mc : ModeCorrectᵃˢ ys Ds)
+    → {Ds⊆  : ys ∪ known Ds #⊆ _}
+    → {Ds⊆′ : ys ∪ known Ds #⊆ _}
+    → {Γ : Cxt} {ts : R.⟦ Ds ⟧ᵃˢ Raw}
+    → M.⟦ Ds ⟧ᵃˢ ρ ys Ds⊆  mc Raw ⊢⇔ Γ ts 
+    → M.⟦ Ds ⟧ᵃˢ σ ys Ds⊆′ mc Raw ⊢⇔ Γ ts 
+  ρ≤σ→⊢tⁿ′ []                   _  _     _   = tt
+  ρ≤σ→⊢tⁿ′ (Δ ⊢[ Chk ] Aₙ ∷ Ds) ys (A⊆ ∷ Δ⊆ , mc) {Ds⊆} {Ds⊆′} (⊢t , ⊢ts)
+    rewrite sub⊆-cong (ρ .proj₂) (σ .proj₂) Aₙ (Ds⊆ ∘ A⊆) (Ds⊆′ ∘ A⊆) λ x∈ →
+      begin
+        ρ .proj₂ _
+          ≡⟨ ρ≤σ .consistency _  ⟩
+        σ .proj₂ _
+          ≡⟨ cong (σ .proj₂) (#∈-uniq _ _) ⟩
+        σ .proj₂ _
+          ∎ = ρ≤σ→⊢tᵃ′ Δ ⊢t , ρ≤σ→⊢tⁿ′ _ _ _ ⊢ts
+  ρ≤σ→⊢tⁿ′ (Δ ⊢[ Syn ] Aₙ ∷ Ds) ys (Δ⊆ , mc) {Ds⊆} {Ds⊂′} (⊢t , ⊢ts)
+    rewrite sub⊆-cong (ρ .proj₂) (σ .proj₂) Aₙ (λ x → Ds⊆ (∪⁺ʳ ys (∪⁺ˡ x))) (λ x → Ds⊂′ (∪⁺ʳ ys (∪⁺ˡ x))) λ x∈ →
+
+      begin
+        ρ .proj₂ _
+          ≡⟨ ρ≤σ .consistency _  ⟩
+        σ .proj₂ _
+          ≡⟨ cong (σ .proj₂) (#∈-uniq _ _) ⟩
+        σ .proj₂ _
+          ∎ = ρ≤σ→⊢tᵃ′ Δ ⊢t , ρ≤σ→⊢tⁿ′ _ _ _ ⊢ts
 
 ------------------------------------------------------------------------
 -- Typing derivations with substitution

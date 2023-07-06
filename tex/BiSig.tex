@@ -15,6 +15,7 @@
 \setdefaultlanguage{british}
 \fi
 
+\usepackage{subfiles}
 \usepackage{bbold}
 \newcommand{\hmmax}{0}
 \newcommand{\bmmax}{0}
@@ -27,6 +28,9 @@
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
 
+% Used for typesetting Agda code
+\usepackage{agda-lhs2tex}
+
 \usepackage{xifthen}
 \newcommand{\varcitet}[3][]{\citeauthor{#2}#3~[\ifthenelse{\isempty{#1}}{\citeyear{#2}}{\citeyear[#1]{#2}}]}
 
@@ -37,20 +41,21 @@
 
 \usepackage{microtype}
 \microtypesetup{babel}
-\usepackage{subfiles}
-
-\citestyle{acmauthoryear}
-\AtEndPreamble{%
-\theoremstyle{acmdefinition}
-\newtheorem{remark}[theorem]{Remark}
-}
 
 \newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40]{{#1}}}
 \newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40]{{#1}}}
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
-\usepackage{agda-lhs2tex}
+
+\citestyle{acmauthoryear}
+
+\AtEndPreamble{%
+\theoremstyle{acmdefinition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{claim}{Claim}
+\newtheorem{claimproof}{Proof of Claim}
+}
 
 \begin{document}
 
@@ -127,8 +132,7 @@
 \input{sec7-future.tex}
 
 \begin{acks}
-We thank Nathanael Arkor for the useful conversation and to thank the Programming Languages and Formal Methods Laboratory at Academia Sinica for the opportunity of sharing earlier ideas.
-
+%We thank Nathanael Arkor for the useful conversation.
 The work is supported by the Ministry of Science and Technology of Taiwan under grant MOST 109-2222-E-001-002-MY3.
 \end{acks}
 

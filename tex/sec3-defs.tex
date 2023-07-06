@@ -1,10 +1,10 @@
 %!TEX root = BiSig.tex
 
-\section{Simple Type Theories and Bidirectional Type Systems}\label{sec:defs}
+\section{Simple Type Systems and Bidirectional Type Systems}\label{sec:defs}
 This section provides generic definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
-of simple types, simple type theories, and bidirectional type systems using simply typed $\lambda$-calculus in \Cref{sec:key-ideas} as our running example.
+of simple types, simple type systems, and bidirectional type systems using simply typed $\lambda$-calculus in \Cref{sec:key-ideas} as our running example.
 
 Our definitions are defined in two steps:
 \begin{enumerate*}
@@ -17,33 +17,33 @@ Upon moving from simple types to bidirectionally typed terms, the notion of arit
 Simple types of a language is understood intuitively as a collection of types whose formation judgement is not indexed by anything but a fixed set of type variables and the only datum needed for specifying a type construct is its number of arguments: 
 
 \begin{definition} \label{def:simple-signature}
-  \begin{figure}
-%    \begin{minipage}[b]{.6\textwidth}
-      \centering
-      \small
-      \judgbox{\Xi|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Xi$}
-      \begin{mathpar}
-        \inferrule{\Xi \ni X_i}{\Xi |-_\Sigma X_i} \and
-        \inferrule{\Xi |-_{\Sigma} A_1 \\ \cdots \\ \Xi |-_{\Sigma} A_n}{\Xi |-_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}\;\text{where $n = \arity(i)$}
-      \end{mathpar}
-      \caption{Simple types}
-      \label{fig:simple-type}
-%    \end{minipage}
-%    \begin{minipage}[b]{.35\textwidth}
+%  \begin{figure}
+%%    \begin{minipage}[b]{.6\textwidth}
 %      \centering
 %      \small
-%      \judgbox{\Xi |-_{\Sigma} \Gamma}{}
+%      \judgbox{\Xi|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Xi$}
 %      \begin{mathpar}
-%        \inferrule{ }{\Xi |-_{\Sigma} \cdot }\and
-%        \inferrule{\Xi |-_{\Sigma} A \\ \Xi|-_{\Sigma} \Gamma}{\Xi |-_{\Sigma} \Gamma, x : A}
+%        \inferrule{\Xi \ni X_i}{\Xi |-_\Sigma X_i} \and
+%        \inferrule{\Xi |-_{\Sigma} A_1 \\ \cdots \\ \Xi |-_{\Sigma} A_n}{\Xi |-_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}\;\text{where $n = \arity(i)$}
 %      \end{mathpar}
-%      \caption{Contexts}
-%    \label{fig:simple-context}
-%    \end{minipage}
-  \end{figure}
+%      \caption{Simple types}
+%      \label{fig:simple-type}
+%%    \end{minipage}
+%%    \begin{minipage}[b]{.35\textwidth}
+%%      \centering
+%%      \small
+%%      \judgbox{\Xi |-_{\Sigma} \Gamma}{}
+%%      \begin{mathpar}
+%%        \inferrule{ }{\Xi |-_{\Sigma} \cdot }\and
+%%        \inferrule{\Xi |-_{\Sigma} A \\ \Xi|-_{\Sigma} \Gamma}{\Xi |-_{\Sigma} \Gamma, x : A}
+%%      \end{mathpar}
+%%      \caption{Contexts}
+%%    \label{fig:simple-context}
+%%    \end{minipage}
+%  \end{figure}
   A \emph{signature} $\Sigma$ for simple types consists of a set\footnote{%
     Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
-    As we work with Martin-L\"of type theory with \AxiomK, all types are actually sets in the sense of homotopy type theory where all inhabitants of its identity type are proved equal.
+    As we work in Martin-L\"of type theory with \AxiomK, all types are legitimately sets in the sense of homotopy type theory where all inhabitants of its identity type are proved equal.
   }
   $I$ with a decidable equality and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
   For a signature $\Sigma$, a \emph{type} $A : \Type_{\Sigma}(\Xi)$ over a variable set $\Xi$ is either
@@ -54,7 +54,6 @@ Simple types of a language is understood intuitively as a collection of types wh
   %as defined in \Cref{fig:simple-type}.
   A \emph{context} $\Gamma \colon \Cxt_{\Sigma}(\Xi)$ over $\Xi$ is a list $\Gamma$ of types over $\Xi$. 
 \end{definition}
-Note that the second clause is a rule schema giving rise to as many rules as inhabitants $i$ in $I$.
 
 \begin{example} \label{ex:type-signature-for-function-type}
   Simply typed $\lambda$-calculus includes function types $A \bto B$ and typically a base type~$\mathtt{b}$ to ensure that the set of all types without type variables is non-empty.
@@ -62,51 +61,56 @@ Note that the second clause is a rule schema giving rise to as many rules as inh
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
-Without the loss of generality, we may use the family of sets $\Fin(n)$ of natural numbers less than $n$ as sets of type variables in this paper, following the inductive definition by \citet{Dybjer1994}.
-In bidirectional type synthesis, it is necessary to have a decidable equality on $\Type_{\Sigma}(\Xi)$, as we need to compare the synthesized type $B$ with a given type $A$ for the $\Rule{Sub}$ rule.
-If $\Xi$ such as $\Fin(n)$ has a decidable equality , the decidable equality on $\Type_{\Sigma}(\Xi)$ can be given.
-In addition, the arity of a construct is always finite, so it suffices to use natural numbers to denote type variables in a $\Sigma$-type.
-Formally, we restrict the set $\Xi$ of type variables to the family of $\Fin(n)$, but for illustrative purposes we still use named variables for presentation.
 
 As \Cref{def:simple-signature} includes type variables, we introduce the typical meta-operations: substitution.
 \begin{definition}
-  The \emph{(simultaneous) type substitution} for a function $\rho\colon\Xi \to \Type_{\Sigma}(\Xi')$ is a map, which sends $A : \Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho} : \Type_{\Sigma}(\Xi')$, defined as usual.
+  The \emph{(simultaneous) type substitution} for a function $\rho\colon\Xi \to \Type_{\Sigma}(\Xi')$ is a map which sends $A : \Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho} : \Type_{\Sigma}(\Xi')$ and is defined as usual.
   By abuse of notation, the substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution $\simsub{A}{\rho}$ to each type $A$ in the context.
 \end{definition}
 
-\subsection{Binding Signatures and Simple Type Theories} \label{subsec:binding-sig}
+We may confine arbitrary variable set $\Xi$ to the family of sets $\Fin(n)$ of natural numbers less than $n$ as sets of type variables, following the inductive definition by \citet{Dybjer1994}, for the reasons below.
+In bidirectional type synthesis, it is necessary to have a decidable equality on $\Type_{\Sigma}(\Xi)$, as we need to compare the synthesized type $B$ with a given type $A$ for the $\Rule{Sub}$ rule.
+If $\Xi$ such as $\Fin(n)$ has a decidable equality, the decidable equality on $\Type_{\Sigma}(\Xi)$ can be given.
+In addition, the arity of a construct is always finite, so it suffices to use natural numbers to denote type variables in a type.
+Therefore, we formally restrict the set $\Xi$ of type variables to the family of $\Fin(n)$, but for illustrative purposes we still use named variables for presentation.
+\subsection{Binding Signatures and Simple Type Systems} \label{subsec:binding-sig}
 
-A simple type theory consists of
+A simple type system consists of
 \begin{enumerate*}
-  \item a set of raw terms $\isTerm{t}$ indexed by a set $V$ of untyped variables where each construct is allowed to bind some variables (as $\Rule{Abs}$) and to take multiple arguments (as $\Rule{App}$);
+  \item a set of raw terms $\isTerm{t}$ indexed by a set $V$ of untyped variables where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
   \item a set of typing derivations indexed by a list $\Gamma$ of typed variables, a type~$A$, and a raw term $\isTerm{t}$ to set their type constraints. 
 \end{enumerate*}
-Therefore, to specify a construct like $\Rule{Abs}$ or $\Rule{App}$, we need to enrich the notion of signature with a type and an extension context for variable binding for each argument and a type for the operation:
+Therefore, to specify a construct like $\Rule{Abs}$ and $\Rule{App}$, we need to enrich the notion of signature with a type and an extension context for variable binding for each argument and a type for the operation:
 \begin{definition}\label{def:binding-signature}
   For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
   \[
-    \mathit{ar}\colon O \to \sum_{\Xi : \N} \left(\Cxt_\Sigma(\Xi) \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
+    \mathit{ar}\colon O \to \sm{\Xi : \N} \left(\Cxt_\Sigma(\Xi) \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
   \]
 \end{definition}
-Each inhabitant $o: O$, meant to represent a term construct $\tmOp_o$ in a simple type theory, has a triple $\left(\Xi, \left[\left(\Delta_1; A_1\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right], A_0\right)$ as its arity $\arity_o$ where
+Each inhabitant $o: O$, meant to represent a term construct $\tmOp_o$ in a simple type system, has a triple $\left(\Xi, \left[\left(\Delta_1; A_1\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right], A_0\right)$ as its arity $\arity_o$ where
 \begin{enumerate}
-  \item $\Xi$ is the number of type variables, 
-  \item $A : \Type_\Sigma(\Xi)$ is for the type of $\tmOp_o$, and
-  \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs where
+  \item $\Xi$ is the number of type variables that are allowed to appear in a typing rule, 
+  \item $\left[\left(\Delta_1; A_{1}\right), \ldots, \left(\Delta_{n}; A_{n}\right) \right]$ is a list of pairs for specifying arguments where
     \begin{enumerate}
-      \item $\Delta_i : \Cxt_{\Sigma}(\Xi)$ is for the types of bound variables and
-      \item $A_i : \Term_{\Sigma}(\Xi)$ for the type of the $i$-th argument of $\tmOp_{o}$.
+      \item $\Delta_i : \Cxt_{\Sigma}(\Xi)$ is the \emph{extension context} consisting of types for bound variables and
+      \item $A_i : \Term_{\Sigma}(\Xi)$ is for the type of the $i$-th argument (i.e.\ premise) of $\tmOp_{o}$;
     \end{enumerate}
+  \item $A_0 : \Type_\Sigma(\Xi)$ is for the type of the construct $\tmOp_o$ in the conclusion.
 \end{enumerate}
-For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n} \to A_0$ to indicate an operation with its arity and omit $[\Delta]$ if $\Delta$ is empty. 
-For example, the $\Rule{Abs}$ rule can be specified by the operation 
+For brevity, we write $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n}}{A_0}$ to indicate an operation with its arity and omit $[\Delta]$ if $\Delta$ is empty. 
+For example, the $\Rule{Abs}$ rule in \Cref{fig:STLC-typing-derivations} can be specified by the operation 
 \[
-  \mathsf{abs}\colon A , B \rhd [A]B \to (A \bto B)
+  \aritysymbol{\mathsf{abs}}{(A, B)}{[A]B}{(A \bto B)}
 \]
-indicating that the $\Rule{Abs}$ rule has two type variables $A$ and $B$, one argument of type $B$ and which binds a variable of type $A$, and the type $A \bto B$ for the construct $\lambda$.
-Similarly, the $\Rule{App}$ rule can be specified by $\mathsf{app}\colon A, B \rhd A \bto B, A \to B$ where extension contexts for its two arguments are empty.
+indicating that in the $\Rule{Abs}$ rule for a raw term $\lam{x}t$
+\begin{enumerate*}
+  \item there are \emph{two} type variables named $A$ and $B$;
+  \item an argument (i.e.\ a typing derivation of $\Gamma, x : A |- t : B$) of type $B$ in a context extended by a variable $x$ of type $A$;
+  \item the type $A\bto B$ for the conclusion.
+\end{enumerate*}
+Similarly, the $\Rule{App}$ rule for $t\;u$ can be specified by $\aritysymbol{\mathsf{app}}{(A, B)}{(A \bto B), A}{B}$ which takes two arguments (i.e.\ typing derivations for $t$ and $u$) under the same context so that their extension contexts are both empty.
 
-Also for brevity, a simple type theory $(\Sigma, \Omega)$ refers to the simple type theory specified by some type signature $\Sigma$ and a binding signature $\Omega$. 
+Also for brevity, a simple type system $(\Sigma, \Omega)$ refers to the simple type system specified by some type signature $\Sigma$ and a binding signature $\Omega$. 
 
 \begin{definition}
 \begin{figure}
@@ -117,27 +121,24 @@ Also for brevity, a simple type theory $(\Sigma, \Omega)$ refers to the simple t
     \inferrule{\isTerm{x} \in V}{V |-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
     \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}}{V |-_{\Sigma, \Omega} \isTerm{t \annotate A}}\,\Rule{Anno}
-    \and
-    \inferrule{V, \vars{x}_\isTerm{1} |-_{\Sigma, \Omega} \isTerm{t_1} \\ \cdots \\ V, \vars{x}_\isTerm{n} |-_{\Sigma, \Omega} \isTerm{t_n}}
-    {V |-_{\Sigma, \Omega} \tmOpts }\,\Rule{Op}
+    \\
+    \inferrule{V, \vars{x}_\isTerm{1} |-_{\Sigma, \Omega} \isTerm{t_1} \\ \cdots \\ V, \vars{x}_\isTerm{n} |-_{\Sigma, \Omega} \isTerm{t_n} } {V |-_{\Sigma, \Omega} \tmOpts }\,\Rule{Op} \and
+    \text{for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n}}{A_0}$ in $\Omega$}
   \end{mathpar}
-%  \begin{flushright}
-%    for $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A$ in $\Omega$
-%  \end{flushright}%
   \caption{Raw terms}
   \label{fig:raw-terms}
 \end{figure}
-  For a simple type theory $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of free variables consists of
+  For a simple type system $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of free variables consists of
   \begin{enumerate}
     \item variables in $V$,
     \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ in $V$ and a type $A$, and
-    \item a construct $\tmOpts$ for some $o \colon \Xi \rhd [\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n} \to A_0$ in $O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$ and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$
+    \item a construct $\tmOpts$ for some $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n}}{A_0}$ in $O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$ and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
 \end{definition}
 
 
-The definition of typing derivations is slightly involved.
+The definition of typing derivations is a bit more involved.
 We need some information to compare types on the object level during type synthesis and substitute those type variables in a typing derivation $\Gamma \vdash \tmOpts : A$ for an operation $o$ in $\Omega$ at some point.
 Hence we choose to include a substitution as part of its typing derivation explicitly:
 \begin{definition}\label{def:typing-derivations}
@@ -152,33 +153,35 @@ Hence we choose to include a substitution as part of its typing derivation expli
       \and
       \inferrule{\rho : \Sub{\Xi}{\emptyset} \\  \Gamma, \vec{\isTerm{x}}_\isTerm{1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \vec{\isTerm{x}}_\isTerm{n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
       {\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}}\,\Rule{Op}
+      \\
+    \text{for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}, \ldots, [\Delta_{n}] A_{n}}{A_0}$ in $\Omega$}
     \end{mathpar}
     \caption{Typing derivations}
     \label{fig:extrinsic-typing}
   \end{figure}
-  For a simple type theory $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$, a raw term with free variables in $\erase{\Gamma}$, and a type $A$ consists of 
+  For a simple type system $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$, a raw term with free variables in $\erase{\Gamma}$, and a type $A$ consists of 
   \begin{enumerate}
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotate A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
-    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for $o \colon \Xi \rhd [\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n} \to A_0$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
+    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for $\aritysymbol{o}{\Xi}{[\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n}}{A_0}$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing} respectively.
 \end{definition}
-Note that, by definition, our simple type theory is always syntax-directed, since each rule in \Cref{fig:raw-terms} corresponds exactly to one rule in \Cref{fig:extrinsic-typing}. 
-The $\Rule{Op}$ in both figures is a rule schema and gives rise to as many rules as there are operations $o : O$.
+Note that our simple type system is always syntax-directed, since each rule in \Cref{fig:raw-terms} corresponds exactly to one rule in \Cref{fig:extrinsic-typing}. 
+The $\Rule{Op}$ rule in both figures is a rule schema and gives rise to as many rules as there are operations $o : O$.
 
 \begin{example}
   Raw terms (\Cref{fig:STLC-raw-terms}) and typing derivations (\Cref{fig:STLC-typing-derivations}) for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the binding signature consisting of 
  \[
-   \mathsf{app}\colon A, B \rhd A \bto B, A \to B
+   \aritysymbol{\mathsf{app}}{(A, B)}{(A \bto B), A}{B}
    \quad\text{and}\quad
-   \mathsf{abs}\colon A , B \rhd [A]B \to (A \bto B).
+   \aritysymbol{\mathsf{abs}}{(A , B)}{[A]B}{(A \bto B)}.
  \]
  Rules $\Rule{Abs}$ and $\Rule{App}$ in simply typed $\lambda$-calculus are subsumed by the $\Rule{Op}$ rule schema, as an application $t\;u$ and an abstraction $\lam{x}t$ can be introduced as $\tmOp_{\mathsf{app}}(t, u)$ and $\tmOp_{\mathsf{abs}}(x.t)$, respectively.
 \end{example}
 
 \subsection{Bidirectional Binding Signatures and Bidirectional Type Systems} \label{subsec:bidirectional-system}
-Finally, for a bidirectional type system, we have raw terms and typing derivations like a simple type theory, but its typing judgements come in two forms $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$.
+Finally, for a bidirectional type system, we have raw terms and typing derivations like a simple type system, but its typing judgements come in two forms $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$.
 Observe that these two typing judgements are just one typing judgement $\Gamma |- t :^\dir{d} A$ indexed additionally by a \emph{mode} $d : \Mode$---which is either $\syn$ or $\chk$---so that $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$ are just abbreviations of $\Gamma |- t :^{\syn} A$ and $\Gamma |- t :^{\chk} A$ respectively.
 Hence, to specify a bidirectional type system, we need further enrich the notion of binding signature with modes as follows.
 
@@ -191,14 +194,14 @@ Hence, to specify a bidirectional type system, we need further enrich the notion
 Each inhabitant $o:O$ is similarly meant to represent a term construct $\tmOp_o$ in a bidirectional type system but the arity of $o : O$ becomes a $4$-tuple $\left(\Xi, \left[\left(\Delta_1; A_1; d_1\right), \ldots, \left(\Delta_{n}; A_{n}; d_n\right) \right], A_0, d\right)$
 including additionally $d$ and $d_i$'s for the modes of the construct $\tmOp_o$ and its arguments respectively.
 
-For brevity, we write $o \colon \Xi \rhd [\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A^{\dir{d_n}}_{n} \to A_0^{\dir{d}}$ to indicate an operation with its arity. 
-For example, the $\ChkRule{Abs}$ rule in \Cref{fig:STLC-bidirectional-typing-derivations} can be specified by $\mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}$ indicating additionally that the construct $\lambda$ and its argument are in checking mode.
-Similarly, the $\SynRule{App}$ rule can be specified by $\mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn}$.
+For brevity, we write $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A^{\dir{d_n}}_{n}}{A_0^{\dir{d}}}$ to indicate an operation with its arity. 
+For example, the $\ChkRule{Abs}$ rule in \Cref{fig:STLC-bidirectional-typing-derivations} can be specified by $\aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}}$ indicating additionally that $\lam{x}t$ and its argument $t$ are in checking mode.
+Similarly, the $\SynRule{App}$ rule can be specified by $\aritysymbol{\mathsf{app}}{A, B}{(A \bto B)^{\syn}, A^{\chk}}{B^{\syn}}$.
 
-We also say a bidirectional type system $(\Sigma, \Omega)$ referring the bidirectional type system specified by some type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
+We also say a bidirectional type system $(\Sigma, \Omega)$ referring to the bidirectional type system specified by some type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
 
 \begin{remark}
-  Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, so a bidirectional binding signature $\Omega$ also specifies a simple type theory, including its raw terms and typing derivations.
+  Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, so a bidirectional binding signature $\Omega$ also specifies a simple type system, including its raw terms and typing derivations.
   We call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
 \end{remark}
 
@@ -220,6 +223,7 @@ We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-de
         \cdots \\
       \Gamma, \simsub{\vars{x}_\isTerm{n} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
       {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\mathsf{Op}
+      \\ \text{for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ in $\Omega$}
     \end{mathpar}
     Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$
     \caption{Bidirectional typing derivations}
@@ -238,19 +242,27 @@ We generalise bidirectional typing rules (\Cref{fig:STLC-bidirectional-typing-de
       \and
       \inferrule{V, \vars{x}_1 |-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \\ \cdots \\ V, \vars{x}_{n} |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
       {V |-_{\Sigma, \Omega} \tmOpts^\dir{d}}\,\Rule{Op}
+      \and \text{for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A^{\dir{d_n}}_{n}}{A_0^{\dir{d}}}$}
     \end{mathpar}
     \caption{Mode derivations}
     \label{fig:mode-derivations}
   \end{figure}
   For a bidirectional type system $(\Sigma, \Omega)$,
   \begin{itemize}
-    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$ indexed by a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$ is defined in \Cref{fig:bidirectional-typing-derivations};
+    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$ indexed by a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$ is defined in \Cref{fig:bidirectional-typing-derivations} and 
+      \begin{itemize}
+        \item in particular, a derivation of
+          \[
+            \Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}
+          \]
+          for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ in $\Omega$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
+      \end{itemize}
     \item the set of \emph{mode derivations} of $V |-_{\Sigma, \Omega} t^\dir{d}$ indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$ is defined in \Cref{fig:mode-derivations}.
   \end{itemize}
 \end{definition}
 
 \begin{example}
-  Bidirectional typing derivations and mode derivations for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the bidirectional binding signature consisting of $\mathsf{abs}\colon A , B \rhd [A]B^{\chk} \to (A \bto B)^{\chk}$ and $\mathsf{app}\colon A, B \rhd (A \bto B)^{\syn}, A^{\chk} \to B^{\syn}$.
+  Bidirectional typing derivations and mode derivations for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the bidirectional binding signature consisting of $\aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}}$ and $\aritysymbol{\mathsf{app}}{A, B}{(A \bto B)^{\syn}, A^{\chk}}{B^{\syn}}$.
 \end{example}
 
 After developing these generic definitions, we are now able to reason about constructions and properties that hold for any bidirectional simple type system $(\Sigma, \Omega)$.

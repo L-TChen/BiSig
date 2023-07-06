@@ -1,13 +1,4 @@
-{-# OPTIONS --safe #-}
-import Prelude
-import Prelude.Level      
-import Prelude.Equivalence
-import Prelude.Logic      
-import Prelude.Category   
-
-import Syntax.Context
-import Syntax.NamedContext
-
+{-# OPTIONS --safe --with-K #-}
 -- Syntaxes
 import Syntax.Simple.Description
 import Syntax.Simple.Term
@@ -34,13 +25,7 @@ import Syntax.BiTyped.Extrinsic.Functor
 import Syntax.BiTyped.Extrinsic.Term
 import Syntax.BiTyped.Extrinsic.Properties
 
--- [TODO] Type-level specifications should make it clear that we’re operating on the same syntax tree throughout.
---        For example: scope checking, bidirectionalisation of raw terms, conversion between extrinsic and intrinsic terms
--- [TODO] What format (intrinsic vs extrinsic) does the compiler need eventually?
 -- [TODO] User interface (for extending existing systems): correct and convenient bidirectional annotation of a base type system
--- [TODO] history of parser generators
-
--- Theory of Bidirectional Type Checking
 import Theory.Soundness
 
 import Theory.Completeness.Description
@@ -55,7 +40,7 @@ import Theory.Ontologisation.Term
 import Theory.ModeCorrectness.Description
 import Theory.ModeCorrectness.Functor
 import Theory.ModeCorrectness.UniqueSynthesised
-import Theory.ModeCorrectness.Properties -- [TODO] not finished yet
+import Theory.ModeCorrectness.Properties
 import Theory.ModeCorrectness.Synthesis 
 
 -- Examples

@@ -1,6 +1,6 @@
 %!TEX root = BiSig.tex
 
-\section{Simple Type Systems and Bidirectional Type Systems}\label{sec:defs}
+\section{Simple Typed Languages and Bidirectional Type Systems}\label{sec:defs}
 This section provides generic definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
@@ -74,9 +74,9 @@ If $\Xi$ has a decidable equality as $\Fin(n)$ does, then $\Type_{\Sigma}(\Xi)$ 
 In addition, the arity of a construct is finite, so it suffices to use natural numbers to denote type variables in a type.
 As we will only consider a finite collection of types (in a typing rule or in a signature), we can formally restrict the set $\Xi$ to the family of $\Fin(n)$ in later definitions.
 For illustrative purposes, though, we still use named variables for presentation.
-\subsection{Binding Signatures and Simple Type Systems} \label{subsec:binding-sig}
+\subsection{Binding Signatures and Simple Typed Languages} \label{subsec:binding-sig}
 
-A simple type system consists of
+A simple typed language consists of
 \begin{enumerate*}
   \item a set of raw terms $\isTerm{t}$ indexed by a set $V$ of untyped variables where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
   \item a set of typing derivations indexed by a list $\Gamma$ of typed variables, a type~$A$, and a raw term $\isTerm{t}$ to set their type constraints. 
@@ -106,7 +106,7 @@ It also includes additionally the number $\Xi$ of type variables that appear in 
     \arity(o) \colon O \to \sm{\Xi : \N} \left(\Cxt_\Sigma(\Xi) \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
   \]
 \end{definition}
-Each inhabitant $o: O$ is meant to represent a term construct except the rules $\Rule{Var}$ and $\Rule{Anno}$ in a simple type system and is associated with a number $\Xi$ of type variables and a binding arity with sort $T = \Type_{\Sigma}(\Xi)$.
+Each inhabitant $o: O$ is meant to represent a term construct except the rules $\Rule{Var}$ and $\Rule{Anno}$ in a simply typed language and is associated with a number $\Xi$ of type variables and a binding arity with sort $\Type_{\Sigma}(\Xi)$.
 As we will always consider binding arities with a number of type variables that appear in a typing rule, we simply call $\arity(o)$ the arity of $o$, denoted by $\aritysymbol{o}{\Xi}{[\Delta_1]A_1, \ldots, [\Delta_{n}]A_{n}}{A_0}$.
 By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature $\Sigma$ and a binding signature $\Omega$.
 
@@ -126,7 +126,7 @@ By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type s
   \caption{Raw terms}
   \label{fig:raw-terms}
 \end{figure}
-  For a simple type system $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of free variables consists of
+  For a simply typed language $(\Sigma, \Omega)$, the set of \emph{raw terms} indexed by a context~$V$ of free variables consists of
   \begin{enumerate}
     \item variables in $V$,
     \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ in $V$ and a type $A$, and
@@ -157,7 +157,7 @@ Hence we choose to include a substitution as part of its typing derivation expli
     \caption{Typing derivations}
     \label{fig:extrinsic-typing}
   \end{figure}
-  For a simple type system $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$, a raw term with free variables in $\erase{\Gamma}$, and a type $A$ consists of 
+  For a simply typed language $(\Sigma, \Omega)$, the set of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$ indexed by a context $\Gamma$, a raw term with free variables in $\erase{\Gamma}$, and a type $A$ consists of 
   \begin{enumerate}
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotate A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
@@ -177,11 +177,8 @@ Hence we choose to include a substitution as part of its typing derivation expli
 \end{example}
 
 \subsection{Bidirectional Binding Signatures and Bidirectional Type Systems} \label{subsec:bidirectional-system}
-
-Finally, for a bidirectional type system, we have raw terms and typing derivations like a simple type system. 
-However, its typing judgements appear in two forms: $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$.
-It is noteworthy that these two typing judgements can be considered as a single typing judgement $\Gamma |- t :^\dir{d} A$, additionally indexed by a \emph{mode} $d : \Mode$---which can either be $\syn$ or $\chk$.
-Therefore, to define a bidirectional type system, we need to further enrich the concept of binding arity by incorporating modes, as described below.
+For a bidirectional type system, typing judgements appear in two forms: $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$, but these two typing judgements can be considered as a single typing judgement $\Gamma |- t :^\dir{d} A$, additionally indexed by a \emph{mode} $d : \Mode$---which can either be $\syn$ or $\chk$.
+Therefore, to define a bidirectional type system, we further enrich the concept of binding arity by incorporating modes:
 
 \begin{definition} \label{def:bidirectional-binding-signature}
   A \emph{bidirectional binding arity} with a set $T$ of sorts is an inhabitant of
@@ -204,7 +201,7 @@ Similar to a binding signature, each $o:O$ is meant to represent a term construc
 We write $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A^{\dir{d_n}}_{n}}{A_0^{\dir{d}}}$ to indicate an operation $o$ with the number $\Xi$ of type variables and its arity with sort $\Type_{\Sigma}(\Xi)$.
 Finally, a bidirectional type system $(\Sigma, \Omega)$ refers to a pair of $\Sigma$ and a bidirectional binding signature $\Omega$.
 
-Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, so a bidirectional binding signature $\Omega$ also specifies a simple type system, including its raw terms and typing derivations.
+Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, so a bidirectional binding signature $\Omega$ also specifies a simply typed language, including its raw terms and typing derivations.
 We call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
 
 \begin{definition}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
@@ -225,7 +222,6 @@ We call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
       {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\mathsf{Op}
       \\ \text{for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ in $\Omega$}
     \end{mathpar}
-    Abbreviations: $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A} \defeq \boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$
     \caption{Bidirectional typing derivations}
     \label{fig:bidirectional-typing-derivations}
   \end{figure}
@@ -249,16 +245,15 @@ We call $\erase{\Omega}$ the \emph{(mode) erasure} of $\Omega$.
   \end{figure}
   For a bidirectional type system $(\Sigma, \Omega)$,
   \begin{itemize}
-    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$ indexed by a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$ is defined in \Cref{fig:bidirectional-typing-derivations} and 
-      \begin{itemize}
-        \item in particular, a derivation of
+    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, indexed by a context $\Gamma$ of typed variables, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$, is defined in \Cref{fig:bidirectional-typing-derivations} and particularly
           \[
             \Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}
           \]
-          for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ in $\Omega$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
-      \end{itemize}
-    \item the set of \emph{mode derivations} of $V |-_{\Sigma, \Omega} t^\dir{d}$ indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$ is defined in \Cref{fig:mode-derivations}.
+          has a derivation for $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ in $\Omega$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
+    \item the set of \emph{mode derivations} of $V |-_{\Sigma, \Omega} t^\dir{d}$, indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$, is defined in \Cref{fig:mode-derivations}.
   \end{itemize}
+  $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A}$ and $\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A}$
+  are shorthands for ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$ respectively.
 \end{definition}
 
 \begin{example}

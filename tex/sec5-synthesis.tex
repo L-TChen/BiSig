@@ -2,7 +2,7 @@
 
 \section{Bidirectional Type Synthesis and Checking} \label{sec:type-synthesis}
 This section is devoted to defining mode-correctness and deriving bidirectional type synthesis for any mode-correct bidirectional type system $(\Sigma, \Omega)$.
-\Cref{subsec:mode-correctness} formalises the concept of mode-correctness and establishes the uniqueness of synthesised types.
+\Cref{sec:mode-correctness} formalises the concept of mode-correctness and establishes the uniqueness of synthesised types.
 This indicates that for a given raw term and context, any two synthesised types must be equal.
 This characteristic is also used in the proof of the logical decidability of bidirectional type synthesis.
 Later, in \Cref{subsec:trichotomy}, we introduce the decidability of bidirectional synthesis but postpone its proof until \Cref{subsec:bidirectional-synthesis-checking}.
@@ -84,7 +84,7 @@ As we have sketched informally, the mode-correctness condition for a synthesis r
   \end{enumerate}
 \end{corollary}
 \begin{proof}
-  Combine  \Cref{thm:soundness,thm:completeness,thm:mode-preprocessing} with \Cref{thm:bidirectional-type-synthesis}.
+  Combine  \Cref{lem:soundness-completeness,thm:mode-preprocessing} with \Cref{thm:bidirectional-type-synthesis}.
   
 \end{proof}
 

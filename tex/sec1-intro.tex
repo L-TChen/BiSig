@@ -110,7 +110,7 @@ Within the theory, we formulate essential criteria including \emph{soundness}, \
 We also pay attention to the problem of whether a raw term has enough type annotations, often overlooked in the literature, by introducing \emph{mode preprocessing}, which assigns a mode to a raw term with enough annotations or otherwise pinpoints missing annotations.
 Practically, by running a mode preprocessor, the user can first make sure that a raw term has enough annotations, and then deal with typing issues without worrying about missing annotations anymore.
 Theoretically, separating the annotation and typing aspects streamlines our theory, in particular allowing us to formulate completeness naturally and differently from \emph{annotatability}, which was proposed and conflated with completeness by \citet{Dunfield2021}.
-By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we achieve our main result~(\cref{cor:trichotomy}): a \emph{trichotomy} on raw terms, which is computationally a type synthesiser that checks if a given raw term is sufficiently annotated and if a sufficiently annotated raw term has an ordinary typing derivation.
+By combining bidirectional type synthesis, soundness, completeness, and mode preprocessing, we achieve our main result~(\cref{cor:trichotomy}): a \emph{trichotomy} on raw terms, which is computationally a type synthesiser that checks if a given raw term is sufficiently annotated and if a sufficiently annotated raw term has an ordinary typing derivation, suggesting that type synthesis should not be viewed as a binary division of raw terms between typable and non-typable but a trichotomy in general.
 
 In summary, we contribute a theory of bidirectional type synthesis that is
 \begin{enumerate}

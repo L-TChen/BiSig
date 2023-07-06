@@ -53,8 +53,8 @@ Traditionally, a type synthesis algorithm is presented as \emph{algorithmic syst
 Such an algorithm is then accompanied with \emph{soundness} and \emph{completeness} assertions such that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised if there are enough annotations.
 By contrast, \citeauthor{Wadler2022} exploit the simultaneously computational and logical nature of Martin-L\"of type theory to formulate algorithmic soundness, completeness, and decidability in one go.
 %(although they do not emphasise the difference of their approach from the traditional one)
-Recall that the law of excluded middle $P \vee \neg P$ does not hold universally as an axiom in type theory---it means that whether $P$~holds is \emph{decidable}, and is non-trivial to prove.
-For example, a proof of $\forall x, y.~x = y \mathrel\vee x \neq y$ is a way to compare arbitrary $x$~and~$y$ and decide whether they are equal, which may or may not be possible depending on the domain of $x$~and~$y$.
+Recall that the law of excluded middle $P + \neg P$ does not hold universally as an axiom in type theory---it means that whether $P$~holds is \emph{decidable}, and is non-trivial to prove.
+For example, a proof of \emph{decidable equality}, i.e. $\forall x, y.~(x = y) + (x \neq y)$, is a way to compare arbitrary $x$~and~$y$ and decide whether they are equal, which may or may not be possible depending on the domain of $x$~and~$y$.
 Given that all proofs as programs terminate, logical decidability implies \emph{algorithmic decidability}.
 Further, suppose a proof of the following statement:
 \begin{quote}
@@ -119,7 +119,7 @@ In summary, we contribute a theory of bidirectional type synthesis that is
   \item \emph{simple yet general}, working for any syntax-directed bidirectional simple type system that can be specified by a bidirectional binding signature;
   \item \emph{constructive} based on Martin-L\"of type theory, and compactly formulated in a way that unifies computation and proof, preferring logical decidability over algorithmic soundness, completeness, and decidability; and mode preprocessing over annotatability.
 \end{enumerate}
-All concepts were formally developed with \Agda and translated to the mathematical vernacular. 
+Our theory was first developed with \Agda and then translated to the mathematical vernacular.
 
 This paper is structured in logical order as follows.
 We first present a concrete overview of our theory using simply typed $\lambda$-calculus in \cref{sec:key-ideas}, prior to developing a general framework for specifying bidirectional type systems in \cref{sec:defs}.

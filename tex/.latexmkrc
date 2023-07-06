@@ -6,8 +6,8 @@ sub mylatex {
   my $lhs = "$base.lhs";
 
   # Run the preprocessor
+  system('lhs2TeX', '--agda', '-o', 'agda-lhs2tex.sty', 'agda-lhs2tex.lhs') == 0 or return $?;
   system('lhs2TeX', '--agda', '-o', 'sec6-formalisation.tex', 'sec6-formalisation.lhs') == 0 or return $?;
-  system('lhs2TeX', '--agda', '-o', 'mylhs2tex.sty', 'mylhs2tex.lhs') == 0 or return $?;
   
   #if (-e $lhs) { system('lhs2TeX', '--agda', '-o', $tex, "$lhs") == 0 or return $?; }
   #opendir(my $dh, '.') or die;

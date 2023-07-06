@@ -17,7 +17,7 @@
 
 \newcommand{\xto}[1]{\xrightarrow{#1}}
   
-\newcommand{\fv}{\mathit{fv}}
+\newcommand{\fv}{\mathit{vars}}
 
 \newcommand{\tmOp}{\mathsf{op}}
 \newcommand{\tyOp}{\mathsf{op}}
@@ -72,11 +72,11 @@
 \mathlig{|-}{\mathrel{\vdash}} 
 \newcommand{\judgbox}[2]{{\raggedright $\boxed{#1}$ \quad \text{#2}}}
 
-\newcommand{\aritysymbol}[4]{#1\colon #2 \rhd #3 \to #4}
+\newcommand{\aritysym}[3]{#1 \rhd #2 \to #3}
+\newcommand{\aritysymbol}[4]{#1\colon\aritysym{#2}{#3}{#4}}
 
 \newcommand{\BTrue}{\ensuremath{\mathbf{T}}}
 \newcommand{\BFalse}{\ensuremath{\mathbf{F}}}
-
 % Some shortcuts
 \newcommand{\vars}[1]{\vec{\isTerm{#1}}}
 \newcommand{\tmOpts}{\isTerm{\tmOp}_o(\vars{x}_\isTerm{1}.\, \isTerm{t_1}; \ldots;\vars{x}_\isTerm{n}.\, \isTerm{t_n})}

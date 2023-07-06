@@ -4,9 +4,10 @@
 This section provides generic definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
-of simple types, simple type systems, and bidirectional type systems using simply typed $\lambda$-calculus in \Cref{sec:key-ideas} as our running example.
+of simple types, simply typed languages, and bidirectional type systems, using simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
+All these definitions are inductive, which we will not emphasise in the individual definitions.
 
-Our definitions are defined in two steps:
+Our definitions are formulated in two steps:
 \begin{enumerate*}
 \item we first introduce a notion of signature which includes a set of operation symbols and an assignment of arities to each operation;
 \item then, we define abstract syntax trees inductively with primitive constructs such as $\Rule{Var}$ and constructs specified by a given signature.
@@ -14,7 +15,7 @@ Our definitions are defined in two steps:
 Upon moving from simple types to bidirectionally typed terms, the notion of arity, initially as the number of arguments of an operation, is enriched to incorporate an extension context for variable binding and the direction of type information flow.
 
 \subsection{Signatures and Simple Types} \label{subsec:simple-types}
-Simple types of a language is understood intuitively as a collection of types whose formation judgement is not indexed by anything but a fixed set of type variables and the only datum needed for specifying a type construct is its number of arguments: 
+Simple types are understood intuitively as a collection of types whose formation judgement is not indexed by anything but a fixed set of type variables, and the only datum needed for specifying a type construct is its number of arguments:
 
 \begin{definition} \label{def:simple-signature}
 %  \begin{figure}
@@ -43,8 +44,7 @@ Simple types of a language is understood intuitively as a collection of types wh
 %  \end{figure}
   A \emph{signature} $\Sigma$ for simple types consists of a set\footnote{%
     Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
-    As we work in Martin-L\"of type theory with \AxiomK, all types are legitimately sets in the sense of homotopy type theory where all inhabitants of its identity type are proved equal.
-  }
+    As we work in Martin-L\"of type theory with \AxiomK, all types are legitimately sets in the sense of homotopy type theory where all inhabitants of its identity type are identified.}
   $I$ with a decidable equality and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
   For a signature $\Sigma$, a \emph{type} $A : \Type_{\Sigma}(\Xi)$ over a variable set $\Xi$ is either
   \begin{enumerate}
@@ -61,8 +61,7 @@ Simple types of a language is understood intuitively as a collection of types wh
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
-
-As \Cref{def:simple-signature} includes type variables, we introduce the typical meta-operations: substitution.
+As \Cref{def:simple-signature} includes type variables, we introduce the typical meta-operation: substitution.
 \begin{definition}
   The \emph{(simultaneous) type substitution} for a function $\rho\colon\Xi \to \Type_{\Sigma}(\Xi')$ is a map which sends $A : \Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho} : \Type_{\Sigma}(\Xi')$ and is defined as usual.
   By abuse of notation, the substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution $\simsub{A}{\rho}$ to each type $A$ in the context.
@@ -110,13 +109,13 @@ indicating that in the $\Rule{Abs}$ rule for a raw term $\lam{x}t$
 \end{enumerate*}
 Similarly, the $\Rule{App}$ rule for $t\;u$ can be specified by $\aritysymbol{\mathsf{app}}{(A, B)}{(A \bto B), A}{B}$ which takes two arguments (i.e.\ typing derivations for $t$ and $u$) under the same context so that their extension contexts are both empty.
 
-Also for brevity, a simple type system $(\Sigma, \Omega)$ refers to the simple type system specified by some type signature $\Sigma$ and a binding signature $\Omega$. 
+Also for brevity, a simply typed language $(\Sigma, \Omega)$ refers to the simply typed language specified by some type signature $\Sigma$ and a binding signature $\Omega$. 
 
 \begin{definition}
 \begin{figure}
   \centering
   \small
-  \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}}{Given a list V of variables, $\isTerm{t}$ is a raw term for the signature $(\Sigma, \Omega)$ with free variables in $V$}
+  \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}}{Given a list~$V$ of variables, $\isTerm{t}$ is a raw term for the signature $(\Sigma, \Omega)$ with free variables in~$V$}
   \begin{mathpar}
     \inferrule{\isTerm{x} \in V}{V |-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and

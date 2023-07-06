@@ -2,49 +2,37 @@
 
 \section{Mode Preprocessing and Related Properties}\label{sec:pre-synthesis}
 
-\Josh{Overview of the section}
+Our first important construction is mode preprocessing in \cref{sec:mode-preprocessing}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
+We also discuss some related properties:
+By bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
+We also formulate \varcitet{Dunfield2021}{'s} annotatability and discuss its relationship with our completeness and generalised mode preprocessing in \cref{sec:annotatability}.
 
 \subsection{Soundness and Completeness}
 \label{sec:soundness-and-completeness}
 
 %\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
-\Josh{One theorem to rule them all}
-
-Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation.
-
-\begin{lemma}[Soundness]\label{thm:soundness}
-If\/ $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, then $\Gamma \vdash_{\Sigma, \erase\Omega} t : A$.
-\end{lemma}
-
-\begin{proof}
-Induction on the given derivation, mapping every bidirectional typing rule to its mode-less counterpart except $\ChkRule{Sub}$, in which case the induction hypothesis $\Gamma |-_{\Sigma,\erase\Omega} t : B$ suffices due to the premise $B = A$.
-\end{proof}
-
+Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
 We can also remove typing and retain mode information, arriving at a mode derivation instead.
+Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation, which is completeness.
+In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
+%Formulating the notion of mode derivation helps to complete this clean picture.
+Technically, all these can be summarised in one lemma.
 
-\begin{proposition}\label{thm:typing-removal}
-If\/ $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, then $\erase\Gamma \vdash_{\Sigma, \Omega} t^\dir{d}$.
-\end{proposition}
-
-\begin{proof}
-Induction on the given derivation, mapping every rule to its counterpart.
-\end{proof}
-
-Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation.
-
-\begin{lemma}[Completeness]\label{thm:completeness}
-If\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$, then $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$.
+\begin{lemma}
+There is a bidirectional typing derivation of\/ $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if there are mode and typing derivations of\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
 \end{lemma}
 
 \begin{proof}
-Induction on the given mode derivation.
-For \SynRule{Var}, \SynRule{Anno}, and \Rule{Op}, the outermost rule used in the given typing derivation must be the corresponding typing rule, so by the induction hypotheses we have bidirectional typing derivations for all the sub-terms, to which we can then apply the corresponding bidirectional typing rule.
+From left to right:
+Induction on the bidirectional typing derivation, mapping every rule to its counterpart except when constructing a typing derivation from the $\ChkRule{Sub}$ rule, in which case the induction hypothesis $\Gamma |-_{\Sigma,\erase\Omega} t : B$ suffices due to the premise $B = A$.
+
+From right to left:
+Induction on the mode derivation.
+For \SynRule{Var}, \SynRule{Anno}, and \Rule{Op}, the outermost rule used in the typing derivation must be the corresponding typing rule, so by the induction hypotheses we have bidirectional typing derivations for all the sub-terms, to which we can then apply the corresponding bidirectional typing rule.
 The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis directly gives us a derivation of $\Gamma |-_{\Sigma,\Omega} t \syn A$, to which we apply $\ChkRule{Sub}$.
 \end{proof}
 
-In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
-%Formulating the notion of mode derivation helps to complete this clean picture.
 
 \subsection{Generalised Mode Preprocessing}
 \label{sec:mode-preprocessing}
@@ -53,10 +41,8 @@ The goal of this sub-section is to construct a mode preprocessor, which decides 
 In fact we will do better:
 If a mode preprocessor returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
 It will be more helpful if a preprocessor can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
-We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:generalised-mode-preprocessing}), which can be weakened to an ordinary mode preprocessor~(\cref{thm:mode-preprocessing}) if the additional explanation is not needed.
-
-\renewcommand{\True}{\mathbf{T}}
-\renewcommand{\False}{\mathbf{F}}
+We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:generalised-mode-preprocessing}), which can be weakened to an ordinary mode preprocessor~(\cref{thm:mode-preprocessing}) if the additional explanation is not needed.%
+\footnote{For clarity, we use ordinary mode preprocessing elsewhere in this paper.}
 
 \begin{figure}
   \centering
@@ -65,68 +51,67 @@ We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:general
     & & is in mode~$d$, \\
     $\smash{\boxed{V |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}\,g\,s}}}$
     & The raw term~$\isTerm{t}$\hspace{-.6em}
-    & misses some type annotation iff $g = \False$, and \\
-    & & is in mode~$d$ due to an outermost mode cast iff $s = \False$
+    & misses some type annotation iff $g = \BFalse$, and \\
+    & & is in mode~$d$ due to an outermost mode cast iff $s = \BFalse$
   \end{tabular}
   \begin{mathpar}
-    \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn\,\True\,\True}}\,\SynRule{Var}
+    \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn\,\BTrue\,\BTrue}}\,\SynRule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,s}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn\,g\,\True}}\,\SynRule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,s}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn\,g\,\BTrue}}\,\SynRule{Anno}
     \and
-    \inferrule{V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,\True}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,\False\,\False}}\,\SynRule{Missing}
+    \inferrule{V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,\BTrue}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,\BFalse\,\BFalse}}\,\SynRule{Missing}
     \and
-    \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,g\,\True}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk\,g\,\False}}\,\ChkRule{Sub}
+    \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,g\,\BTrue}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk\,g\,\BFalse}}\,\ChkRule{Sub}
     \and
     \inferrule{V, \vec x_1 |-_{\Sigma, \Omega} \isTerm{t_1}^{\dir{d_1}\,g_1\,s_1} \\ \cdots \\ V, \vec x_n |-_{\Sigma, \Omega} \isTerm{t_n}^{\dir{d_n}\,g_n\,s_n}}
-    {V |-_{\Sigma, \Omega} \tmOpts^{\dir{d}\,(\bigwedge_i g_i)\,\True}}\,\Rule{Op}
+    {V |-_{\Sigma, \Omega} \tmOpts^{\dir{d}\,(\bigwedge_i g_i)\,\BTrue}}\,\Rule{Op}
   \end{mathpar}
   \caption{Generalised mode derivations}
   \label{fig:generalised-mode-derivations}
 \end{figure}
 
-Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations, but such negative formulations convey little information.%
-\todo{still default in the rest of the paper}
+Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations, but such negative formulations convey little information.
 Instead, we can provide more information by pointing out the places in the term that require annotations.
 For a bidirectional type system, an annotation is required wherever a term is `strictly' (which we will explain shortly) in checking mode but required to be in synthesising mode, in which case there is no rule for switching from checking to synthesising, and thus there is no way to construct a mode derivation.
 We can, however, consider \emph{generalised mode derivations} defined in \cref{fig:generalised-mode-derivations} that allow the use of an additional $\SynRule{Missing}$ rule for such switching, so that a derivation can always be constructed.
 Given a generalised mode derivation, if it uses $\SynRule{Missing}$ in some places, then those places are exactly where annotations should be supplied, which is helpful information to the user; if it does not use $\SynRule{Missing}$, then the derivation is \emph{genuine} in the sense that it corresponds directly to an original mode derivation.
-This can be succinctly formulated as \cref{thm:Pre?-true} below by encoding genuineness as a boolean~$g$ in the generalised mode judgement, which is set to~$\False$ only by the $\SynRule{Missing}$ rule.
+This can be succinctly formulated as \cref{thm:Pre?-true} below by encoding genuineness as a boolean~$g$ in the generalised mode judgement, which is set to~$\BFalse$ only by the $\SynRule{Missing}$ rule.
 (Ignore the boolean~$s$ for now.)
 
 \begin{lemma}\label{thm:Pre?-true}
-If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,s}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
+If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BTrue\,s}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
 \begin{proof}
 Induction on the given derivation.
-The $\SynRule{Missing}$ rule cannot appear because $g = \True$, and the other rules are mapped to their counterparts.
+The $\SynRule{Missing}$ rule cannot appear because $g = \BTrue$, and the other rules are mapped to their counterparts.
 \end{proof}
 
-We also want a lemma that covers the case where $g = \False$.
+We also want a lemma that covers the case where $g = \BFalse$.
 
 \begin{lemma}\label{thm:Pre?-false}
-If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,s}$, then $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
+If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
 This lemma would be wrong if the `strictness' boolean~$s$ was left out of the rules:
 Having both $\ChkRule{Sub}$ and $\SynRule{Missing}$, which we call \emph{mode casts}, it would be possible to switch between the two modes freely, which unfortunately means that we could insert a pair of $\ChkRule{Sub}$ and $\SynRule{Missing}$ anywhere, constructing a non-genuine derivation even when there is in fact a genuine one.
 The `strictness' boolean~$s$ can be thought of as disrupting the formation of such pairs of mode casts:
-Every rule other than the mode casts sets~$s$ to~$\True$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\False$.
+Every rule other than the mode casts sets~$s$ to~$\BTrue$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\BFalse$.
 Furthermore, the sub-derivation of a mode cast has to be strict, so it is impossible to have consecutive mode casts.
 Another way to understand the role of~$s$ is that it makes the $\SynRule{Missing}$ rule precise: an annotation is truly missing only when a term is \emph{strictly} in checking mode but is required to be in synthesising mode.
 With strictness coming into play, non-genuine derivations are now `truly non-genuine'.
 
 \begin{proof}[Proof of \cref{thm:Pre?-false}]
 Induction on the generalised mode derivation, in each case analysing an arbitrary mode derivation and showing that it cannot exist.
-The key case is $\SynRule{Missing}$, where we have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\chk\,g\,\True}$ for some boolean~$g$.
-We do not have an induction hypothesis and seem to get stuck, because $g$~is not necessarily~$\False$.
+The key case is $\SynRule{Missing}$, where we have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\chk\,g\,\BTrue}$ for some boolean~$g$.
+We do not have an induction hypothesis and seem to get stuck, because $g$~is not necessarily~$\BFalse$.
 But what matters here is that $t$~is \emph{strictly} in checking mode: if we continue to analyse the sub-derivation, the outermost rule must be $\Rule{Op}$ with $\dir d = {\chk}$, implying that $t$~has to be an operation in checking mode.
 Then a case analysis shows that it is impossible to have a (synthesising) mode derivation of $V |-_{\Sigma,\Omega} t^{\syn}$.
 %\begin{itemize}
 %\item $\SynRule{Anno}$:
 %Any mode derivation must also use $\SynRule{Anno}$ as the outermost rule, and then the induction hypothesis suffices.
 %\item $\ChkRule{Sub}$:
-%We have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\False\,\True}$.
+%We have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\syn\,\BFalse\,\BTrue}$.
 %Any mode derivation of $V |-_{\Sigma,\Omega} t^{\chk}$ must use $\ChkRule{Chk}$ as the outermost rule.
 %(The $\Rule{Op}$ rule with $\dir d = {\chk}$ is impossible because the sub-derivation shows that $t$~is exactly a synthesising term.)
 %We then have a sub-derivation of $V |-_{\Sigma,\Omega} t^{\syn}$, and can use the induction hypothesis.
@@ -145,7 +130,7 @@ Instead, we distill the case analysis that deals with mode casts into the follow
 \begin{lemma}\label{thm:adjustment}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
 \begin{equation}\label{eq:strict-derivation}
-V |-_{\Sigma,\Omega} t^{\dir{d'}\,g'\,\True} \quad\text{for some mode~$\dir{d'}$ and boolean~$g'$}
+V |-_{\Sigma,\Omega} t^{\dir{d'}\,g'\,\BTrue} \quad\text{for some mode~$\dir{d'}$ and boolean~$g'$}
 \end{equation}
 then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{lemma}
@@ -185,11 +170,11 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %We can also establish the converse of \cref{thm:Pre?-true,thm:Pre?-false}.
 %
 %\begin{corollary}\label{thm:toPre?-true}
-%If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\True\,s}$ for some boolean~$s$.
+%If\/ $V |-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BTrue\,s}$ for some boolean~$s$.
 %\end{corollary}
 %
 %\begin{corollary}\label{thm:toPre?-false}
-%If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\False\,s}$ for some boolean~$s$.
+%If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$ for some boolean~$s$.
 %\end{corollary}
 %
 %Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} provides little information for constructing a required derivation, and basically we have to construct such a derivation from scratch for a raw term.
@@ -199,8 +184,8 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %\begin{proof}[Proofs of \cref{thm:toPre?-true,thm:toPre?-false}]
 %
 %By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
-%If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\True$ since $g = \False$ leads to a contradiction with \cref{thm:Pre?-false}.
-%Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\False$ so as not to contradict \cref{thm:Pre?-true}.
+%If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\BTrue$ since $g = \BFalse$ leads to a contradiction with \cref{thm:Pre?-false}.
+%Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\BFalse$ so as not to contradict \cref{thm:Pre?-true}.
 %\end{proof}
 
 \subsection{Annotatability}
@@ -227,8 +212,8 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
   \label{fig:annotation-ordering}
 \end{figure}
 
-\citet{Dunfield2021} formulated completeness differently from ours (\cref{thm:completeness}) and proposed \emph{annotatability} as a more suitable name.
-Here we formulate annotatability in our theory and discuss its relationship with our completeness and generalised mode preprocessing.
+\citet{Dunfield2021} formulated completeness differently from ours (\cref{thm:STLC-completeness,sec:soundness-and-completeness}) and proposed \emph{annotatability} as a more suitable name.
+In our theory, we may formulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
 If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.

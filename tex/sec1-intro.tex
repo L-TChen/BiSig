@@ -5,9 +5,7 @@
 Type inference is an important mechanism for the transition to well-typed programs from parsed abstract syntax trees, which we call \emph{raw terms}.
 Here `type inference' refers specifically to algorithms that ascertain the type of any raw term \emph{without type annotations}.
 However, it was later found that full parametric polymorphism leads to undecidability in type inference, as do dependent types~\citep{Wells1999,Dowek1993}.
-In light of these limitations, bidirectional type synthesis emerged as a viable alternative, providing algorithms for deciding the types of raw terms that meet some syntactic criteria%
-\todo{confirm}
-and usually contain some type annotations.
+In light of these limitations, bidirectional type synthesis emerged as a viable alternative, providing algorithms for deciding the types of raw terms that meet some syntactic criteria and usually contain some type annotations.
 \citet{Dunfield2021} summarised the design principles of bidirectional type synthesis and its wide coverage of languages with simple types, polymorphic types, dependent types, gradual types, among others.
 
 The basic idea of bidirectional type synthesis is that while the problem of type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types (for example, the type of a variable can be looked up in the context); for other kinds of terms, we can switch to the simpler problem of type checking, where the expected type of a raw term is also given so that there is more information to work with.

@@ -43,6 +43,7 @@
 \DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
 \DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
 \DeclareUnicodeCharacter{2083}{\ensuremath{_3}}
+\DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
 
 \DeclareUnicodeCharacter{2115}{\ensuremath{\mathbb{N}}}
 \DeclareUnicodeCharacter{2236}{:}

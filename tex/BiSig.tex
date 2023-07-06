@@ -75,12 +75,12 @@
   While there is much progress in designing bidirectional type systems and associated type synthesis algorithms on a case-by-case basis, the lack of a general theory makes it difficult to study the common principles and develop widely applicable techniques and practical tools such as a `type-synthesiser generator'.
   In response to this difficulty, we propose a simple yet general and constructive theory of bidirectional type synthesis.
 %  which refers to the mutual use of type checking and synthesis based on bidirectional typing rules to determine the type of a program with type annotations.
-  First, our theory is simple yet general as it applies to any syntax-directed bidirectional simple type system that can be specified by a signature.
+  First, it is simple yet general as it applies to any syntax-directed bidirectional simple type system that can be specified by a signature.
 %  which is analogous to a grammar in parsing.
-  Second, our theory is constructive because it is not only formalised in a proof assistant based on Martin-L\"of type theory, but also formulated in a way that unifies computation and proof, resulting in a compact and practical theory---for example, a proof of the decidability of the type synthesis problem is also computationally a type synthesiser.
+  Second, it is constructive because it is not only formalised in a proof assistant based on Martin-L\"of type theory, but also formulated in a way that unifies computation and proof, resulting in a compact and practical theory---for example, a proof of the decidability of the type synthesis problem is computationally a type synthesiser.
   Moreover, we introduce `mode preprocessing' to deal with missing type annotations, an aspect often overlooked in the literature.
-  The main theorem is logically a trichotomy on parsed syntax trees and computationally a type synthesiser that may throw an exception due to missing type annotations.
-  Being parametrised by a signature, our theory works as a verified type-synthesiser generator overall.
+  The main theorem is logically a trichotomy on parsed syntax trees and computationally a synthesiser that may throw an exception due to missing type annotations.
+  By being parametrised by a signature, our theory works as a verified type-synthesiser generator overall.
 \end{abstract}
 
 \begin{CCSXML}
@@ -113,7 +113,7 @@
 \ccsdesc[500]{Theory of computation~Type theory}
 \ccsdesc[300]{Software and its engineering~Formal software verification}
 
-\keywords{bidirectional typing, type synthesis, type checking, type inference, language formalisation, \Agda}
+\keywords{type checking, type inference, language formalisation, \Agda}
 
 \maketitle
 

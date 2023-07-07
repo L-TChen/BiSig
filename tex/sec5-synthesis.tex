@@ -4,18 +4,17 @@
 This section is devoted to defining mode-correctness and deriving bidirectional type synthesis for any mode-correct bidirectional type system $(\Sigma, \Omega)$.
 \Cref{sec:mode-correctness} formalises the concept of mode-correctness and establishes the uniqueness of synthesised types.
 This indicates that for a given raw term and context, any two synthesised types must be equal.
-This characteristic is also used in the proof of the logical decidability of bidirectional type synthesis.
+This property will also be used in the proof of the logical decidability of bidirectional type synthesis.
 Later, in \Cref{subsec:trichotomy}, we introduce the decidability of bidirectional synthesis but postpone its proof until \Cref{subsec:bidirectional-synthesis-checking}.
 At that point, we will combine mode preprocessing, soundness, and completeness from \Cref{sec:pre-synthesis} to show the trichotomy on raw terms as a simple corollary.
-Note that the result is applicable to an arbitrary mode-correct bidirectional type system, rather than being restricted to the simply typed $\lambda$-calculus as we did in \Cref{sec:key-ideas}.
 
 \subsection{Mode Correctness}\label{sec:mode-correctness}
-As \citet[Section~3.1]{Dunfield2021} outlined, mode-correctness for a bidirectional type system means that for every bidirectional typing rule:
+As \citet{Dunfield2021} outlined, mode-correctness for a bidirectional type system means that for every typing rule:
 \begin{enumerate*}
-\item each `input' type variable in a premise must be synthesised from `earlier' premises or, if the mode of the conclusion is checking, provided by the conclusion;
-\item each `output' type variable in the typing judgement of the conclusion should have been synthesised from premises already, if the mode of the conclusion is synthesis.
+\item each `input' type variable in a premise must be synthesised from `earlier' premises or provided by the conclusion, if the rule is checking;
+\item each `output' type variable in the conclusion should have been synthesised from premises already, if the rule is synthesis.
 \end{enumerate*}
-An `input' type variable refers to types in an extension context and the type of a premise in the checking mode.
+Here an `input' type variable refers to types in an extension context and the type of a premise in the checking mode.
 It is important to note that the order of premises in a bidirectional typing rule matters, as it also sets the order of bidirectional type synthesis.
 
 Consider the rule $\ChkRule{Abs}$ (\Cref{fig:STLC-bidirectional-typing-derivations}) as an example.
@@ -23,33 +22,68 @@ This rule is mode-correct, as the type variables $A$ and $B$ in its only premise
 Likewise, the rule $\SynRule{App}$ for an application term $\isTerm{t\;u}$ is mode-correct because:
 \begin{enumerate*}
 \item the type $A \bto B$ of the first argument $t$ is synthesised, thereby ensuring type variables $A$ and $B$ must be known if successfully synthesised;
-\item the type of the second argument $u$ is checked against $A$, which was synthesised earlier;
+\item the type of the second argument $u$ is checked against $A$, which has been synthesised earlier;
 \item as a result, the type of an application $t\;u$ can be synthesised.
 \end{enumerate*}
 
 As this is a condition for \emph{typing rules} and not for raw terms or typing derivations, this property \emph{cannot} be formalised without the concept of bidirectional binding signature presented in \Cref{sec:defs}.
-This contrasts with the properties in \Cref{sec:pre-synthesis}, which are properties that can still be expressed for individual systems even without the general definition of bidirectional type systems.
+This contrasts with the properties in \Cref{sec:pre-synthesis}, which are properties that can still be expressed for individual systems even without a general definition of bidirectional type systems.
 Now that we have the notion of signature available, we can articulate mode-correctness more precisely.
 
-First, let us introduce the finite subset\footnote{%
-  There are various definitions for finite subsets of a set within Martin-L\"{o}f type theory.
-  However, for our purposes, the choice among these definitions is not a matter of concern.
-}
-$\fv(A)$ and $\fv(\Gamma)$ of (free) variables in a type and in a context, respectively, which are defined in the usual way:
-\begin{enumerate*}
-\item For a type $A : \Type_{\Sigma}(\Xi)$ define the subset $\fv(A)$ of $\Xi$ inductively by $\fv(x) = {x}$ and $\fv(\tyOp_{i}(A_1, \ldots, A_n)) = \bigcup_{i = 1}^{n} \fv(A_i)$;
-\item by reusing this notation, for a context $\Gamma : \Type_{\Sigma}(\Xi)$ define the set $\fv(\Gamma)$ as $\fv(\emptyset) = \emptyset$ and $\fv(\Gamma, A) = \fv(\Gamma) \cup \fv(A)$.
-\end{enumerate*}
-As we have sketched informally, the mode-correctness condition for a synthesis rule is different from a checking rule
-\begin{definition}[Mode-Correctness] \label{def:mode-correctness}
-  An operation $\aritysymbol{o}{\Xi}{[\Delta_1]A_{1}^{\dir{d_1}}, \ldots, [\Delta_{n}] A_{n}^{\dir{d_n}}}{A_0^{\dir{d}}}$ is \emph{mode-correct} whenever
-  \begin{enumerate}
-    \item if $d$ is $\syn$ (synthesis);
-    \item if $d$ is $\chk$ (checking);
-  \end{enumerate}
-  
-\end{definition}
+But, first, we assume that the set $\Xi$ of variables has a \emph{decidable equality}, rather than being an arbitrary set, so that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.
+This requirement for decidable equality is necessary, as type comparisons are ubiquitous throughout type synthesis.
+To simplify our choice, we could just restrict $\Xi$ to any set within the family of sets $\Fin_n$ of natural numbers less than $n$, as defined by \citet{Dybjer1994}.
+Given that this set has a decidable equality and the arity of a type construct is always finite, it would be a viable choice.
+For clarity in presentation, however, we will continue to use named variables.
 
+Now we proceed with the definition of mode-correctness.
+As we have outlined at the beginning, the condition of mode-correctness for a synthesis rule is different from that of a checking rule, and the argument order also matters.
+Defining the condition directly for a signature can be somewhat intricate.
+Hence, we instead choose to define the condition in a few more steps, based on the list of arguments---more specifically, triples of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, and subsequently on a signature.
+We also need some auxiliary definitions for the subset of variables of a type and the set of variables that have been synthesised:
+\begin{definition}
+  The finite subset\footnote{%
+  There are various definitions for finite subsets of a set within Martin-L\"{o}f type theory.
+  However, for our purposes, the choice among these definitions is not a matter of concern.}
+  of \emph{variables} which occur in a type $A$ is denoted by $\fv(A)$.
+  The finite subset $\fv(\Gamma)$ of variables in a context $\Gamma$ is defined inductively by $\fv(\cdot) = \emptyset$ and $\fv(\Gamma, A) = \fv(\Gamma) \cup \fv(A)$.
+  For a list of \emph{arguments} $\overrightarrow{[\Delta_i]A_i^{d_i}}$, define the set of \emph{synthesis type variables} inductively as 
+  \begin{align*}
+    \synvar(\cdot)                                  & = \emptyset  \\
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}] A_{n}^{\dir{\chk}}) & = 
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}) \\
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}] A_{n}^{\dir{\syn}}) & = 
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}) \cup \fv(A_{n}).
+  \end{align*}
+\end{definition}
+This subset accumulates type variables of a synthesising argument and they are exactly those type variables that would be synthesised during type synthesis.
+
+\begin{definition}\label{def:mode-correctness}
+  The \emph{mode-correctness for an argument list} $\Xi \rhd [\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}}$  with respect to a subset $S$ of $\Xi$ is defined inductively as
+  \begin{align*}
+    \MC_{\mathit{as}}( \cdot ) ={} & \top \\
+    \MC_{\mathit{as}}(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}]A_{n}^{\syn}) 
+    & = \MC_{\mathit{as}}(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})
+    \land \fv(\Delta) \subseteq \left( S \cup \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}) \right)\\
+    \MC_{\mathit{as}}(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}]A_{n}^{\chk})
+    & = \MC_{\mathit{as}}(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})
+    \land \fv(\Delta, A_n) \subseteq \left( S \cup \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})\right).
+  \end{align*}
+\end{definition}
+This definition encapsulates the idea that every `input' type variable, possibly deriving from a context $\Delta$ or a checking argument $A_n$, must be an 'output' variable from $\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ or, if the rule is checking, belong to the set $S$ of 'input' variables in its conclusion.
+This condition must be met for every tail of the argument list to ensure that `output' variables accessible at each argument position are from preceding arguments only.
+\begin{definition}
+  An operation $o\colon \Xi \rhd [\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}} \to A_0^{\dir{d}}$ is \emph{mode-correct} provided that
+  \begin{enumerate}
+    \item $d$ is $\chk$, its argument list is mode-correct w.r.t.\ $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ contains every inhabitant of $\Xi$;
+    \item $d$ is $\syn$, its argument list is mode-correct w.r.t.\ $\emptyset$, and the finite subset $\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
+  \end{enumerate}
+  A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
+\end{definition}
+Finally, for a checking operation, an 'input' variable of an argument could be derived from $A_0$, as these are known during type checking as an input.
+Since every inhabitant of $\Xi$ can be located in either $A_0$ or synthesis variables, we can determine a concrete type for each instance of $\Xi$ during type synthesis.
+On the other hand, for a synthesis operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to $\emptyset$.
+Also, the set of synthesis variables alone should include every type variable in $\Xi$ and particularly in $A_n$.
 
 \begin{lemma}[Uniqueness of the Synthesised Types]\label{thm:unique-syn}
   Let $(\Sigma, \Omega)$ be a mode-correct bidirectional type system.

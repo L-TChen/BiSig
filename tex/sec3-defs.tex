@@ -68,13 +68,6 @@ As \Cref{def:simple-signature} includes type variables, we introduce the typical
   By abuse of notation, the substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution to each $A$ in $\Gamma$.
 \end{definition}
 
-% We may confine the use of an arbitrary variable set $\Xi$ to some set in the family of sets $\Fin_n$ of natural numbers less than $n$, as defined by \citet{Dybjer1994}, for the following reasons.
-% In bidirectional type synthesis, a decidable equality on $\Type_{\Sigma}(\Xi)$ is necessary, as we need to compare the synthesised type $B$ with a given type $A$ for the $\Rule{Sub}$ rule.
-% If $\Xi$ has a decidable equality as $\Fin_n$ does, then $\Type_{\Sigma}(\Xi)$ also has a decidable equality.
-% In addition, the arity of a construct is finite, so it suffices to use natural numbers to denote type variables in a type.
-% As we will only consider a finite collection of types (in a typing rule or in a signature), we can formally restrict $\Xi$ to the family of $\Fin_n$ in later definitions.
-% For illustrative purposes, though, we still use named variables for presentation.
-
 \subsection{Binding Signatures and Simply Typed Languages} \label{subsec:binding-sig}
 
 A simply typed language consists of
@@ -85,7 +78,7 @@ A simply typed language consists of
 Therefore, to specify a term construct, we enrich the notion of arity with some sort and extension context for variable binding:
 \begin{definition}\label{def:binding-arity}
   A \emph{binding arity} with a sort $T$ is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
-  In a binding arity ${[\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n}} \to {A_0}$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the sort of the $i$-th argument, respectively; for brevity, we denote it as ${[\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n}} \to {A_0}$ and omit $[\Delta_i]$ if $\Delta_i$ is empty.
+  In a binding arity ${[\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n}} \to {A_0}$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the sort of the $i$-th argument, respectively; for brevity, we denote it as ${[\Delta_1]A_{1}, \ldots, \left[\Delta_{n}\right] A_{n}} \to {A_0}$ and omit $[\Delta_i]$ if the extension context $\Delta_i$ is empty.
 \end{definition}
 
 For example, the $\Rule{Abs}$ rule (\Cref{fig:STLC-typing-derivations}) has the binding arity with the sort $\Type_{\Sigma_{\bto}}\{A, B\}$:
@@ -100,7 +93,7 @@ indicating that the $\Rule{Abs}$ rule for an abstraction $\lam{x}t$ has
 Similarly, the arity of the $\Rule{App}$ rule for an application $t\;u$ is ${(A \bto B), A} \to {B}$, indicating that it takes two arguments (i.e.\ typing derivations for $t$ and $u$) of types $A \bto B$ and $A$, respectively, with their extension contexts empty and the resulting type is $B$.
 
 Next, akin to a signature, our binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities.
-It also includes additionally the set $\Xi$ of type variables that appear in the binding arity with the sort $\Type_{\Sigma}(\Xi)$ for each operation:
+It also includes additionally the set $\Xi$ of type variables that may appear in the binding arity with the sort $\Type_{\Sigma}(\Xi)$ for each operation:
 \begin{definition}\label{def:binding-signature}
   For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
   \[

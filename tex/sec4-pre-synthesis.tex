@@ -20,7 +20,7 @@ In short, soundness and completeness are no more than the separation and combina
 Technically, all these can be summarised in one theorem.
 
 \begin{theorem}\label{lem:soundness-completeness}
-There is a bidirectional typing derivation of\/ $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if there are mode and typing derivations of\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
+$\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
 \end{theorem}
 
 \begin{proof}

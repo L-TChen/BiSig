@@ -1,82 +1,215 @@
-%! TEX root = BiSig.tex
+%!TEX root = BiSig.tex
 
 \section{Bidirectional Type Synthesis and Checking} \label{sec:type-synthesis}
+This section focuses on defining mode-correctness and deriving bidirectional type synthesis for any mode-correct bidirectional type system $(\Sigma, \Omega)$.
+We start with the statement of the decidability of bidirectional synthesis and the trichotomy on raw terms for mode-correct bidirectional type systems in \Cref{subsec:trichotomy}, but defer the definition of mode-correctness until \Cref{sec:mode-correctness} and the decidability proof until \Cref{subsec:bidirectional-synthesis-checking}.
+We will then formalise mode-correctness and show the uniqueness of synthesized types in \Cref{sec:mode-correctness}.
+This uniqueness property means that any two synthesised types for the same raw term $t$ under the same context $\Gamma$ have to be equal.
+This will be used later in the proof of the decidability of bidirectional type synthesis and checking in \Cref{subsec:bidirectional-synthesis-checking}.
 
-\subsection{Mode Correctness}
+\subsection{Trichotomy on Raw Terms by Type Synthesis} \label{subsec:trichotomy}
 
-\begin{theorem}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
-  Let $(\Sigma, \Omega)$ be a bidirectional type system where $\Omega$ is mode-correct.
-  Then, for every raw term $t$ in synthesising mode and two derivations of 
+\begin{theorem}[Decidability of Bidirectional Type Synthesis] \label{thm:bidirectional-type-synthesis}
+  In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
+  it is decidable whether there exists some $A$ such that
   \[
-    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow A
-    \quad\text{and}\quad
-    \Gamma \vdash_{\Sigma, \Omega} t \Rightarrow B
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A.
   \]
-  for some types $A$ and $B$ respectively, the synthesised types must be equal, i.e.\ $A = B$.
-\end{theorem}
- 
-
-\subsection{Trichotomy of Raw Terms by Type Synthesis}
-
-\begin{theorem}[Decidability of Bidirectional Typing Synthesis] \label{thm:bidirectional-type-synthesis}
-  For every type signature $\Sigma$ and bidirectional binding signature $\Omega$ for $\Sigma$ that is mode-correct, the following two statements hold.
-
-  \begin{enumerate}
-    \item For every context $\Gamma$ and raw term $\isTerm{t}$ in synthesising mode, it is decidable that there is a type~$A$ and a derivation of
-      \[
-        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Rightarrow A.
-      \]
-    \item For every context $\Gamma$, raw term $\isTerm{t}$ in checking mode, and type $A$, it is decidable that there is a derivation of
-      \[
-        \Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \Leftarrow A.
-      \]
-  \end{enumerate}
 \end{theorem}
 
-\begin{corollary}[Trichotomy of Raw Terms]
-  Let $\Sigma$ be a type signature and $\Omega$ a bidirectional binding signature.
-  Then, for every context $\Gamma$ and raw term $t$, exactly one of the following statements holds:
+\begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
+  For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
+  exactly one of the following holds:
   \begin{enumerate}
-    \item $t$ is synthesising and there exists a typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for some type $A$.
-    \item $t$ is synthesising but there is no typing derivation of\, $\Gamma \vdash_{\Sigma, \Omega} t : A$ for any type $A$.
-    \item $t$ is not synthesising.
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type $A$.
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but\/ $\Gamma \not|-_{\Sigma, \Omega} \isTerm{t} : A$.
+    \item $\erase{\Gamma} \not|-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
   \end{enumerate}
 \end{corollary}
 \begin{proof}
-  Combine  \Cref{thm:term-soundness,thm:term-completeness,thm:bidirectionalisation} with \Cref{thm:bidirectional-type-synthesis}.
+  Combine  \Cref{lem:soundness-completeness,thm:mode-preprocessing} with \Cref{thm:bidirectional-type-synthesis}.
   
 \end{proof}
 
-\subsection{Decidability of Bidirectional Type Synthesis}
+\subsection{Mode Correctness}\label{sec:mode-correctness}
+As \citet{Dunfield2021} outlined, mode-correctness for a bidirectional type system means that for every typing rule:
+\begin{enumerate*}
+\item each `input' type variable in a premise must be synthesised from `earlier' premises or provided by the conclusion, if the rule is checking;
+\item each `output' type variable in the conclusion should have been synthesised from premises already, if the rule is synthesis.
+\end{enumerate*}
+Here an `input' type variable refers to types in an extension context and the type of a premise in the checking mode.
+It is important to note that the order of premises in a bidirectional typing rule also matters, since synthesised types are accumulated during type synthesis.
+
+Consider the rule $\ChkRule{Abs}$ (\Cref{fig:STLC-bidirectional-typing-derivations}) as an example.
+This rule is mode-correct, as the type variables $A$ and $B$ in its only premise are already provided by its conclusion $A \bto B$.
+Likewise, the rule $\SynRule{App}$ for an application term $\isTerm{t\;u}$ is mode-correct because:
+\begin{enumerate*}
+\item the type $A \bto B$ of the first argument $t$ is synthesised, thereby ensuring type variables $A$ and $B$ must be known if successfully synthesised;
+\item the type of the second argument $u$ is checked against $A$, which has been synthesised earlier;
+\item as a result, the type of an application $t\;u$ can be synthesised.
+\end{enumerate*}
+
+
+
+Now we proceed with the definition of mode-correctness.
+As we have outlined, the condition of mode-correctness for a synthesis rule is different from that of a checking rule, and the argument order also matters.
+Defining the condition directly for a signature can be somewhat intricate.
+Instead, we choose to define the condition in a few more steps, based on the list of arguments---more specifically, triples of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, and subsequently on a signature.
+We also need some auxiliary definitions for the subset of variables of a type and of a context and the set of variables that have been synthesised:
+\begin{definition}
+  The finite subset\footnote{%
+  There are various definitions for finite subsets of a set within Martin-L\"{o}f type theory.
+  However, for our purposes, the choice among these definitions is not a matter of concern.}
+  of \emph{variables} which occur in a type $A$ is denoted by $\fv(A)$.
+  The subset $\fv(\Gamma)$ of variables in a context $\Gamma$ is defined by $\fv(\cdot) = \emptyset$ and $\fv(\Gamma, A) = \fv(\Gamma) \cup \fv(A)$.
+  For a list of \emph{arguments} $\overrightarrow{[\Delta_i]A_i^{d_i}}$, define the set of \emph{synthesis type variables} inductively as 
+  \begin{align}
+    \label{eq:synvar1}\synvar(\cdot)                                  & = \emptyset  \\
+    \label{eq:synvar2}\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}] A_{n}^{\dir{\chk}}) & = 
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}) \\
+    \label{eq:synvar3}\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}] A_{n}^{\dir{\syn}}) & = 
+    \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}) \cup \fv(A_{n}).
+  \end{align}
+\end{definition}
+This subset contains type variables of a synthesising argument and they are exactly those type variables that would be synthesised during type synthesis.
+
+\begin{definition}\label{def:mode-correctness}
+  The \emph{mode-correctness for an argument list} $\Xi \rhd [\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}}$  with respect to a subset $S$ of $\Xi$ is defined inductively as
+  \begin{align}
+    \label{eq:MC1} \MC_{\mathit{as}}( \cdot ) ={} & \top \\
+    \label{eq:MC2} \MC_{\mathit{as}}\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}]A_{n}^{\syn}\right) 
+    & = \MC_{\mathit{as}}\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}\right)
+    \land \fv(\Delta) \subseteq \left( S \cup \synvar\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}\right) \right)\\
+    \label{eq:MC3} \MC_{\mathit{as}}\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}, [\Delta_{n}]A_{n}^{\chk}\right)
+    & = \MC_{\mathit{as}}\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}\right)
+    \land \fv(\Delta, A_n) \subseteq \left( S \cup \synvar\left(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}}\right)\right).
+  \end{align}
+\end{definition}
+This definition encapsulates the idea that every `input' type variable, possibly deriving from a context $\Delta$ or a checking argument $A_n$, must be an `output' variable from $\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
+This condition must be met for every tail of the argument list as well to ensure that `output' variables accessible at each argument position are from preceding arguments only, hence an inductive definition.
+\begin{definition}
+  An operation $o\colon \Xi \rhd [\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}} \to A_0^{\dir{d}}$ is \emph{mode-correct} provided that
+  \begin{enumerate}
+    \item $d$ is $\chk$, its argument list is mode-correct w.r.t.\ $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ contains every inhabitant of $\Xi$;
+    \item $d$ is $\syn$, its argument list is mode-correct w.r.t.\ $\emptyset$, and the finite subset $\synvar(\overrightarrow{[\Delta_i]A_i^{\dir{d_i}}})$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
+  \end{enumerate}
+  A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
+\end{definition}
+Finally, for a checking operation, an `input' variable of an argument could be derived from $A_0$, as these are known during type checking as an input.
+Since every inhabitant of $\Xi$ can be located in either $A_0$ or synthesis variables, we can determine a concrete type for each inhabitant of $\Xi$ during type synthesis.
+On the other hand, for a synthesis operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to $\emptyset$.
+Also, the set of synthesis variables alone should include every type variable in $\Xi$ and particularly in $A_n$.
+
+
+\begin{lemma}[Uniqueness of the Synthesised Types]\label{thm:unique-syn}
+  In a mode-correct bidirectional type system $(\Sigma, \Omega)$, the synthesised types of any two derivations
+  \[
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A
+    \quad\text{and}\quad
+    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B
+  \]
+  for the same term $t$ must be equal, i.e.\ $A = B$.
+\end{lemma}
+\begin{proof}%[Proof of \Cref{thm:unique-syn}]
+  We prove the statement by induction on derivations $d_1$ and $d_2$ for $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$ and $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$.
+  Our system is syntax-directed, so $d_1$ and $d_2$ must be derived from the same rule: 
+  \begin{itemize}
+    \item $\SynRule{Var}$ follows from the requirement that each variable in a context is unique.
+    \item $\SynRule{Anno}$ holds trivially, since the synthesised type $A$ is from the term $t \annotate A$ in question.
+    \item $\Rule{Op}$: Recall here that a derivation of\/ $\Gamma |- \tmOpts : A$ contains a substitution $\rho$ to concrete types from the local context $\Xi$ of an operation $o\colon \Xi \rhd [\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}} \to A_0^{\syn}$.
+      To prove that any two derivations for the same $\tmOpts$ has the same synthesised type, it suffices to show that those substitutions $\rho_1$ and $\rho_2$ agree on $X = \synvar\left([\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_n]A_{n}^{\dir{d_n}}\right)$ by induction on the list:
+      \begin{itemize}
+        \item For the empty list, the statement is vacuously true by~\eqref{eq:synvar1}.
+        \item If $\dir{d_{i+1}}$ is checking, then it holds by induction hypothesis.
+        \item If $\dir{d_{i+1}}$ is synthesis, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ by mode-correctness~\eqref{eq:MC2} and induction hypothesis (of the list).
+          Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar\left([\Delta_{1}] A_{1}^{\dir{d}}, \ldots, [\Delta_i]A_{i}^{\dir{d_i}}\right)$, as required for the case \eqref{eq:synvar3} in the definition of $\synvar$.
+      \end{itemize}
+  \end{itemize}
+\end{proof}
+
+Uniqueness above is a prevalent property in bidirectional type systems, although the specific proofs can vary depending on the constructs in the system, which can involve selecting synthesis arguments whose type variables include the variables of the conclusion.
+For instance, for a derivation of $\Gamma |- t\;u \syn B$, one would apply the hypothesis to the sub-derivation $\Gamma |- t \syn A \bto B$.
+On the other hand, our proof is based on mode-correctness and need not consider specific sub-derivations.
+
+\begin{remark}
+  Mode-correctness is fundamentally a condition for typing \emph{rules} themselves, not for derivations.
+  Thus, this property cannot be formalised without treating rules as some mathematical object, such as the notion of bidirectional binding signature presented in \Cref{sec:defs}.
+  This contrasts with the properties in \Cref{sec:pre-synthesis}, which can still be articulated for individual systems even in the absence of a general definition of bidirectional type systems.
+  With the concept of signature now at our disposal, we can express mode-correctness as defined formally above.
+\end{remark}
+\subsection{Decidability of Bidirectional Type Synthesis and Checking}\label{subsec:bidirectional-synthesis-checking}
+
+For bidirectional type synthesis, we assume further that the set $\Xi$ of variables has a \emph{decidable equality}, rather than being an arbitrary set, so that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.
+This assumption is necessary, as type comparisons are ubiquitous throughout type synthesis. 
+To simplify our choice, we could just restrict $\Xi$ to any set within the family of sets $\Fin_n$ of natural numbers less than $n$, as defined by \citet{Dybjer1994}.
+Given that this set has a decidable equality and the arity of a type construct is always finite, it would be a viable choice.
+For clarity in presentation, however, we will continue to use named variables.
+
+\begin{theorem}[Decidability of Bidirectional Type Synthesis and Checking] \label{thm:bidirectional-type-synthesis-checking}
+  In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
+  \begin{enumerate}
+    \item if $\erase{\Gamma} |-_{\Sigma, \erase{\Omega}} \isTerm{t}^{\syn}$, then it is decidable whether there is a type~$A$ such that
+      \[
+        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A;
+      \]
+    \item if $\erase{\Gamma} |-_{\Sigma, \erase{\Omega}} \isTerm{t}^{\chk}$, then it is decidable for any $A$ whether
+      \[
+        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A.
+      \]
+  \end{enumerate}
+\end{theorem}
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis}}]
-  We prove this statement by induction on $t$.
-
-  \begin{description}
-    \item[(var)] If $x : A$ is in the context $\Gamma$, then there exists a type $A$ such that $\Gamma \vdash_{\Sigma, \Omega} x \Rightarrow A$.
-      Otherwise, if $\Gamma \vdash_{\Sigma, \Omega} x \Rightarrow A$ is derivable, then by inversion $(x : A)$ must be in $\Gamma$, a contradiction.
-    \item[(anno)]
-    \item[(sub)]
+  We prove this statement by induction on the derivation of $|-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$ (instead of $\isTerm{t}$ alone).
+  The first two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness directly.
+  The third case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$ to check.
+  The last case \Rule{Op} is the interesting part of this theorem.
+  \begin{itemize}
+    \item \SynRule{Var}: If $\isTerm{t}$ is a variable $\isTerm{x}$ in the context $\Gamma$, then there exists a type $A$ such that $\Gamma |- \isTerm{x} \syn A$.
+      Otherwise, if $\isTerm{x}$ is not in $\Gamma$ but $\Gamma |- \isTerm{x} \syn A$ is derivable, then by inversion $\isTerm{x}$ must be in $\Gamma$, a contradiction.
+    \item \SynRule{Anno}: For a raw term of the form $\isTerm{t} \annotate A$ in synthesising mode, it is decidable that $\Gamma |- \isTerm{t} \chk A$ is derivable or not by induction hypothesis.
+      \begin{enumerate}
+        \item If $\Gamma |- \isTerm{t} \chk A$ is derivable, then $\Gamma |- \isTerm{t \annotate A} \syn A$ is derivable.
+        \item If $\Gamma |- t \chk A$ is not derivable but $\Gamma |- \isTerm{t \annotate A} \syn$ is derivable, then by inversion $\Gamma |- t \chk A$ is derivable, thus a contradiction.
+      \end{enumerate}
+      
+    \item \ChkRule{Sub}: If $t$ is in checking mode because of the subsumption rule, then by induction hypothesis it is decidable whether $\Gamma |- t \syn B$ for some $B$:
+      \begin{enumerate}
+        \item If $\Gamma |- t \syn B$ is derivable for some $B$, then we have to consider any type $A$ and it is decidable if $A$ is equal to $B$:
+          \begin{enumerate}
+            \item if $A = B$ then we have arrived a derivation of $\Gamma |- t \chk A$.
+            \item if $A \neq B$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn A$.
+              However, by \Cref{thm:unique-syn}, synthesised types $A$ and $B$ must be equal, so it is a contradiction.
+          \end{enumerate}
+        \item if $\Gamma |- t \syn C$ is not derivable for any type $C$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
+      \end{enumerate}
+      
 %    \item For every mode-correct operation $o \colon \Xi \rhd [\Delta_1]A_{1}^{d_1}, \ldots, [\Delta_{n}] A^{d_n}_{n} \to A^{d}$, a context $\Gamma$, and a raw term
 %      \[
 %        \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)}, 
 %      \]
 %      with a mode $d$, it is decidable that there exists a substitution $\rho$ from $\Xi$ to $\emptyset$ and a typing derivation of
 %      \[
-%        \Gamma \vdash_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^\isDir{d}.
+%        \Gamma |-_{\Sigma, \Omega} \isTerm{\tmOp_{o}(\vec{x}_1.t_1,\ldots, \vec{x}_n.t_n)} : \simsub{A}{\rho}^{d}.
 %      \]
-    \item For every set $\Xi$ of type variables, list of
-      \[
-        \left(\Delta_i, A_i, d_i\right) : \Cxt_{\Sigma}(\Xi) \times \Type_{\Sigma}(\Xi) \times \Mode, 
-      \]
-      for $i = 1, \ldots, n$, \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$, context $\Gamma$, and raw terms $t_i$'s in mode $d_i$,
-      \begin{enumerate}
-        \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that all     of following judgements are derivable
-          \[
-            \Gamma, \simsub{\Delta_i}{\ext{\rho}} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\ext{\rho}}^{d_i}
-          \]
+    \item \Rule{Op}:
+      Suppose that $t$ is of them $\tmOpts$ for some mode-correct operation $o$ in $\Omega$.
+      No matter $t$ is checking or synthesising, we need to build derivations for its arguments incrementally and maintain a set of unifiers, i.e.\ a partial substitution $\rho\colon \PSub{\Xi}{\emptyset}$ is incrementally defined which is initially defined nowhere if $t$ is synthesising or on variables of the target $A$ if $t$ is checking. 
 
-        \item or there is no extension $\sigma$ such that all $\Gamma, \simsub{\Delta_i}{\sigma} \vdash_{\Sigma, \Omega} t_i \colon \simsub{A_i}{\sigma}^{d_i}$ has a typing derivation. 
-      \end{enumerate}
-  \end{description}
+  \begin{claim}\label{lem:args-induction}
+    For every set $\Xi$ of type variables, list 
+    \[
+      \mathit{as} = \left([\Delta_i] A_{i}^{\dir{d_i}}\right)_{i = 1}^{n}
+    \]
+    list of raw terms $t_i$'s in mode $d_i$, context $\Gamma$, and \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$
+    \begin{enumerate}
+      \item either there is a minimal extension $\ext{\rho}$ of $\rho$ defined on $\synvar(\mathit{as})$ such that all of following judgements are derivable
+        \[
+          \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
+        \]
+
+      \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\sigma}^{\dir{d_i}}$ has a typing derivation. 
+    \end{enumerate}
+  \end{claim}
+  \end{itemize}
 \end{proof}

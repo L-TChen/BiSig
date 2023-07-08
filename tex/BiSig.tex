@@ -1,33 +1,61 @@
 \documentclass[acmsmall,screen]{acmart}
+
+\acmJournal{PACMPL}
+\acmVolume{0}
+\acmNumber{0}
+\acmArticle{0}
+\acmMonth{7}
+
+\ifPDFTeX
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
+\else
+\usepackage{polyglossia}
+\setdefaultlanguage{british}
+\fi
 
-\usepackage{bm,braket,mathtools,mathpartir,bussproofs}
-\EnableBpAbbreviations
-\usepackage[all,cmtip]{xy}
-
-\usepackage{subcaption,xfrac,xspace,xcolor,xspace}
-\usepackage{hyperref}
+\usepackage{subfiles}
+\usepackage{bbold}
+\newcommand{\hmmax}{0}
+\newcommand{\bmmax}{0}
+\usepackage{bm}
+\usepackage{mathtools}
+\input{mathlig}
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows}
+\usepackage{mathpartir}
+\usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
-\usepackage[inline]{enumitem} % for environment enumerate*
-\setlist[enumerate]{mode=unboxed}
 
-\setlength {\marginparwidth }{2cm}
-\usepackage[color=yellow,textsize=small]{todonotes}
-\newcommand{\LT}[1]{\todo[author=LT,inline,color=green!40,caption={}]{{#1}}}
-\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=green!40,caption={}]{{#1}}}
+% Used for typesetting Agda code
+\usepackage{agda-lhs2tex}
+
+\usepackage{xifthen}
+\newcommand{\varcitet}[3][]{\citeauthor{#2}#3~[\ifthenelse{\isempty{#1}}{\citeyear{#2}}{\citeyear[#1]{#2}}]}
+
+\usepackage[inline]{enumitem} % for environment enumerate*
+
+\setlength{\marginparwidth}{1.25cm}
+\usepackage[obeyFinal,color=yellow,textsize=scriptsize]{todonotes}
 
 \usepackage{microtype}
+\microtypesetup{babel}
+
+\newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40]{{#1}}}
+\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40]{{#1}}}
+
+\input{type-notation} %% for type theory notation copied from HoTT Book
+\input{macros}
 
 \citestyle{acmauthoryear}
 
 \AtEndPreamble{%
 \theoremstyle{acmdefinition}
-\newtheorem{remark}[theorem]{Remark}}
-
-\input{type-notation} %% for type theory notation copied from HoTT Book
-\input{macros}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{claim}{Claim}
+\newtheorem{claimproof}{Proof of Claim}
+}
 
 \begin{document}
 
@@ -37,7 +65,6 @@
 \author{Hsiang-Shang Ko}
 \orcid{0000-0002-2439-1048}
 \email{joshko@iis.sinica.edu.tw}
-
 \affiliation{%
   \institution{Academia Sinica}
   \streetaddress{128 Academia Road}
@@ -46,25 +73,67 @@
   \postcode{115}
 }
 
-\title{A Constructive Metatheory of Bidirectional Type Synthesis for Simple Types}
+\title{A Theory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
-  This paper proposes a formal theory of bidirectional typing.
+%  Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
+  While there is much progress in designing bidirectional type systems and associated type synthesis algorithms on a case-by-case basis, the lack of a general theory makes it difficult to study the common principles and develop widely applicable techniques and practical tools such as a `type-synthesiser generator'.
+  In response to this difficulty, we propose a simple yet general and constructive theory of bidirectional type synthesis.
+%  which refers to the mutual use of type checking and synthesis based on bidirectional typing rules to determine the type of a program with type annotations.
+  First, it is simple yet general as it applies to any syntax-directed bidirectional simple type system that can be specified by a signature.
+%  which is analogous to a grammar in parsing.
+  Second, it is constructive because it is not only formalised in a proof assistant based on Martin-L\"of type theory, but also compactly formulated in a way that unifies computation and proof---for example, a proof of the decidability of the type synthesis problem is computationally a type synthesiser.
+  Moreover, we introduce `mode preprocessing' to deal with missing type annotations, an aspect often overlooked in the literature.
+  The main theorem is logically a trichotomy on untyped abstract syntax trees and computationally a type synthesiser that may throw an exception due to missing type annotations.
+  By being parametrised by a signature, our theory works overall as a verified type-synthesiser generator.
 \end{abstract}
 
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10011007.10011006.10011041</concept_id>
+       <concept_desc>Software and its engineering~Compilers</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011006.10011039.10011040</concept_id>
+       <concept_desc>Software and its engineering~Syntax</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011074.10011099.10011692</concept_id>
+       <concept_desc>Software and its engineering~Formal software verification</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003752.10003790.10011740</concept_id>
+       <concept_desc>Theory of computation~Type theory</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~Compilers}
+\ccsdesc[500]{Software and its engineering~Syntax}
+\ccsdesc[500]{Theory of computation~Type theory}
+\ccsdesc[300]{Software and its engineering~Formal software verification}
+
+\keywords{type checking, type inference, language formalisation, \Agda}
+
 \maketitle
+
 
 \input{sec1-intro}
 \input{sec2-outline}
 \input{sec3-defs.tex}
-\input{sec4-bidirectionalisation.tex}
+\input{sec4-pre-synthesis.tex}
 \input{sec5-synthesis.tex}
-\input{sec6-formalisation.tex}
+\subfile{sec6-formalisation}
 \input{sec7-future.tex}
 
 \begin{acks}
-We thank Nathanael Arkor for the useful conversation and to thank the Programming Languages and Formal Methods Laboratory at Academia Sinica for the opportunity of sharing earlier ideas.
-
+%We thank Nathanael Arkor for the useful conversation.
+We thank Kuen-Bang {Hou (Favonia)} for his comments and suggestions.
 The work is supported by the Ministry of Science and Technology of Taiwan under grant MOST 109-2222-E-001-002-MY3.
 \end{acks}
 

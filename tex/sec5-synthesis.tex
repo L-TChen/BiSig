@@ -18,10 +18,10 @@ This will be used later in the proof of the decidability of bidirectional type s
 \end{theorem}
 
 \begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
-  Exactly one of the following statements holds:
+  Exactly one of the following holds:
   \begin{enumerate}
-    \item $\isTerm{t}$ is synthesising and the judgement $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation for some type $A$.
-    \item $\isTerm{t}$ is synthesising but the judgement $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ has no derivation for any type $A$.
+    \item $\isTerm{t}$ is synthesising and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type $A$.
+    \item $\isTerm{t}$ is synthesising but\/ $\Gamma \not|-_{\Sigma, \Omega} \isTerm{t} : A$ for any type $A$.
     \item $\isTerm{t}$ is not synthesising.
   \end{enumerate}
 \end{corollary}
@@ -51,10 +51,10 @@ Likewise, the rule $\SynRule{App}$ for an application term $\isTerm{t\;u}$ is mo
 
 
 Now we proceed with the definition of mode-correctness.
-As we have outlined at the beginning, the condition of mode-correctness for a synthesis rule is different from that of a checking rule, and the argument order also matters.
+As we have outlined, the condition of mode-correctness for a synthesis rule is different from that of a checking rule, and the argument order also matters.
 Defining the condition directly for a signature can be somewhat intricate.
-Hence, we instead choose to define the condition in a few more steps, based on the list of arguments---more specifically, triples of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, and subsequently on a signature.
-We also need some auxiliary definitions for the subset of variables of a type and the set of variables that have been synthesised:
+Instead, we choose to define the condition in a few more steps, based on the list of arguments---more specifically, triples of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, and subsequently on a signature.
+We also need some auxiliary definitions for the subset of variables of a type and of a context and the set of variables that have been synthesised:
 \begin{definition}
   The finite subset\footnote{%
   There are various definitions for finite subsets of a set within Martin-L\"{o}f type theory.
@@ -115,6 +115,10 @@ Also, the set of synthesis variables alone should include every type variable in
   for the same term $t$ must be equal, i.e.\ $A = B$.
 \end{lemma}
  
+\begin{proof}
+  
+\end{proof}
+
 
 
 \subsection{Decidability of Bidirectional Type Synthesis and Checking}\label{subsec:bidirectional-synthesis-checking}

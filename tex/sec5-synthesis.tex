@@ -18,11 +18,12 @@ This will be used later in the proof of the decidability of bidirectional type s
 \end{theorem}
 
 \begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
-  Exactly one of the following holds:
+  For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
+  exactly one of the following holds:
   \begin{enumerate}
-    \item $\isTerm{t}$ is synthesising and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type $A$.
-    \item $\isTerm{t}$ is synthesising but\/ $\Gamma \not|-_{\Sigma, \Omega} \isTerm{t} : A$ for any type $A$.
-    \item $\isTerm{t}$ is not synthesising.
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type $A$.
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but\/ $\Gamma \not|-_{\Sigma, \Omega} \isTerm{t} : A$.
+    \item $\erase{\Gamma} \not|-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
   \end{enumerate}
 \end{corollary}
 \begin{proof}

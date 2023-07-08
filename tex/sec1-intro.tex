@@ -84,14 +84,10 @@ Our work takes the same approach but expands the scope significantly.
 The vision of formalising the metatheory of every programming language was initiated by the \PoplMark challenge~\citep{Aydemir2005}.
 Earlier than \PoplMark, \citet{Altenkirch1993} commented that basic meta-operations and their meta-properties constitute the bulk of formalisation, motivating a number of frameworks~\citep{Ahrens2018,Fiore2022,Gheri2020,Ahrens2022,Allais2021} to define well-scoped/typed terms, substitution, term traversal, and their meta-properties universally.
 One of the core gadgets of these frameworks is the notion of \emph{binding signatures} (coined by~\citet{Aczel1978} in line with the term \emph{signature} in universal algebra) for specifying type systems.
-It is noteworthy that these state-of-the-art frameworks are basically restricted to simple types%
-\todo{confirm}
-and cannot specify polymorphic types or dependent types yet, and only \citeauthor{Allais2021} discussed meta-operations beyond substitution.
+It is noteworthy that these state-of-the-art frameworks are basically restricted to simple types and cannot specify polymorphic types or dependent types yet, and only \citeauthor{Allais2021} discussed meta-operations beyond substitution.
 Like these frameworks, our work is  built on a variant of binding signature for simple types.
 Unlike these frameworks, we target constructions for a different part of programming language theory, namely the transition from a surface language (raw terms) to a core language (well-typed terms), and our type synthesiser is significantly more complex than those meta-operations previously considered.
-Another difference is that several of the frameworks%
-\todo{Which ones precisely?}
-adopt intrinsically typed terms, whereas for our theory it is essential to use an extrinsic formulation to make it possible to relate a synthesised typing derivation with an input term.
+Another difference is that several of the frameworks~\citep{Fiore2022,Allais2021,Ahrens2022} focus on intrinsically typed terms, whereas for our theory it is essential to use an extrinsic formulation to make it possible to relate a synthesised typing derivation with an input term.
 This difference can be easily reconciled by converting extrinsic typing derivations to intrinsically typed terms though.
 
 \subsection{Contributions and Plan of This Paper}

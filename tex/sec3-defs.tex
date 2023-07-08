@@ -254,9 +254,10 @@ Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typ
   A typing rule is \emph{checking} if its conclusion mode is $\chk$ and \emph{synthesis} if the conclusion mode is $\syn$.
 \end{definition}
 
-Having established generic definitions, we can now specify the simply typed $\lambda$-calculus and its bidirectional type system in \Cref{sec:key-ideas}---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ and $\Omega^{\Leftrightarrow}_\Lambda$ where $\Omega^{\Leftrightarrow}_{\Lambda}$ consists of
+\begin{example}\label{ex:signature-simply-typed-lambda}
+Having established generic definitions, we can now specify the simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
 \[
-  \aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}} \quad\text{and}\quad \aritysymbol{\mathsf{app}}{A, B}{(A \bto B)^{\syn}, A^{\chk}}{B^{\syn}}
+  \aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}} \quad\text{and}\quad \aritysymbol{\mathsf{app}}{A, B}{(A \bto B)^{\syn}, A^{\chk}}{B^{\syn}}.
 \]
-and $\Sigma_{\bto}$ is from \Cref{ex:type-signature-for-function-type}.
+\end{example}
 Moreover, we are able to reason about constructions and properties that hold for any bidirectional simple type system $(\Sigma, \Omega)$.

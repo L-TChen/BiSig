@@ -42,8 +42,8 @@
 \usepackage{microtype}
 \microtypesetup{babel}
 
-\newcommand{\LT}[1]{\todo[author=LT,inline,color=orange!40]{{#1}}}
-\newcommand{\Josh}[1]{\todo[author=Josh,inline,color=yellow!40]{{#1}}}
+\newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
+\newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
@@ -76,6 +76,7 @@
 \title{A Theory of Bidirectional Type Synthesis for Simple Types}
 
 \begin{abstract}
+  \LT{Still not coherent enough}
 %  Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
   While there is much progress in designing bidirectional type systems and associated type synthesis algorithms on a case-by-case basis, the lack of a general theory makes it difficult to study the common principles and develop widely applicable techniques and practical tools such as a `type-synthesiser generator'.
   In response to this difficulty, we propose a simple yet general and constructive theory of bidirectional type synthesis.

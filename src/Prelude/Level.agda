@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Prelude.Level where
 
 open import Level                                 public
@@ -7,4 +5,4 @@ open import Level                                 public
   renaming (suc to lsuc)
 
 variable
-  ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ : Level
+  ℓ ℓ₀ ℓ₁ ℓ₂ ℓ′ ℓ′′ : Level

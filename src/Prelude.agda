@@ -1,14 +1,17 @@
-{-# OPTIONS --safe #-}
-
 module Prelude where
 
-open import Prelude.Level                      public
+open import Agda.Builtin.FromNat               public
 
 open import Axiom.UniquenessOfIdentityProofs   public
 open import Function                           public
   hiding (_∋_; id; Equivalence; _⇔_)
+open import Data.Empty                         public
+  using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
+open import Data.Empty.Polymorphic             public
+  using (⊥; ⊥-elim)
+
 open import Relation.Nullary                      public
-  using (Dec; yes; no; _because_; ¬_)
+  using (Dec; yes; no; _because_; ¬_; ¬?)
 open import Relation.Nullary.Decidable            public
   using (map′)
 open import Relation.Binary                       public
@@ -16,11 +19,6 @@ open import Relation.Binary                       public
 open import Relation.Binary.PropositionalEquality public
   using (_≡_; _≗_; refl; sym; trans; cong; cong₂; subst; subst₂; _≢_; isPropositional; module ≡-Reasoning)
   renaming (isEquivalence to ≡-isEquivalence)
-
-open import Data.Empty                         public
-  using () renaming (⊥ to ⊥₀; ⊥-elim to ⊥-elim₀)
-open import Data.Empty.Polymorphic             public
-  using (⊥; ⊥-elim)
 
 open import Data.Unit                          public
   using () renaming (⊤ to ⊤₀; tt to tt₀)
@@ -30,18 +28,18 @@ open import Data.Unit.Polymorphic              public
 open import Data.Maybe                         public
   using (Maybe; just; nothing)
 module N where
-  open import Data.Nat as N       public
+  open import Data.Nat            public
+  open import Data.Nat.Literals   public
   open import Data.Nat.Properties public
 open N public
   using (ℕ; zero; suc; _+_; _∸_; less-than-or-equal; +-assoc; +-comm)
-  renaming (_≤″_ to _≤_; _≥″_ to _≥_; _<″_ to _<_)
 
 module F where
   open import Data.Fin            public
   open import Data.Fin.Literals   public
   open import Data.Fin.Properties public
 open F public
-  using (Fin; #_; zero; suc; fromℕ; _↑ˡ_; _↑ʳ_)
+  using (Fin; #_; zero; suc; fromℕ; _↑ˡ_; _↑ʳ_; punchIn; punchOut)
 
 module L where
   open import Data.List                          public
@@ -63,17 +61,15 @@ module L where
     using (_⊆_)
 
   index-∈-lookup
-    : {A : Set ℓ} (xs : List A) (i : Fin (length xs))
+    : ∀ {ℓ} {A : Set ℓ} (xs : List A) (i : Fin (length xs))
     → index (∈-lookup {xs = xs} i) ≡ i
   index-∈-lookup (x ∷ xs) zero    = refl
   index-∈-lookup (x ∷ xs) (suc i) = cong suc (index-∈-lookup xs i)
 open L public using
   ( List; []; _∷_; length; _++_; zip
   ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
-  ; All; Any; _⊆_; module A)
+  )
   renaming (_∈_ to infix 5 _∈_)
-
-
 
 open import Data.Bool                          public
   using (Bool; true; false)
@@ -91,10 +87,8 @@ module V where
 --  open import Data.Vec.Relation.Unary.All      public
 --    using (All; []; _∷_)
   open import Data.Vec.Membership.Propositional public
-    using (_∈_)
 open V public using
-  (Vec; []; _∷_; toList; insert; lookup; tabulate
-  ; allFin; tabulate∘lookup; lookup∘tabulate; tabulate-cong)
+  (Vec; []; _∷_; toList; lookup)
 
 open import Data.String                        public
   using (String)
@@ -111,11 +105,11 @@ module WF where
 open WF public
   hiding (module All)
 
--- open import Prelude.Prop                          public
--- open import Prelude.Maybe                         public
+open import Prelude.Level                         public
 open import Prelude.Equivalence                   public
 open import Prelude.Logic                         public
 open import Prelude.Category                      public
+open import Prelude.Distinct                      public
 
 private variable
   m n l : ℕ
@@ -139,13 +133,12 @@ Fins = List ∘ Fin
 Lift₀ : {ℓ : Level} → Set ℓ → Set ℓ
 Lift₀ {ℓ} = Lift {ℓ} 0ℓ
 
-{-# DISPLAY Lift 0ℓ A = Lift₀ A #-}
+{-# DISPLAY Lift lzero A = Lift₀ A #-}
 
+infixl 6 _ʳ+_
 _ʳ+_ : ℕ → ℕ → ℕ
 zero  ʳ+ m = m
 suc n ʳ+ m = n ʳ+ (suc m)
-
-infixl 6 _ʳ+_
 
 ------------------------------------------------------------------------------
 -- Properties of _≗_
@@ -157,10 +150,6 @@ infixl 6 _ʳ+_
   ; trans = λ {f} {g} {h} f=g g=h x → trans (f=g x) (g=h x)
   }
 
-⊆-trans : {xs ys zs : List A}
-  → xs ⊆ ys → ys ⊆ zs → xs ⊆ zs
-⊆-trans xs⊆ys ys⊆zs = ys⊆zs ∘ xs⊆ys
-
 ------------------------------------------------------------------------------
 -- Type classes
 ------------------------------------------------------------------------------
@@ -168,12 +157,7 @@ infixl 6 _ʳ+_
 ------------------------------------------------------------------------------
 -- Decidable Equality
 
-record DecEq {a} (A : Set a) : Set a where
-  infix 4 _≟_
-  field
-    _≟_ : (x y : A) → Dec (x ≡ y)
-
-open DecEq ⦃...⦄ public
+open import Prelude.DecEq public
 
 instance
   EqNat : DecEq ℕ
@@ -181,3 +165,10 @@ instance
 
   EqFin : DecEq (Fin n)
   _≟_ ⦃ EqFin ⦄ = F._≟_
+
+instance
+  NumNat : Number ℕ
+  NumNat = N.number
+
+  NumFin : {n : ℕ} → Number (Fin n)
+  NumFin {n} = F.number n

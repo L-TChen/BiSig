@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 open import Prelude
 
 module Syntax.Simple.Description where
@@ -16,16 +14,11 @@ record Desc : Set₁ where
 open Desc public
 
 ⟦_⟧ : Desc → Set → Set
-⟦ D ⟧ X = Σ[ i ∈ D .Op ] X ^ D .rules i 
--- Desc = List ℕ
-
--- ⟦_⟧ : Desc → Set → Set
--- ⟦ Ds ⟧ X = ∃[ D ] Σ[ _ ∈ (D ∈ Ds) ] X ^ D
+⟦ D ⟧ X = Σ[ i ∈ D .Op ] X ^ D .rules i
 
 mapⁿ : {X Y : Set} {n : ℕ} (f : X → Y)
   → X ^ n → Y ^ n
 mapⁿ f xs = V.map f xs
--- mapⁿ (suc n) f (x ∷ xs) = f x ∷ mapⁿ n f xs
 
 fmap : (D : Desc) (f : X → Y)
   → ⟦ D ⟧ X → ⟦ D ⟧ Y

@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description as S
 import Syntax.Typed.Description  as T
 
@@ -22,9 +20,11 @@ infix 6 _⊢_⦂_
 
 data _⊢_⦂_ : Fam₀ Raw where
 
-  `_  : (i : A ∈ Γ)
-      → ---------------------
-        Γ ⊢ (` L.index i) ⦂ A
+  var : (i : A ∈ Γ)
+      → {j : Fin (length Γ)}
+      → L.index i ≡ j
+      → --------------------
+        Γ ⊢ (` j) ⦂ A
 
   _∋_ : (A : Ty)
       → Γ ⊢ r ⦂ A

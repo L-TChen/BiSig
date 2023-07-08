@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B'
 
@@ -41,7 +39,7 @@ mutual
     → Γ ⊢ r ⦂ A
     → ∃[ r' ]  r ≤ᴬ r'
             ×  Γ ⊢ r' [ d ] A
-  annotatability (` .(L.index i)) (` i) = _ , ` (L.index i) , ` i
+  annotatability (` j) (var i eq) = _ , ` j , var i eq
   annotatability (A ∋ p) (.A ∋ t) with annotatability p t
   ... | _ , r≤r' , t' = _ , A ∋ r≤r' , A ∋ t'
   annotatability (p ↑) t with annotatability p t

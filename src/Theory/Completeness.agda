@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
@@ -32,7 +30,7 @@ private variable
 mutual
 
   completeness : Pre d r  →  Γ ⊢ r ⦂ A  →  Γ ⊢ r [ d ] A
-  completeness (` ._)  (` i)    = ` i
+  completeness (` j) (var i eq) = var i eq
   completeness (A ∋ p) (.A ∋ t) = A ∋ completeness p t
   completeness (p ↑)   t        = completeness p t ↑ refl
   completeness (op ps) (op ts)  = op (completenessᶜ (BD .rules _) ps ts)

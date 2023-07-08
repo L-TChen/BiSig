@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Example.Outline where
 
 open import Prelude

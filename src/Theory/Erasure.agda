@@ -1,10 +1,8 @@
-{-# OPTIONS --safe #-}
-
-open import Prelude
-
 import Syntax.Simple.Description  as S
 
 module Theory.Erasure {SD : S.Desc} where
+
+open import Prelude
 
 open import Syntax.Typed.Description   SD as T
 open import Syntax.BiTyped.Description SD as B

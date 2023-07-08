@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
@@ -31,7 +29,7 @@ private variable
 mutual
 
   soundness : Γ ⊢ r [ d ] A  →  Γ ⊢ r ⦂ A
-  soundness (` i)      = ` i
+  soundness (var i eq) = var i eq
   soundness (A ∋ t)    = A ∋ soundness t
   soundness (t ↑ refl) = soundness t
   soundness (op ts)    = op (soundnessᶜ (BD .rules _) ts)

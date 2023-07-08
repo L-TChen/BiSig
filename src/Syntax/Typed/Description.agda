@@ -1,10 +1,8 @@
-{-# OPTIONS --with-K --safe #-}
-
-open import Prelude
-
 import Syntax.Simple.Description as S
 
 module Syntax.Typed.Description (SD : S.Desc)  where
+
+open import Prelude
 
 open import Syntax.Simple SD as Ty
 
@@ -20,9 +18,9 @@ ArgsD Ξ = List (ArgD Ξ)
 record ConD : Set where
   constructor ι
   field
-    {vars} : ℕ           -- the number of type variables
-    type   : TExp  vars  -- the target type
-    args   : ArgsD vars  -- the arguments of a typing rule
+    {tvars} : ℕ            -- the number of type variables
+    type    : TExp  tvars  -- the target type
+    args    : ArgsD tvars  -- the arguments of a typing rule
 
 record Desc : Set₁ where
   constructor desc

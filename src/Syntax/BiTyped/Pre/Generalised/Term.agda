@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 

@@ -1,10 +1,9 @@
-{-# OPTIONS --safe #-}
-
-open import Prelude
-  hiding (_+_)
 open import Syntax.Simple.Description
 
 module Syntax.Simple.Properties (D : Desc) where
+
+open import Prelude
+  hiding (_+_)
 
 open import Syntax.Simple.Term        D
 
@@ -16,11 +15,12 @@ private variable
   Ξ Θ Θ₁ Θ₂ Θ₃ n : ℕ
   ts us   : Tm Θ ^ n
   σ₁ σ₂   : Sub Ξ Θ
+  xs ys   : Fins# Ξ
   x y     : Fin Ξ
   t u v   : Tm Ξ
 
 ------------------------------------------------------------------------------
--- Instances of Presheaves 
+-- Instances of Presheaves
 
 open ≡-Reasoning
 
@@ -50,15 +50,7 @@ Ren-assoc
   : (σ : Ren Θ₁ Θ₂) (ρ : Ren Θ₂ Θ₃) (γ : Ren Θ₃ Θ)
   → Ren-⨟ (Ren-⨟ σ ρ) γ ≡ Ren-⨟ σ (Ren-⨟ ρ γ)
 Ren-assoc σ ρ γ = refl
-  {- tabulate-cong (λ i → begin
-  lookup γ (lookup (Ren-⨟ σ ρ) i)  -- ` i ⟨ σ ⨟ ρ ⟩ ⟨ γ ⟩
-    ≡⟨ cong (lookup γ) (lookup∘tabulate (lookup ρ ∘ lookup σ) i) ⟩
-  lookup γ (lookup ρ (lookup σ i))
-    ≡⟨ (sym $ lookup∘tabulate (lookup γ ∘ lookup ρ) (lookup σ i)) ⟩
-  lookup (tabulate (λ i → lookup γ (lookup ρ i))) (lookup σ i)
-    ∎)
-  -}
-    
+
 module _ {Θ : ℕ} where mutual
   sub-id : (t : Tm Θ)
     → sub Sub-id t ≡ t
@@ -88,41 +80,16 @@ Sub-assoc
   → (i : Fin Θ)
   → (Sub-⨟ (Sub-⨟ σ ρ) γ) i ≡ (Sub-⨟ σ (Sub-⨟ ρ γ)) i
 Sub-assoc σ ρ γ i = sym (sub-⨟ ρ γ (σ i))
-{- tabulate-cong (λ i → begin
-  sub γ (sub (Sub-⨟ σ ρ) (` i)) 
-    ≡⟨ cong (sub γ ) (sub-⨟ σ ρ (` i)) ⟩
-  sub γ (sub ρ (sub σ (` i)))
-    ≡⟨ sym $ sub-⨟ ρ γ (sub σ $ ` i) ⟩
-  sub (Sub-⨟ ρ γ) (sub σ (` i))
-    ∎)
--}
 
 Sub-⨟-idᵣ : (σ : Sub Θ n)
   → (i : Fin Θ)
   → Sub-⨟ σ Sub-id i ≡ σ i
 Sub-⨟-idᵣ σ i = sub-id (σ i)
-{- begin
-  Sub-⨟ σ Sub-id
-    ≡⟨ tabulate-cong (λ i → sub-id (lookup σ i)) ⟩
-  tabulate (λ i → lookup σ i) 
-    ≡⟨ tabulate∘lookup σ ⟩
-  σ
-    ∎
--}
-
 
 Sub-⨟-idₗ : (σ : Sub Θ n)
   → (i : Fin Θ)
   → Sub-⨟ Sub-id σ i ≡ σ i
 Sub-⨟-idₗ σ i = refl
-{- begin
-  Sub-⨟ Sub-id σ
-    ≡⟨ tabulate-cong (λ i → cong (sub σ) (sub-id (` i))) ⟩
-  tabulate (λ i → sub σ (` i))
-    ≡⟨ tabulate∘lookup σ ⟩
-  σ
-    ∎
--}
 
 instance
   RenIsCategory : IsCategory ℕ Ren _≡_
@@ -131,29 +98,12 @@ instance
   RenIsCategory ._⨟_     = Ren-⨟
   RenIsCategory .⨟-assoc = Ren-assoc
   RenIsCategory .⨟-idᵣ σ = refl
-  {-
-    begin
-    σ ⨟ id
-      ≡⟨ tabulate-cong (λ i → lookup∘tabulate (λ i → i) (lookup σ i)) ⟩
-    tabulate (λ x → lookup σ x)
-      ≡⟨ tabulate∘lookup σ ⟩
-    σ
-      ∎
-   -}
   RenIsCategory .⨟-idₗ σ = refl
-  {- begin
-    id ⨟ σ
-      ≡⟨ tabulate-cong (λ i → cong (lookup σ) (lookup∘tabulate (λ i → i) i)) ⟩
-    tabulate (lookup σ)
-      ≡⟨ tabulate∘lookup σ ⟩
-    σ
-      ∎
-  -}
 
   SubIsCategory : IsCategory ℕ Sub _≗_
-  SubIsCategory .isEquivalence = ≗-isEquivalence 
+  SubIsCategory .isEquivalence = ≗-isEquivalence
   SubIsCategory .id      = Sub-id
-  SubIsCategory ._⨟_     = Sub-⨟ 
+  SubIsCategory ._⨟_     = Sub-⨟
   SubIsCategory .⨟-assoc = Sub-assoc
   SubIsCategory .⨟-idᵣ   = Sub-⨟-idᵣ
   SubIsCategory .⨟-idₗ   = Sub-⨟-idₗ
@@ -162,7 +112,7 @@ instance
   TmRenIsPresheaf : IsPresheaf Tm
   TmRenIsPresheaf ._⟨_⟩ t ρ   = rename ρ t
   TmRenIsPresheaf .⟨⟩-id t    = rename-id t
-  TmRenIsPresheaf .⟨⟩-⨟ σ ρ t = rename-⨟ σ ρ t 
+  TmRenIsPresheaf .⟨⟩-⨟ σ ρ t = rename-⨟ σ ρ t
 
   TmsRenIsPresheaf : IsPresheaf (λ Θ → Tm Θ ^ n)
   TmsRenIsPresheaf ._⟨_⟩ ts ρ = renameⁿ ρ ts
@@ -213,108 +163,12 @@ op-inj₃
   → ts ≡ us
 op-inj₃ refl = refl -- refl
 
-op-cong⇔ : {i : D .Op} 
+op-cong⇔ : {i : D .Op}
   → {ts us : (Tm Ξ) ^ (D .rules i)}
   → ts ≡ us ⇔ _≡_ {A = Tm Ξ} (op (i , ts)) (op (i , us))
 op-cong⇔ {i = i} = record
   { to   = cong λ ts → op (i , ts)
   ; from = op-inj₃ }
-
--- ∈→≡ : x ∈ᵥ ` y → x ≡ y
--- ∈→≡  (here x=y) = x=y
-
-------------------------------------------------------------------------------
--- Proofs about free variables
-
-mutual
-  ∈ᵥ→∈fv : x ∈ᵥ t → x ∈ fv t
-  ∈ᵥ→∈fv (here p) = here p
-  ∈ᵥ→∈fv (op   p) = ∈ᵥ→∈fvⁿ p
-
-  ∈ᵥ→∈fvⁿ : x ∈ᵥₛ ts → x ∈ fvⁿ ts
-  ∈ᵥ→∈fvⁿ (head x∈)         = ∈-++⁺ˡ        (∈ᵥ→∈fv x∈)
-  ∈ᵥ→∈fvⁿ (tail {_} {t} x∈) = ∈-++⁺ʳ (fv t) (∈ᵥ→∈fvⁿ x∈)
-
-module _ {Ξ : ℕ} where mutual 
-  ∈fv→∈ᵥ : {t : Tm Ξ} {x : Fin Ξ} → x ∈ fv t → x ∈ᵥ t
-  ∈fv→∈ᵥ {` x}  (here px) = here px
-  ∈fv→∈ᵥ {op _} x∈        = op (∈fv→∈ᵥⁿ x∈)
-
-  ∈fv→∈ᵥⁿ : {x : Fin Ξ} {ts : Tm Ξ ^ n} → x ∈ fvⁿ ts → x ∈ᵥₛ ts
-  ∈fv→∈ᵥⁿ  {suc l} {x} {ts = t ∷ ts} x∈ with ∈-++⁻ (fv t) x∈
-  ... | inl x∈t  = head (∈fv→∈ᵥ x∈t)
-  ... | inr x∈ts = tail (∈fv→∈ᵥⁿ x∈ts)
-
-module _ {Ξ : ℕ} where
-  Any∈ᵥ→Any∈ : {ts : Tms Ξ} {i : Fin Ξ}
-    → L.Any (_∈ᵥ_ i) ts → L.Any (_≡_ i) (fvs ts)
-  Any∈ᵥ→Any∈ {t ∷ ts} (here px) = L.++⁺ˡ (∈ᵥ→∈fv px)
-  Any∈ᵥ→Any∈ {t ∷ ts} (there x) = L.++⁺ʳ (fv t) (Any∈ᵥ→Any∈ x)
-
-  Any∈→Any∈ᵥ : {ts : Tms Ξ} {i : Fin Ξ}
-    → L.Any (_≡_ i) (fvs ts) → L.Any (_∈ᵥ_ i) ts
-  Any∈→Any∈ᵥ {t ∷ ts} x∈ with L.++⁻ (fv t) x∈
-  ... | inl x∈t  = here (∈fv→∈ᵥ x∈t)
-  ... | inr x∈ts = there (Any∈→Any∈ᵥ x∈ts)
-
-∈sub-++ : {xs ys : Fins Ξ}
-  → (ρ : ∈Sub xs Θ) (σ : ∈Sub ys Θ)
-  → Consistent ρ σ
-  → ∈Sub (xs ++ ys) Θ
-∈sub-++ {Ξ} {Θ} {xs} {ys} (ρ , p) (σ , q) con = γ , conγ
-  where
-    γ : (i : Fin Ξ) → i ∈ (xs ++ ys) → Tm Θ
-    γ i i∈ with L.++⁻ xs i∈
-    ... | inl x = ρ _ x
-    ... | inr y = σ _ y
-
-    conγ : ∀ {i} → (x y : i ∈ (xs ++ ys)) → γ i x ≡ γ i y
-    conγ x y with L.++⁻ xs x | L.++⁻ xs y
-    ... | inl x₁ | inl x₂ = p x₁ x₂
-    ... | inl x₁ | inr y₁ = con x₁ y₁
-    ... | inr y₁ | inl x₁ = sym (con x₁ y₁)
-    ... | inr y₁ | inr y₂ = q y₁ y₂
-
-{-
-∈sub-++-inv : {xs ys : Fins Ξ}
-  → ∈Sub (xs ++ ys) Θ
-  → Σ[ ρ ∈ ∈Sub xs Θ ] Σ[ σ ∈ ∈Sub ys Θ ] Consistent ρ σ
-∈sub-++-inv γ@(f , r) = ⊆-∈Sub L.++⁺ˡ γ  , ⊆-∈Sub (L.++⁺ʳ _) γ ,
-  λ x y → r (L.++⁺ˡ x) (L.++⁺ʳ _ y)
--}
-
-⊑-refl : {xs : Fins Ξ}
-  → (ρ : ∈Sub xs Θ) → ρ ⊑ ρ
-⊑-refl ρ = (λ x → x) , ρ .proj₂
-
-module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
-  ≡-fv-inv : (A : Tm Θ₁) 
-    → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
-    → x ∈ᵥ A
-    → σ₁ x ≡ σ₂ x -- lookup σ₁ x ≡ lookup σ₂ x
-  ≡-fv-inv (` x)      p (here refl) = p
-  ≡-fv-inv (op (i , ts)) p (op x∈)    = ≡-fv-invⁿ ts (op-inj₃ p) x∈
-
-  ≡-fv-invⁿ : (As : Tm Θ₁ ^ n)
-    → subⁿ σ₁ As ≡ subⁿ σ₂ As
-    → x ∈ᵥₛ As
-    → σ₁ x ≡ σ₂ x -- lookup σ₁ x ≡ lookup σ₂ x
-  ≡-fv-invⁿ (A ∷ As) p (head x∈) = ≡-fv-inv  A  (V.∷-injectiveˡ p) x∈
-  ≡-fv-invⁿ (A ∷ As) p (tail x∈) = ≡-fv-invⁿ As (V.∷-injectiveʳ p) x∈
-
-module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
-  ≡-fv : (A : Tm Θ₁)
-    → (∀ {x} → x ∈ᵥ A → σ₁ x ≡ σ₂ x)
-    → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
-  ≡-fv (` x)         p = p (here refl)
-  ≡-fv (op (_ , ts)) p = cong (λ ts → op (_ , ts)) (≡-fvⁿ ts (p ∘ op)) -- (≡-fvⁿ ts p)
-
-  ≡-fvⁿ : {n : ℕ} (As : Tm Θ₁ ^ n)
-    → (∀ {x} → x ∈ᵥₛ As → σ₁ x ≡ σ₂ x) -- lookup σ₁ x ≡ lookup σ₂ x)
-    → subⁿ σ₁ As ≡ subⁿ σ₂ As
-  ≡-fvⁿ {zero}  []       _ = refl
-  ≡-fvⁿ {suc n} (A ∷ As) p = cong₂ _∷_
-    (≡-fv A (p ∘ head)) (≡-fvⁿ As (p ∘ tail))
 
 ------------------------------------------------------------------------------
 -- Renames are also substitutions
@@ -324,14 +178,6 @@ module _ {ρ : Fin Θ₁ → Fin Θ₁} where mutual
     : (t : Tm Θ₁)
     → t ⟨ `_ ∘ ρ ⟩ ≡ t ⟨ ρ ⟩
   rename-is-sub (` x)      = refl -- lookup∘tabulate _ x
-  {- begin
-    lookup (tabulate (`_ ∘ ρ)) x
-      ≡⟨ lookup∘tabulate (`_ ∘ ρ) x ⟩
-    ` ρ x
-      ≡⟨ cong `_ (sym $ lookup∘tabulate ρ x) ⟩
-    ` lookup (tabulate ρ) x
-      ∎
-   -}
   rename-is-sub (op (i , ts)) = cong (op ∘ (i ,_)) (rename-is-subⁿ ts)
 
   rename-is-subⁿ
@@ -340,269 +186,444 @@ module _ {ρ : Fin Θ₁ → Fin Θ₁} where mutual
   rename-is-subⁿ []       = refl
   rename-is-subⁿ (t ∷ ts) = cong₂ _∷_ (rename-is-sub t) (rename-is-subⁿ ts)
 
-{-
-module _ {Θ : ℕ} where mutual
-  linearlise : {t : Tm Θ}
-    → Σ[ x ∈ Fin Θ ] (x ∈ᵥ t)
-    → Fin (length (fv t))
-  linearlise (_ , here _) = zero
-  linearlise (_ , op x∈)  = linearliseⁿ (_ , x∈)
+------------------------------------------------------------------------------
+-- Proofs about free variables
 
-  linearliseⁿ : {ts : Tm Θ ^ n}
-    → Σ[ x ∈ Fin Θ ] (x ∈ᵥₛ ts)
-    → Fin (length (fvⁿ ts))
-  linearliseⁿ {ts = t ∷ ts} (_ , head x∈) =
-    subst Fin (sym $ L.length-++ (fv t))
-    $ linearlise (_ , x∈) F.↑ˡ (length $ fvⁿ ts)
-  linearliseⁿ {ts = t ∷ ts} (_ , tail x∈) =
-    subst Fin (sym $ L.length-++ (fv t))
-    $ (length $ fv t) F.↑ʳ linearliseⁿ (_ , x∈)
+mutual
+  ∈ᵥ→∈vars : x ∈ᵥ t → x #∈ vars t
+  ∈ᵥ→∈vars (here eq) = here eq
+  ∈ᵥ→∈vars (op  x∈) = ∈ᵥₛ→∈varsⁿ x∈
 
-module _ {Θ : ℕ} where mutual
-  reindex : {t : Tm Θ}
-    → Fin (length (fv t))
-    → Σ[ x ∈ Fin Θ ] (x ∈ᵥ t)
-  reindex {t = ` x}         _ = x , here refl
-  reindex {t = op (i , ts)} j = map₂ op (reindexⁿ j)
+  ∈ᵥₛ→∈varsⁿ : x ∈ᵥₛ ts → x #∈ varsⁿ ts
+  ∈ᵥₛ→∈varsⁿ (head x∈) = ∪⁺ˡ (∈ᵥ→∈vars x∈)
+  ∈ᵥₛ→∈varsⁿ (tail {_} {t} x∈) = ∪⁺ʳ (vars t) (∈ᵥₛ→∈varsⁿ x∈)
 
-  reindexⁿ : {ts : Tm Θ ^ n}
-    → Fin (length (fvⁿ ts))
-    → Σ[ x ∈ Fin Θ ] (x ∈ᵥₛ ts)
-  reindexⁿ {ts = t ∷ ts} i with F.splitAt (length (fv t)) (subst Fin (L.length-++ (fv t)) i)
-  ... | inl i = map₂ head (reindex i)
-  ... | inr j = map₂ tail (reindexⁿ j)
--}
+mutual
+  ∈vars→∈ᵥ : x #∈ vars t → x ∈ᵥ t
+  ∈vars→∈ᵥ {t = ` x} (here px) = here px
+  ∈vars→∈ᵥ {t = op x} x∈ = op (∈varsⁿ→∈ᵥₛ x∈)
 
--- ------------------------------------------------------------------------
--- -- Properties of Partial Substitution
+  ∈varsⁿ→∈ᵥₛ : x #∈ varsⁿ ts → x ∈ᵥₛ ts
+  ∈varsⁿ→∈ᵥₛ {ts = t ∷ ts} x∈ with ∈-∪⁻ (vars t) x∈
+  ... | inl x∈t  = head (∈vars→∈ᵥ x∈t)
+  ... | inr x∈ts = tail (∈varsⁿ→∈ᵥₛ x∈ts)
 
--- psub-∷ : (g : PSub Ξ Θ) (t : Tm Ξ) (ts : Tm Ξ ^ n)
---   → psubⁿ g (t ∷ ts) ≡ just (u ∷ us) → psub g t ≡ just u × psubⁿ g ts ≡ just us
--- psub-∷ g t ts eq with psub g t 
--- ... | just u with psubⁿ g ts
--- psub-∷ g t ts refl | just u | just us = refl , refl
 
--- psubⁿ-op : (g : PSub Ξ Θ) {i : D .Op} (ts : Tm Ξ ^ D .rules i) (us : Tm Θ ^ D . rules i)
---   → psub g (op (i , ts)) ≡ just (op (i , us))
---   → psubⁿ g ts           ≡ just us
--- psubⁿ-op g ts us eq with psubⁿ g ts
--- psubⁿ-op g ts _ refl | just _ = refl
+module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
+  ≡-fv-inv : (A : Tm Θ₁)
+    → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
+    → x ∈ᵥ A
+    → σ₁ x ≡ σ₂ x
+  ≡-fv-inv (` x)      p (here refl) = p
+  ≡-fv-inv (op (i , ts)) p (op x∈)    = ≡-fv-invⁿ ts (op-inj₃ p) x∈
 
--- psubⁿ-op′ : (g : PSub Ξ Θ) {i j : D .Op} (ts : Tm Ξ ^ D .rules i) (us : Tm Θ ^ D . rules j)
---   → psub g (op (i , ts)) ≡ just (op (j , us))
---   → i ≡ j
--- psubⁿ-op′ g ts us eq with psubⁿ g ts
--- psubⁿ-op′ g ts _ refl | just _ = refl
+  ≡-fv-invⁿ : (As : Tm Θ₁ ^ n)
+    → subⁿ σ₁ As ≡ subⁿ σ₂ As
+    → x ∈ᵥₛ As
+    → σ₁ x ≡ σ₂ x
+  ≡-fv-invⁿ (A ∷ As) p (head x∈) = ≡-fv-inv  A  (V.∷-injectiveˡ p) x∈
+  ≡-fv-invⁿ (A ∷ As) p (tail x∈) = ≡-fv-invⁿ As (V.∷-injectiveʳ p) x∈
 
--- module _ (g : PSub Ξ Θ) (σ : Sub Ξ Θ)  (g=σ : ∀ i → g i ≡ just (σ i)) where mutual
---   psub-sub : (t : Tm Ξ)
---     → psub g t ≡ just (t ⟨ σ ⟩)
---   psub-sub (` x)         = g=σ x
---   psub-sub (op (i , ts)) with psubⁿ g ts | psub-subⁿ ts
---   ... | just us | refl = refl
+module _ {σ₁ σ₂ : Sub Θ₁ Θ₂} where mutual
+  ≡-fv : (A : Tm Θ₁)
+    → (∀ {x} → x ∈ᵥ A → σ₁ x ≡ σ₂ x)
+    → A ⟨ σ₁ ⟩ ≡ A ⟨ σ₂ ⟩
+  ≡-fv (` x)         p = p (here refl)
+  ≡-fv (op (_ , ts)) p = cong (λ ts → op (_ , ts)) (≡-fvⁿ ts (p ∘ op))
 
---   psub-subⁿ : (ts : Tm Ξ ^ n)
---     → psubⁿ g ts ≡ just (ts ⟨ σ ⟩)
---   psub-subⁿ []       = refl
---   psub-subⁿ (t ∷ ts) with psub g t | psub-sub t
---   ... | just u  | refl with psubⁿ g ts | psub-subⁿ ts
---   ... | just us | refl = refl
-  
--- module _ (g : PSub Ξ Θ) (g↓ : ∀ i → ∃[ y ] g i ≡ just y) where mutual
---   totalise : Σ (Sub Ξ Θ) λ σ → (x : Fin Ξ) → g x ≡ just (σ x)
---   totalise = Partial→Total g g↓
+  ≡-fvⁿ : {n : ℕ} (As : Tm Θ₁ ^ n)
+    → (∀ {x} → x ∈ᵥₛ As → σ₁ x ≡ σ₂ x)
+    → subⁿ σ₁ As ≡ subⁿ σ₂ As
 
---   totalise-soundness : Σ (Sub Ξ Θ) (λ σ → psub g t ≡ just (t ⟨ σ ⟩))
---   totalise-soundness {t = t} = map₂ (λ p → psub-sub g _ p t) totalise 
+  ≡-fvⁿ {zero}  []       _ = refl
+  ≡-fvⁿ {suc n} (A ∷ As) p = cong₂ _∷_
+    (≡-fv A (p ∘ head)) (≡-fvⁿ As (p ∘ tail))
 
--- toPartial : (σ : Sub Ξ Θ)
---   → (t : Tm Ξ)
---   → Σ[ f ∈ PSub Ξ Θ ] psub f t ≡ just (t ⟨ σ ⟩)
--- toPartial σ t = just ∘ σ , psub-sub (just ∘ σ) σ (λ _ → refl) t 
--- ------------------------------------------------------------------------
--- -- Properties of Occurrence Substitution
+------------------------------------------------------------------------
+-- Properties regarding Partial Substitution
 
--- module _ {Ξ Θ : ℕ} where mutual
---   eq? : (t : Tm Ξ) (u : Tm Θ)
---     → Dec (Σ[ f ∈ ∈-Sub t Θ ] ∈-sub t f ≡ u)
---   eq? (` x)         u             = yes ((λ { (here p) → u}) , refl)
---   eq? (op x)        (` y)         = no λ (f , P) → var≢op P
---   eq? (op (i , ts)) (op (j , us)) with i ≟ j
---   ... | no ¬p = no λ where
---     (_ , refl) → ¬p refl
---   ... | yes refl = map′
---     (λ (f , P) → (λ { (op x∈) → f x∈ }) , cong (op ∘ (i ,_)) P)
---     (λ (f , P) → (λ {i} x∈ → f (op x∈)) , op-inj₃ P) (eq?ⁿ ts us) 
+∅≤ρ : {ρ : ∃Sub⊆ Ξ} → empty ≤ ρ
+∅≤ρ = record
+  { domain-ext  = λ ()
+  ; consistency = λ ()
+  }
+-- ≤ is a preorder
+≤-refl : (ρ : ∃Sub⊆ Ξ) → ρ ≤ ρ
+≤-refl ρ = record
+  { domain-ext  = λ x → x
+  ; consistency = λ _ → refl
+  }
 
---   eq?ⁿ : (ts : Tm Ξ ^ n) (us : Tm Θ ^ n)
---     → Dec (Σ[ f ∈ ∈-Subⁿ ts Θ ] ∈-subⁿ ts f ≡ us)
---   eq?ⁿ []       []       = yes ((λ ()) , refl)
---   eq?ⁿ (t ∷ ts) (u ∷ us) with eq? t u
---   ... | no ¬p = no λ where
---     (f , P) → ¬p (f ∘ head , V.∷-injectiveˡ P) 
---   ... | yes (f , P) with eq?ⁿ ts us
---   ... | no ¬q       = no λ where
---     (g , Q) → ¬q (g ∘ tail , V.∷-injectiveʳ Q)
---   ... | yes (g , Q) = yes ((λ { (head x∈) → f x∈ ; (tail x∈) → g x∈ }) , cong₂ _∷_ P Q)
+≤-trans : {ρ σ γ : ∃Sub⊆ Ξ}
+  → ρ ≤ σ → σ ≤ γ → ρ ≤ γ
+≤-trans {_} {xs , ρ} {ys , σ} {zs , γ} (≤-con xs⊆ys con₁) (≤-con ys⊆zs con₂) = record
+  { domain-ext  = ⊆-trans xs⊆ys ys⊆zs
+  ; consistency = λ x∈ → begin
+    ρ x∈
+      ≡⟨ con₁ _ ⟩
+    σ (xs⊆ys x∈)
+      ≡⟨ con₂ _ ⟩
+    γ (ys⊆zs (xs⊆ys x∈))
+      ∎
+  }
 
--- ------------------------------------------------------------------------
--- -- Properties of Partial Substitution and Occurrence Substitution
+-- Partial substitutions vars t ⊆ xs is supposed to be a proposition
+-- (but it cannot be proved in vanilla Agda)
 
--- postulate
---   dec-∈-irrelevance : (f : ∈-Sub t Θ) → Dec (∈-Irrelevant-Sub t f)
+module _ (ρ : Sub⊆ Ξ xs) where
+  mutual
+    sub⊆-⊆-irrelevant : (t : Tm Ξ) (t⊆ t⊆′ : vars t #⊆ xs)
+      → sub⊆ ρ t t⊆ ≡ sub⊆ ρ t t⊆′
+    sub⊆-⊆-irrelevant (` x)         t⊆ t⊆′ = cong ρ (#∈-uniq _ _)
+    sub⊆-⊆-irrelevant (op (i , ts)) t⊆ t⊆′ =
+      cong (λ ts → op (i , ts)) (sub⊆ⁿ-⊆-irrelevant ts _ _)
 
--- module _ (g : PSub Ξ Θ) where mutual
---   psub=∈-sub : (t : Tm Ξ) (f : ∈-Sub t Θ)
---     → (∀ {i} (x : i ∈ᵥ t) → g i ≡ just (f x))
---     → psub g t ≡ just (∈-sub t f)
---   psub=∈-sub (` x)         f P = P (here refl)
---   psub=∈-sub (op (i , ts)) f P
---     with psubⁿ g ts | psub=∈-subⁿ ts (f ∘ op) (P ∘ op)
---   ...  | just us    | refl = refl
+    sub⊆ⁿ-⊆-irrelevant : (ts : Tm Ξ ^ n) (t⊆ t⊆′ : varsⁿ ts #⊆ xs)
+      → sub⊆ⁿ ρ ts t⊆ ≡ sub⊆ⁿ ρ ts t⊆′
+    sub⊆ⁿ-⊆-irrelevant []       t⊆ t⊆′ = refl
+    sub⊆ⁿ-⊆-irrelevant (t ∷ ts) t⊆ t⊆′ = cong₂ _∷_
+      (sub⊆-⊆-irrelevant t _ _) (sub⊆ⁿ-⊆-irrelevant ts _ _)
 
---   psub=∈-subⁿ : (ts : Tm Ξ ^ n) (f : ∈-Subⁿ ts Θ)
---     → (∀ {i} (x : i ∈ᵥₛ ts) → g i ≡ just (f x))
---     → psubⁿ g ts ≡ just (∈-subⁿ ts f)
---   psub=∈-subⁿ []       _ _ = refl
---   psub=∈-subⁿ (t ∷ ts) f P
---     with psub g t | psub=∈-sub t (f ∘ head) (P ∘ head)
---   ...  | just u   | refl with psubⁿ g ts | psub=∈-subⁿ ts (f ∘ tail) (P ∘ tail)
---   ...                       | just us    | refl         = refl
-  
--- module _ (g : PSub Ξ Θ) where mutual
---   psub→∈-sub : psub g t ≡ just u
---     → {i : Fin Ξ} (x : i ∈ᵥ t)
---     → Σ[ v ∈ Tm Θ ] (g i ≡ just v)
---   psub→∈-sub eq (here refl) = _ , eq
---   psub→∈-sub {op (i , ts)} {` _} eq (op x∈) with psubⁿ g ts
---   ... | just x  = ⊥-elim₀ (var≢op (just-injective eq))
---   ... | nothing = ⊥-elim₀ (nothing≢just eq)
---   psub→∈-sub {op (i , ts)} {op (j , us)} eq (op x∈) with psubⁿ-op′ g ts us eq
---   ... | refl = psub→∈-subⁿ (psubⁿ-op g ts us eq) x∈
+mutual
+  ρ=σ→subρ=subσ : (t : Tm Ξ) (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys)
+    → (⊆xs : vars t #⊆ xs) (⊆ys : vars t #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ vars t) → ρ (⊆xs x∈) ≡ σ (⊆ys x∈))
+    → sub⊆ ρ t ⊆xs ≡ sub⊆ σ t ⊆ys
+  ρ=σ→subρ=subσ (` x)  ρ σ ⊆xs ⊆ys ρ=σ = ρ=σ (here refl)
+  ρ=σ→subρ=subσ (op (i , ts)) ρ σ ⊆xs ⊆ys ρ=σ =
+    cong (λ ts → op (i , ts)) (ρ=σ→subρ=subσⁿ ts ρ σ ⊆xs ⊆ys ρ=σ)
 
---   psub→∈-subⁿ : psubⁿ g ts ≡ just us
---     → {i : Fin Ξ} (x : i ∈ᵥₛ ts) → Σ[ v ∈ Tm Θ ] (g i ≡ just v)
---   psub→∈-subⁿ {_} {t ∷ ts} {u ∷ us} eq (head x) = psub→∈-sub  (psub-∷ g t ts eq .proj₁) x
---   psub→∈-subⁿ {_} {t ∷ ts} {u ∷ us} eq (tail x) = psub→∈-subⁿ (psub-∷ g t ts eq .proj₂) x
+  ρ=σ→subρ=subσⁿ : (ts : Tm Ξ ^ n) (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys)
+    → (⊆xs : varsⁿ ts #⊆ xs) (⊆ys : varsⁿ ts #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ varsⁿ ts) → ρ (⊆xs x∈) ≡ σ (⊆ys x∈))
+    → sub⊆ⁿ ρ ts ⊆xs ≡ sub⊆ⁿ σ ts ⊆ys
+  ρ=σ→subρ=subσⁿ []       ρ σ ⊆xs ⊆ys ρ=σ = refl
+  ρ=σ→subρ=subσⁿ (t ∷ ts) ρ σ ⊆xs ⊆ys ρ=σ = cong₂ _∷_
+    (ρ=σ→subρ=subσ  t  ρ σ (∪-⊆⁻ˡ ⊆xs)          (∪-⊆⁻ˡ ⊆ys)          (λ x∈ → ρ=σ (∪⁺ˡ x∈)))
+    (ρ=σ→subρ=subσⁿ ts ρ σ (∪-⊆⁻ʳ (vars t) ⊆xs) (∪-⊆⁻ʳ (vars t) ⊆ys) λ x∈ → ρ=σ (∪⁺ʳ (vars t) x∈))
 
--- module _ (g : PSub Ξ Θ) where
---   mutual
---     psub=∈-sub→pointwise : {t : Tm Ξ} (f : ∈-Sub t Θ)
---       → psub g t ≡ just (∈-sub t f)
---       → (∀ {i} (x : i ∈ᵥ t) → g i ≡ just (f x))
---     psub=∈-sub→pointwise               f eq (here refl) = eq
---     psub=∈-sub→pointwise {op (i , ts)} f eq (op x∈)     =
---       psub=∈-sub→pointwiseⁿ (f ∘ op) (psubⁿ-op g ts _ eq) x∈
+------------------------------------------------------------------------
+-- Substitution ⇒ Partial substitution
+x≠y→sucx≠sucy
+  : {x y : Fin Ξ}
+  → x ≢ y → suc x ≢ suc y
+x≠y→sucx≠sucy neq = neq ∘ F.suc-injective
 
---     psub=∈-sub→pointwiseⁿ  : {ts : Tm Ξ ^ n} (f : ∈-Subⁿ ts Θ)
---       → psubⁿ g ts ≡ just (∈-subⁿ ts f)
---       → (∀ {i} (x : i ∈ᵥₛ ts) → g i ≡ just (f x))
---     psub=∈-sub→pointwiseⁿ {_} {t ∷ ts} f eq (head x∈) =
---       psub=∈-sub→pointwise  (f ∘ head) (psub-∷ g t ts eq .proj₁) x∈
---     psub=∈-sub→pointwiseⁿ {_} {t ∷ ts} f eq (tail x∈) =
---       psub=∈-sub→pointwiseⁿ (f ∘ tail) (psub-∷ g t ts eq .proj₂) x∈
+0#suc : (xs : Fins# Ξ)
+  → zero # map suc x≠y→sucx≠sucy xs
+0#suc []            = tt
+0#suc (cons a xs x) = F.0≢1+n , 0#suc xs
 
---   PSub→∈-Irrelevant-Sub : (f : ∈-Sub t Θ)
---     → psub g t ≡ just (∈-sub t f)
---     → ∈-Irrelevant-Sub t f
---   PSub→∈-Irrelevant-Sub f eq {i} x y = just-injective $ begin
---     just (f x)
---       ≡⟨ (sym $ psub=∈-sub→pointwise f eq x) ⟩
---     g i 
---       ≡⟨ psub=∈-sub→pointwise f eq y ⟩
---     just (f y)
---       ∎
+enumerate : (Ξ : ℕ) → List# (Fin Ξ)
+enumerate zero    = []
+enumerate (suc i) =
+  cons zero (map suc x≠y→sucx≠sucy  (enumerate i)) (0#suc (enumerate i))
 
--- module _ {t : Tm Ξ} (f : ∈-Sub t Θ ) where
---   ∀tᵢ=fₓ : ∈-Irrelevant-Sub t f
---     → (i : Fin Ξ) → Σ[ tᵢ ∈ Maybe (Tm Θ) ] ((x : i ∈ᵥ t) → tᵢ ≡ just (f x))
---   ∀tᵢ=fₓ P i with i ∈ᵥ? t
---   ... | no x∉  = nothing     , λ x∈ → ⊥-elim₀ (x∉ x∈)
---   ... | yes x∈ = just (f x∈) , λ x∈′ → cong just (P x∈ x∈′)
-  
---   ∃σᵢ=fₓ : ∈-Irrelevant-Sub t f
---     → Σ[ g ∈ PSub Ξ Θ ] (∀ {i} (x : i ∈ᵥ t) → g i ≡ just (f x))
---   ∃σᵢ=fₓ P = (λ i → ∀tᵢ=fₓ P i .proj₁) , ∀tᵢ=fₓ P _ .proj₂
+x∈xs→1+x∈1+xs
+  : x #∈ xs
+  → suc x #∈ map suc x≠y→sucx≠sucy xs
+x∈xs→1+x∈1+xs (here eq)  = here (cong suc eq)
+x∈xs→1+x∈1+xs (there x∈) = there (x∈xs→1+x∈1+xs x∈)
 
---   ∈-Irrelevant-Sub→PSub
---     : Dec (∈-Irrelevant-Sub t f)
---     → Dec (Σ[ g ∈ PSub Ξ Θ ] (∀ {i} (x : i ∈ᵥ t) → g i ≡ just (f x)))
---   ∈-Irrelevant-Sub→PSub = map′ ∃σᵢ=fₓ
---     (λ (σ , P) x y → M.just-injective $ begin
---       just (f x)
---         ≡⟨ sym (P x) ⟩
---       _
---         ≡⟨ P y ⟩
---       just (f y)
---         ∎)
-  
--- module _ {Ξ Θ : ℕ} where mutual
---   PSub→∈-Sub : (t : Tm Ξ) (u : Tm Θ) (g : PSub Ξ Θ) → psub g t ≡ just u
---     → Σ[ f ∈ ∈-Sub t Θ ] (∈-sub t f ≡ u)
---   PSub→∈-Sub t u g eq =
---     let f = λ {i : Fin _} (x : i ∈ᵥ t) → psub→∈-sub g eq x .proj₁
---         P = λ {i : Fin _} (x : i ∈ᵥ t) → psub→∈-sub g eq x .proj₂ in
---     f , just-injective (begin
---       just (∈-sub t _)
---         ≡⟨ sym (psub=∈-sub g t f P) ⟩ 
---       psub g t
---         ≡⟨ eq ⟩
---       just u
---         ∎)
+Sub⇒Sub⊆ : Sub Ξ 0 → Sub⊆ Ξ (enumerate Ξ)
+Sub⇒Sub⊆ ρ {x} x∈ = ρ x
 
--- module _ (t : Tm Ξ) (u : Tm Θ) where
---   peq? : Dec (Σ[ g ∈ PSub Ξ Θ ] psub g t ≡ just u)
---   peq? with eq? t u
---   ... | no ¬p = no (¬p ∘ uncurry (PSub→∈-Sub t u))
---   ... | yes (f , p) with dec-∈-irrelevance f
---   ... | no ¬q = no (¬q ∘ λ (g , eq) → PSub→∈-Irrelevant-Sub g f (begin
---     psub g t
---       ≡⟨ eq ⟩
---     just u
---       ≡⟨ sym (cong just p) ⟩
---     just (∈-sub t f)
---       ∎))
---   ... | yes q = let g  = ∃σᵢ=fₓ f q .proj₁
---                     gq = ∃σᵢ=fₓ f q .proj₂ in
---                 yes (g , (begin
---     psub g t
---       ≡⟨ psub=∈-sub _ t f gq ⟩
---     just (∈-sub t f)
---       ≡⟨ cong just p ⟩
---     just u
---       ∎))
+⊆enum : (x : Fin Ξ) → x #∈ enumerate Ξ
+⊆enum zero    = here refl
+⊆enum (suc x) = there (x∈xs→1+x∈1+xs (⊆enum x))
 
--- {-
--- module _ (f g : PSub Ξ Θ) (p : ∀ i → f i ≡ g i) where mutual
---   psub-cong : (t : Tm Ξ) 
---     → psub f t ≡ psub g t
---   psub-cong (`  x)        = p x
---   psub-cong (op (i , ts)) with psubⁿ f ts | psubⁿ g ts | psub-congⁿ ts
---   ... | nothing | nothing | _ = refl
---   ... | just ts | just ts′ | refl = refl
+t⊆Ξ : (t : Tm Ξ) → vars t #⊆ enumerate Ξ
+t⊆Ξ t {x} x∈ = ⊆enum x
 
---   psub-congⁿ : (ts : Tm Ξ ^ n)
---     → psubⁿ f ts ≡ psubⁿ g ts
---   psub-congⁿ []       = refl
---   psub-congⁿ (t ∷ ts) with psub f t | psub g t | psub-cong t 
---   ... | nothing  | nothing  | _ = refl
---   ... | just u₁  | just u₂  | refl with psubⁿ f ts | psubⁿ g ts | psub-congⁿ ts
---   ...                                 | nothing    | nothing    | refl = refl
---   ...                                 | just us₁   | just us₂   | refl = refl
+mutual
+  Sub⇒Sub⊆-=
+    : (σ : Sub Ξ 0)
+    → (t : Tm Ξ)
+    → sub⊆ (Sub⇒Sub⊆ σ) t (t⊆Ξ t) ≡ sub σ t
+  Sub⇒Sub⊆-= σ (` x)         = refl
+  Sub⇒Sub⊆-= σ (op (i , ts)) =
+    cong (λ ts → op (i , ts)) (Sub⇒Sub⊆-=ⁿ σ ts)
 
--- module _{Ξ : ℕ} where mutual
---   ∈-sub-cong : (t : Tm Ξ) (f g : ∈-Sub t Θ)
---     → (∀ {i} (x : i ∈ᵥ t) → f x ≡ g x)
---     → ∈-sub t f ≡ ∈-sub t g
---   ∈-sub-cong (` x)         f g p = p (here refl)
---   ∈-sub-cong (op (i , ts)) f g p = cong (op ∘ (i ,_))
---     (∈-sub-congⁿ ts (f ∘ op) (g ∘ op) (p ∘ op))
+  Sub⇒Sub⊆-=ⁿ
+    : (σ : Sub Ξ 0)
+    → (t : Tm Ξ ^ n)
+    → sub⊆ⁿ (Sub⇒Sub⊆ σ) t (λ {x} _ → ⊆enum x) ≡ subⁿ σ t
+  Sub⇒Sub⊆-=ⁿ σ []       = refl
+  Sub⇒Sub⊆-=ⁿ σ (t ∷ ts) = cong₂ _∷_ (Sub⇒Sub⊆-= σ t) (Sub⇒Sub⊆-=ⁿ σ ts)
 
---   ∈-sub-congⁿ : (ts : Tm Ξ ^ n) (f g : ∈-Subⁿ ts Θ)
---     → (∀ {i} (x : i ∈ᵥₛ ts) → f x ≡ g x)
---     → ∈-subⁿ ts f ≡ ∈-subⁿ ts g
---   ∈-sub-congⁿ []       f g p = refl
---   ∈-sub-congⁿ (t ∷ ts) f g p = cong₂ _∷_
---     (∈-sub-cong t (f ∘ head) (g ∘ head) (p ∘ head))
---     (∈-sub-congⁿ ts (f ∘ tail) (g ∘ tail) (p ∘ tail))
--- -}
+------------------------------------------------------------------------
+-- Partial Substitution to Substitution
+Sub⊆⇒Sub
+  : Sub⊆ Ξ xs → ((x : Fin Ξ) → x #∈ xs)
+  → Sub Ξ 0
+Sub⊆⇒Sub σ ∀x∈xs x = σ (∀x∈xs x)
+
+module _ (ρ : Sub⊆ Ξ xs) (∀x∈xs : (x : Fin Ξ) → x #∈ xs) where mutual
+  Sub⊆⇒Sub-≡
+    : (t : Tm Ξ)
+    → sub (Sub⊆⇒Sub ρ ∀x∈xs) t ≡ sub⊆ ρ t (λ {x} _ → ∀x∈xs x)
+  Sub⊆⇒Sub-≡ (` x)         = refl
+  Sub⊆⇒Sub-≡ (op (i , ts)) = cong (λ ts → op (i , ts)) (Sub⊆⇒Sub-≡ⁿ ts)
+
+  Sub⊆⇒Sub-≡ⁿ
+    : (ts : Tm Ξ ^ n)
+    → subⁿ ((Sub⊆⇒Sub ρ ∀x∈xs)) ts ≡ sub⊆ⁿ ρ ts λ {x} _ → ∀x∈xs x
+  Sub⊆⇒Sub-≡ⁿ []       = refl
+  Sub⊆⇒Sub-≡ⁿ (t ∷ ts) = cong₂ _∷_ (Sub⊆⇒Sub-≡ t) (Sub⊆⇒Sub-≡ⁿ ts)
+
+------------------------------------------------------------------------
+--
+
+module _ (σ : Sub Ξ 0) (ρ : Sub⊆ Ξ xs) where
+  mutual
+    σ=ρ|A
+      : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+      → sub σ t ≡ sub⊆ ρ t t⊆
+      → ∀ {x} (x∈ : x #∈ vars t)
+      → ρ (t⊆ x∈) ≡ σ x
+    σ=ρ|A (` x)         t⊆ eq (here refl) = sym eq
+    σ=ρ|A (op (i , ts)) t⊆ eq {y} y∈ = σ=ρ|Aⁿ ts t⊆ (op-inj₃ eq) y∈
+
+    σ=ρ|Aⁿ
+      : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
+      → subⁿ σ ts ≡ sub⊆ⁿ ρ ts ts⊆
+      → ∀ {x} (x∈ : x #∈ varsⁿ ts)
+      → ρ (ts⊆ x∈) ≡ σ x
+    σ=ρ|Aⁿ (t ∷ ts) ts⊆ eq x∈ with ∈-∪⁻ (vars t) x∈
+    ... | inl x∈t  = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|A t (∪-⊆⁻ˡ ts⊆) (V.∷-injectiveˡ eq) x∈t)
+    ... | inr x∈ts = trans (cong ρ (#∈-uniq _ _)) (σ=ρ|Aⁿ ts (∪-⊆⁻ʳ (vars t) ts⊆) (V.∷-injectiveʳ eq) x∈ts)
+
+------------------------------------------------------------------------
+-- Constructions regarding partial substitution properties
+
+open Equivalence
+Pρ→MinExtP : {P : Sub⊆-Prop Ξ} {ρ : ∃Sub⊆ Ξ} → P ρ → Min (Ext ρ P) ρ
+Pρ→MinExtP {Ξ} {P} {ρ} Pρ = min-con (ext-con (≤-refl ρ) Pρ) λ σ (ext-con ρ≤σ _) → ρ≤σ
+
+Ext⇔ : {P Q : Sub⊆-Prop Ξ}
+  → ((ρ : ∃Sub⊆ Ξ) → P ρ ⇔ Q ρ)
+  → (ρ σ : ∃Sub⊆ Ξ) → Ext ρ P σ ⇔ Ext ρ Q σ
+Ext⇔ P⇔Q ρ σ = record
+  { to   = λ (ext-con ρ≤σ Pσ) → ext-con ρ≤σ (P⇔Q σ .to Pσ)
+  ; from = λ (ext-con ρ≤σ Qσ) → ext-con ρ≤σ (P⇔Q σ .from Qσ)
+  }
+
+Min⇔ : {P Q : Sub⊆-Prop Ξ}
+  → (∀ ρ → P ρ ⇔ Q ρ)
+  → ∀ ρ → Min P ρ ⇔ Min Q ρ
+Min⇔ P⇔Q ρ = record
+  { to   = λ (min-con Pρ minρ) →
+    min-con (P⇔Q ρ .to Pρ)   λ σ Qσ → minρ σ (P⇔Q σ .from Qσ)
+  ; from = λ (min-con Qρ minρ) →
+    min-con (P⇔Q ρ .from Qρ) λ σ Pσ → minρ σ (P⇔Q σ .to Pσ)
+  }
+
+MinDec⇔ : {P Q : Sub⊆-Prop Ξ}
+  → (∀ ρ → P ρ ⇔ Q ρ)
+  → MinDec P ⇔ MinDec Q
+MinDec⇔ P⇔Q = record
+  { to   = λ where
+    (yesₘ ρ Minρ) → yesₘ ρ (Min⇔ P⇔Q ρ .to Minρ)
+    (noₘ ¬Pσ)     → noₘ (λ σ Qσ → ¬Pσ σ (P⇔Q σ .from Qσ))
+  ; from = λ where
+    (yesₘ ρ Minρ) → yesₘ ρ (Min⇔ P⇔Q ρ .from Minρ)
+    (noₘ ¬Qσ)     → noₘ λ σ Pσ → ¬Qσ σ (P⇔Q σ .to Pσ)
+  }
+
+MinDecExt∅⇔MinDec
+  : {P : Sub⊆-Prop Ξ}
+  → MinDec (Ext empty P) ⇔ MinDec P
+MinDecExt∅⇔MinDec = MinDec⇔ λ ρ → record
+  { to   = λ where
+    (ext-con _ Pρ) → Pρ
+  ; from = λ Pρ → ext-con ∅≤ρ Pρ
+  }
+
+optimist
+  : {P Q : Sub⊆-Prop Ξ}
+  → (ρ ρ̅₁ ρ̅₂ : ∃Sub⊆ Ξ)
+  → ↑-closed P → Min (Ext ρ P) ρ̅₁ → Min (Ext ρ̅₁ Q) ρ̅₂
+  → Min (Ext ρ (P ∧ Q)) ρ̅₂
+optimist ρ ρ̅ ρ̅₂ ↑P (min-con (ext-con ρ≤ρ̅ Pρ̅) minρ) (min-con (ext-con ρ̅≤ρ̅₂ Qρ̅) minρ₂) = record
+  { proof      = record
+    { ext     = ≤-trans ρ≤ρ̅ ρ̅≤ρ̅₂
+    ; witness = (↑P ρ̅≤ρ̅₂ Pρ̅) , Qρ̅
+    }
+  ; minimality = λ where
+    σ (ext-con ρ≤σ (Pσ , Qσ)) → minρ₂ σ
+      (ext-con (minρ σ (ext-con ρ≤σ Pσ)) Qσ)
+  }
+
+failure-propagate : {P Q : Sub⊆-Prop Ξ} → (ρ ρ̅ : ∃Sub⊆ Ξ)
+  → Min (Ext ρ P) ρ̅
+  → (∀ σ → ¬ Ext ρ̅ Q σ)
+  → ∀ σ → ¬ Ext ρ (P ∧ Q) σ
+failure-propagate ρ ρ̅ (min-con Pρ̅ minρ̅) ¬Q σ (ext-con ρ≤σ (Pσ , Qσ)) =
+  ¬Q σ (ext-con (minρ̅ σ (ext-con ρ≤σ Pσ)) Qσ)
+
+↑≈ : (t : Tm Ξ) (u : Tm 0) → ↑-closed (t ≈ u)
+↑≈ t u {xs , ρ} {ys , σ} (≤-con xs⊆ys con) (t⊆xs , eq) =
+  ⊆-trans t⊆xs xs⊆ys , (begin
+    sub⊆ σ t _
+      ≡⟨ ρ=σ→subρ=subσ t σ ρ
+        (⊆-trans t⊆xs xs⊆ys) t⊆xs (λ x∈ → sym (con (t⊆xs x∈))) ⟩
+    sub⊆ ρ t t⊆xs
+      ≡⟨ eq ⟩
+    u
+      ∎)
+
+↑≈ⁿ : (ts : Tm Ξ ^ n) (us : Tm 0 ^ n) → ↑-closed (ts ≈ⁿ us)
+↑≈ⁿ ts us {xs , ρ} {ys , σ} (≤-con xs⊆ys con) (t⊆xs , eq) =
+  (⊆-trans t⊆xs xs⊆ys) , (begin
+  sub⊆ⁿ σ ts _
+    ≡⟨ ρ=σ→subρ=subσⁿ ts σ ρ
+        (⊆-trans t⊆xs xs⊆ys) t⊆xs (λ x∈ → sym (con (t⊆xs x∈))) ⟩
+  sub⊆ⁿ ρ ts t⊆xs
+    ≡⟨ eq ⟩
+  us
+    ∎)
+
+-- Simple facts about unification
+ts≈us⇔opts≈opus
+  : ∀ {i} (ts : Tm Ξ ^ D .rules i) (us : Tm 0 ^ D .rules i)
+  → (ρ : ∃Sub⊆ Ξ)
+  → (ts ≈ⁿ us) ρ ⇔ (op (i , ts) ≈ op (i , us)) ρ
+ts≈us⇔opts≈opus {_} {i} ts us ρ = record
+  { to   = λ (ts⊆xs , ts=us) → ts⊆xs , cong op (cong (i ,_) ts=us)
+  ; from = λ (t⊆xs  , t=u)   → t⊆xs  , op-inj₃ t=u
+  }
+
+t≈u×ts≈us⇔tts≈uus
+  : (t : Tm Ξ) (u : Tm 0) (ts : Tm Ξ ^ n) (us : Tm 0 ^ n)
+  → (ρ : ∃Sub⊆ Ξ)
+  → ((ts ≈ⁿ us) ∧ (t ≈ u)) ρ ⇔ (t ∷ ts ≈ⁿ u ∷ us) ρ
+t≈u×ts≈us⇔tts≈uus t u ts us ρ@(xs , ρf) = record
+  { to   = helper₁
+  ; from = helper₂ }
+  where
+    helper₁ : (ts ≈ⁿ us ∧ t ≈ u) ρ → (t ∷ ts ≈ⁿ u ∷ us) ρ
+    helper₁ ((ts⊆ , ts≈us) , (t⊆ , t≈u)) = (∪-⊆⁺ t⊆ ts⊆) , cong₂ _∷_
+      (begin
+        sub⊆ ρf t _
+          ≡⟨ sub⊆-⊆-irrelevant ρf t _ _ ⟩
+        sub⊆ ρf t t⊆
+          ≡⟨ t≈u ⟩
+        u ∎ )
+
+      (begin
+        sub⊆ⁿ ρf ts _
+          ≡⟨ sub⊆ⁿ-⊆-irrelevant ρf ts _ _ ⟩
+        sub⊆ⁿ ρf ts _
+          ≡⟨ ts≈us ⟩
+        us ∎)
+
+    helper₂ : (t ∷ ts ≈ⁿ u ∷ us) ρ → (ts ≈ⁿ us ∧ t ≈ u) ρ
+    helper₂ (ts⊆ , tts≈uus) = let t≈u , ts≈us = V.∷-injective tts≈uus  in
+      ((∪-⊆⁻ʳ (vars t) ts⊆) , (begin
+        sub⊆ⁿ ρf ts _
+          ≡⟨ sub⊆ⁿ-⊆-irrelevant ρf ts _ _ ⟩
+        sub⊆ⁿ ρf ts _
+          ≡⟨ ts≈us ⟩
+        us
+          ∎)) ,
+      ∪-⊆⁻ˡ ts⊆ , (begin
+        sub⊆ ρf t _
+          ≡⟨ sub⊆-⊆-irrelevant ρf t _ _ ⟩
+        sub⊆ ρf t _
+          ≡⟨ t≈u ⟩
+        u
+          ∎)
+
+⊆→Sub⊆
+  : ys #⊆ xs → Sub⊆ Ξ xs
+  → Sub⊆ Ξ ys
+⊆→Sub⊆ ys⊆xs ρ = ρ ∘ ys⊆xs
+
+module _ (ρ : Sub⊆ Ξ xs) (σ : Sub⊆ Ξ ys) where mutual
+  sub⊆-cong
+    : (t : Tm Ξ) (t⊆xs : vars t #⊆ xs)  (t⊆ys : vars t #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ vars t) → ρ (t⊆xs x∈) ≡ σ (t⊆ys x∈))
+    → sub⊆ ρ t t⊆xs ≡ sub⊆ σ t t⊆ys
+  sub⊆-cong (` x)         t⊆xs t⊆ys eq = eq (here refl)
+  sub⊆-cong (op (i , ts)) t⊆xs t⊆ys eq = cong (λ ts → op (i , ts))
+    (sub⊆-congⁿ ts _ _ eq)
+
+  sub⊆-congⁿ
+    : (ts : Tm Ξ ^ n) (⊆xs : varsⁿ ts #⊆ xs)  (⊆ys : varsⁿ ts #⊆ ys)
+    → (∀ {x} (x∈ : x #∈ varsⁿ ts) → ρ (⊆xs x∈) ≡ σ (⊆ys x∈))
+    → sub⊆ⁿ ρ ts ⊆xs ≡ sub⊆ⁿ σ ts ⊆ys
+  sub⊆-congⁿ []       ⊆xs ⊆ys eq = refl
+  sub⊆-congⁿ (t ∷ ts) ⊆xs ⊆ys eq = cong₂ _∷_
+    (sub⊆-cong t _ _ (eq ∘ ∪⁺ˡ)) (sub⊆-congⁿ ts _ _ (eq ∘ ∪⁺ʳ (vars t)))
+
+module _ (σ : Sub Ξ 0) where mutual
+  sub⊆=sub
+    : (t : Tm Ξ)
+    → sub σ t ≡ sub⊆ (Sub⇒Sub⊆ σ) t λ {x} _ → ⊆enum x
+  sub⊆=sub (` x)         = refl
+  sub⊆=sub (op (i , ts)) =
+    cong (λ ts → op (i , ts)) (sub⊆=subⁿ ts)
+
+  sub⊆=subⁿ
+    : (ts : Tm Ξ ^ n)
+    → subⁿ σ ts ≡ sub⊆ⁿ (Sub⇒Sub⊆ σ) ts λ {x} _ → ⊆enum x
+  sub⊆=subⁿ []       = refl
+  sub⊆=subⁿ (t ∷ ts) = cong₂ _∷_ (sub⊆=sub t) (sub⊆=subⁿ ts)
+
+module _ (ρ : Sub⊆ Ξ xs) (⊆xs : ∀ x → x #∈ xs) where mutual
+  sub⊆=sub′
+    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+    → sub (ρ ∘ ⊆xs) t ≡ sub⊆ ρ t t⊆
+  sub⊆=sub′ (` x)         t⊆ = cong ρ (#∈-uniq _ _) -- refl
+  sub⊆=sub′ (op (i , ts)) t⊆ =
+    cong (λ ts → op (i , ts)) (sub⊆=subⁿ′ ts _)
+
+  sub⊆=subⁿ′
+    : (ts : Tm Ξ ^ n) (ts⊆ : varsⁿ ts #⊆ xs)
+    → subⁿ (ρ ∘ ⊆xs) ts ≡ sub⊆ⁿ ρ ts ts⊆
+  sub⊆=subⁿ′ []       ts⊆ = refl
+  sub⊆=subⁿ′ (t ∷ ts) ts⊆ = cong₂ _∷_
+   (sub⊆=sub′ t _) (sub⊆=subⁿ′ ts _)
+
+domain-cmp : (t : Tm Ξ) (u : Tm 0)
+  → (xs : Fins# Ξ) (ρ : Sub⊆ Ξ xs)
+  → Min (t ≈ u) (xs , ρ)
+  → xs #⊆ vars t
+domain-cmp {Ξ} t u xs ρ (min-con (t⊆xs , eq) minσ) x∈ =
+  minσ (_ , ⊆→Sub⊆ t⊆xs ρ) ((λ y∈ → y∈) ,
+    (begin
+      sub⊆ (⊆→Sub⊆ t⊆xs ρ) t (λ y∈ → y∈)
+        ≡⟨ sub⊆-cong (ρ ∘ t⊆xs) ρ t _ t⊆xs (λ _ → refl) ⟩
+      sub⊆ ρ t t⊆xs
+        ≡⟨ eq ⟩
+      u ∎)) .domain-ext x∈
+
+module _ (ρ : Sub⊆ Ξ xs) (σ : Sub Ξ 0) where mutual
+  sub-σ=sub⊆-ρ→σ=ρ
+    : (t : Tm Ξ) (t⊆ : vars t #⊆ xs)
+    → sub⊆ ρ t t⊆ ≡ sub σ t
+    → ∀ {x} (x∈ : x #∈ vars t)
+    → ρ (t⊆ x∈) ≡ σ x
+  sub-σ=sub⊆-ρ→σ=ρ (` x)         t⊆ eq (here refl) = eq
+  sub-σ=sub⊆-ρ→σ=ρ (op (i , ts)) t⊆ eq y∈ =
+    sub-σ=sub⊆-ρ→σ=ρⁿ ts t⊆ (op-inj₃ eq) y∈
+
+  sub-σ=sub⊆-ρ→σ=ρⁿ
+    : (ts : Tm Ξ ^ n) (⊆xs : varsⁿ ts #⊆ xs)
+    → sub⊆ⁿ ρ ts ⊆xs ≡ subⁿ σ ts
+    → ∀ {x} (x∈ : x #∈ varsⁿ ts)
+    → ρ (⊆xs x∈) ≡ σ x
+  sub-σ=sub⊆-ρ→σ=ρⁿ (t ∷ ts) ⊆xs eq {x} x∈ with ∈-∪⁻ (vars t) x∈
+  ... | inl ∈t  = begin
+    ρ (⊆xs x∈)
+      ≡⟨ cong ρ (#∈-uniq _ _) ⟩
+    ρ _
+      ≡⟨ sub-σ=sub⊆-ρ→σ=ρ t _ (V.∷-injectiveˡ eq) ∈t ⟩
+    σ x
+      ∎
+  ... | inr ∈ts = begin
+    ρ (⊆xs x∈)
+      ≡⟨ cong ρ (#∈-uniq _ _) ⟩
+    ρ _
+      ≡⟨ sub-σ=sub⊆-ρ→σ=ρⁿ ts _ (V.∷-injectiveʳ eq) ∈ts ⟩
+    σ x ∎

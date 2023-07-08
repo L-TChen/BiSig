@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description as S
 
 module Syntax.BiTyped.Pre.Functor (SD : S.Desc) where

@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Example.STLC where
 
 open import Prelude
@@ -104,5 +102,5 @@ t ·ᴮ u = op (refl , lookup (_ ∷ _ ∷ []) , refl , t , u , _)
 ƛᴮ t = op (refl , lookup (_ ∷ _ ∷ []) , refl , t , _)
 
 ⊢S : Γ ⊢ S ⇐ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
-⊢S = ƛᴮ ƛᴮ ƛᴮ ((` there (there (here refl)) ·ᴮ ((` here refl) ↑ refl) ·ᴮ
-                     ((` there (here refl)  ·ᴮ ((` here refl) ↑ refl)) ↑ refl)) ↑ refl)
+⊢S = ƛᴮ ƛᴮ ƛᴮ ((var (there (there (here refl))) refl ·ᴮ ((var (here refl) refl) ↑ refl) ·ᴮ
+              ((var        (there (here refl))  refl ·ᴮ ((var (here refl) refl) ↑ refl)) ↑ refl)) ↑ refl)

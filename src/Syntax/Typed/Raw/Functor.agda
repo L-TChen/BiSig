@@ -1,11 +1,9 @@
-{-# OPTIONS --safe #-}
-
-open import Prelude
-
 import Syntax.Simple.Description as S
 import Syntax.Typed.Description  as T
 
 module Syntax.Typed.Raw.Functor (SD : S.Desc) where
+
+open import Prelude
 
 open import Syntax.Simple SD
 open T SD

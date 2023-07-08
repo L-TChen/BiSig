@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
@@ -30,7 +28,7 @@ private variable
 mutual
 
   typingErasure : Γ ⊢ r [ d ] A  →  Pre d r
-  typingErasure (` i)   = ` (L.index i)
+  typingErasure (var i {j} _) = ` j
   typingErasure (A ∋ t) = A ∋ typingErasure t
   typingErasure (t ↑ _) = (typingErasure t) ↑
   typingErasure (op ts) = op (typingErasureᶜ (BD .rules _) ts)

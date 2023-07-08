@@ -31,10 +31,10 @@ ArgsD Ξ = List (ArgD Ξ)
 record ConD : Set where
   constructor ι
   field
-    {vars} : ℕ
-    mode   : Mode
-    type   : TExp  vars
-    args   : ArgsD vars
+    {tvars} : ℕ
+    mode    : Mode
+    type    : TExp  tvars
+    args    : ArgsD tvars
 
 record Desc : Set₁ where
   constructor desc

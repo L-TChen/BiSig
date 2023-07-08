@@ -1,14 +1,15 @@
-{-# OPTIONS --safe #-}
-
-open import Prelude
 open import Syntax.Simple.Description
 
 module Syntax.Simple.Term (D : Desc) where
+
+open import Prelude
 
 private variable
   Ξ Θ Θ₁ Θ₂ Θ₃ : ℕ
   n k i        : ℕ
   A B          : Set
+  x  : Fin Ξ
+  xs : Fins# Ξ
 
 infix 9 `_
 data Tm (Θ : ℕ) : Set where
@@ -38,10 +39,19 @@ mutual
   fvⁿ : Tm Θ ^ n → List (Fin Θ)
   fvⁿ []       = []
   fvⁿ (t ∷ ts) = fv t ++ fvⁿ ts
- 
+
 fvs : Tms Θ → List (Fin Θ)
 fvs []       = []
 fvs (t ∷ ts) = fv t ++ fvs ts
+
+mutual
+  vars : Tm Ξ → Fins# Ξ
+  vars (` x)         = x ∷# []
+  vars (op (i , ts)) = varsⁿ ts
+
+  varsⁿ : Tm Ξ ^ n → Fins# Ξ
+  varsⁿ []       = []
+  varsⁿ (t ∷ ts) = vars t ∪ varsⁿ ts
 
 mutual
   size : Tm Θ → ℕ
@@ -73,10 +83,9 @@ mutual
   ... | no ¬q = no λ where refl → ¬q refl
   ... | yes q = yes (cong₂ _∷_ p q)
 
--- [TODO] Generalise it to an Any predicate
 infix 4 _∈ᵥ_ _∈ᵥₛ_ _∈ᵥ?_ _∈ᵥₛ?_ _∉ᵥ_ _∉ᵥₛ_
 
-mutual 
+mutual
   data _∈ᵥ_ (x : Fin Θ) : Tm Θ → Set where
     here : {y : Fin Θ} → x ≡ y → x ∈ᵥ ` y
     op   : {i : D .Op} {ts : Tm Θ ^ D .rules i}
@@ -86,7 +95,7 @@ mutual
     head : {t : Tm Θ} {ts : Tm Θ ^ n}
       → (x∈ : x ∈ᵥ t) → x ∈ᵥₛ (t ∷ ts)
     tail : {t : Tm Θ} {ts : Tm Θ ^ n}
-      → (x∈ : x ∈ᵥₛ ts) 
+      → (x∈ : x ∈ᵥₛ ts)
       → x ∈ᵥₛ (t ∷ ts)
 
 _∉ᵥ_ : (x : Fin Θ) → Tm Θ → Set
@@ -133,7 +142,7 @@ module _ (ρ : Ren Θ n) where mutual
     → Tm Θ ^ l → Tm n ^ l
   renameⁿ []        = []
   renameⁿ (t ∷ ts) = rename t ∷ renameⁿ ts
-  
+
 Ren-id : Ren Θ Θ
 Ren-id = λ i → i -- allFin _
 
@@ -154,42 +163,84 @@ module _ (σ : Sub Θ n) where mutual
   subⁿ (t ∷ ts) = sub t ∷ subⁿ ts
 
 Sub-id : Sub Θ Θ
-Sub-id = `_ -- tabulate `_
+Sub-id = `_
 
 RenToSub : Ren Θ n → Sub Θ n
-RenToSub σ = `_ ∘ σ -- tabulate (`_ ∘ σ)
+RenToSub σ = `_ ∘ σ
 
 Sub-⨟ : Sub Θ₁ Θ₂ → Sub Θ₂ Θ₃ → Sub Θ₁ Θ₃
-Sub-⨟ σ₁ σ₂ i = sub σ₂ (σ₁ i) -- tabulate λ i → sub σ₂ (lookup σ₁ i)
+Sub-⨟ σ₁ σ₂ i = sub σ₂ (σ₁ i)
 
-------------------------------------------------------------------------------
--- Substitutio as Variable Assignment
+------------------------------------------------------------------------
+-- Partial Substitution
 
-∈Sub : Fins Ξ → ℕ → Set
-∈Sub {Ξ} xs Θ = Σ ((i : Fin Ξ) → i ∈ xs → Tm Θ)
-  λ ρ → ∀ {i} → (x y : i ∈ xs) → ρ i x ≡ ρ i y
-  -- Liang-Ting (2023-06-08): I really want HIT to make a subset of Fin Ξ here.
+Sub⊆ : (Ξ : ℕ) → Fins# Ξ → Set
+Sub⊆ Ξ xs = ∀ {x} → x #∈ xs → Tm 0
 
-∈Sub₀ : Fins Ξ → Set
-∈Sub₀ xs = ∈Sub xs 0
+∃Sub⊆ : ℕ → Set
+∃Sub⊆ Ξ = ∃ (Sub⊆ Ξ)
 
-Consistent : {xs ys : Fins Ξ}
-  → (ρ : ∈Sub xs Θ) (σ : ∈Sub ys Θ) → Set
-Consistent {Ξ} {_} {xs} {ys} (ρ , _) (σ , _) =
-  {i : Fin _} (x : i ∈ xs) (y : i ∈ ys) → ρ i x ≡ σ i y
+empty : ∃Sub⊆ Ξ
+empty = ([] , λ ())
 
-_⊑_ : {xs ys : Fins Ξ}
-  → ∈Sub xs Θ → ∈Sub ys Θ → Set
-_⊑_ {_} {_} {xs} {ys} ρ σ = xs ⊆ ys × Consistent ρ σ
+module _ (ρ : Sub⊆ Ξ xs) where
+  extend : (x# : x # xs) (t : Tm 0)
+    → Sub⊆ Ξ (cons x xs x#)
+  extend x# t (here x)   = t
+  extend x# t (there x∈) = ρ x∈
 
-module _ {vs : Fins Ξ} ((ρ , p) : ∈Sub vs Θ) where mutual
-  ∈sub : (t : Tm Ξ) → fv t ⊆ vs → Tm Θ
-  ∈sub (` x)         ⊆vs = ρ x (⊆vs (here refl))
-  ∈sub (op (i , ts)) ⊆vs = op (i , ∈subⁿ ts ⊆vs)
+  mutual
+    sub⊆
+      : (t : Tm Ξ) → vars t #⊆ xs
+      → Tm 0
+    sub⊆ (` x)         t⊆ = ρ (t⊆ (here refl))
+    sub⊆ (op (i , ts)) t⊆ = op (i , sub⊆ⁿ ts t⊆)
 
-  ∈subⁿ : (ts : Tm Ξ ^ n) → fvⁿ ts ⊆ vs → Tm Θ ^ n
-  ∈subⁿ []       ⊆vs = []
-  ∈subⁿ (t ∷ ts) ⊆vs = ∈sub t (⊆vs ∘ L.++⁺ˡ) ∷ ∈subⁿ ts (⊆vs ∘ L.++⁺ʳ _)
+    sub⊆ⁿ
+      : (ts : Tm Ξ ^ n) → varsⁿ ts #⊆ xs
+      → Tm 0 ^ n
+    sub⊆ⁿ []       ts⊆ = []
+    sub⊆ⁿ (t ∷ ts) ts⊆ = sub⊆ t (ts⊆ ∘ ∪⁺ˡ) ∷ sub⊆ⁿ ts (ts⊆ ∘ ∪⁺ʳ (vars t))
 
-∅∈sub : ∈Sub {Ξ} [] Θ
-∅∈sub = (λ _ ()) , λ ()
+Sub⊆-Prop : ℕ → Set₁
+Sub⊆-Prop Ξ = ∃Sub⊆ Ξ → Set
+
+infixr 3 _∧_
+_∧_ : (P Q : Sub⊆-Prop Ξ) → Sub⊆-Prop Ξ
+(P ∧ Q) ρ = P ρ × Q ρ
+
+record _≤_ (ρ σ : ∃Sub⊆ Ξ) : Set where
+  constructor ≤-con
+  field
+    domain-ext  : ρ .proj₁ #⊆ σ .proj₁
+    consistency : ∀ {x} (x∈ : x #∈ ρ .proj₁)
+      → ρ .proj₂ x∈ ≡ σ .proj₂ (domain-ext x∈)
+open _≤_ public
+
+record Min (P : Sub⊆-Prop Ξ) (ρ : ∃Sub⊆ Ξ) : Set where
+  constructor min-con
+  field
+    proof      : P ρ
+    minimality : ∀ σ → P σ → ρ ≤ σ
+open Min
+
+record Ext (ρ : ∃Sub⊆ Ξ) (P : Sub⊆-Prop Ξ) (ρ̅ : ∃Sub⊆ Ξ) : Set where
+  constructor ext-con
+  field
+    ext     : ρ ≤ ρ̅
+    witness : P ρ̅
+open Ext
+
+data MinDec (P : Sub⊆-Prop Ξ) : Set where
+  yesₘ : (ρ : ∃Sub⊆ Ξ) → (Pρ : Min P ρ) → MinDec P
+  noₘ  : (¬Pσ : ((σ : ∃Sub⊆ Ξ) → P σ → ⊥₀)) → MinDec P
+
+↑-closed : Sub⊆-Prop Ξ → Set
+↑-closed P = ∀ {ρ ρ̅} → ρ ≤ ρ̅ → P ρ → P ρ̅
+
+infix 4 _≈_ _≈ⁿ_
+_≈_ : Tm Ξ → Tm 0 → Sub⊆-Prop Ξ
+(t ≈ t₀) (xs , ρ) = Σ[ t⊆ ∈ vars t #⊆ xs ] sub⊆ ρ t t⊆ ≡ t₀
+
+_≈ⁿ_ : Tm Ξ ^ n → Tm 0 ^ n → Sub⊆-Prop Ξ
+(ts ≈ⁿ ts₀) (xs , ρ) = Σ[ ts⊆ ∈ varsⁿ ts #⊆ xs ] sub⊆ⁿ ρ ts ts⊆ ≡ ts₀

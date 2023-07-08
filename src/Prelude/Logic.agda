@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Prelude.Logic where
 
 open import Prelude.Level

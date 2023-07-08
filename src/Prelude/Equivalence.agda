@@ -1,5 +1,3 @@
-{-# OPTIONS --safe #-}
-
 module Prelude.Equivalence where
 
 open import Relation.Binary.PropositionalEquality
@@ -25,8 +23,8 @@ _⇔_ : Set a → Set b → Set _
 A ⇔ B = Equivalence A B
 
 ≡to⟺ : A ≡ B → A ⇔ B
-≡to⟺ eq .to   = subst (λ A → A) eq 
-≡to⟺ eq .from = subst (λ A → A) (sym eq) 
+≡to⟺ eq .to   = subst (λ A → A) eq
+≡to⟺ eq .from = subst (λ A → A) (sym eq)
 
 ⇔-sym : A ⇔ B → B ⇔ A
 ⇔-sym equiv .to   = from equiv

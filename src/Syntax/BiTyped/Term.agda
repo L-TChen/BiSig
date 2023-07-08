@@ -1,11 +1,9 @@
-{-# OPTIONS --safe #-}
-
-open import Prelude
-
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
 module Syntax.BiTyped.Term {SD : S.Desc} (D : B.Desc SD) where
+
+open import Prelude
 
 open import Syntax.Simple            SD
 open import Syntax.Context           SD
@@ -31,18 +29,20 @@ mutual
 
   data _⊢_[_]_ : Fam₀ Raw where
 
-    `_  : (i : A ∈ Γ)
-        → ---------------------
-          Γ ⊢ (` L.index i) ⇒ A
+    var : (i : A ∈ Γ)
+        → {j : Fin (length Γ)}
+        → L.index i ≡ j
+        → --------------------
+          Γ ⊢ (` j) ⇒ A
 
     _∋_ : (A : Ty)
         → Γ ⊢ r ⇐ A
         → Γ ⊢ (A ∋ r) ⇒ A
 
-    _↑_ : Γ ⊢ r ⇒ A
+    _↑_ : Γ ⊢ r ⇒ B
         → A ≡ B
         → ---------
-          Γ ⊢ r ⇐ B
+          Γ ⊢ r ⇐ A
 
     op  : {rs : R.⟦ erase D ⟧ Raw (length Γ)}
         → ⟦ D ⟧ Raw _⊢_[_]_ Γ rs d A

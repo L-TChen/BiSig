@@ -1,7 +1,7 @@
 name: BiSig
-include: 
+include:
   src
   agda-stdlib/src
 
 flags:
-  --auto-inline --guardedness
+  --auto-inline --safe --with-K

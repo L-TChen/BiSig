@@ -2,21 +2,39 @@
 
 \section{Concluding Remarks} \label{sec:future}
 
-\Josh[inline]{Getting rid of the assumption of being syntax-directed (the triangular picture) --- 0.5p}
-\Josh[inline]{Ornaments -- 0.25p}
-\Josh[inline]{NDGP -- 0.25p (optional?), \citep{Ko2022} }
+\paragraph{Beyond syntax-directed type systems}
+
+As a first theory of bidirectional type synthesis, our work focuses on syntax-directed type systems.
+To explore more general settings, an extreme possibility is to independently specify an ordinary type system and a bidirectional one over the same raw terms and then investigate possible relationships between the two systems, but a more manageable and practical setting suitable for a next step is probably one that only mildly generalises ours: 
+for each raw term construct, there can be several ordinary typing rules, and each typing rule can be refined to several bidirectional typing rules with different mode assignments.
+Even for this mildly generalised setting, there is already a lot more work to do:
+Both the mode preprocessor and the bidirectional type synthesiser will have to backtrack, and become significantly more complex.
+For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and type information, but the completeness direction will pose a problem---for every node of a raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.
+There should be ways to fix this problem while retaining the mode preprocessing phase---for example, one idea is to make the mode preprocessor produce all possible mode derivations, and refine completeness to say that any typing derivation can be combined with one of these mode derivations into a bidirectional typing derivation.
+All these considerations are rather too complex for a first theory, however, and should best be left as future work.
+
+%\Josh[inline, caption={}]{Getting rid of the assumption of being syntax-directed (the triangular picture) --- 0.5p
+%\begin{enumerate}
+%\item In general: two independently formulated type systems over raw terms
+%\item More sensible next step: a `refinement chain'
+%\item Backtracking algorithms are required. for both mode preprocessing and bidirectional type synthesis.
+%\item The idea of separating and combining mode and type information should still work, but requires more care in the completeness direction.
+%\item Too complex for a first theory, and left as future work
+%\end{enumerate}}
 
 \LT[inline]{polymorphic algebraic theories, dependent signatures --- 0.5p}
 
 \paragraph{Beyond simple types}
 While algebraic approaches to polymorphic types have been developed~\citep{Fiore2013,Hamana2011}, these approaches do not take subtyping into account.
 Subtyping is essential for formulating important concepts such as \emph{principal types} in type synthesis.
-On the other hand, in the realm of dependent types, \citeauthor{Cartmell1986}'s generalized algebraic theories~\citeyearpar{Cartmell1986} can handle a wide variety of dependent type theories.
-\citet{Bezem2021} investigate the notion of presentation (extending the notion of signature) in the context of generalized algebraic theories.
+On the other hand, in the realm of dependent types, \citeauthor{Cartmell1986}'s generalised algebraic theories~\citeyearpar{Cartmell1986} can handle a wide variety of dependent type theories.
+\citet{Bezem2021} investigate the notion of presentation (extending the notion of signature) in the context of generalised algebraic theories.
 Nonetheless, type synthesis for dependent types requires normalisation or some form of conversion to check type equality.
 Normalisation in its generic form still remains out of reach and recent advances in this topic are discussed in the doctoral thesis by~\citet{Valliappan2023}.
 
 \todo[inline]{We leave the problem of presenting bidirectional typing for more general and advanced language features as future work (such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}), which requires advancement in language formalisation~(\cref{sec:language-formalisation}) that is orthogonal to our work.}
+
+\Josh[inline]{Optional: ornaments (0.25p), NDGP (0.25p)}
 
 %\subsubsection{Theories of abstract syntax with variable binding}
 %\label{sec:theory-of-syntax}

@@ -264,12 +264,13 @@ We are now ready for the decidability proof.
       We now complete the decidability proof.
   \end{itemize}
 \end{proof}
-While the proof presented above is complex, its formal counterpart essentially serves as two programs for checking and synthesis.
+While the proof presented above is intricate, its formal counterpart essentially functions as two programs for type checking and synthesis.
 These programs either compute the typing derivation or provide a proof of contradiction.
-Each case analysis simply branches based on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification.
-If a proof of contradiction is not of interest for implementation, the programs can be simplified by disregarding the cases that provide such contradiction proofs.
-On the other hand, the contradiction proof contains the information as to why the construction of a derivation failed.
-This can potentially be restructured further to provide informative error messages, assisting users in resolving issues with ill-typed terms, instead of merely answering a blatant `no'.
+Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification process.
+If a contradiction proof is not of interest for implementation, the programs can be simplified by disregarding the cases that yield such contradiction proofs.
+Alternatively, we could consider generalising typing derivations like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}).
+This could accommodate ill-typed cases and improve contradiction proofs to deliver more informative error messages.
+This would assist users in resolving issues with ill-typed terms, rather than simply returning a blatant 'no'.
 
 \subsection{Trichotomy on Raw Terms by Type Synthesis} \label{subsec:trichotomy}
 

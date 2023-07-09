@@ -71,7 +71,7 @@ Since every inhabitant of $\Xi$ can be located in either $A_0$ or synthesis vari
 On the other hand, for a synthesis operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to $\emptyset$.
 Also, the set of synthesis variables alone should include every type variable in $\Xi$ and particularly in $A_n$.
 It is also easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct according to our definition.
-\LT{perhaps we shall prove that mode-correctness is decidable}
+\LT{perhaps we shall prove it decidable}
 
 \begin{remark}
   Mode-correctness is fundamentally a condition for typing \emph{rules} themselves, not for derivations.
@@ -129,27 +129,31 @@ We are here for the main technical contribution of this paper---the decidability
   \end{enumerate}
 \end{theorem}
 
-The interesting part of the proof is the case for the $\Rule{Op}$ rule, so we shall give the insight first before jumping into details.
+The interesting part of the proof is the case for the $\Rule{Op}$ rule, so we shall give the insight first instead of jumping into the details.
 Recall that a typing derivation for $\tmOpts$ contains a substitution $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$.
-The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with a \emph{partial} substitution $\rho_0$ defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere, as an `accumulating argument'.
+The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with a \emph{partial} substitution $\rho_0$, as an `accumulating argument', defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
 Then, as we visit each synthesis argument $\synbiarg[i+1]$, we may be able to extend the domain of $\rho_i$ to include the synthesis variables $\fv(A_{i + 1})$ if type synthesis is successful and also that the synthesised type can be \emph{unified with $A_{i+ 1}$} and \emph{extending} $\rho_i$ to $\bar{\rho_i} = \rho_{i+1}$.
-By mode-correctness, the accumulating substitution~$\rho_i$ would be defined on enough synthesis variables so that each type synthesis and checking can be performed on $t_{i}$ with the context $\Gamma, \simsub{\Delta_{i+1}}{\rho_i}$ based on its mode derivation $\erase{\Gamma}, \vars{x}_i |-_{\Sigma, \Omega} t_i^{\dir{d_i}}$.
-Then, if we go through every argument $t_i$ successfully, we will have a substitution $\rho_n$ from $\Xi$ to $\Type_{\Sigma}(\emptyset)$ defined on every variable $x : \Xi$ by mode-correctness.
+By mode-correctness, the accumulating substitution~$\rho_i$ would be defined on enough synthesis variables so that type synthesis or checking can be performed on $t_{i}$ with the context $\Gamma, \simsub{\Delta_{i+1}}{\rho_i}$ based on its mode derivation $\erase{\Gamma}, \vars{x}_i |-_{\Sigma, \Omega} t_i^{\dir{d_i}}$.
+Then, if we go through every argument $t_i$ successfully, we will have a substitution $\rho_n$ defined everywhere by mode-correctness.
 
-To make the aforementioned argument holds, it is necessary to compare types and solve a unification problem.
-Hence, we assume that the set $\Xi$ of variables has a decidable equality, rather than being an arbitrary set, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
-To simplify our choice, we could simply confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$.
-Given that these sets have a decidable equality and the arity of a type construct is finite, this would be a viable choice.
+\begin{remark}
+To make the argument above sound, it is necessary to compare types and solve a unification problem.
+Hence, we assume that the set\/ $\Xi$ of variables has a decidable equality, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
+To simplify our choice, we could simply confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$, given that these sets have a decidable equality and the arity of a type construct is finite.
 Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in the definition of $\Type_{\Sigma}$ (see \Cref{sec:formalisation} for details).
-However, for the sake of clarity in presentation, we keep using named variables and just assume that $\Xi$ has a decidable equality.}
-The unification problem is as follows:
-\begin{lemma}
-  For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, 
+For the sake of clarity in presentation, though, we keep using named variables and just assume that $\Xi$ has a decidable equality.}
+\end{remark}
+We need some auxiliary definitions for the notion of extension to state the unification problem:
+\begin{definition}
+  Let $\rho$ be a partial substitution.
+  Then, by an \emph{extension}\/ $\sigma \geq \rho$ we mean that the domain of $\sigma$ contains the domain $\rho$ and\/ $\sigma(x) = \rho(x)$ for every\/ $x$ in the domain of $\rho$; by a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
+\end{definition}
+\begin{lemma}\label{lem:unify}
+  For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, 
   \begin{enumerate}
-    \item either there is a \emph{minimal extension} $\bar{\rho}$ of $\rho$ such that $\simsub{A}{\bar{\rho}} = B$, or 
-    \item there is no extension $\sigma$ of $\rho$ such that $\simsub{A}{\sigma} = B$
+    \item either there is a minimal extension\/ $\bar{\rho}$ of\/ $\rho$ such that\/ $\simsub{A}{\bar{\rho}} = B$, or 
+    \item there is no extension\/ $\sigma$ of\/ $\rho$ such that\/ $\simsub{A}{\sigma} = B$
   \end{enumerate}
-  where by an extension $\sigma \geq \rho$ we mean that the domain of $\sigma$ contains the domain $\rho$ and $\sigma(x) = \rho(x)$ for every $x$ in the domain of $\rho$; by a minimal extension $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho}$ of $\rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma$ is an extension of $\rho$ with $P(\sigma)$.
 \end{lemma}
 This lemma can be inferred from the correctness of first-order unification~\citep{McBride2003,McBride2003a}, or be proved directly without unification.
 We are now ready for the decidability proof.
@@ -157,23 +161,24 @@ We are now ready for the decidability proof.
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis-checking}}]
   We prove this statement by induction on the mode derivation\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
   The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness.
-  The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |- \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
+  The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
   The first three cases follow essentially the same argument provided by \citet{Wadler2022}, but we still give the arguments here for the sake of completeness.
-  The last case \Rule{Op} is new and has been discussed informally above.
+  The last case \Rule{Op} is new and has been discussed above.
+  (For brevity we omit the subscript $(\Sigma, \Omega)$.)
   \begin{itemize}
-    \item \SynRule{Var}: As $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}$, there exists a type $A$ such that $\Gamma |- \isTerm{x} \syn A$.
+    \item \SynRule{Var}: As $\erase{\Gamma} |- \isTerm{t}$, there exists a type $A$ such that $\Gamma |- \isTerm{x} \syn A$.
 
-    \item \SynRule{Anno}: For $\erase{\Gamma} |-_{\Sigma, \Omega} (\isTerm{t} \annotate A)^{\syn}$, it is decidable whether $\Gamma |- \isTerm{t} \chk A$ by induction hypothesis.
+    \item \SynRule{Anno}: For $\erase{\Gamma} |- (\isTerm{t} \annotate A)^{\syn}$, it is decidable whether $\Gamma |- \isTerm{t} \chk A$ by induction hypothesis.
       \begin{itemize}
         \item If $\Gamma |- \isTerm{t} \chk A$, then $\Gamma |- \isTerm{t \annotate A} \syn A$.
         \item If $\Gamma |/- t \chk A$ but $\Gamma |- \isTerm{t \annotate A} \syn$, then by inversion $\Gamma |- t \chk A$, leading to a contradiction.
       \end{itemize}
       
-    \item \ChkRule{Sub}: If $\erase{\Gamma} |-_{\Sigma, \Omega}t^{\chk}$ by the rule $\ChkRule{Sub}$, then $\Gamma |-_{\Sigma, \Omega} t^{\syn}$ by inversion.
-      We show that it is decidable for any $A$ whether $\Gamma |-_{\Sigma, \Omega} t \chk A$.
+    \item \ChkRule{Sub}: If $\erase{\Gamma} |-t^{\chk}$ by the rule $\ChkRule{Sub}$, then $\Gamma |- t^{\syn}$ by inversion.
+      We show that it is decidable for any $A$ whether $\Gamma |- t \chk A$.
       By induction hypothesis, it is decidable whether $\Gamma |- t \syn B$ for some $B$:
       \begin{itemize}
-        \item If $\Gamma |/- t \syn C$ for any type $C$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
+        \item If $\Gamma |/- t \syn C$ for any $C$ but $\Gamma |- t \chk A$, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
         \item If $\Gamma |- t \syn B$ for some $B$, then either $A = B$ or $A \neq B$ by the decidable equality on $\Type_{\Sigma}(\Xi)$: 
           \begin{itemize}
             \item if $A = B$ then we have\/ $\Gamma |- t \chk A$;
@@ -182,31 +187,91 @@ We are now ready for the decidability proof.
           \end{itemize}
       \end{itemize}
     \item \Rule{Op}:
-      Consider the mode derivation of\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \tmOpts^{\dir{d}}$.
-%
-%  \begin{claim}\label{lem:args-induction}
-%    For the argument list $\overrightarrow{[\Delta_i] A_{i}^{\dir{d_i}}}$, \emph{partial} substitution $\rho$ from $\Xi$ to $\emptyset$
-%    \begin{enumerate}
-%      \item either there is a minimal extension $\ext{\rho}$ of $\rho$ defined on $\synvar(\mathit{as})$ such that all of following judgements are derivable
-%        \[
-%          \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
-%        \]
-%
-%      \item or there is no extension $\sigma$ of $\rho$ such that all $\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\sigma} |-_{\Sigma, \Omega} \isTerm{t_i} \colon \simsub{A_i}{\sigma}^{\dir{d_i}}$ has a typing derivation. 
-%    \end{enumerate}
-%  \end{claim}
+      Consider the mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$.
+      First we claim:
+      \begin{claim}\label{lem:args-induction}
+        For an argument list $\as = \biargvec$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
+        \begin{enumerate}
+          \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
+            \begin{equation} \label{eq:claim}
+              \text{$\ext{\rho}$ is defined on $\synvar(\as)$ and\/} \quad
+              \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |- \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
+              \quad\text{for all $i$};
+            \end{equation}
+          \item or there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
+        \end{enumerate}
+      \end{claim}
+      Then, case analysis on $\dir{d}$:
+      \begin{itemize}
+        \item $\dir{d}$ is $\syn$: We apply our claim with the partial substitution $\rho_0$ defined nowhere.
+          \begin{enumerate}
+            \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds but for some $A$ we have $\Gamma |- \tmOpts \syn A$, then by inversion we have a substitution $\rho\colon \Sub{\Xi}{\emptyset}$ such that ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}}$ for every $i$.
+              Obviously, $\rho$ is an extension of $\rho_0$ such that ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}}$ for every $i$ and it contradicts the assumption that no such an extension exists.
+
+            \item If there exists a minimal $\ext{\rho} \geq \rho_0$ defined on $\synvar(\biargs)$ such that \eqref{eq:claim} holds, then by mode-correctness we have $\ext{\rho}$ is total and
+              \[
+                \Gamma |- \tmOpts \syn \simsub{A_0}{\ext{\rho}}.
+              \]
+          \end{enumerate}
+
+        \item $\dir{d}$ is $\chk$: Let $A$ be a type and apply \Cref{lem:unify} with $\rho_0$ defined nowhere.
+          \begin{enumerate}
+            \item If there is no $\sigma \geq \rho_0$ such that $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then by inversion there is a substitution $\rho$ such that $A = \simsub{A_0}{\rho}$, thus a contradiction.
+            \item If there is a minimal $\ext{\rho} \geq \rho_0$ such that $\simsub{A_0}{\ext{\rho}} = A$, then apply our claim with $\ext{\rho}$:
+              \begin{enumerate}
+                \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ such that $\simsub{A_0}{\gamma} = A$ and also ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ for every $i$.
+                  Given that $\ext{\rho} \geq \rho$ is minimal such that $\simsub{A_0}{\ext{\rho}} = A$, then $\gamma$ is an extension of $\ext{\rho}$ but by assumption no such an extension satisfying ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ exists, thus a contradiction.
+                
+                \item If there is a minimal $\ext{\ext{\rho}} \geq \ext{\rho}$ such that \eqref{eq:claim}, then by mode-correctness $\ext{\ext{\rho}}$ is total and
+                  \[
+                    \Gamma |- \tmOpts \chk \simsub{A_0}{\ext{\ext{\rho}}}
+                  \]
+                  where $\simsub{A_0}{\ext{\ext{\rho}}} = \simsub{A_0}{\ext{\rho}} = A$ since $\ext{\ext{\rho}}(x) = \ext{\rho}$ for every $x$ in the domain of $\ext{\rho}$.
+              \end{enumerate}
+          \end{enumerate}
+      \end{itemize}
+      \begin{claimproof}
+        For a partial substitution $\rho$, we prove it by induction on the list $\biargvec$:
+        \begin{enumerate}
+          \item For the empty list, $\rho$ is the minimal extension of $\rho$ itself satisfying \eqref{eq:claim} trivially. 
+          \item For $\biargvec, \biarg[m+1]$, by induction hypothesis on the list, we have two cases:
+            \begin{enumerate}
+              \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m$ but a minimal $\gamma \geq \rho$ such that~\eqref{eq:claim} holds for all $1 \leq i \leq m + 1$, then we clearly have a contradiction.
+              \item There is a minimal $\ext{\rho} \geq \rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m$.
+                By case analysis on $\dir{d_{m+1}}$:
+                \begin{itemize}
+                  \item $\dir{d_{m+1}}$ is $\chk$: By mode-correctness, $\simsub{\Delta_{m+1}}{\ext{\rho}}$ and $\simsub{A_{m+1}}{\ext{\rho}}$ are defined and by the induction hypothesis it is decidable whether $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}^{\dir{d_{m+1}}}$.
+                    Clearly, if $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}^{\dir{d_{m+1}}}$ then the desired statement is proved; otherwise we can also easily derive a contradiction.
+
+                  \item $\dir{d_{m+1}}$ is $\syn$: By mode-correctness, $\simsub{\Delta_{m+1}}{\ext{\rho}}$ is defined and by the induction hypothesis, it is decidable that $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$.
+                    \begin{enumerate}
+                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |/- \isTerm{t_{m+1}} \syn A$ for any $A$ but there is $\gamma \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m+1$, then $\gamma \geq \ext{\rho}$.
+                        Therefore $\simsub{\Delta_{m+1}}{\ext{\rho}} = \simsub{\Delta_{m+1}}{\gamma}$ and we derive a contradiction because $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
+                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$, then by \Cref{lem:unify} we have two cases: %we unify $A$ with $A_{m+1}$ extending $\ext{\rho}$.
+                        \begin{itemize}
+                          \item Suppose no $\sigma \geq \ext{\rho}$ such that $\simsub{A_{m+1}}{\sigma} = A$ but an extension $\gamma \geq \rho$ such that \eqref{eq:claim} holds for $1 \leq i \leq m + 1$. 
+                            Then, $\gamma \geq \ext{\rho}$ by the minimality of $\ext{\rho}$ and thus
+                            $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
+                            However, by \Cref{thm:unique-syn}, the synthesised type $\simsub{A_{m+1}}{\gamma}$ must be unique, so $\gamma$ is an extension of $\ext{\rho}$ such that $\simsub{A_{m+1}}{\gamma} = A$, leading to a contradiction.
+                          \item If there is a minimal $\ext{\ext{\rho}}$ such that $\simsub{A_{m+1}}{\ext{\ext{\rho}}} = A$, then it is now hard to show that $\ext{\ext{\rho}}$ is the minimal extension of $\rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m + 1$.
+                        \end{itemize}
+                    \end{enumerate}
+                \end{itemize}
+            \end{enumerate}
+        \end{enumerate}
+        \hfill{\footnotesize$\blacksquare$}
+      \end{claimproof}
+      We now complete the decidability proof.
   \end{itemize}
 \end{proof}
+While the proof presented above is complex, its formal counterpart essentially serves as two programs for checking and synthesis.
+These programs either compute the typing derivation or provide a proof of contradiction.
+Each case analysis simply branches based on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification.
+If a proof of contradiction is not of interest for implementation, the programs can be simplified by disregarding the cases that provide such contradiction proofs.
+On the other hand, the contradiction proof contains the information as to why the construction of a derivation failed.
+This can potentially be restructured further to provide informative error messages, assisting users in resolving issues with ill-typed terms, instead of merely answering a blatant `no'.
 
 \subsection{Trichotomy on Raw Terms by Type Synthesis} \label{subsec:trichotomy}
-
-%\begin{corollary}[Decidability of Bidirectional Type Synthesis] \label{thm:bidirectional-type-synthesis}
-%  In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
-%  it is decidable whether there exists some $A$ such that
-%  \[
-%    \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A.
-%  \]
-%\end{corollary}
 
 \begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
   For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 

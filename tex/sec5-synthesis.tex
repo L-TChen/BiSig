@@ -2,12 +2,10 @@
 
 \section{Bidirectional Type Synthesis and Checking} \label{sec:type-synthesis}
 This section focuses on defining mode-correctness and deriving bidirectional type synthesis for any mode-correct bidirectional type system $(\Sigma, \Omega)$.
-\LT{trichotomy first or last?}
-We start with the statement of the decidability of bidirectional synthesis and the trichotomy on raw terms for mode-correct bidirectional type systems in \Cref{subsec:trichotomy}, but defer the definition of mode-correctness until \Cref{sec:mode-correctness} and the decidability proof until \Cref{subsec:bidirectional-synthesis-checking}.
-We will then formalise mode-correctness and show the uniqueness of synthesized types in \Cref{sec:mode-correctness}.
-This uniqueness property means that any two synthesised types for the same raw term $t$ under the same context $\Gamma$ have to be equal.
-This will be used later in the proof of the decidability of bidirectional type synthesis and checking in \Cref{subsec:bidirectional-synthesis-checking}.
-
+We start with \Cref{sec:mode-correctness} by defining mode-correctness and showing the uniqueness of synthesized types.
+This uniqueness means that any two synthesised types for the same raw term $t$ under the same context $\Gamma$ have to be equal.
+It will be used especially in \Cref{subsec:bidirectional-synthesis-checking} for the proof of the decidability of bidirectional type synthesis and checking.
+Then, we conclude this section with the trichotomy on raw terms that has been illustrated at the beginning in \Cref{subsec:trichotomy}.
 
 \subsection{Mode Correctness}\label{sec:mode-correctness}
 As \citet{Dunfield2021} outlined, mode-correctness for a bidirectional typing rule means that 

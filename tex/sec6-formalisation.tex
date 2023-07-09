@@ -284,6 +284,11 @@
 \DeclareUnicodeCharacter{2200}{\ensuremath{\forall}}
 
 \DeclareUnicodeCharacter{2294}{\ensuremath{\sqcup}}
+
+\DeclareUnicodeCharacter{1D43}{\ensuremath{^a}}
+\DeclareUnicodeCharacter{1D9C}{\ensuremath{^c}}
+\DeclareUnicodeCharacter{02E2}{\ensuremath{^s}}
+
 \DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
 \DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
 \DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
@@ -291,8 +296,12 @@
 \DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
 
 \DeclareUnicodeCharacter{2115}{\ensuremath{\mathbb{N}}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
 \DeclareUnicodeCharacter{2236}{:}
+\DeclareUnicodeCharacter{2261}{\ensuremath{\equiv}}
 \DeclareUnicodeCharacter{2237}{\ensuremath{\mathrel{::}}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
 \DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
 \DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
 \DeclareUnicodeCharacter{039E}{\ensuremath{\Xi}}
@@ -346,84 +355,161 @@
 
 \begin{figure}
   \small
+  \begin{minipage}[t]{.3\linewidth}
   \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[3]{}\Keyword{record}\;\Conid{ArgD}\;(\Conid{Ξ}\;\mathbin{:}\;\Conid{ℕ})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\>[B]{}\Keyword{record}\;\Conid{ArgD}\;(\Conid{Ξ}\;\mathbin{:}\;\Conid{ℕ})\;\mathbin{:}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Keyword{field}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{cxt}\;{}\<[14]%
-\>[14]{}\mathbin{:}\;\Conid{Cxt}\;\Conid{Ξ}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{mode}\;{}\<[14]%
-\>[14]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{type}\;{}\<[14]%
-\>[14]{}\mathbin{:}\;\Conid{TExp}\;\Conid{Ξ}{}\<[E]%
-\\[\blanklineskip]%
-\>[3]{}\Conid{ArgsD}\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}{}\<[E]%
-\\
-\>[3]{}\Conid{ArgsD}\;\Conid{Ξ}\;\mathrel{=}\;\Conid{List}\;(\Conid{ArgD}\;\Conid{Ξ}){}\<[E]%
-\\[\blanklineskip]%
-\>[3]{}\Keyword{record}\;\Conid{ConD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\>[5]{}\Varid{cxt}\;{}\<[12]%
+\>[12]{}\mathbin{:}\;\Conid{Cxt}\;\Conid{Ξ}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Keyword{constructor}\;\Varid{ι}{}\<[E]%
+\>[5]{}\Varid{type}\;{}\<[12]%
+\>[12]{}\mathbin{:}\;\Conid{TExp}\;\Conid{Ξ}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Keyword{field}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\{\mskip1.5mu \Varid{vars}\mskip1.5mu\}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;\Conid{ℕ}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{mode}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{type}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;\Conid{TExp}\;{}\<[24]%
-\>[24]{}\Varid{vars}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{args}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;\Conid{ArgsD}\;\Varid{vars}{}\<[E]%
-\\[\blanklineskip]%
-\>[3]{}\Keyword{record}\;\Conid{Desc}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Keyword{constructor}\;\Varid{desc}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Keyword{field}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Conid{Op}\;{}\<[19]%
-\>[19]{}\mathbin{:}\;\Conid{Set}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\{\kern-.9pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-1.5pt\;\Varid{decOp}\;\kern-1.5pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-.9pt\}\;{}\<[19]%
-\>[19]{}\mathbin{:}\;\Conid{DecEq}\;\Conid{Op}{}\<[E]%
-\\
-\>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Varid{rules}\;{}\<[19]%
-\>[19]{}\mathbin{:}\;\Conid{Op}\;\Varid{→}\;\Conid{ConD}{}\<[E]%
+\>[5]{}\Varid{mode}\;{}\<[12]%
+\>[12]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-  \caption{Definition of Bidirectional Binding Signature}  
+  \end{minipage}
+  \begin{minipage}[t]{.32\linewidth}
+  \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{22}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{ConD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\{\mskip1.5mu \Varid{vars}\mskip1.5mu\}\;{}\<[14]%
+\>[14]{}\mathbin{:}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{args}\;{}\<[14]%
+\>[14]{}\mathbin{:}\;\Conid{List}\;(\Conid{ArgsD}\;\Varid{vars}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{type}\;{}\<[14]%
+\>[14]{}\mathbin{:}\;\Conid{TExp}\;{}\<[22]%
+\>[22]{}\Varid{vars}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mode}\;{}\<[14]%
+\>[14]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+  \begin{minipage}[t]{.3\linewidth}
+   \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{Desc}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Conid{Op}\;{}\<[17]%
+\>[17]{}\mathbin{:}\;\Conid{Set}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{rules}\;{}\<[17]%
+\>[17]{}\mathbin{:}\;\Conid{Op}\;\Varid{→}\;\Conid{ConD}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+  
+  \caption{Definition of bidirectional binding signature}  
 \end{figure}
+
+{\small\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{20}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{36}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{46}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Fam}\;\mathbin{:}\;(\Varid{ℓ′}\;\mathbin{:}\;\Conid{Level})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;\Varid{→}\;\Conid{Set}\;(\Varid{ℓ}\;\Varid{⊔}\;\Varid{lsuc}\;\Varid{ℓ′}){}\<[E]%
+\\
+\>[B]{}\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X}\;\mathrel{=}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Mode}\;\Varid{→}\;\Conid{Ty}\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′})\;{}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[10]%
+\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
+\>[24]{}\mathrel{=}\;\Conid{Y}\;\Conid{Γ}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{A}\;\Varid{∷}\;\Conid{Δ}\;{}\<[10]%
+\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
+\>[24]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;((\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩})\;\Varid{∷}\;\Conid{Γ})\;\Varid{t}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Varid{eraseᵃˢ}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[20]%
+\>[20]{}\Varid{⟧ᵃˢ}\;\anonymous \;{}\<[27]%
+\>[27]{}\anonymous \;{}\<[30]%
+\>[30]{}\anonymous \;{}\<[33]%
+\>[33]{}\anonymous \;{}\<[36]%
+\>[36]{}\anonymous \;{}\<[46]%
+\>[46]{}\mathrel{=}\;\Varid{⊤}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⊢[}\;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;\Varid{∷}\;\Conid{Ds}\;{}\<[20]%
+\>[20]{}\Varid{⟧ᵃˢ}\;\Conid{X}\;{}\<[27]%
+\>[27]{}\Conid{Y}\;{}\<[30]%
+\>[30]{}\Varid{σ}\;{}\<[33]%
+\>[33]{}\Conid{Γ}\;{}\<[36]%
+\>[36]{}(\Varid{x}\;\Varid{,}\;\Varid{xs})\;{}\<[46]%
+\>[46]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\Conid{Γ'}\;\Varid{x'}\;\Varid{→}\;\Conid{Y}\;\Conid{Γ'}\;\Varid{x'}\;\Varid{d}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\Varid{ℓ′}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{B}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}\;\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{d}\;\Varid{≡}\;\Varid{d′}\;\Varid{×}\;\Conid{Σ[}\;\Varid{σ}\;\Varid{∈}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\mskip1.5mu]\;\Conid{B}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}\;\Varid{×}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{Desc})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\Varid{ℓ′}\;(\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;(\Varid{i}\;\Varid{,}\;\Varid{xs})\;\Varid{d}\;\Conid{A}\;\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+
 
 \end{document}

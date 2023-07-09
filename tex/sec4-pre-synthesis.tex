@@ -10,7 +10,7 @@ We also formulate \varcitet{Dunfield2021}{'s} annotatability and discuss its rel
 \subsection{Soundness and Completeness}
 \label{sec:soundness-and-completeness}
 
-%\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma \vdash_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
+%\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma |-_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
 Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
 We can also remove typing and retain mode information, arriving at a mode derivation instead.
@@ -90,7 +90,7 @@ The $\SynRule{Missing}$ rule cannot appear because $g = \BTrue$, and the other r
 We also want a lemma that covers the case where $g = \BFalse$.
 
 \begin{lemma}\label{thm:Pre?-false}
-If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
+If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V |/-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
 This lemma would be wrong if the `strictness' boolean~$s$ was left out of the rules:
@@ -164,7 +164,7 @@ Finally, having constructed a generalised mode preprocessor, it is easy to deriv
 \end{corollary}
 
 \begin{proof}
-By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$, and then simply check~$g$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V \not|-_{\Sigma,\Omega} t^\dir{d}$.
+By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$, and then simply check~$g$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V |/-_{\Sigma,\Omega} t^\dir{d}$.
 \end{proof}
 
 %We can also establish the converse of \cref{thm:Pre?-true,thm:Pre?-false}.
@@ -174,7 +174,7 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %\end{corollary}
 %
 %\begin{corollary}\label{thm:toPre?-false}
-%If\/ $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$ for some boolean~$s$.
+%If\/ $V |/-_{\Sigma,\Omega} t^\dir{d}$, then $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$ for some boolean~$s$.
 %\end{corollary}
 %
 %Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} provides little information for constructing a required derivation, and basically we have to construct such a derivation from scratch for a raw term.
@@ -185,7 +185,7 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %
 %By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 %If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\BTrue$ since $g = \BFalse$ leads to a contradiction with \cref{thm:Pre?-false}.
-%Symmetrically, if $V \not|-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\BFalse$ so as not to contradict \cref{thm:Pre?-true}.
+%Symmetrically, if $V |/-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\BFalse$ so as not to contradict \cref{thm:Pre?-true}.
 %\end{proof}
 
 \subsection{Annotatability}

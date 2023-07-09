@@ -166,14 +166,14 @@ We are now ready for the decidability proof.
     \item \SynRule{Anno}: For $\erase{\Gamma} |-_{\Sigma, \Omega} (\isTerm{t} \annotate A)^{\syn}$, it is decidable whether $\Gamma |- \isTerm{t} \chk A$ by induction hypothesis.
       \begin{itemize}
         \item If $\Gamma |- \isTerm{t} \chk A$, then $\Gamma |- \isTerm{t \annotate A} \syn A$.
-        \item If $\Gamma \not|- t \chk A$ but $\Gamma |- \isTerm{t \annotate A} \syn$, then by inversion $\Gamma |- t \chk A$, leading to a contradiction.
+        \item If $\Gamma |/- t \chk A$ but $\Gamma |- \isTerm{t \annotate A} \syn$, then by inversion $\Gamma |- t \chk A$, leading to a contradiction.
       \end{itemize}
       
     \item \ChkRule{Sub}: If $\erase{\Gamma} |-_{\Sigma, \Omega}t^{\chk}$ by the rule $\ChkRule{Sub}$, then $\Gamma |-_{\Sigma, \Omega} t^{\syn}$ by inversion.
       We show that it is decidable for any $A$ whether $\Gamma |-_{\Sigma, \Omega} t \chk A$.
       By induction hypothesis, it is decidable whether $\Gamma |- t \syn B$ for some $B$:
       \begin{itemize}
-        \item If $\Gamma \not|- t \syn C$ for any type $C$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
+        \item If $\Gamma |/- t \syn C$ for any type $C$ but $\Gamma |- t \chk A$ is derivable, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
         \item If $\Gamma |- t \syn B$ for some $B$, then either $A = B$ or $A \neq B$ by the decidable equality on $\Type_{\Sigma}(\Xi)$: 
           \begin{itemize}
             \item if $A = B$ then we have\/ $\Gamma |- t \chk A$;
@@ -213,8 +213,8 @@ We are now ready for the decidability proof.
   exactly one of the following holds:
   \begin{enumerate}
     \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type $A$.
-    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but\/ $\Gamma \not|-_{\Sigma, \Omega} \isTerm{t} : A$.
-    \item $\erase{\Gamma} \not|-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but\/ $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$.
+    \item $\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
   \end{enumerate}
 \end{corollary}
 \begin{proof}

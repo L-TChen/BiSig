@@ -427,121 +427,39 @@
                   RosserTheorem.pdf},
 }
 
-@inproceedings{Fiore1999,
-  address =       {Trento, Italy},
-  author =        {Fiore, Marcelo P. and Plotkin, Gordon D. and
-                   Turi, Daniele},
-  booktitle =     {Proceedings. 14th Symposium on Logic in Computer
-                   Science},
-  pages =         {193--202},
-  publisher =     {IEEE},
-  title =         {Abstract syntax and variable binding},
-  year =          {1999},
-  doi =           {10.1109/LICS.1999.782615},
-  isbn =          {0-7695-0158-3},
-  url =           {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?
-                  arnumber=782615},
+@article{Peyton-Jones2007,
+  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
+                   Weirich, Stephanie and Shields, Mark},
+  journal =       {Journal of Functional Programming},
+  number =        {1},
+  pages =         {1--82},
+  publisher =     {Cambridge University Press},
+  title =         {Practical type inference for arbitrary-rank types},
+  volume =        {17},
+  year =          {2007},
+  doi =           {10.1017/S0956796806006034},
 }
 
-@inproceedings{Arkor2020,
-  address =       {New York, NY, USA},
-  author =        {Arkor, Nathanael and Fiore, Marcelo},
-  booktitle =     {Proceedings of the 35th Annual ACM/IEEE Symposium on
-                   Logic in Computer Science},
-  pages =         {88--101},
-  publisher =     {Association for Computing Machinery},
-  series =        {LICS '20},
-  title =         {Algebraic models of simple type theories: A
-                   polynomial approach},
-  year =          {2020},
-  abstract =      {We develop algebraic models of simple type theories,
-                   laying out a framework that extends universal algebra
-                   to incorporate both algebraic sorting and variable
-                   binding. Examples of simple type theories include the
-                   unityped and simply-typed λ-calculi, the
-                   computational λ-calculus, and predicate logic.Simple
-                   type theories are given models in presheaf
-                   categories, with structure specified by algebras of
-                   polynomial endofunctors that correspond to natural
-                   deduction rules. Initial models, which we construct,
-                   abstractly describe the syntax of simple type
-                   theories. Taking substitution structure into
-                   consideration, we further provide sound and complete
-                   semantics in structured cartesian multicategories.
-                   This development generalises Lambek's correspondence
-                   between the simply-typed λ-calculus and
-                   cartesian-closed categories, to arbitrary simple type
-                   theories.},
-  doi =           {10.1145/3373718.3394771},
-  isbn =          {9781450371049},
-  url =           {https://doi.org/10.1145/3373718.3394771},
+@article{McBride2003,
+  author =        {McBride, Conor},
+  journal =       {Journal of Functional Programming},
+  number =        {6},
+  pages =         {1061--1075},
+  publisher =     {Cambridge University Press},
+  title =         {First-order unification by structural recursion},
+  volume =        {13},
+  year =          {2003},
+  doi =           {10.1017/S0956796803004957},
 }
 
-@phdthesis{Gast2004,
-  author =        {Gast, Holger},
-  school =        {Universit{\"a}t T{\"u}bingen},
-  title =         {A generator for type checkers},
-  year =          {2004},
-  url =           {http://hdl.handle.net/10900/48845},
-}
-
-@inproceedings{Grewe2015,
-  address =       {New York, NY, USA},
-  author =        {Grewe, Sylvia and Erdweg, Sebastian and
-                   Wittmann, Pascal and Mezini, Mira},
-  booktitle =     {2015 ACM International Symposium on New Ideas, New
-                   Paradigms, and Reflections on Programming and
-                   Software (Onward!)},
-  pages =         {137--150},
-  publisher =     {Association for Computing Machinery},
-  series =        {Onward! 2015},
-  title =         {Type systems for the masses: {Deriving} soundness
-                   proofs and efficient checkers},
-  year =          {2015},
-  abstract =      {The correct definition and implementation of
-                   non-trivial type systems is difficult and requires
-                   expert knowledge, which is not available to
-                   developers of domain-specific languages (DSLs) in
-                   practice. We propose Veritas, a workbench that
-                   simplifies the development of sound type systems.
-                   Veritas provides a single, high-level specification
-                   language for type systems, from which it
-                   automatically tries to derive soundness proofs and
-                   efficient and correct type-checking algorithms. For
-                   verification, Veritas combines off-the-shelf
-                   automated first-order theorem provers with automated
-                   proof strategies specific to type systems. For
-                   deriving efficient type checkers, Veritas provides a
-                   collection of optimization strategies whose
-                   applicability to a given type system is checked
-                   through verification on a case-by-case basis. We have
-                   developed a prototypical implementation of Veritas
-                   and used it to verify type soundness of the
-                   simply-typed lambda calculus and of parts of typed
-                   SQL. Our experience suggests that many of the
-                   individual verification steps can be automated and,
-                   in particular, that a high degree of automation is
-                   possible for type systems of DSLs.},
-  doi =           {10.1145/2814228.2814239},
-  isbn =          {9781450336888},
-  url =           {https://doi.org/10.1145/2814228.2814239},
-}
-
-@inproceedings{Fiore2010,
-  address =       {Berlin, Heidelberg},
-  author =        {Fiore, Marcelo and Hur, Chung-Kil},
-  booktitle =     {Computer Science Logic. CSL 2010},
-  editor =        {Dawar, Anuj and Veith, Helmut},
-  pages =         {320--335},
-  publisher =     {Springer Berlin Heidelberg},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Second-order equational logic (Extended Abstract)},
-  volume =        {6247},
-  year =          {2010},
-  abstract =      {We extend universal algebra and its equational logic
-                   from first to second order as follows.},
-  doi =           {10.1007/978-3-642-15205-4_26},
-  isbn =          {978-3-642-15205-4},
+@unpublished{McBride2003a,
+  author =        {McBride, Conor},
+  note =          {Supplement to the paper `First-Order Unification by
+                   Structural Recursion'},
+  title =         {First-order unification by structural recursion:
+                   Correctness proof},
+  year =          {2003},
+  url =           {http://www.strictlypositive.org/foubsr-website/},
 }
 
 @article{Ko2022,

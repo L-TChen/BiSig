@@ -17,7 +17,7 @@
 
 \newcommand{\xto}[1]{\xrightarrow{#1}}
   
-\newcommand{\fv}{\mathit{vars}}
+\newcommand{\fv}{\mathit{fv}}
 
 \newcommand{\tmOp}{\mathsf{op}}
 \newcommand{\tyOp}{\mathsf{op}}
@@ -60,6 +60,7 @@
 \newcommand{\SynRule}[1]{\ensuremath{\mathsc{#1}^{\syn}}}
 \newcommand{\ChkRule}[1]{\ensuremath{\mathsc{#1}^{\chk}}}
 \newcommand{\MC}{\mathsf{MC}}
+\newcommand{\MCas}{\MC_{\mathit{as}}}
 
 \newcommand{\ext}[1]{\bar{#1}}
 \newcommand{\erase}[1]{\left|#1\right|}
@@ -70,13 +71,33 @@
 \newcommand{\app}{\mathsf{app}}
 
 \mathlig{|-}{\mathrel{\vdash}} 
+\mathlig{|/-}{\mathrel{\nvdash}} 
 \newcommand{\judgbox}[2]{{\raggedright $\boxed{#1}$ \quad \text{#2}}}
 
-\newcommand{\aritysymbol}[4]{#1\colon #2 \rhd #3 \to #4}
 
 \newcommand{\BTrue}{\ensuremath{\mathbf{T}}}
 \newcommand{\BFalse}{\ensuremath{\mathbf{F}}}
+
 % Some shortcuts
 \newcommand{\vars}[1]{\vec{\isTerm{#1}}}
 \newcommand{\tmOpts}{\isTerm{\tmOp}_o(\vars{x}_\isTerm{1}.\, \isTerm{t_1}; \ldots;\vars{x}_\isTerm{n}.\, \isTerm{t_n})}
 \newcommand{\tmOpus}{\isTerm{\tmOp}_o(\vars{x}_\isTerm{1}.\, \isTerm{u_1}; \ldots;\vars{x}_\isTerm{n}.\, \isTerm{u_n})}
+
+
+\newcommand{\aritysymbol}[4]{#1\colon #2 \rhd #3 \to #4}
+\newcommand{\formatarg}[2]{[#1]#2}
+\newcommand{\formatbiarg}[3]{\formatarg{#1}{#2}^{\dir{#3}}}
+
+\newcommand{\barg}[1][]{\formatarg{\Delta_{#1}}{A_{#1}}}
+\newcommand{\bargs}{\barg[1], \ldots, \barg[n]}
+\newcommand{\bop}{\aritysymbol{o}{\Xi}{\bargs}{A_0}}
+
+\newcommand{\chkbiarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{\chk}}
+\newcommand{\synbiarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{\syn}}
+\newcommand{\biarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{d_{#1}}}
+\newcommand{\biargs}{\biarg[1], \ldots, \biarg[n]}
+\newcommand{\biarity}{\biargs\to A_0^{\dir{d}}}
+\newcommand{\biargvec}{\overrightarrow{\biarg[i]}}
+\newcommand{\synop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\syn}}}
+\newcommand{\chkop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\chk}}}
+\newcommand{\biop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\dir{d}}}}

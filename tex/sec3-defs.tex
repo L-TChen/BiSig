@@ -9,7 +9,7 @@ of simple types, simply typed languages, and bidirectional type systems, using s
 Our definitions are formulated in two steps:
 \begin{enumerate*}
   \item first we introduce a notion of arity and a notion of signature which includes a set of operation symbols and an assignment of arities to symbols;
-\item then, given a signature, we define sets of raw terms and derivations by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by a operational symbol~$o$.
+\item then, given a signature, we define sets of raw terms and derivations by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operational symbol~$o$.
 \end{enumerate*}
 All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
 Upon moving from simple types to bidirectional typing, the notion of arity, initially as the number of arguments of an operation, is enriched to incorporate an extension context for variable binding and the mode for the direction of type information flow.
@@ -138,7 +138,7 @@ As such, this information forms part of the arity of an operation, and typing de
 
 The definition of typing derivations is a bit more involved.
 We need some information to compare types on the object level during type synthesis and substitute those type variables in a typing derivation $\Gamma \vdash \tmOpts : A$ for an operation $o$ in $\Omega$ at some point.
-Hence we choose to include a substitution $\rho$ from the local context $\Xi$ to $\emptyset$ as part of its typing derivation explicitly:
+Here we choose to include a substitution $\rho$ from the local context $\Xi$ to $\emptyset$ as part of its typing derivation explicitly:
 \begin{definition}\label{def:typing-derivations}
   \begin{figure}
     \centering
@@ -183,7 +183,7 @@ Therefore, to define a bidirectional type system, we further enrich the concept 
   \[
     \left(T^* \times T \times \Mode \right)^* \times T \times \Mode.
   \]
-  and is denoted by $\biarity$.
+  For clarity, an arity is denoted by $\biarity$.
 \end{definition}
 When compared to a binding arity, a bidirectional binding arity provides further details, specifying the mode for each of its arguments and for the conclusion.
 Take the $\ChkRule{Abs}$ rule (\Cref{fig:STLC-bidirectional-typing-derivations}) for $\lam{x}t$ as an example.

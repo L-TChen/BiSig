@@ -59,10 +59,10 @@ This subset contains type variables of a synthesis argument and they are exactly
 This definition encapsulates the idea that every `input' type variable, possibly deriving from a context $\Delta$ or a checking argument $A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
 This condition must be met for every tail of the argument list as well to ensure that `output' variables accessible at each argument position are from preceding arguments only, hence an inductive definition.
 \begin{definition}\label{def:mode-correctness}
-  An operation $\biop$ is \emph{mode-correct} if either
+  An operation $\biop$ is \emph{mode-correct} if 
   \begin{enumerate}
-    \item $d$ is $\chk$, its argument list is mode-correct w.r.t.\ $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\biargvec)$ contains every inhabitant of $\Xi$; or
-    \item $d$ is $\syn$, its argument list is mode-correct w.r.t.\ $\emptyset$, and the finite subset $\synvar(\biargvec)$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
+    \item either $d$ is $\chk$, its argument list is mode-correct w.r.t.\ $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\biargvec)$ contains every inhabitant of $\Xi$;
+    \item or $d$ is $\syn$, its argument list is mode-correct w.r.t.\ $\emptyset$, and the finite subset $\synvar(\biargvec)$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
   \end{enumerate}
   A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
 \end{definition}
@@ -71,7 +71,6 @@ Since every inhabitant of $\Xi$ can be located in either $A_0$ or synthesis vari
 On the other hand, for a synthesis operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to $\emptyset$.
 Also, the set of synthesis variables alone should include every type variable in $\Xi$ and particularly in $A_n$.
 It is also easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct according to our definition.
-\LT{perhaps we shall prove it decidable}
 
 \begin{remark}
   Mode-correctness is fundamentally a condition for typing \emph{rules} themselves, not for derivations.
@@ -114,7 +113,9 @@ However, given the mode-correctness---which incorporates an inductive definition
 %On the other hand, our proof is based on mode-correctness and need not consider specific sub-derivations.
 
 \subsection{Decidability of Bidirectional Type Synthesis and Checking}\label{subsec:bidirectional-synthesis-checking}
-We are here for the main technical contribution of this paper---the decidability of bidirectional type synthesis and checking for any mode correct bidirectional type system:
+
+We are here for the main technical contribution of this paper.
+
 \begin{theorem}[Decidability of Bidirectional Type Synthesis and Checking] \label{thm:bidirectional-type-synthesis-checking}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
   \begin{enumerate}
@@ -145,8 +146,8 @@ For the sake of clarity in presentation, though, we keep using named variables a
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
 \begin{definition}
-  Let $\rho$ be a partial substitution.
-  Then, by an \emph{extension}\/ $\sigma \geq \rho$ we mean that the domain of $\sigma$ contains the domain $\rho$ and\/ $\sigma(x) = \rho(x)$ for every\/ $x$ in the domain of $\rho$; by a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
+  By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain of $\sigma$ contains the domain $\rho$ and\/ $\sigma(x) = \rho(x)$ for every\/ $x$ in the domain of $\rho$.
+  By a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
 \end{definition}
 \begin{lemma}\label{lem:unify}
   For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, 
@@ -175,7 +176,6 @@ We are now ready for the decidability proof.
       \end{itemize}
       
     \item \ChkRule{Sub}: If $\erase{\Gamma} |-t^{\chk}$ by the rule $\ChkRule{Sub}$, then $\Gamma |- t^{\syn}$ by inversion.
-      We show that it is decidable for any $A$ whether $\Gamma |- t \chk A$.
       By induction hypothesis, it is decidable whether $\Gamma |- t \syn B$ for some $B$:
       \begin{itemize}
         \item If $\Gamma |/- t \syn C$ for any $C$ but $\Gamma |- t \chk A$, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
@@ -190,25 +190,29 @@ We are now ready for the decidability proof.
       Consider the mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$.
       First we claim:
       \begin{claim}\label{lem:args-induction}
-        For an argument list $\as = \biargvec$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
+        For an argument list $\as = \biargs$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
         \begin{enumerate}
           \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
             \begin{equation} \label{eq:claim}
               \text{$\ext{\rho}$ is defined on $\synvar(\as)$ and\/} \quad
               \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |- \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
-              \quad\text{for all $i$};
+              \quad\text{for $i = 1, \ldots, n$};
             \end{equation}
           \item or there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
         \end{enumerate}
       \end{claim}
-      Then, case analysis on $\dir{d}$:
+      Then, we proceed with a case analysis on $\dir{d}$:
       \begin{itemize}
         \item $\dir{d}$ is $\syn$: We apply our claim with the partial substitution $\rho_0$ defined nowhere.
           \begin{enumerate}
-            \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds but for some $A$ we have $\Gamma |- \tmOpts \syn A$, then by inversion we have a substitution $\rho\colon \Sub{\Xi}{\emptyset}$ such that ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}}$ for every $i$.
-              Obviously, $\rho$ is an extension of $\rho_0$ such that ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}}$ for every $i$ and it contradicts the assumption that no such an extension exists.
+            \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds but $\Gamma |- \tmOpts \syn A$ for some $A$, then by inversion we have a substitution $\rho\colon \Sub{\Xi}{\emptyset}$ such that
+              \[
+                \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}
+              \]
+              for every $i$.
+              Obviously, $\rho \geq \rho_0$ and ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}}$ for every $i$ and it contradicts the assumption that no such an extension exists.
 
-            \item If there exists a minimal $\ext{\rho} \geq \rho_0$ defined on $\synvar(\biargs)$ such that \eqref{eq:claim} holds, then by mode-correctness we have $\ext{\rho}$ is total and
+            \item If there exists a minimal $\ext{\rho} \geq \rho_0$ defined on $\synvar(\biargs)$ such that~\eqref{eq:claim} holds, then by mode-correctness $\ext{\rho}$ is total and thus
               \[
                 \Gamma |- \tmOpts \syn \simsub{A_0}{\ext{\rho}}.
               \]
@@ -231,7 +235,7 @@ We are now ready for the decidability proof.
           \end{enumerate}
       \end{itemize}
       \begin{claimproof}
-        For a partial substitution $\rho$, we prove it by induction on the list $\biargvec$:
+        We prove it by induction on the list $\biargs$:
         \begin{enumerate}
           \item For the empty list, $\rho$ is the minimal extension of $\rho$ itself satisfying \eqref{eq:claim} trivially. 
           \item For $\biargvec, \biarg[m+1]$, by induction hypothesis on the list, we have two cases:
@@ -253,7 +257,7 @@ We are now ready for the decidability proof.
                             Then, $\gamma \geq \ext{\rho}$ by the minimality of $\ext{\rho}$ and thus
                             $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
                             However, by \Cref{thm:unique-syn}, the synthesised type $\simsub{A_{m+1}}{\gamma}$ must be unique, so $\gamma$ is an extension of $\ext{\rho}$ such that $\simsub{A_{m+1}}{\gamma} = A$, leading to a contradiction.
-                          \item If there is a minimal $\ext{\ext{\rho}}$ such that $\simsub{A_{m+1}}{\ext{\ext{\rho}}} = A$, then it is now hard to show that $\ext{\ext{\rho}}$ is the minimal extension of $\rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m + 1$.
+                          \item If there is a minimal $\ext{\ext{\rho}} \geq \ext{\rho}$ such that $\simsub{A_{m+1}}{\ext{\ext{\rho}}} = A$, then it is not hard to show that $\ext{\ext{\rho}}$ is the minimal extension of $\rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m + 1$.
                         \end{itemize}
                     \end{enumerate}
                 \end{itemize}
@@ -261,13 +265,14 @@ We are now ready for the decidability proof.
         \end{enumerate}
         \hfill{\footnotesize$\blacksquare$}
       \end{claimproof}
-      We now complete the decidability proof.
+      We now have completed the decidability proof.
   \end{itemize}
 \end{proof}
-While the proof presented above is intricate, its formal counterpart essentially functions as two programs for type checking and synthesis.
+
+The formal counterpart of the above proof in \Agda essentially functions as two programs for type checking and synthesis.
 These programs either compute the typing derivation or provide a proof of contradiction.
 Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification process.
-If a contradiction proof is not of interest for implementation, the programs can be simplified by disregarding the cases that yield such contradiction proofs.
+If a contradiction proof is not of interest for implementation, these programs can be simplified by disregarding the cases that yield such contradiction proofs.
 Alternatively, we could consider generalising typing derivations like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}).
 This could accommodate ill-typed cases and improve contradiction proofs to deliver more informative error messages.
 This would assist users in resolving issues with ill-typed terms, rather than simply returning a blatant 'no'.

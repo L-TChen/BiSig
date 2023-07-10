@@ -1,11 +1,11 @@
 %!TEX root = BiSig.tex
 
-\section{Mode Preprocessing and Related Properties}\label{sec:pre-synthesis}
+\section{Mode Decoration and Related Properties}\label{sec:pre-synthesis}
 
-Our first important construction is mode preprocessing in \cref{sec:mode-preprocessing}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
+Our first important construction is mode decoration in \cref{sec:mode-decoration}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
 We also discuss some related properties:
 By bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
-We also formulate \varcitet{Dunfield2021}{'s} annotatability and discuss its relationship with our completeness and generalised mode preprocessing in \cref{sec:annotatability}.
+We also formulate \varcitet{Dunfield2021}{'s} annotatability and discuss its relationship with our completeness and generalised mode decoration in \cref{sec:annotatability}.
 
 \subsection{Soundness and Completeness}
 \label{sec:soundness-and-completeness}
@@ -34,15 +34,15 @@ The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis
 \end{proof}
 
 
-\subsection{Generalised Mode Preprocessing}
-\label{sec:mode-preprocessing}
+\subsection{Generalised Mode Decoration}
+\label{sec:mode-decoration}
 
-The goal of this sub-section is to construct a mode preprocessor, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
+The goal of this sub-section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
 In fact we will do better:
-If a mode preprocessor returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
-It will be more helpful if a preprocessor can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
-We will construct such a \emph{generalised mode preprocessor}~(\cref{thm:generalised-mode-preprocessing}), which can be weakened to an ordinary mode preprocessor~(\cref{thm:mode-preprocessing}) if the additional explanation is not needed.%
-\footnote{For clarity, we use ordinary mode preprocessing elsewhere in this paper.}
+If a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
+It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
+We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalised-mode-decoration}), which can be weakened to an ordinary mode decorator~(\cref{thm:mode-decoration}) if the additional explanation is not needed.%
+\footnote{For brevity, we use ordinary mode decoration elsewhere in this paper.}
 
 \begin{figure}
   \centering
@@ -118,14 +118,14 @@ Then a case analysis shows that it is impossible to have a (synthesising) mode d
 %\end{itemize}
 \end{proof}
 
-Now we are ready to construct a generalised mode preprocessor.
+Now we are ready to construct a generalised mode decorator.
 
-\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-preprocessing}
+\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-decoration}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{theorem}
 
 The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term and apply mode casts depending on what modes are required.
-Instead, we distill the case analysis that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:strict-derivation}) is then established by induction on the input term in the proof of \cref{thm:generalised-mode-preprocessing}.
+Instead, we distill the case analysis that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:strict-derivation}) is then established by induction on the input term in the proof of \cref{thm:generalised-mode-decoration}.
 
 \begin{lemma}\label{thm:adjustment}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
@@ -142,7 +142,7 @@ Note that it is permissible to add an outermost mode cast because the antecedent
 
 
 
-\begin{proof}[Proof of \cref{thm:generalised-mode-preprocessing}]
+\begin{proof}[Proof of \cref{thm:generalised-mode-decoration}]
 By \cref{thm:adjustment}, it suffices to prove statement~(\ref{eq:strict-derivation}) by induction on~$t$.
 
 \begin{itemize}
@@ -157,14 +157,14 @@ By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of 
 \end{itemize}
 \end{proof}
 
-Finally, having constructed a generalised mode preprocessor, it is easy to derive an ordinary one.
+Finally, having constructed a generalised mode decorator, it is easy to derive an ordinary one.
 
-\begin{corollary}[Mode Preprocessing]\label{thm:mode-preprocessing}
+\begin{corollary}[Mode Preprocessing]\label{thm:mode-decoration}
   It is decidable whether\/ $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.%for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$
 \end{corollary}
 
 \begin{proof}
-By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$, and then simply check~$g$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V |/-_{\Sigma,\Omega} t^\dir{d}$.
+By \cref{thm:generalised-mode-decoration}, there is a derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$, and then simply check~$g$ and apply either \cref{thm:Pre?-true} or \cref{thm:Pre?-false} to obtain $V |-_{\Sigma,\Omega} t^\dir{d}$ or $V |/-_{\Sigma,\Omega} t^\dir{d}$.
 \end{proof}
 
 %We can also establish the converse of \cref{thm:Pre?-true,thm:Pre?-false}.
@@ -178,12 +178,12 @@ By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\S
 %\end{corollary}
 %
 %Whereas it is possible to prove \cref{thm:toPre?-true} directly by induction, converting a mode derivation to a generalised one, the negated antecedent of \cref{thm:toPre?-false} provides little information for constructing a required derivation, and basically we have to construct such a derivation from scratch for a raw term.
-%But this is exactly what generalised mode preprocessing does, so we can simply reuse \cref{thm:generalised-mode-preprocessing}.
+%But this is exactly what generalised mode decoration does, so we can simply reuse \cref{thm:generalised-mode-decoration}.
 %And \cref{thm:toPre?-true} can also be proved easily in the same way.
 %
 %\begin{proof}[Proofs of \cref{thm:toPre?-true,thm:toPre?-false}]
 %
-%By \cref{thm:generalised-mode-preprocessing}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
+%By \cref{thm:generalised-mode-decoration}, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 %If $V |-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be $\BTrue$ since $g = \BFalse$ leads to a contradiction with \cref{thm:Pre?-false}.
 %Symmetrically, if $V |/-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\BFalse$ so as not to contradict \cref{thm:Pre?-true}.
 %\end{proof}
@@ -221,10 +221,10 @@ If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/
 
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term is typable in $(\Sigma, \erase\Omega)$, it may not be typable in $(\Sigma, \Omega)$ directly due to some missing annotations, but will be if those annotations are added correctly.
-In our theory, \cref{thm:annotatability} can be easily proved from generalised mode preprocessing.
+In our theory, \cref{thm:annotatability} can be easily proved from generalised mode decoration.
 
 \begin{proof}[Proof of \cref{thm:annotatability}]
-By \cref{thm:generalised-mode-preprocessing}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
+By \cref{thm:generalised-mode-decoration}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
 Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are determined by the derivations and omitted here).
 \begin{itemize}
 \item $\SynRule{Var}$, $\SynRule{Anno}$, and $\Rule{Op}$:
@@ -238,5 +238,5 @@ This is the interesting case where we map a $\SynRule{Missing}$ rule to an $\Syn
 \end{proof}
 
 On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), our completeness is much simpler to use than annotatability, which requires the bidirectional type synthesiser to produce more complex evidence when the synthesis fails.
-Annotatability also does not help the user to deal with missing annotations like (generalised) mode preprocessing does: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
+Annotatability also does not help the user to deal with missing annotations like (generalised) mode decoration does: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
 Therefore we believe that the notion of annotatability is too complex for what it achieves, and our theory offers simpler and more useful alternatives.

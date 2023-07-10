@@ -140,12 +140,11 @@ This is called \emph{mode-correctness}, which we will formally define in \cref{s
 While it is possible for a bidirectional type synthesiser to do its job in one go, which can be thought of as adding both mode and typing information to a raw term and arriving at a bidirectional typing derivation, it is beneficial to have a preprocessing step which adds only mode information, based on which the synthesiser then continues to add typing information.
 More precisely, the preprocessing step attempts to produce \emph{mode derivations} as defined in \cref{fig:STLC-mode-derivations}, where the rules are exactly the mode part of the bidirectional typing rules~(\cref{fig:STLC-bidirectional-typing-derivations}).
 
-\begin{definition}
-\label{def:STLC-mode-preprocessor}
-A \emph{mode preprocessor} decides for any raw term~$V \vdash \isTerm{t}$ whether $V \vdash \isTerm{t}^{\syn}$.
+\begin{definition} \label{def:STLC-mode-decorator}
+A \emph{mode decorator} decides for any raw term~$V \vdash \isTerm{t}$ whether $V \vdash \isTerm{t}^{\syn}$.
 \end{definition}
 
-One (less important) benefit of mode preprocessing is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
+One (less important) benefit of mode decoration is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
 More importantly, whether there is a mode derivation for a term is actually very useful information to the user, because it corresponds to whether the term has enough type annotations:
 Observe that the $\SynRule{Anno}$ and $\ChkRule{Sub}$ rules allow us to switch between the synthesising and checking modes;
 the switch from synthesising to checking is free, whereas the opposite direction requires a type annotation.
@@ -164,11 +163,11 @@ A \emph{bidirectional type synthesiser} decides for any context~$\Gamma$ and syn
 Now we can get back to our goal of implementing a type synthesiser~(\cref{def:STLC-type-synthesiser}).
 
 \begin{theorem}\label{thm:implementation}
-A type synthesiser that uses `not in synthesising mode' as its excuse can be constructed from a mode preprocessor and a bidirectional type synthesiser.
+A type synthesiser that uses `not in synthesising mode' as its excuse can be constructed from a mode decorator and a bidirectional type synthesiser.
 \end{theorem}
 
 The construction is straightforward:
-Run the mode preprocessor on the input term~$\erase\Gamma \vdash t$.
+Run the mode decorator on the input term~$\erase\Gamma \vdash t$.
 If there is no synthesising mode derivation, report that $t$~is not in synthesising mode (the third outcome).
 Otherwise $\erase\Gamma \vdash t^{\syn}$, and we can run the bidirectional type synthesiser.
 If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}).
@@ -183,7 +182,7 @@ If there is no derivation of $\Gamma \vdash t \syn A$ for any type~$A$, report t
 If\/ $\erase\Gamma \vdash t^{\syn}$ and\/ $\Gamma \vdash t : A$, then $\Gamma \vdash t \syn A$.
 \end{lemma}
 
-We will construct a mode preprocessor~(\cref{sec:mode-preprocessing}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
+We will construct a mode decorator~(\cref{sec:mode-decoration}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
 To quantify over all such systems, we need their generic definitions, which we formulate next.
 
 %\begin{figure}
@@ -195,7 +194,7 @@ To quantify over all such systems, we need their generic definitions, which we f
 %    \boxed{\Gamma \vdash \isTerm{t} : A} & \boxed{\Gamma \vdash \isTerm{t} \syn A} \\
 %  };
 %  \path[->, line width=0.5pt]
-%      (m-1-1) edge node [above] {mode preprocessing} (m-1-2)
+%      (m-1-1) edge node [above] {mode decoration} (m-1-2)
 %      (m-1-2) edge node [right,align=center] {bidirectional\\type synthesis} (m-2-2)
 %      (m-2-1) edge[bend right=8] node [below] {completeness} (m-2-2)
 %      (m-2-2) edge[bend right=8] node [above] {soundness}    (m-2-1);

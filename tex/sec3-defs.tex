@@ -24,7 +24,7 @@ For simple types, the only datum needed for specifying a type construct is its n
       \small
       \judgbox{\Xi|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Xi$}
       \begin{mathpar}
-        \inferrule{\Xi \ni X_i}{\Xi |-_\Sigma X_i} \and
+        \inferrule{X_i \in \Xi}{\Xi |-_\Sigma X_i} \and
         \inferrule{\Xi |-_{\Sigma} A_1 \\ \cdots \\ \Xi |-_{\Sigma} A_n}{\Xi |-_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}\;\text{where $n = \arity(i)$}
       \end{mathpar}
       \caption{Simple types}
@@ -53,7 +53,8 @@ For simple types, the only datum needed for specifying a type construct is its n
     \item $\tyOp_{i}(A_1, \ldots, A_n)$ for some $i:I$ with $\arity(i) = n$ and types $A_1,\ldots, A_n$,
   \end{enumerate}
   as shown in \Cref{fig:simple-type}.
-  A \emph{context} $\Gamma \colon \Cxt_{\Sigma}(\Xi)$ over $\Xi$ is a list $\Gamma$ of types over $\Xi$. 
+  A \emph{context} $\Gamma \colon \Cxt_{\Sigma}(\Xi)$ over $\Xi$ is a list $\Gamma$ of types over $\Xi$.%
+\todo{Name-type pairs?}
 \end{definition}
 
 \begin{example} \label{ex:type-signature-for-function-type}
@@ -79,7 +80,7 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
 \begin{definition}\label{def:binding-arity}
   A \emph{binding arity} with a sort $T$ is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
   In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the sort of the $i$-th argument, respectively, and $A$ the target sort.
-  For brevity, a binding arity is denoted by $\bargs \to {A_0}$ and omit $[\Delta_i]$ if $\Delta_i$ is empty.
+  For brevity, a binding arity is denoted by $\bargs \to A$ where $[\Delta_i]$ is omitted if $\Delta_i$ is empty.
 \end{definition}
 
 For example, consider the $\Rule{Abs}$ rule (\Cref{fig:STLC-typing-derivations}).
@@ -87,13 +88,17 @@ Its binding arity has the sort $\Type_{\Sigma_{\bto}}\{A, B\}$ and is
 \[
   {[A]B} \to {(A \bto B)}.
 \]
-This means that the $\Rule{Abs}$ rule for derivations of\/ $\Gamma |- \lam{x}t : A \bto B$, contains:
+This means that the $\Rule{Abs}$ rule for derivations of\/ $\Gamma |- \lam{x}t : A \bto B$ contains:
 \begin{enumerate*}
   \item a derivation of\/ $\Gamma, x : A |- t : B$ as an argument of type $B$ in a \emph{context extended} by variable $x$ of type $A$;
   \item the type $A\bto B$ for itself.
 \end{enumerate*}
-In a similar vein, the arity of the $\Rule{App}$ rule is denoted as ${(A \bto B), A} \to {B}$, saying that any derivation of\/ $\Gamma \vdash t\;u : B$ accepts derivations $\Gamma \vdash t : A \bto B$ and $\Gamma \vdash u : A$ as its arguments.
-These arguments have types $A \bto B$ and $A$ respectively and their extension contexts are empty.
+In a similar vein, the arity of the $\Rule{App}$ rule is denoted as
+\[
+  {(A \bto B), A} \to {B}
+\]
+saying that any derivation of\/ $\Gamma \vdash t\;u : B$ accepts derivations $\Gamma \vdash t : A \bto B$ and $\Gamma \vdash u : A$ as its arguments.
+These arguments have types $A \bto B$ and $A$ respectively and empty extension contexts.
 
 Next, akin to a signature, a binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities.
 This also includes the set $\Xi$ of type variables that might be present in the binding arity, each operation is assigned the sort $\Type_{\Sigma}(\Xi)$:

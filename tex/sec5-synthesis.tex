@@ -36,11 +36,11 @@ We also need some auxiliary definitions for the subset of variables of a type an
   However, for our purposes, the choice among these definitions is not a matter of concern.}
   of \emph{(free) variables} of a type $A$ is denoted by $\fv(A)$.
   The subset $\fv(\Gamma)$ of variables in a context $\Gamma$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Gamma, A) = \fv(\Gamma) \cup \fv(A)$.
-  For an argument list $\biargvec$,\LT{Eww...} define the set of \emph{synthesis type variables} inductively as 
+  For an argument list $\biargs$,\LT{Eww...} define its set of \emph{synthesis type variables} inductively as 
   \begin{align}
     \label{eq:synvar1}\synvar(\cdot)                   & = \emptyset  \\
-    \label{eq:synvar2}\synvar(\biargvec, \chkbiarg[n]) & = \phantom{\fv(A_{n}) \cup {}} \synvar(\biargvec) \\
-    \label{eq:synvar3}\synvar(\biargvec, \synbiarg[n]) & = \fv(A_{n}) \cup           \synvar(\biargvec).
+    \label{eq:synvar2}\synvar(\biargs, \chkbiarg[n+1]) & = \phantom{\fv(A_{n+1}) \cup {}} \synvar(\biargs) \\
+    \label{eq:synvar3}\synvar(\biargs, \synbiarg[n+1]) & = \fv(A_{n+1}) \cup           \synvar(\biargs).
   \end{align}
 \end{definition}
 This subset contains type variables of a synthesis argument and they are exactly those type variables that would be synthesised during type synthesis.
@@ -97,13 +97,13 @@ However, given the mode-correctness---which incorporates an inductive definition
     \item $\SynRule{Var}$ follows from that each variable as a raw term refers to the same variable in its context.
     \item $\SynRule{Anno}$ holds trivially, since the synthesised type $A$ is from the term $t \annotate A$ in question.
     \item $\Rule{Op}$: Recall that a derivation of\/ $\Gamma |- \tmOpts \syn A$ contains a substitution $\rho$ from the local context $\Xi$ to concrete types.
-      To prove that any two typing derivations has the same synthesised type, it suffices to show that those substitutions $\rho_1$ and $\rho_2$ of $d_1$ and $d_2$, respectively, agree on variables in $\synvar\left(\biargs\right)$ so that $\simsub{A_0}{\rho_1} = \simsub{A_0}{\rho_2}$.
+      To prove that any two typing derivations has the same synthesised type, it suffices to show that those substitutions $\rho_1$ and $\rho_2$ of $d_1$ and $d_2$, respectively, agree on variables in $\synvar(\biargs)$ so that $\simsub{A_0}{\rho_1} = \simsub{A_0}{\rho_2}$.
       We prove it by induction on the argument list:
       \begin{enumerate}
         \item For the empty list, the statement is vacuously true by~\eqref{eq:synvar1}.
         \item If $\dir{d_{i+1}}$ is checking, then the statement holds for~\eqref{eq:synvar2} by induction hypothesis.
         \item If $\dir{d_{i+1}}$ is synthesis, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ by mode-correctness~\eqref{eq:MC2} and induction hypothesis (of the list).
-          Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar\left(\biargs\right)$, as required for the case \eqref{eq:synvar3} in the definition of $\synvar$.
+          Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar(\biargs)$, as required for the case \eqref{eq:synvar3} in the definition of $\synvar$.
       \end{enumerate}
   \end{itemize}
 \end{proof}
@@ -146,7 +146,7 @@ For the sake of clarity in presentation, though, we keep using named variables a
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
 \begin{definition}
-  By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain of $\sigma$ contains the domain $\rho$ and\/ $\sigma(x) = \rho(x)$ for every\/ $x$ in the domain of $\rho$.
+By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain $\dom(\sigma)$ of $\sigma$ contains the domain of $\rho$ and $\sigma(x) = \rho(x)$ for every\/ $x$ in $\dom(\rho)$.
   By a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
 \end{definition}
 \begin{lemma}\label{lem:unify}
@@ -165,7 +165,7 @@ We are now ready for the decidability proof.
   The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
   The first three cases follow essentially the same argument provided by \citet{Wadler2022}, but we still give the arguments here for the sake of completeness.
   The last case \Rule{Op} is new and has been discussed above.
-  (For brevity we omit the subscript $(\Sigma, \Omega)$.)
+  For brevity we omit the subscript $(\Sigma, \Omega)$.
   \begin{itemize}
     \item \SynRule{Var}: As $\erase{\Gamma} |- \isTerm{t}$, there exists a type $A$ such that $\Gamma |- \isTerm{x} \syn A$.
 
@@ -187,21 +187,23 @@ We are now ready for the decidability proof.
           \end{itemize}
       \end{itemize}
     \item \Rule{Op}:
-      Consider the mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$.
-      First we claim:
+      For a mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$, we first claim:
       \begin{claim}\label{lem:args-induction}
-        For an argument list $\as = \biargs$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
+        For an argument list $\biargs$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
         \begin{enumerate}
           \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
             \begin{equation} \label{eq:claim}
-              \text{$\ext{\rho}$ is defined on $\synvar(\as)$ and\/} \quad
+              \dom(\ext{\rho}) \supseteq \synvar(\biargs)
+              \quad\text{and}\quad
+%              \text{the domain of $\ext{\rho}$ contains $\synvar(\biargs)$ and\/} \quad
               \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |- \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
               \quad\text{for $i = 1, \ldots, n$};
             \end{equation}
           \item or there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
         \end{enumerate}
       \end{claim}
-      Then, we proceed with a case analysis on $\dir{d}$:
+
+      Then, we proceed with a case analysis on $\dir{d}$ in the mode derivation:
       \begin{itemize}
         \item $\dir{d}$ is $\syn$: We apply our claim with the partial substitution $\rho_0$ defined nowhere.
           \begin{enumerate}
@@ -263,12 +265,13 @@ We are now ready for the decidability proof.
                 \end{itemize}
             \end{enumerate}
         \end{enumerate}
+        Therefore, we have proved our claim for any argument list.
       \end{claimproof}
   \end{itemize}
   We now have completed the decidability proof.
 \end{proof}
 
-The formal counterpart of the above proof in \Agda essentially functions as two programs for type checking and synthesis.
+The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.
 These programs either compute the typing derivation or provide a proof of contradiction.
 Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification process.
 If a contradiction proof is not of interest for implementation, these programs can be simplified by disregarding the cases that yield such contradiction proofs.

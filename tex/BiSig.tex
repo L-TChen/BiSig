@@ -22,9 +22,10 @@
 \usepackage{bm}
 \usepackage{mathtools}
 \input{mathlig}
-\usepackage{tikz}
-\usetikzlibrary{matrix,arrows}
+%\usepackage{tikz}
+%\usetikzlibrary{matrix,arrows}
 \usepackage{mathpartir}
+
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
 
@@ -54,9 +55,9 @@
 \newtheorem*{claim}{Claim}
 \theoremstyle{acmdefinition}
 %\newtheorem*{claimproof}{Proof of Claim}
-\newenvironment{claimproof}[1][\proofname]{\par
+\newenvironment{claimproof}{\par
   \renewcommand{\qedsymbol}{\footnotesize$\blacksquare$}%
-    \begin{proof}[#1]%
+  \begin{proof}[{Proof of Claim}]%
 }{%
   \end{proof}%
 }

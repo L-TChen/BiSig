@@ -107,14 +107,15 @@ That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variable
 By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature $\Sigma$ and a binding signature $\Omega$.
 
 The inclusion of a variable set $\Xi$ for each operation, called its \emph{local context}, plays a crucial role in type synthesis.
-For a typing rule like $\ChkRule{Abs}$, we will need to substitute concrete types (i.e.\ types without any type variables) for variables $A, B$, but firstly, we must identify for which type variables to substitute.
+For a typing rule like $\ChkRule{Abs}$, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
+But, we must first identify for which type variables to substitute.
 As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include an instantiation to assign concrete types to variables.
 
 \begin{definition}
 \begin{figure}
   \centering
   \small
-  \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}}{Given a list~$V$ of variables, $\isTerm{t}$ is a raw term for the signature $(\Sigma, \Omega)$ with free variables in~$V$}
+  \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}}{$\isTerm{t}$ is a raw term for a simply typed language $(\Sigma, \Omega)$ with free variables in~$V$}
   \begin{mathpar}
     \inferrule{\isTerm{x} \in V}{V |-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
@@ -143,7 +144,7 @@ Here we choose to include a substitution $\rho$ from the local context $\Xi$ to 
   \begin{figure}
     \centering
     \small
-    \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{A raw term $\isTerm{t}$ has a type $A$ without type variables under $\Gamma$ for the signature $(\Sigma, \Omega)$}
+    \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{A raw term $\isTerm{t}$ has a concrete type $A$ under $\Gamma$ for a simply typed language $(\Sigma, \Omega)$}
     \begin{mathpar}
       \inferrule{(\isTerm{x} : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
       \and
@@ -206,7 +207,7 @@ Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typ
   \begin{figure}
     \centering
     \small
-    \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{A raw term $\isTerm{t}$ is of type $A$ without type variables in mode $\dir{d}$ under $\Gamma$}
+    \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{$\isTerm{t}$ has a concrete type $A$ in mode $\dir{d}$ under $\Gamma$ for a bidirectional type system $(\Sigma, \Omega)$} 
     \begin{mathpar}
       \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
       \and
@@ -226,7 +227,7 @@ Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typ
   \begin{figure}
     \centering
     \small
-    \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{A raw term $\isTerm{t}$ is in mode $d$ with free variables in $V$}
+    \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$\isTerm{t}$ is in mode $d$ with free variables in $V$ for a bidirectional type system $(\Sigma, \Omega)$}
     \begin{mathpar}
       \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
       \and

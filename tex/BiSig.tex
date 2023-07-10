@@ -53,7 +53,13 @@
 \AtEndPreamble{%
 \newtheorem*{claim}{Claim}
 \theoremstyle{acmdefinition}
-\newtheorem*{claimproof}{Proof of Claim}
+%\newtheorem*{claimproof}{Proof of Claim}
+\newenvironment{claimproof}[1][\proofname]{\par
+  \renewcommand{\qedsymbol}{\footnotesize$\blacksquare$}%
+    \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
 \newtheorem{remark}[theorem]{Remark}
 }
 

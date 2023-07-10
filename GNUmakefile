@@ -18,6 +18,9 @@ listings: Everything.agda
 # # not found any problem running both commands with different versions
 # # of cabal-install. See Issue #1001.
 # 	cabal run GenerateEverything
+#
+paper: tex/*.tex tex/agda.fmg tex/*.lhs
+	$(MAKE) -C tex paper
 
 clean :
 	rm -rf _build

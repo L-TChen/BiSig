@@ -52,7 +52,7 @@ Such an algorithm is then accompanied with \emph{soundness} and \emph{completene
 By contrast, \citeauthor{Wadler2022} exploit the simultaneously computational and logical nature of Martin-L\"of type theory to formulate algorithmic soundness, completeness, and decidability in one go.
 %(although they do not emphasise the difference of their approach from the traditional one)
 Recall that the law of excluded middle $P + \neg P$ does not hold universally as an axiom in type theory---it means that whether $P$~holds is \emph{decidable}, and is non-trivial to prove.
-For example, a proof of \emph{decidable equality}, i.e. $\forall x, y.~(x = y) + (x \neq y)$, is a way to compare arbitrary $x$~and~$y$ and decide whether they are equal, which may or may not be possible depending on the domain of $x$~and~$y$.
+For example, a proof of \emph{decidable equality}, i.e. $\forall x, y.~(x = y) + (x \neq y)$, decides whether they are equal and gives an identity proof explicitly if they are, which may or may not be possible depending on the domain of $x$~and~$y$.
 Given that all proofs as programs terminate, logical decidability implies \emph{algorithmic decidability}.
 Further, suppose a proof of the following statement:
 \begin{quote}
@@ -62,9 +62,9 @@ or rephrased succinctly as
 \begin{quote}
   `It is \underline{\emph{decidable}} for any $\Gamma$~and~$t$ whether $\Gamma |- t : A$ has a derivation for some~$A$'.
 \end{quote}
+It yields either a typing derivation for the given raw term~$t$ or a contradiction proof that such a derivation is impossible where the former case is algorithmic soundness and the latter algorithmic completeness in contrapositive form.
+Then, both algorithmic soundness and completeness in original form are implied.
 %echoing \citeauthor{Wadler2022}'s formulation as noted in \cref{re:type-synthesis-as-decidability-proof}.
-Then, both algorithmic soundness and completeness are implied.
-%the proof either yields a typing derivation for the given raw term~$t$, or a proof that such a derivation is impossible; the former case is algorithmic soundness, and the latter is algorithmic completeness in contrapositive form.
 %\todo{traditional completeness is still derivable from this `LEM'}
 Our work takes the same approach but expands the scope significantly.
 %That is, our decidable bidirectional type synthesis (\cref{thm:bidirectional-type-synthesis-checking}) provides algorithmic soundness, completeness, and decidability.

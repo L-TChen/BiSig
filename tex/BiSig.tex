@@ -31,6 +31,8 @@
 
 % Used for typesetting Agda code
 \usepackage{agda-lhs2tex}
+\newcommand{\cons}[1]{\mathbf{#1}}
+\newcommand{\iden}{\mathit}
 
 \usepackage{xifthen}
 \newcommand{\varcitet}[3][]{\citeauthor{#2}#3~[\ifthenelse{\isempty{#1}}{\citeyear{#2}}{\citeyear[#1]{#2}}]}
@@ -63,8 +65,6 @@
 }
 \newtheorem{remark}[theorem]{Remark}
 }
-
-\begin{document}
 
 \author{Liang-Ting Chen}
 \email{liang.ting.chen.tw@gmail.com}
@@ -103,6 +103,8 @@ The entire theory is formulated constructively, and has been formalised in the \
 %The main theorem is logically a trichotomy on untyped abstract syntax trees and computationally a type synthesiser that may throw an exception due to missing type annotations.
 %By being parametrised by a signature, our theory works overall as a verified type-synthesiser generator.
 \end{abstract}
+\begin{document}
+
 
 \begin{CCSXML}
 <ccs2012>

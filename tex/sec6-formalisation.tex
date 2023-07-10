@@ -2,6 +2,7 @@
 
 \documentclass[BiSig.tex]{subfiles}
 
+
 %% ODER: format ==         = "\mathrel{==}"
 %% ODER: format /=         = "\neq "
 %
@@ -287,6 +288,7 @@
 
 \DeclareUnicodeCharacter{1D43}{\ensuremath{^a}}
 \DeclareUnicodeCharacter{1D9C}{\ensuremath{^c}}
+\DeclareUnicodeCharacter{02B3}{\ensuremath{^r}}
 \DeclareUnicodeCharacter{02E2}{\ensuremath{^s}}
 
 \DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
@@ -300,8 +302,11 @@
 \DeclareUnicodeCharacter{2236}{:}
 \DeclareUnicodeCharacter{2261}{\ensuremath{\equiv}}
 \DeclareUnicodeCharacter{2237}{\ensuremath{\mathrel{::}}}
+\DeclareUnicodeCharacter{2982}{\ensuremath{\bbcolon}}
+
 \DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
 \DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{0398}{\ensuremath{\Theta}}
 \DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
 \DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
 \DeclareUnicodeCharacter{039E}{\ensuremath{\Xi}}
@@ -312,11 +317,12 @@
 \DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
 \DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
 
-\DeclareUnicodeCharacter{2032}{\ensuremath{\prime}}
+\DeclareUnicodeCharacter{2032}{\ensuremath{{}^\prime}}
 \DeclareUnicodeCharacter{2113}{\ensuremath{\ell}}
 \DeclareUnicodeCharacter{2207}{\ensuremath{\nabla}}
 \DeclareUnicodeCharacter{220B}{\ensuremath{\ni}}
 \DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{21D0}{\ensuremath{\Leftarrow}}
 \DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
 \DeclareUnicodeCharacter{22A2}{\ensuremath{\vdash}}
 \DeclareUnicodeCharacter{22A4}{\ensuremath{\top}}
@@ -342,20 +348,98 @@
 
 
 
+
 \begin{document}
 
-\section{Formalisation} \label{sec:formalisation}
-\begin{enumerate}
-  \item (Bidirectional) binding signature, functor, and terms (extrinsic typing, raw terms, raw terms in some mode) --- 2.5 pp
-  \item Compare the induction principle and the \Agda proof of Soundness --- 2 pp
-  \item type synthesis and checking -- 0.5 p
-  \item Examples including STLC (PCF), application in spine form --- 1p
+\section{Formalisation and Examples} \label{sec:formalisation}
+%\begin{enumerate}
+%  \item (Bidirectional) binding signature, functor, and terms (extrinsic typing, raw terms, raw terms in some mode) --- 2.5 pp
+%  \item Compare the induction principle and the \Agda proof of Soundness --- 2 pp
+%  \item type synthesis and checking -- 0.5 p
+%  \item Examples including STLC (PCF), application in spine form --- 1p
+%
+%\end{enumerate}
+Our theory, initially developed in \Agda, has been later translated into the mathematical vernacular.
+While the translation is reasonably straightforward, understanding the design of the formalisation itself could pose some difficulty.
+Indeed, as discussed in \Cref{sec:language-formalisation}, designing a language formalisation framework is still a challenging task and our formalisation is no exception.
+Unlike prior frameworks that have primarily focused on meta-properties centred around substitution and term traversal for intrinsically-typed terms, our theory of bidirectional type synthesis does not require term substitution but structural induction for extrinsically-typed terms.
+The formal definitions of extrinsic typing in bidirectional type systems, including bidirectional typing derivations and mode derivations, are more complex than their intrinsic counterparts.
+For a specific language such as PCF, it is noted by \citet{Wadler2022} already that `extrinsically-typed terms require about 1.6 times as much code as intrinsically-typed' for their formalisation of type safety.
+As for our generic definitions, the formal type-theoretic definition for extrinsic typing derivations $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ (\Cref{fig:extrinsic-typing}), for example, is a generic families of sets, also known as a \emph{proof-relevant predicate}, indexed by a generic raw \emph{term} $t$ in additional to a type $A$ and a context $\Gamma$ rather than just one family of sets of intrinsically-typed terms indexed by $A$ and $\Gamma$.
 
-\end{enumerate}
+A categorical analysis of extrinsic typing requires not only \varcitet{Fiore1999}{'s} theory of abstract syntax with variable binding which backs \citet{Fiore2022}'s framework but also \varcitet{Hermida1998}{'s} interpretation of inductive proofs as algebras on the category of predicates.
+Thus, a faithful understanding of our formal constructions requires certain proficiency in category theory, which falls outside the scope of this paper.
 
-\begin{figure}
+As such, in this section, we will merely provide an overview of our design and draw an analogy between the construction of simple types in \Cref{subsec:formal-simple-types} and bidirectional typing rules in \Cref{subsec:formal-extrinsic-typing} in plain terms, avoiding category theory deliberately.
+On the other hand, the formal proofs in our theory closely mirror the informal versions presented so far, thus we will only illustrate the soundness part of \Cref{lem:soundness-completeness} as an example in \Cref{subsec:formal-proofs}. 
+We conclude the technical content of this paper with some mode-correct simply typed languages in \Cref{subsec:formal-examples}.
+
+\subsection{Defining Simple Types}\label{subsec:formal-simple-types}
+
+% simple types
+\begin{figure}[h]
   \small
-  \begin{minipage}[t]{.3\linewidth}
+  \begin{minipage}[t]{.45\textwidth}
+    \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{Desc}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Conid{Op}\;{}\<[16]%
+\>[16]{}\mathbin{:}\;{}\<[19]%
+\>[19]{}\Conid{Set}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\{\kern-.9pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-1.5pt\;\Varid{decEq}\;\kern-1.5pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-.9pt\}\;{}\<[16]%
+\>[16]{}\mathbin{:}\;{}\<[19]%
+\>[19]{}\Conid{DecEq}\;\Conid{Op}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{rules}\;{}\<[16]%
+\>[16]{}\mathbin{:}\;{}\<[19]%
+\>[19]{}\Conid{Op}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;\Conid{Desc}\;\Varid{→}\;\Conid{Set}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\mathrel{=}\;\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Conid{X}\;\hat{}\;(\Conid{D}\;\Varid{.rules}\;\Varid{i}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Keyword{data}\;\Conid{Tm}\;(\Conid{Θ}\;\mathbin{:}\;\Conid{ℕ})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\text{\textasciigrave}\anonymous \;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{Fin}\;\Conid{Θ}\;{}\<[24]%
+\>[24]{}\Varid{→}\;\Conid{Tm}\;\Conid{Θ}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{op}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;(\Conid{Tm}\;\Conid{Θ})\;{}\<[24]%
+\>[24]{}\Varid{→}\;\Conid{Tm}\;\Conid{Θ}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+\end{figure}
+\subsection{Defining Raw Terms and Extrinsic Typing Derivations}\label{subsec:formal-extrinsic-typing}
+
+\begin{figure}[H]
+  \small
+  \begin{minipage}[t]{.3\textwidth}
   \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -384,15 +468,17 @@
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
-  \begin{minipage}[t]{.32\linewidth}
+  \begin{minipage}[t]{.33\textwidth}
   \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{14}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{22}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{record}\;\Conid{ConD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{constructor}\;\Varid{ι}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{field}{}\<[E]%
@@ -403,12 +489,11 @@
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{args}\;{}\<[14]%
-\>[14]{}\mathbin{:}\;\Conid{List}\;(\Conid{ArgsD}\;\Varid{vars}){}\<[E]%
+\>[14]{}\mathbin{:}\;\Conid{List}\;(\Conid{ArgD}\;\Varid{vars}){}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{type}\;{}\<[14]%
-\>[14]{}\mathbin{:}\;\Conid{TExp}\;{}\<[22]%
-\>[22]{}\Varid{vars}{}\<[E]%
+\>[14]{}\mathbin{:}\;\Conid{TExp}\;\Varid{vars}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{mode}\;{}\<[14]%
@@ -416,7 +501,7 @@
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
-  \begin{minipage}[t]{.3\linewidth}
+  \begin{minipage}[t]{.3\textwidth}
    \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -438,11 +523,224 @@
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
-  
-  \caption{Definition of bidirectional binding signature}  
 \end{figure}
 
-{\small\begin{hscode}\SaveRestoreHook
+% functors for raw terms
+\begin{figure}[H]
+  \small
+  \begin{minipage}[t]{.57\textwidth}
+%Fam : (ℓ : Level) → Set (lsuc ℓ)
+%Fam ℓ = ℕ → Set ℓ
+%
+%Fam₀ : Set₁
+%Fam₀ = Fam 0ℓ
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{22}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ}\;{}\<[19]%
+\>[19]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{Δ}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃ}\;{}\<[22]%
+\>[22]{}\Conid{X}\;\Varid{n}\;{}\<[27]%
+\>[27]{}\mathrel{=}\;\Conid{X}\;(\Varid{length}\;\Conid{Δ}\;\Varid{ʳ+}\;\Varid{n}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ}\;{}\<[19]%
+\>[19]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃˢ}\;{}\<[22]%
+\>[22]{}\anonymous \;\anonymous \;{}\<[27]%
+\>[27]{}\mathrel{=}\;\Varid{⊤}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;(\Conid{Δ}\;\Varid{⊢}\;\Conid{A})\;\Varid{∷}\;\Conid{Ds}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃˢ}\;{}\<[22]%
+\>[22]{}\Conid{X}\;\Varid{n}\;{}\<[27]%
+\>[27]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Varid{n}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Varid{n}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{ConD}\;{}\<[19]%
+\>[19]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{ι}\;\anonymous \;\Conid{D}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᶜ}\;{}\<[22]%
+\>[22]{}\Conid{X}\;{}\<[27]%
+\>[27]{}\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{Desc}\;{}\<[19]%
+\>[19]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{D}\;{}\<[17]%
+\>[17]{}\Varid{⟧}\;{}\<[22]%
+\>[22]{}\Conid{X}\;\Varid{n}\;{}\<[27]%
+\>[27]{}\mathrel{=}\;\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+  \begin{minipage}[t]{.4\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{32}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infix}\;\Varid{5}\;\Varid{\char95 ∋\char95 }{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Keyword{data}\;\Conid{Raw}\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\text{\textasciigrave}\anonymous \;{}\<[7]%
+\>[7]{}\mathbin{:}\;\Conid{Fin}\;\Varid{n}\;{}\<[32]%
+\>[32]{}\Varid{→}\;\Conid{Raw}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 ∋\char95 }\;\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;(\Varid{t}\;\mathbin{:}\;\Conid{Raw}\;\Varid{n})\;{}\<[32]%
+\>[32]{}\Varid{→}\;\Conid{Raw}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{op}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{n}\;{}\<[32]%
+\>[32]{}\Varid{→}\;\Conid{Raw}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \small
+%Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
+%Fam ℓ′ X = (Γ : Cxt 0) → X (length Γ) → Ty → Set ℓ′
+%
+%Fam₀ : (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc 0ℓ)
+%Fam₀ X = Fam 0ℓ X
+%
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{39}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0}){}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set})\;{}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;{}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;{}\<[39]%
+\>[39]{}\mathrel{=}\;\Conid{Y}\;\Conid{Γ}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{A}\;\Varid{∷}\;\Conid{Δ}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;{}\<[39]%
+\>[39]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;((\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩})\;\Varid{∷}\;\Conid{Γ})\;\Varid{x}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;{}\<[E]%
+\\
+\>[B]{}\hsindent{7}{}\<[7]%
+\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃˢ}\;\anonymous \;\anonymous \;\anonymous \;\anonymous \;\anonymous \;{}\<[39]%
+\>[39]{}\mathrel{=}\;\Varid{⊤}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;(\Conid{Δ}\;\Varid{⊢}\;\Conid{A})\;\Varid{∷}\;\Conid{Ds}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;(\Varid{x}\;\Varid{,}\;\Varid{xs})\;{}\<[39]%
+\>[39]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{→}\;\Conid{Y}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;(\Conid{R.⟦}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Conid{B}\;\Conid{D}\;{}\<[17]%
+\>[17]{}\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Conid{A}\;{}\<[39]%
+\>[39]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{Σ[}\;\Varid{σ}\;\Varid{∈}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\mskip1.5mu]\;\Conid{B}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}\;\Varid{×}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{Desc})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{D}\;{}\<[17]%
+\>[17]{}\Varid{⟧}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;(\Varid{i}\;\Varid{,}\;\Varid{xs})\;\Conid{A}\;{}\<[39]%
+\>[39]{}\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{figure}
+\begin{figure}[H]
+  \small
+\begin{minipage}[t]{.47\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;\mathbin{:}\;\Conid{Fam₀}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{var}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\{\mskip1.5mu \Varid{j}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Conid{Γ})\mskip1.5mu\}\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[8]{}\hsindent{2}{}\<[10]%
+\>[10]{}\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⦂}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+\begin{minipage}[t]{.47\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[3]{}\Varid{\char95 ∋\char95 }\;{}\<[8]%
+\>[8]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A}\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[8]{}\hsindent{2}{}\<[10]%
+\>[10]{}\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;\Varid{⦂}\;\Conid{A}{}\<[E]%
+\\
+\>[3]{}\Varid{op}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Conid{A}\;{}\<[E]%
+\\
+\>[8]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[8]{}\hsindent{2}{}\<[10]%
+\>[10]{}\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;\Varid{⦂}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \small
+% bidirectionally typed terms
+%Fam : (ℓ′ : Level) (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
+%Fam ℓ′ X = (Γ : Cxt 0) → X (length Γ) → Mode → Ty → Set ℓ′
+%
+\begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -456,14 +754,10 @@
 \column{36}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{46}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Conid{Fam}\;\mathbin{:}\;(\Varid{ℓ′}\;\mathbin{:}\;\Conid{Level})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;\Varid{→}\;\Conid{Set}\;(\Varid{ℓ}\;\Varid{⊔}\;\Varid{lsuc}\;\Varid{ℓ′}){}\<[E]%
-\\
-\>[B]{}\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X}\;\mathrel{=}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Mode}\;\Varid{→}\;\Conid{Ty}\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[7]%
-\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′})\;{}\<[E]%
+\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set})\;{}\<[E]%
 \\
-\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
+\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[10]%
 \>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
@@ -474,9 +768,9 @@
 \>[24]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;((\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩})\;\Varid{∷}\;\Conid{Γ})\;\Varid{t}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;{}\<[8]%
-\>[8]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;{}\<[E]%
+\>[8]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;{}\<[E]%
 \\
-\>[8]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Varid{eraseᵃˢ}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}\;\Varid{ℓ′}{}\<[E]%
+\>[8]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Varid{eraseᵃˢ}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[20]%
 \>[20]{}\Varid{⟧ᵃˢ}\;\anonymous \;{}\<[27]%
@@ -495,21 +789,231 @@
 \>[46]{}\mathrel{=}\;{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\Conid{Γ'}\;\Varid{x'}\;\Varid{→}\;\Conid{Y}\;\Conid{Γ'}\;\Varid{x'}\;\Varid{d}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{→}\;\Conid{Y}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{d}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\Varid{ℓ′}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
+\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{B}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}\;\mathrel{=}\;{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{d}\;\Varid{≡}\;\Varid{d′}\;\Varid{×}\;\Conid{Σ[}\;\Varid{σ}\;\Varid{∈}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\mskip1.5mu]\;\Conid{B}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}\;\Varid{×}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{Desc})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Varid{ℓ′}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\Varid{ℓ′}\;(\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
+\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{Desc})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;(\Varid{i}\;\Varid{,}\;\Varid{xs})\;\Varid{d}\;\Conid{A}\;\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d}\;\Conid{A}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-}
+\end{figure}
+
+\begin{figure}[H]
+  \small 
+\begin{minipage}[t]{.48\textwidth}
+%
+%  _⊢_⇐_ _⊢_⇒_
+%    : (Γ : Cxt 0) → Raw (length Γ) → Ty → Set
+%  Γ ⊢ r ⇐ A  = Γ ⊢ r [ Chk ] A
+%  Γ ⊢ r ⇒ A  = Γ ⊢ r [ Syn ] A
+%
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{mutual}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\mathbin{:}\;\Conid{Fam₀}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{var}\;\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[9]{}\hsindent{2}{}\<[11]%
+\>[11]{}\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}{}\<[E]%
+\\[\blanklineskip]%
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{\char95 ∋\char95 }\;\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇐}\;\Conid{A}\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;\Varid{⇒}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{minipage}
+\begin{minipage}[t]{.48\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[5]{}\Varid{\char95 ↑\char95 }\;\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇒}\;\Conid{B}\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\Conid{A}\;\Varid{≡}\;\Conid{B}\;{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[9]{}\hsindent{2}{}\<[11]%
+\>[11]{}\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇐}\;\Conid{A}{}\<[E]%
+\\[\blanklineskip]%
+\>[5]{}\Varid{op}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
+\\
+\>[9]{}\Varid{→}\;\mbox{\onelinecomment }{}\<[E]%
+\\
+\>[9]{}\hsindent{2}{}\<[11]%
+\>[11]{}\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+  
+\end{minipage}
+\end{figure}
+\subsection{Formal Proofs: Soundness as an Example}\label{subsec:formal-proofs}
+
+\begin{figure}[H]
+  \small
+% soundness proof
+\begin{minipage}{.48\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{46}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{mutual}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundness}\;\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;{}\<[30]%
+\>[30]{}\Varid{→}\;{}\<[33]%
+\>[33]{}\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundness}\;(\Varid{var}\;\Varid{i}\;\Varid{eq})\;{}\<[26]%
+\>[26]{}\mathrel{=}\;\Varid{var}\;\Varid{i}\;\Varid{eq}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundness}\;(\Conid{A}\;\Varid{∋}\;\Varid{t})\;{}\<[26]%
+\>[26]{}\mathrel{=}\;\Conid{A}\;\Varid{∋}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundness}\;(\Varid{t}\;\Varid{↑}\;\Varid{refl})\;{}\<[26]%
+\>[26]{}\mathrel{=}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundness}\;(\Varid{op}\;\Varid{ts})\;{}\<[26]%
+\>[26]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{op}\;(\Varid{soundnessᶜ}\;(\Conid{BD}\;\Varid{.rules}\;\anonymous )\;\Varid{ts}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundnessᶜ}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Conid{A}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{soundnessᶜ}\;(\Varid{ι}\;\anonymous \;\anonymous \;\Conid{Ds})\;(\anonymous \;\Varid{,}\;\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{ts})\;{}\<[46]%
+\>[46]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;\Conid{Ds}\;\Varid{ts}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{40}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{41}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{45}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{50}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[3]{}\Varid{soundnessᵃˢ}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbin{:}\;(\Conid{Ds}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[27]%
+\>[27]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;{}\<[40]%
+\>[40]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Varid{eraseᵃˢ}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[27]%
+\>[27]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;{}\<[40]%
+\>[40]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}{}\<[E]%
+\\
+\>[3]{}\Varid{soundnessᵃˢ}\;\Varid{[]}\;{}\<[35]%
+\>[35]{}\anonymous \;{}\<[45]%
+\>[45]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{tt}{}\<[E]%
+\\
+\>[3]{}\Varid{soundnessᵃˢ}\;((\Conid{Δ}\;\Varid{⊢[}\;\anonymous \;\mskip1.5mu]\;\anonymous )\;\Varid{∷}\;\Conid{Ds})\;(\Varid{t}\;\Varid{,}\;\Varid{ts})\;{}\<[45]%
+\>[45]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;\Conid{Ds}\;\Varid{ts}{}\<[E]%
+\\[\blanklineskip]%
+\>[3]{}\Varid{soundnessᵃ}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[17]%
+\>[17]{}\Conid{Raw}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{r}^\prime}\;\Varid{→}\;\iden{\Conid{Γ}^\prime}\;\Varid{⊢}\;\iden{\Varid{r}^\prime}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A})\;{}\<[50]%
+\>[50]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[17]%
+\>[17]{}\Conid{Raw}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{r}^\prime}\;\Varid{→}\;\iden{\Conid{Γ}^\prime}\;\Varid{⊢}\;\iden{\Varid{r}^\prime}\;\Varid{⦂}\;\Conid{A})\;{}\<[50]%
+\>[50]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}{}\<[E]%
+\\
+\>[3]{}\Varid{soundnessᵃ}\;\Varid{[]}\;{}\<[23]%
+\>[23]{}\Varid{t}\;{}\<[26]%
+\>[26]{}\mathrel{=}\;\Varid{soundness}\;{}\<[41]%
+\>[41]{}\Varid{t}{}\<[E]%
+\\
+\>[3]{}\Varid{soundnessᵃ}\;(\anonymous \;\Varid{∷}\;\Conid{Δ})\;{}\<[23]%
+\>[23]{}\Varid{t}\;{}\<[26]%
+\>[26]{}\mathrel{=}\;\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{minipage}
+
+\end{figure}
+
+\subsection{Examples in \Agda} \label{subsec:formal-examples}
 
 
 \end{document}

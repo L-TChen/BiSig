@@ -36,7 +36,7 @@ We also need some auxiliary definitions for the subset of variables of a type an
   However, for our purposes, the choice among these definitions is not a matter of concern.}
   of \emph{(free) variables} of a type $A$ is denoted by $\fv(A)$.
   The subset $\fv(\Gamma)$ of variables in a context $\Gamma$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Gamma, A) = \fv(\Gamma) \cup \fv(A)$.
-  For an argument list $\biargs$,\LT{Eww...} define its set of \emph{synthesis type variables} inductively as 
+  For an argument list $\biargs$, define its set of \emph{synthesis type variables} inductively as 
   \begin{align}
     \label{eq:synvar1}\synvar(\cdot)                   & = \emptyset  \\
     \label{eq:synvar2}\synvar(\biargs, \chkbiarg[n+1]) & = \phantom{\fv(A_{n+1}) \cup {}} \synvar(\biargs) \\

@@ -265,10 +265,10 @@ We are now ready for the decidability proof.
                 \end{itemize}
             \end{enumerate}
         \end{enumerate}
-        Therefore, we have proved our claim for any argument list.
+        Therefore, we have proved our claim for any argument list by induction.
       \end{claimproof}
   \end{itemize}
-  We now have completed the decidability proof.
+  We now have completed the decidability proof by induction on the mode derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$.
 \end{proof}
 
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.

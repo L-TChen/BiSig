@@ -9,7 +9,7 @@ In light of these limitations, bidirectional type synthesis emerged as a viable 
 \citet{Dunfield2021} summarised the design principles of bidirectional type synthesis and its wide coverage of languages with simple types, polymorphic types, dependent types, gradual types, among others.
 
 The basic idea of bidirectional type synthesis is that while the problem of type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types (for example, the type of a variable can be looked up in the context); for other kinds of terms, we can switch to the simpler problem of type checking, where the expected type of a raw term is also given so that there is more information to work with.
-More formally, every judgement in a bidirectional type system is assigned one of two \emph{modes}:
+More formally, every judgement in a bidirectional type system is extended with a \emph{mode}:
 \begin{enumerate*}
   \item $\Gamma |- \isTerm{t} \syn A$ for \emph{synthesis} and 
   \item $\Gamma |- \isTerm{t} \chk A$ for \emph{checking}.
@@ -18,7 +18,8 @@ The former indicates that the type~$A$ is computed as output, using both the con
 The algorithm of a bidirectional type synthesiser can usually be `read off' from a well designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
 %if a condition called \emph{mode-correctness} is satisfied.
 %every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking.
-As \citet{Pierce2000} noted, bidirectional type synthesis propagates type information locally within adjacent nodes of a raw term, and does not require unification as Damas--Milner type inference does---in fact, introducing long-distance unification constraints would undermine the essence of locality in bidirectional type synthesis.
+As \citet{Pierce2000} noted, bidirectional type synthesis propagates type information locally within adjacent nodes of a raw term, and does not require unification as Damas--Milner type inference does.
+Moreover, introducing long-distance unification constraints would even undermine the essence of locality in bidirectional type synthesis.
 
 %Also, annotations for, say, top-level definitions make the purpose of a program easier to understand, so they are sometimes beneficial and not necessarily a nuisance.
 %In light of these considerations, bidirectional type synthesis can be deemed as a type-checking technique that is more fundamental than unification, as it is capable of handling a broad spectrum of programming languages.%
@@ -115,11 +116,12 @@ In summary, we contribute a theory of bidirectional type synthesis that is
 \end{enumerate}
 Our theory was first developed with \Agda and then translated to the mathematical vernacular.
 
-This paper is structured in logical order as follows.
+This paper is structured as follows.
 We first present a concrete overview of our theory using simply typed $\lambda$-calculus in \cref{sec:key-ideas}, prior to developing a general framework for specifying bidirectional type systems in \cref{sec:defs}.
 Following this, we discuss mode decoration and related properties in \cref{sec:pre-synthesis}.
 The most heavyweight technical contribution lies in \cref{sec:type-synthesis}, where we introduce mode-correctness and bidirectional type synthesis.
-In \cref{sec:formalisation}, we sketch the formalisation of our theory in \Agda and give some examples other than simply typed $\lambda$-calculus.
+Some examples other than simply typed $\lambda$-calculus are given in \Cref{sec:example}.
+We sketch the design of the \Agda formalisation of our theory in \cref{sec:formalisation} briefly.
 We conclude in \cref{sec:future}, where we reflect on related techniques that can be used to improve the formal development and potential challenges in extending our theory to a more general setting.
 
 %\todo[inline,caption={}]{\begin{enumerate}

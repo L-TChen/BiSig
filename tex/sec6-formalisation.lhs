@@ -305,7 +305,4 @@ mutual
 
 \end{figure}
 
-\subsection{Examples in \Agda} \label{subsec:formal-examples}
-
-
 \end{document}

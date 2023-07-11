@@ -12,10 +12,8 @@ The first serves as a standard exercise in implementing a type synthesiser and t
 \subsection{PCF with Products and Let Bindings}\label{subsec:PCF}
 Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This also applies to parsing: while there are grammar and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
 While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022} which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding following rules:
-
 \bgroup
 \small
-  \centering
   \begin{mathpar}
     \inferrule{ }{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}
     \and
@@ -63,10 +61,8 @@ This example might initially appear impossible, since the number of arguments a 
 However, we do not have any restriction on the number of symbols that may be inhabited in a signature, enabling us to have a corresponding type construct and term construct for each number $n$ of arguments.
 This underscores the importance and necessity of having an arbitrary set (with decidable equality) as a set of operation symbols.
 To be precise, consider the following rule
-
 \bgroup
 \small
-  \centering
   \begin{mathpar}
     \inferrule{\Gamma \vdash t \syn \textstyle{\prod_{i = 1}^{n}} A_i \bto B \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
   \end{mathpar}

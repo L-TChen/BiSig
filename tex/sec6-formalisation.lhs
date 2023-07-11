@@ -20,7 +20,7 @@
 
 \begin{document}
 
-\section{Formalisation and Examples} \label{sec:formalisation}
+\section{Formalisation} \label{sec:formalisation}
 %\begin{enumerate}
 %  \item (Bidirectional) binding signature, functor, and terms (extrinsic typing, raw terms, raw terms in some mode) --- 2.5 pp
 %  \item Compare the induction principle and the \Agda proof of Soundness --- 2 pp

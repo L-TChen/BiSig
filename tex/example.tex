@@ -1,0 +1,78 @@
+%!TEX root = BiSig.tex
+
+\section{Examples}\label{sec:example}
+Since our theory is not confined to a specific simply-typed language, we can employ it with any language that can be specified by a bidirectional binding signature.
+To showcase its general applicability, we present two additional examples:
+\begin{enumerate}
+\item \PCF with products and let bindings
+\item spine calculus: a simply-typed $\lambda$-calculus with applications in spine form.
+\end{enumerate}
+The first serves as a standard exercise in implementing a type synthesiser and the second for an example of a system with infinitely many operations.
+
+\subsection{PCF with Products and Let Bindings}\label{subsec:PCF}
+Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This also applies to parsing: while there are grammar and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
+While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022} which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding following rules:
+
+\bgroup
+\small
+  \centering
+  \begin{mathpar}
+    \inferrule{ }{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}
+    \and
+    \inferrule{\Gamma \vdash t \chk \mathtt{nat}}{\Gamma \vdash \mathtt{s}(t) \chk \mathtt{nat}}
+    \and
+    \inferrule{\Gamma \vdash t \syn \mathtt{nat} \and \Gamma \vdash t_0 \chk A \and \Gamma, x : \mathtt{nat} \vdash t_1 \chk A}{\Gamma \vdash \mathtt{ifz}(t_0; x.t_1)(t) \chk A}
+    \and
+    \inferrule{\Gamma \vdash t \chk A \and \Gamma \vdash u \chk B}{\Gamma \vdash (t, u) \chk A \times B}
+    \and
+    \inferrule{\Gamma \vdash t \syn A \times B}{\Gamma \vdash \mathtt{proj}_1(t) \syn A}
+    \and
+    \inferrule{\Gamma \vdash u \syn A \times B}{\Gamma \vdash \mathtt{proj}_2(u) \syn A}
+    \and
+    \inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, x \chk A}
+    \and
+    \inferrule{\Gamma \vdash t \syn A \and \Gamma, x : A \vdash u \chk B}{\Gamma \vdash \mathtt{let}\;x = t\;\mathtt{in}\;u\chk B}
+  \end{mathpar}
+\egroup
+
+In this language, there are additional type constructs other than $\bto$, so first we extend $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) with operations
+In this language, we introduce additional type constructs apart from $\bto$.
+To do so, we extend $\Sigma_{\bto}$ (as shown in \Cref{ex:type-signature-for-function-type}) with the operations $\mathsf{nat}$ and $\mathsf{times}$ such that
+\[
+  \arity({\mathsf{nat}}) = 0 \quad\text{and}\quad \arity({\mathsf{times}}) = 2
+\]
+enabling the introduction of $\mathtt{nat}$ and $A \times B$ as $\tyOp_{\mathsf{nat}}$ and $\tyOp_{\mathsf{times}}(A, B)$, respectively.
+Following this, we also extend the bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with the following operations to correspond with each rule:
+\begin{align*}
+  \aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}
+  && \aritysymbol{\mathsf{s}}{\cdot}{\mathtt{nat}^{\chk}}{\mathtt{nat}^{\chk}}
+  && \aritysymbol{\mathsf{ifz}}{A}{\mathtt{nat}^{\syn}, A^{\chk}, A^{\chk}}{A^{\chk}} \\
+  \aritysymbol{\mathsf{pair}}{A, B}{A^{\chk}, B^{\chk}}{A \times B^{\chk}}
+  && \aritysymbol{\mathsf{proj}_1}{A, B}{A \times B^{\syn}}{A^{\syn}}
+  && \aritysymbol{\mathsf{proj}_2}{A, B}{A \times B^{\syn}}{B^{\syn}} \\
+  \aritysymbol{\mathsf{mu}}{A}{[A]A^{\chk}}{A^{\chk}}
+  && \aritysymbol{\mathsf{let}}{A, B}{A^{\syn},[A]B^{\chk}}{B^{\chk}}
+\end{align*}
+With these operations, a straightforward check shows that every rule is mode-correct, therefore this as a mode-correct bidirectional type system.
+As a result, we can apply the type synthesiser presented in \Cref{sec:type-synthesis} directly to this system, eliminating the need for re-implementation.
+
+\subsection{Spine Calculus}\label{subsec:spine}
+
+A spine calculus is a calculus with applications in spine form $t\;u_1\;\ldots\;u_n$ which consists of a head $t$ and an indefinite number of arguments $u_1\;u_2\;\dots\;u_n$.
+This example might initially appear impossible, since the number of arguments a term construct specified by a signature can take  is finite.
+However, we do not have any restriction on the number of symbols that may be inhabited in a signature, enabling us to have a corresponding type construct and term construct for each number $n$ of arguments.
+This underscores the importance and necessity of having an arbitrary set (with decidable equality) as a set of operation symbols.
+To be precise, consider the following rule
+
+\bgroup
+\small
+  \centering
+  \begin{mathpar}
+    \inferrule{\Gamma \vdash t \syn \textstyle{\prod_{i = 1}^{n}} A_i \bto B \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
+  \end{mathpar}
+\egroup
+extending the type signature $\Sigma_{\bto}$ with $\mathsf{fun}_n$ such that $\arity({\mathsf{fun}_n}) = n$ and the bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with $\mathtt{app}_n$ such that 
+\[
+  \aritysymbol{\mathsf{app}_n}{A_1,\ldots, A_n}{\tyOp_{\mathsf{fun}_n}(A_1, \ldots, A_n) \bto B^{\syn}, A_1^{\chk}, \ldots, A_n^{\chk}}{B}.
+\]
+Then each spine application $t\;u_1\;\ldots\;u_n$ of the length $n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$.

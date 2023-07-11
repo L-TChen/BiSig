@@ -133,7 +133,7 @@ We are here for the main technical contribution of this paper.
 The interesting part of the theorem is the case for the $\Rule{Op}$ rule and it is rather complex.
 Here we shall give its insight first instead of jumping into the details.
 Recall that a typing derivation for $\tmOpts$ contains a substitution $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$.
-The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with an `accumulating parameter': a substitution $\rho_0$ \emph{partially defined} on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
+The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with an `accumulating' substitution: a substitution $\rho_0$ that is partially defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
 By mode-correctness, the accumulating substitution~$\rho_i$ will be defined on enough synthesis variables so that type synthesis or checking can be performed on $t_{i}$ with the context $\Gamma, \vars{x}_{i} : \simsub{\Delta_{i}}{\rho_{i}}$ based on its mode derivation $\erase{\Gamma}, \vars{x}_i |-_{\Sigma, \Omega} t_i^{\dir{d_i}}$.
 If we visit a synthesis argument $\synbiarg[i+1]$, then we may extend the domain of $\rho_i$ to include the synthesis variables $\fv(A_{i + 1})$ if type synthesis is successful and also that the synthesised type can be \emph{unified with $A_{i+ 1}$} and thereby \emph{extend} $\rho_i$ to $\bar{\rho_i} = \rho_{i+1}$ with the unifier.
 Then, if we go through every $t_i$ successfully, we will have a total substitution $\rho_n$ by mode-correctness and a derivation of $\Gamma, \vars{x}_i : \Delta_i |-_{\Sigma, \Omega} t_i :^{\dir{d_i}} \simsub{A}{\rho_n}$ for each subterm $t_i$.

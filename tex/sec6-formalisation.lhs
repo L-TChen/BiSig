@@ -41,7 +41,6 @@ Thus, a faithful understanding of our formal constructions requires certain prof
 
 As such, in this section, we will merely provide an overview of our design and draw an analogy between the construction of simple types in \Cref{subsec:formal-simple-types} and bidirectional typing rules in \Cref{subsec:formal-extrinsic-typing} in plain terms, avoiding category theory deliberately.
 On the other hand, the formal proofs in our theory closely mirror the informal versions presented so far, thus we will only illustrate the soundness part of \Cref{lem:soundness-completeness} as an example in \Cref{subsec:formal-proofs}. 
-We conclude the technical content of this paper with some mode-correct simply typed languages in \Cref{subsec:formal-examples}.
 
 \subsection{Defining Simple Types}\label{subsec:formal-simple-types}
 

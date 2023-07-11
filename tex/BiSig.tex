@@ -90,18 +90,8 @@ The whole theory works as a verified type-synthesiser generator for syntax-direc
 From a signature that specifies a bidirectionally typed language, the theory produces a type synthesiser that decides whether an input abstract syntax tree has a typing derivation or reports that the input does not have enough type annotations.
 Within the theory, we formally define soundness, completeness, and mode-correctness, which are sufficient conditions for deriving a correct type synthesiser.
 We also propose a preprocessing step called `mode decoration', which helps the user to deal with missing type annotations and streamlines the theory.
-The entire theory is formulated constructively, and has been formalised in the \Agda proof assistant.
+The entire theory is formulated constructively, and has been formalised in the proof assistant \Agda with \AxiomK.
 
-%\LT{Still not coherent enough}
-%Type checking and inference serve as the transition from parsed abstract syntax trees to well-typed programs.
-%In response to this difficulty, we propose a simple yet general and constructive theory of bidirectional type synthesis.
-%which refers to the mutual use of type checking and synthesis based on bidirectional typing rules to determine the type of a program with type annotations.
-%First, it is simple yet general as it applies to any syntax-directed bidirectional simple type system that can be specified by a signature.
-%which is analogous to a grammar in parsing.
-%Second, it is constructive because it is not only formalised in a proof assistant based on Martin-L\"of type theory, but also compactly formulated in a way that unifies computation and proof---for example, a proof of the decidability of the type synthesis problem is computationally a type synthesiser.
-%Moreover, we introduce `mode decoration' to deal with missing type annotations, an aspect often overlooked in the literature.
-%The main theorem is logically a trichotomy on untyped abstract syntax trees and computationally a type synthesiser that may throw an exception due to missing type annotations.
-%By being parametrised by a signature, our theory works overall as a verified type-synthesiser generator.
 \end{abstract}
 \begin{document}
 

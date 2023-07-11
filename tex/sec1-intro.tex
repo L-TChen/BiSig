@@ -9,7 +9,7 @@ In light of these limitations, bidirectional type synthesis emerged as a viable 
 \citet{Dunfield2021} summarised the design principles of bidirectional type synthesis and its wide coverage of languages with simple types, polymorphic types, dependent types, gradual types, among others.
 
 The basic idea of bidirectional type synthesis is that while the problem of type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types (for example, the type of a variable can be looked up in the context); for other kinds of terms, we can switch to the simpler problem of type checking, where the expected type of a raw term is also given so that there is more information to work with.
-More formally, every judgement in a bidirectional type system is extended with a \emph{mode}:
+More formally, every judgement in a bidirectional type system is extended with a \emph{mode:}
 \begin{enumerate*}
   \item $\Gamma |- \isTerm{t} \syn A$ for \emph{synthesis} and 
   \item $\Gamma |- \isTerm{t} \chk A$ for \emph{checking}.
@@ -32,7 +32,7 @@ Moreover, their algorithms are not proved complete.}
 %While it is straightforward to derive a type synthesis algorithm,
 For bidirectional typing, \citet{Dunfield2021} could only present informal design principles that the community learned from individual systems, rather than a general theory providing logical specifications and rigorously proven properties for a class of systems.
 Moreover, unlike the plethora of available parser generators, `type-synthesiser generators' rarely exist, so each type synthesiser has to be independently built from scratch.
-To remedy the situation, we present a first theory of bidirectional typing, which amounts to a verified type-synthesiser generator for syntax-directed bidirectional simple type systems.
+To remedy the situation, we initiate a theory of bidirectional typing, which amounts to a verified type-synthesiser generator for syntax-directed bidirectional simple type systems.
 
 \subsection{Background and Related Work}\label{sec:related-work}
 
@@ -52,7 +52,7 @@ Traditionally, a type synthesis algorithm is presented as \emph{algorithmic syst
 Such an algorithm is then accompanied with \emph{soundness} and \emph{completeness} assertions such that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised if there are enough annotations.
 By contrast, \citeauthor{Wadler2022} exploit the simultaneously computational and logical nature of Martin-L\"of type theory to formulate algorithmic soundness, completeness, and decidability in one go.
 %(although they do not emphasise the difference of their approach from the traditional one)
-Recall that the law of excluded middle $P + \neg P$ does not hold universally as an axiom in type theory---it means that whether $P$~holds is \emph{decidable}, and is non-trivial to prove.
+Recall that the law of excluded middle $P + \neg P$ does not hold as an axiom for every $P$ in Martin-L\"of type theory and we say $P$ is \emph{decidable} if it holds for $P$.
 For example, a proof of \emph{decidable equality}, i.e. $\forall x, y.~(x = y) + (x \neq y)$, decides whether they are equal and gives an identity proof explicitly if they are, which may or may not be possible depending on the domain of $x$~and~$y$.
 Given that all proofs as programs terminate, logical decidability implies \emph{algorithmic decidability}.
 Further, suppose a proof of the following statement:

@@ -127,76 +127,62 @@
   url =           {https://doi.org/10.1145/345099.345100},
 }
 
-@article{Peyton-Jones2007,
-  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
-                   Weirich, Stephanie and Shields, Mark},
-  journal =       {Journal of Functional Programming},
-  number =        {1},
-  pages =         {1--82},
-  publisher =     {Cambridge University Press},
-  title =         {Practical type inference for arbitrary-rank types},
-  volume =        {17},
-  year =          {2007},
-  doi =           {10.1017/S0956796806006034},
+@phdthesis{Gast2004,
+  author =        {Gast, Holger},
+  school =        {Universit{\"a}t T{\"u}bingen},
+  title =         {A generator for type checkers},
+  year =          {2004},
+  url =           {http://hdl.handle.net/10900/48845},
 }
 
-@inproceedings{Dunfield2013,
+@inproceedings{Grewe2015,
   address =       {New York, NY, USA},
-  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
-  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
-                   Conference on Functional Programming},
-  pages =         {429--442},
+  author =        {Grewe, Sylvia and Erdweg, Sebastian and
+                   Wittmann, Pascal and Mezini, Mira},
+  booktitle =     {2015 ACM International Symposium on New Ideas, New
+                   Paradigms, and Reflections on Programming and
+                   Software (Onward!)},
+  pages =         {137--150},
   publisher =     {Association for Computing Machinery},
-  series =        {ICFP '13},
-  title =         {Complete and easy bidirectional typechecking for
-                   higher-rank polymorphism},
-  year =          {2013},
-  abstract =      {Bidirectional typechecking, in which terms either
-                   synthesize a type or are checked against a known
-                   type, has become popular for its scalability (unlike
-                   Damas-Milner type inference, bidirectional typing
-                   remains decidable even for very expressive type
-                   systems), its error reporting, and its relative ease
-                   of implementation. Following design principles from
-                   proof theory, bidirectional typing can be applied to
-                   many type constructs. The principles underlying a
-                   bidirectional approach to polymorphism, however, are
-                   less obvious. We give a declarative, bidirectional
-                   account of higher-rank polymorphism, grounded in
-                   proof theory; this calculus enjoys many properties
-                   such as eta-reduction and predictability of
-                   annotations. We give an algorithm for implementing
-                   the declarative system; our algorithm is remarkably
-                   simple and well-behaved, despite being both sound and
-                   complete.},
-  doi =           {10.1145/2500365.2500582},
-  isbn =          {9781450323260},
-  url =           {https://doi.org/10.1145/2500365.2500582},
+  series =        {Onward! 2015},
+  title =         {Type systems for the masses: {Deriving} soundness
+                   proofs and efficient checkers},
+  year =          {2015},
+  abstract =      {The correct definition and implementation of
+                   non-trivial type systems is difficult and requires
+                   expert knowledge, which is not available to
+                   developers of domain-specific languages (DSLs) in
+                   practice. We propose Veritas, a workbench that
+                   simplifies the development of sound type systems.
+                   Veritas provides a single, high-level specification
+                   language for type systems, from which it
+                   automatically tries to derive soundness proofs and
+                   efficient and correct type-checking algorithms. For
+                   verification, Veritas combines off-the-shelf
+                   automated first-order theorem provers with automated
+                   proof strategies specific to type systems. For
+                   deriving efficient type checkers, Veritas provides a
+                   collection of optimization strategies whose
+                   applicability to a given type system is checked
+                   through verification on a case-by-case basis. We have
+                   developed a prototypical implementation of Veritas
+                   and used it to verify type soundness of the
+                   simply-typed lambda calculus and of parts of typed
+                   SQL. Our experience suggests that many of the
+                   individual verification steps can be automated and,
+                   in particular, that a high degree of automation is
+                   possible for type systems of DSLs.},
+  doi =           {10.1145/2814228.2814239},
+  isbn =          {9781450336888},
+  url =           {https://doi.org/10.1145/2814228.2814239},
 }
 
-@inproceedings{Xie2018,
-  address =       {Cham},
-  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
-  booktitle =     {Programming Languages and Systems. ESOP 2018},
-  editor =        {Ahmed, Amal},
-  pages =         {272--299},
-  publisher =     {Springer International Publishing},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Let arguments go first},
-  volume =        {10801},
-  year =          {2018},
-  abstract =      {Bi-directional type checking has proved to be an
-                   extremely useful and versatile tool for type checking
-                   and type inference. The conventional presentation of
-                   bi-directional type checking consists of two modes:
-                   inference mode and checked mode. In traditional
-                   bi-directional type-checking, type annotations are
-                   used to guide (via the checked mode) the type
-                   inference/checking procedure to determine the type of
-                   an expression, and type information flows from
-                   functions to arguments.},
-  doi =           {10.1007/978-3-319-89884-1_10},
-  isbn =          {978-3-319-89884-1},
+@book{Wadler2022,
+  author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
+  month =         aug,
+  title =         {Programming Language Foundations in \textsc{Agda}},
+  year =          {2022},
+  url =           {https://plfa.inf.ed.ac.uk/22.08/},
 }
 
 @inproceedings{Aydemir2005,
@@ -220,14 +206,6 @@
                    appendix with machine-checked proofs?},
   doi =           {10.1007/11541868_4},
   isbn =          {978-3-540-31820-0},
-}
-
-@book{Wadler2022,
-  author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
-  month =         aug,
-  title =         {Programming Language Foundations in \textsc{Agda}},
-  year =          {2022},
-  url =           {https://plfa.inf.ed.ac.uk/22.08/},
 }
 
 @inproceedings{Altenkirch1993,
@@ -427,6 +405,19 @@
                   RosserTheorem.pdf},
 }
 
+@article{Peyton-Jones2007,
+  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
+                   Weirich, Stephanie and Shields, Mark},
+  journal =       {Journal of Functional Programming},
+  number =        {1},
+  pages =         {1--82},
+  publisher =     {Cambridge University Press},
+  title =         {Practical type inference for arbitrary-rank types},
+  volume =        {17},
+  year =          {2007},
+  doi =           {10.1017/S0956796806006034},
+}
+
 @article{McBride2003,
   author =        {McBride, Conor},
   journal =       {Journal of Functional Programming},
@@ -449,18 +440,55 @@
   url =           {http://www.strictlypositive.org/foubsr-website/},
 }
 
-@article{Ko2022,
-  author =        {Ko, Hsiang-Shang and Chen, Liang-Ting and
-                   Lin, Tzu-Chi},
-  journal =       {Proceedings of the ACM on Programming Languages},
-  number =        {ICFP},
-  pages =         {1--29},
-  title =         {Datatype-generic programming meets elaborator
-                   reflection},
-  volume =        {6},
-  year =          {2022},
-  doi =           {10.1145/3547629},
-  url =           {https://doi.org/10.1145/3547629},
+@inproceedings{Fiore1999,
+  address =       {Trento, Italy},
+  author =        {Fiore, Marcelo P. and Plotkin, Gordon D. and
+                   Turi, Daniele},
+  booktitle =     {Proceedings. 14th Symposium on Logic in Computer
+                   Science},
+  pages =         {193--202},
+  publisher =     {IEEE},
+  title =         {Abstract syntax and variable binding},
+  year =          {1999},
+  doi =           {10.1109/LICS.1999.782615},
+  isbn =          {0-7695-0158-3},
+  url =           {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?
+                  arnumber=782615},
+}
+
+@article{Hermida1998,
+  author =        {Hermida, Claudio and Jacobs, Bart},
+  journal =       {Information and Computation},
+  number =        {2},
+  pages =         {107--152},
+  title =         {Structural induction and coinduction in a fibrational
+                   setting},
+  volume =        {145},
+  year =          {1998},
+  abstract =      {We present a categorical logic formulation of
+                   induction and coinduction principles for reasoning
+                   about inductively and coinductively defined types.
+                   Our main results provide sufficient criteria for the
+                   validity of such principles: in the presence of
+                   comprehension, the induction principle for initial
+                   algebras is admissible, and dually, in the presence
+                   of quotient types, the coinduction principle for
+                   terminal coalgebras is admissible. After giving an
+                   alternative formulation of induction in terms of
+                   binary relations, we combine both principles and
+                   obtain a mixed induction/coinduction principle which
+                   allows us to reason about minimal solutionsX≅σ(X)
+                   whereXmay occur both positively and negatively in the
+                   type constructor σ. We further strengthen these
+                   logical principles to deal with contexts and prove
+                   that such strengthening is valid when the (abstract)
+                   logic we consider is contextually/functionally
+                   complete. All the main results follow from a basic
+                   result about adjunctions between ``categories of
+                   algebras'' (inserters).},
+  doi =           {10.1006/inco.1998.2725},
+  issn =          {08905401},
+  url =           {http://dx.doi.org/10.1006/inco.1998.2725},
 }
 
 @inproceedings{Fiore2013,
@@ -564,25 +592,62 @@
   url =           {https://research.chalmers.se/en/publication/535726},
 }
 
-@article{Dybjer1994,
-  author =        {Dybjer, Peter},
-  journal =       {Formal Aspects of Computing},
-  number =        {4},
-  pages =         {440--465},
-  title =         {Inductive families},
-  volume =        {6},
-  year =          {1994},
-  abstract =      {A general formulation of inductive and recursive
-                   definitions in Martin-L{\"o}f's type theory is
-                   presented. It extends Backhouse's `Do-It-Yourself
-                   Type Theory'to include inductive definitions of
-                   families of sets and definitions of functions by
-                   recursion on the way elements of such sets are
-                   generated. The formulation is in natural deduction
-                   and is intended to be a natural generalisation to
-                   type theory of Martin-L{\"o}f's theory of iterated
-                   inductive definitions in predicate logic.},
-  doi =           {10.1007/BF01211308},
-  isbn =          {1433-299X},
-  url =           {https://doi.org/10.1007/BF01211308},
+@inproceedings{Dunfield2013,
+  address =       {New York, NY, USA},
+  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
+  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
+                   Conference on Functional Programming},
+  pages =         {429--442},
+  publisher =     {Association for Computing Machinery},
+  series =        {ICFP '13},
+  title =         {Complete and easy bidirectional typechecking for
+                   higher-rank polymorphism},
+  year =          {2013},
+  abstract =      {Bidirectional typechecking, in which terms either
+                   synthesize a type or are checked against a known
+                   type, has become popular for its scalability (unlike
+                   Damas-Milner type inference, bidirectional typing
+                   remains decidable even for very expressive type
+                   systems), its error reporting, and its relative ease
+                   of implementation. Following design principles from
+                   proof theory, bidirectional typing can be applied to
+                   many type constructs. The principles underlying a
+                   bidirectional approach to polymorphism, however, are
+                   less obvious. We give a declarative, bidirectional
+                   account of higher-rank polymorphism, grounded in
+                   proof theory; this calculus enjoys many properties
+                   such as eta-reduction and predictability of
+                   annotations. We give an algorithm for implementing
+                   the declarative system; our algorithm is remarkably
+                   simple and well-behaved, despite being both sound and
+                   complete.},
+  doi =           {10.1145/2500365.2500582},
+  isbn =          {9781450323260},
+  url =           {https://doi.org/10.1145/2500365.2500582},
 }
+
+@inproceedings{Xie2018,
+  address =       {Cham},
+  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
+  booktitle =     {Programming Languages and Systems. ESOP 2018},
+  editor =        {Ahmed, Amal},
+  pages =         {272--299},
+  publisher =     {Springer International Publishing},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Let arguments go first},
+  volume =        {10801},
+  year =          {2018},
+  abstract =      {Bi-directional type checking has proved to be an
+                   extremely useful and versatile tool for type checking
+                   and type inference. The conventional presentation of
+                   bi-directional type checking consists of two modes:
+                   inference mode and checked mode. In traditional
+                   bi-directional type-checking, type annotations are
+                   used to guide (via the checked mode) the type
+                   inference/checking procedure to determine the type of
+                   an expression, and type information flows from
+                   functions to arguments.},
+  doi =           {10.1007/978-3-319-89884-1_10},
+  isbn =          {978-3-319-89884-1},
+}
+

@@ -50,11 +50,9 @@ For simple types, the only datum needed for specifying a type construct is its n
   For a signature $\Sigma$, a \emph{type} $A : \Type_{\Sigma}(\Xi)$ over a variable set $\Xi$ is either
   \begin{enumerate}
     \item a variable in $\Xi$ or
-    \item $\tyOp_{i}(A_1, \ldots, A_n)$ for some $i:I$ with $\arity(i) = n$ and types $A_1,\ldots, A_n$,
+    \item $\tyOp_{i}(A_1, \ldots, A_n)$ for some $i:I$ with $\arity(i) = n$ and types $A_1,\ldots, A_n$.
   \end{enumerate}
-  as shown in \Cref{fig:simple-type}.
-  A \emph{context} $\Gamma \colon \Cxt_{\Sigma}(\Xi)$ over $\Xi$ is a list $\Gamma$ of types over $\Xi$.%
-\todo{Name-type pairs?}
+  A \emph{context} $\Gamma \colon \Cxt_{\Sigma}(\Xi)$ over $\Xi$ is formed by $\cdot$ for the empty context and $\Gamma, A$ for an additional type $A$.
 \end{definition}
 
 \begin{example} \label{ex:type-signature-for-function-type}
@@ -63,11 +61,8 @@ For simple types, the only datum needed for specifying a type construct is its n
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
-As \Cref{def:simple-signature} includes type variables, we introduce the typical meta-operation: substitution.
-\begin{definition}
-  The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$, denoted by $\rho\colon \Sub{\Xi}{\Xi'}$, is a map which sends a type $A$ of $\Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho}$ of $\Type_{\Sigma}(\Xi')$ and is defined as usual.
-  By abuse of notation, the substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution to each $A$ in $\Gamma$.
-\end{definition}
+The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$, denoted by $\rho\colon \Sub{\Xi}{\Xi'}$, is a map which sends a type $A$ of $\Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho}$ of $\Type_{\Sigma}(\Xi')$ and is defined as usual.
+By abuse of notation, the substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution to each $A$ in $\Gamma$.
 
 \subsection{Binding Signatures and Simply Typed Languages} \label{subsec:binding-sig}
 

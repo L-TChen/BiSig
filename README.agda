@@ -16,21 +16,22 @@ import Example.Outline
 -- Section 3
 
 import Syntax.Simple.Description   -- Definition 3.1
-import Syntax.Context
 import Syntax.Simple.Term          -- Figure 5 (Definition 3.1)
 import Syntax.Simple.Properties    -- Definition 3.3
 
-import Syntax.Typed.Description    -- Definitions 3.4 & 3.5
-import Syntax.Typed.Raw.Term       -- Figure 6 (Definition 3.6)
+import Syntax.Typed.Description    -- Definitions 3.4 & 3.6
+import Syntax.Typed.Raw.Term       -- Figure 6 (Definition 3.7)
 import Syntax.Typed.Raw.Functor
-import Syntax.Typed.Term           -- Figure 7 (Definitions 3.7)
+import Syntax.Context              -- Definition 3.8
+import Syntax.Typed.Term           -- Figure 7 (Definitions 3.9)
 import Syntax.Typed.Functor
 
-import Syntax.BiTyped.Description  -- Definition 3.8 & 3.9
+
+import Syntax.BiTyped.Description  -- Definition 3.11 & 3.13
 import Theory.Erasure              -- (Mode) erasure
-import Syntax.BiTyped.Term         -- Figure 8 (Definition 3.10)
+import Syntax.BiTyped.Term         -- Figure 8 (Definition 3.14)
 import Syntax.BiTyped.Functor
-import Syntax.BiTyped.Pre.Term     -- Figure 9 (Definition 3.10)
+import Syntax.BiTyped.Pre.Term     -- Figure 9 (Definition 3.14)
 import Syntax.BiTyped.Pre.Functor
 
 import Example.STLC                -- STLC examples

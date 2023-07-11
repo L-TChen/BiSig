@@ -39,16 +39,6 @@ Normalisation in its generic form still remains out of reach and recent advances
 %\subsubsection{Theories of abstract syntax with variable binding}
 %\label{sec:theory-of-syntax}
 %
-%The aforementioned frameworks except \citeauthor{Gheri2020}'s are at least inspired by \varcitet{Fiore1999}{'s} initial semantics for abstract syntax with variable binding using category theory.
-%The main idea is that the set of (untyped) abstract syntax trees for a language consists of
-%\begin{enumerate*}
-%  \item a family of sets $\Term_{\Gamma}$ of well-scoped terms under a context~$\Gamma$ with
-%  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, and
-%  \item an initial algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf~$V$ of variables (i.e.\ the embedding $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$) to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts, the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the arities of constructs, and the initiality amounts to structural recursion, i.e.\ \emph{term traversal}.
-%\end{enumerate*}
-%To put it succinctly, it is the free $\mathbb{\Sigma}$-algebra over the presheaf~$V$ of variables.
-%
-%Fortunately, constructing the initial algebra of terms in type theory boils down to defining an inductive type with a few constructors that align with the variable rule and a rule schema for language constructs specified by a signature~\citep{Fiore2022}.
 
 %Substitution is also modelled categorically, but it does not play a role in this paper.%
 %\todo{Reveal a bit about this paper?}

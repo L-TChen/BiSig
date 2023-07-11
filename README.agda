@@ -44,7 +44,7 @@ import Theory.Completeness
 import Syntax.BiTyped.Pre.Generalised.Term  -- Figure 10
 import Syntax.BiTyped.Pre.Generalised.Functor
 import Theory.Pre.Term                 -- Lemmas 4.2 & 4.3
-import Theory.ModePreprocessing        -- Theorem 4.4, Lemma 4.5, Corollary 4.6
+import Theory.ModeDecoration           -- Theorem 4.4, Lemma 4.5, Corollary 4.6
 
 import Syntax.Typed.Raw.Ordering.Term  -- Figure 11
 import Syntax.Typed.Raw.Ordering.Functor

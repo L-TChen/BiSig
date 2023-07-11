@@ -1,7 +1,7 @@
 import Syntax.Simple.Description  as S
 import Syntax.BiTyped.Description as B
 
-module Theory.ModePreprocessing {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.ModeDecoration {SD : S.Desc} (BD : B.Desc SD) where
 
 open import Prelude
 
@@ -30,32 +30,32 @@ adjustMode Syn (_ , Syn , p) = _ , _ ,    p
 
 mutual
 
-  preprocess' : (r : Raw n) → ∃[ v ] ∃[ d ] Pre? v true d r
-  preprocess' (` i) = _ , _ , ` i
-  preprocess' (A ∋ r) with adjustMode Chk (preprocess' r)
+  decorate' : (r : Raw n) → ∃[ v ] ∃[ d ] Pre? v true d r
+  decorate' (` i) = _ , _ , ` i
+  decorate' (A ∋ r) with adjustMode Chk (decorate' r)
   ... | _ , _ , p = _ , _ , A ∋ p
-  preprocess' (op (i , rs)) with preprocessᶜ (BD .rules i) rs
+  decorate' (op (i , rs)) with decorateᶜ (BD .rules i) rs
   ... | _ , _ , p = _ , _ , op (refl , p)
 
-  preprocessᶜ
+  decorateᶜ
     : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)
     → ∃[ v ] ∃[ d ] P.⟦ D ⟧ᶜ Raw Pre? v d rs
-  preprocessᶜ (ι d _ Ds) rs with preprocessᵃˢ Ds rs
+  decorateᶜ (ι d _ Ds) rs with decorateᵃˢ Ds rs
   ... | vs , v , a , p = v , d , vs , a , refl , p
 
-  preprocessᵃˢ
+  decorateᵃˢ
     : (Ds : ArgsD Ξ)  (rs : T.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw n)
     → ∃[ vs ] ∃[ v ] And (toList vs) v × P.⟦ Ds ⟧ᵃˢ Raw Pre? vs rs
-  preprocessᵃˢ []                  _        = _ , _ , nil , tt
-  preprocessᵃˢ ((Δ ⊢[ d ] _) ∷ Ds) (r , rs)
-      with adjustMode d (preprocess' r) | preprocessᵃˢ Ds rs
+  decorateᵃˢ []                  _        = _ , _ , nil , tt
+  decorateᵃˢ ((Δ ⊢[ d ] _) ∷ Ds) (r , rs)
+      with adjustMode d (decorate' r) | decorateᵃˢ Ds rs
   ... | false , _ , p | vs , v , _ , q = false ∷ vs , false , hd   , (_ , p) , q
   ... | true  , _ , p | vs , v , a , q = true  ∷ vs , v     , tl a , (_ , p) , q
 
-preprocess? : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
-preprocess? d = adjustMode d ∘ preprocess'
+decorate? : (d : Mode) (r : Raw n) → ∃[ v ] ∃[ e ] Pre? v e d r
+decorate? d = adjustMode d ∘ decorate'
 
-preprocess : (d : Mode) (r : Raw n) → Dec (Pre d r)
-preprocess d r with preprocess? d r
+decorate : (d : Mode) (r : Raw n) → Dec (Pre d r)
+decorate d r with decorate? d r
 ... | false , _ , p = no (to¬Pre p)
 ... | true  , _ , p = yes (toPre p)

@@ -1,5 +1,6 @@
 name: BiSig
 include:
+  .
   src
   agda-stdlib/src
 

@@ -37,7 +37,7 @@ The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis
 \subsection{Generalised Mode Decoration}
 \label{sec:mode-decoration}
 
-The goal of this sub-section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
+The major goal of this section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
 In fact we will do better:
 If a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
 It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
@@ -72,7 +72,7 @@ We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalise
 
 Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations, but such negative formulations convey little information.
 Instead, we can provide more information by pointing out the places in the term that require annotations.
-For a bidirectional type system, an annotation is required wherever a term is `strictly' (which we will explain shortly) in checking mode but required to be in synthesising mode, in which case there is no rule for switching from checking to synthesising, and thus there is no way to construct a mode derivation.
+For a bidirectional type system, an annotation is required wherever a term is `strictly' (which we will define shortly) in checking mode but required to be in synthesising mode, in which case there is no rule for switching from checking to synthesising, and thus there is no way to construct a mode derivation.
 We can, however, consider \emph{generalised mode derivations} defined in \cref{fig:generalised-mode-derivations} that allow the use of an additional $\SynRule{Missing}$ rule for such switching, so that a derivation can always be constructed.
 Given a generalised mode derivation, if it uses $\SynRule{Missing}$ in some places, then those places are exactly where annotations should be supplied, which is helpful information to the user; if it does not use $\SynRule{Missing}$, then the derivation is \emph{genuine} in the sense that it corresponds directly to an original mode derivation.
 This can be succinctly formulated as \cref{thm:Pre?-true} below by encoding genuineness as a boolean~$g$ in the generalised mode judgement, which is set to~$\BFalse$ only by the $\SynRule{Missing}$ rule.
@@ -136,7 +136,7 @@ then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^
 \end{lemma}
 
 \begin{proof}
-Case analysis on $\dir{d}$ and $\dir{d'}$, adding an outermost mode cast to change the given derivation to a different mode if $d \neq d'$.
+Case analysis on $\dir{d}$ and $\dir{d'}$, adding an outermost mode cast to change the given derivation to a different mode if $\dir{d} \neq \dir{d'}$.
 Note that it is permissible to add an outermost mode cast because the antecedent~(\ref{eq:strict-derivation}) requires the given derivation to be strict.
 \end{proof}
 
@@ -220,7 +220,7 @@ If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/
 \end{proposition}
 
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
-In a sense, annotatability is a reasonable form of completeness: if a term is typable in $(\Sigma, \erase\Omega)$, it may not be typable in $(\Sigma, \Omega)$ directly due to some missing annotations, but will be if those annotations are added correctly.
+In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
 In our theory, \cref{thm:annotatability} can be easily proved from generalised mode decoration.
 
 \begin{proof}[Proof of \cref{thm:annotatability}]

@@ -26,7 +26,6 @@ import Syntax.Context              -- Definition 3.8
 import Syntax.Typed.Term           -- Figure 7 (Definitions 3.9)
 import Syntax.Typed.Functor
 
-
 import Syntax.BiTyped.Description  -- Definition 3.11 & 3.13
 import Theory.Erasure              -- (Mode) erasure
 import Syntax.BiTyped.Term         -- Figure 8 (Definition 3.14)

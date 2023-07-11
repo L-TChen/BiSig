@@ -1,17 +1,17 @@
 %!TEX root = BiSig.tex
 
 \section{Examples}\label{sec:example}
-Since our theory is not confined to a specific simply-typed language, we can employ it with any language that can be specified by a bidirectional binding signature.
+Our theory works for any simply typed language that can be specified in a syntax-directed manner by a bidirectional binding signature, and is not confined to a specific language.
 To showcase its general applicability, we present two additional examples:
 \begin{enumerate}
-\item \PCF with products and let bindings
-\item spine calculus: a simply-typed $\lambda$-calculus with applications in spine form.
+\item \PCF with products and let bindings, and
+\item spine calculus, a simply typed $\lambda$-calculus with applications in spine form.
 \end{enumerate}
 The first is a standard exercise in implementing a type synthesiser and the second is an example of a system with infinitely many operations.
 
 \subsection{PCF with Products and Let Bindings}\label{subsec:PCF}
-Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This also applies to parsing: while there are grammar and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
-While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022} which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding following rules:
+Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This has also been the case for parsing: while there are grammar and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
+While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022}, which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding the following rules:
 \bgroup
 \small
   \begin{mathpar}
@@ -33,7 +33,7 @@ While the focus of this paper is not to design bidirectional type systems, we ad
   \end{mathpar}
 \egroup
 
-In this language, there are additional type constructs other than $\bto$, so first we extend $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) with operations
+%In this language, there are additional type constructs other than $\bto$, so first we extend $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) with operations
 In this language, we introduce additional type constructs apart from $\bto$.
 To do so, we extend $\Sigma_{\bto}$ (as shown in \Cref{ex:type-signature-for-function-type}) with the operations $\mathsf{nat}$ and $\mathsf{times}$ such that
 \[
@@ -52,14 +52,14 @@ Following this, we also extend the bidirectional binding signature $\Omega_{\Lam
   && \aritysymbol{\mathsf{let}}{A, B}{A^{\syn},[A]B^{\chk}}{B^{\chk}}
 \end{flalign*}
 With these operations, a straightforward check shows that every rule is mode-correct, therefore this as a mode-correct bidirectional type system.
-As a result, we can apply the type synthesiser presented in \Cref{sec:type-synthesis} directly to this system, eliminating the need for re-implementation.
+As a result, we can instantiate the type synthesiser presented in \Cref{sec:type-synthesis} for this system, eliminating the need for re-implementation.
 
 \subsection{Spine Calculus}\label{subsec:spine}
-A spine application, denoted as $t\;u_1\;\ldots\;u_n$, is a variant of application that consists of a head term $t$ and an indefinite number of arguments $u_1\;u_2\;\dots\;u_n$.
+A spine application, denoted as $t\;u_1\;\ldots\;u_n$, is a variant of application that consists of a head term $t$ and an indeterminate number of arguments $u_1\;u_2\;\dots\;u_n$.
 This arrangement allows direct access to the head term, making it practical in various applications.
-For instance, \Agda's core language employs this form of applications, as does its reflected syntax used for metaprogramming.
+For instance, \Agda's core language employs this form of application, as does its reflected syntax used for metaprogramming.
 
-At first glance, accommodating this form of application may seem impossible, given the number of arguments a construct can accept is finite as specified by a signature.
+At first glance, accommodating this form of application may seem impossible, given that the number of arguments a construct can accept has to be fixed in a signature.
 Nonetheless, there is no constraint on the total number of operation symbols a signature can have, allowing us to establish corresponding constructs for each number $n$ of arguments, thereby exhibiting the necessity of having an arbitrary set (with decidable equality) for operation symbols.
 
 To illustrate this, let us consider the following rule:

@@ -19,28 +19,28 @@ Upon moving from simple types to bidirectional typing, the notion of arity, init
 For simple types, the only datum needed for specifying a type construct is its number of arguments:
 \begin{definition} \label{def:simple-signature}
   \begin{figure}
-%    \begin{minipage}[b]{.6\textwidth}
+    \begin{minipage}[b]{.6\textwidth}
       \centering
       \small
-      \judgbox{\Xi|-_{\Sigma} A}{$A$ is a well-formed type with type variables in $\Xi$}
+      \judgbox{\Xi|-_{\Sigma} A}{$A$ is a type with type variables in $\Xi$ for a signature $\Sigma$}
       \begin{mathpar}
         \inferrule{X_i \in \Xi}{\Xi |-_\Sigma X_i} \and
         \inferrule{\Xi |-_{\Sigma} A_1 \\ \cdots \\ \Xi |-_{\Sigma} A_n}{\Xi |-_{\Sigma} \tyOp_i(A_1, \ldots, A_n)}\;\text{where $n = \arity(i)$}
       \end{mathpar}
       \caption{Simple types}
       \label{fig:simple-type}
-%    \end{minipage}
-%    \begin{minipage}[b]{.35\textwidth}
-%      \centering
-%      \small
-%      \judgbox{\Xi |-_{\Sigma} \Gamma}{}
-%      \begin{mathpar}
-%        \inferrule{ }{\Xi |-_{\Sigma} \cdot }\and
-%        \inferrule{\Xi |-_{\Sigma} A \\ \Xi|-_{\Sigma} \Gamma}{\Xi |-_{\Sigma} \Gamma, x : A}
-%      \end{mathpar}
-%      \caption{Contexts}
-%    \label{fig:simple-context}
-%    \end{minipage}
+    \end{minipage}
+    \begin{minipage}[b]{.39\textwidth}
+      \centering
+      \small
+      \judgbox{\Xi |-_{\Sigma} \Gamma}{$\Gamma$ is a context under $\Xi$}
+      \begin{mathpar}
+        \inferrule{ }{\Xi |-_{\Sigma} \cdot }\and
+        \inferrule{\Xi |-_{\Sigma} A \\ \Xi|-_{\Sigma} \Gamma}{\Xi |-_{\Sigma} \Gamma, x : A}
+      \end{mathpar}
+      \caption{Contexts}
+    \label{fig:simple-context}
+    \end{minipage}
   \end{figure}
   A \emph{signature} $\Sigma$ for simple types consists of a set\footnote{%
     Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 

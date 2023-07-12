@@ -62,3 +62,7 @@ import Syntax.Simple.Term                  -- Definition 5.8
 import Syntax.Simple.Unif                  -- Lemma 5.9
 
 import Theory.Trichotomy                   -- Corollary 5.10
+
+-- Section 6
+
+import Example.Spine

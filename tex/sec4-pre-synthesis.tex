@@ -42,7 +42,7 @@ In fact we will do better:
 If a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
 It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
 We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalised-mode-decoration}), which can be weakened to an ordinary mode decorator~(\cref{thm:mode-decoration}) if the additional explanation is not needed.%
-\footnote{For brevity, we use ordinary mode decoration elsewhere in this paper.}
+\footnote{To simplify the presentation, we use ordinary mode decoration elsewhere in this paper.}
 
 \begin{figure}
   \centering
@@ -124,8 +124,8 @@ Now we are ready to construct a generalised mode decorator.
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
 \end{theorem}
 
-The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term and apply mode casts depending on what modes are required.
-Instead, we distill the case analysis that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:strict-derivation}) is then established by induction on the input term in the proof of \cref{thm:generalised-mode-decoration}.
+The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term~$\isTerm{t}$ and apply mode casts depending on which mode~$\dir{d}$ is required.
+Instead, we distill the case analysis on~$\dir{d}$ that deals with mode casts into the following \cref{thm:adjustment}, whose antecedent~(\ref{eq:strict-derivation}) is then established by induction on~$\isTerm{t}$ in the proof of \cref{thm:generalised-mode-decoration}.
 
 \begin{lemma}\label{thm:adjustment}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
@@ -212,7 +212,7 @@ By \cref{thm:generalised-mode-decoration}, there is a derivation of $V |-_{\Sigm
   \label{fig:annotation-ordering}
 \end{figure}
 
-\citet{Dunfield2021} formulated completeness differently from ours (\cref{thm:STLC-completeness,sec:soundness-and-completeness}) and proposed \emph{annotatability} as a more suitable name.
+\citet[Section~3.2]{Dunfield2021} formulated completeness differently from ours (\cref{thm:STLC-completeness,sec:soundness-and-completeness}) and proposed \emph{annotatability} as a more suitable name.
 In our theory, we may formulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
@@ -221,7 +221,7 @@ If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/
 
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
-In our theory, \cref{thm:annotatability} can be easily proved from generalised mode decoration.
+In our theory, \cref{thm:annotatability} can be easily proved with generalised mode decoration.
 
 \begin{proof}[Proof of \cref{thm:annotatability}]
 By \cref{thm:generalised-mode-decoration}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.

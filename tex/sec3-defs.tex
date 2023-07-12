@@ -5,13 +5,13 @@ This section provides generic definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
 of simple types, simply typed languages, and bidirectional type systems, using simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
-(These definitions are somewhat dense, especially on first reading.
-The reader may still get some rough ideas from the subsequent sections if they choose to skim over this section, in particular the figures, and carry on.)
+(These definitions may look dense, especially on first reading.
+The reader may choose to skim through this section, in particular the figures, and still get some rough ideas from later sections.)
 
-Our definitions are formulated in two steps:
+The definitions are formulated in two steps:
 \begin{enumerate*}
   \item first we introduce a notion of arity and a notion of signature which includes a set of operation symbols and an assignment of arities to symbols;
-\item then, given a signature, we define raw terms and typing derivations by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operational symbol~$o$.
+\item then, given a signature, we define raw terms and typing derivations by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operation symbol~$o$.
 \end{enumerate*}
 All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
 As we move from simple types to bidirectional typing, the notion of arity, initially as the number of arguments of an operation, is enriched to incorporate an extension context for variable binding and the mode for the direction of type information flow.
@@ -49,8 +49,8 @@ For simple types, the only datum needed for specifying a type construct is its n
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
-\begin{definition}
-The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$, denoted by $\rho\colon \Sub{\Xi}{\Xi'}$, is a map which sends a type $A$ of $\Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho}$ of $\Type_{\Sigma}(\Xi')$ and is defined as usual.
+\begin{definition} \label{def:substitution}
+The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$, denoted by $\rho\colon \Sub{\Xi}{\Xi'}$, is a map which sends a type $A : \Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho} : \Type_{\Sigma}(\Xi')$ and is defined as usual.
 \end{definition}
 
 \subsection{Binding Signatures and Simply Typed Languages} \label{subsec:binding-sig}
@@ -81,8 +81,8 @@ This specifies that any derivation of\/ $\Gamma \vdash t\;u : B$ accepts derivat
 These arguments have types $A \bto B$ and $A$ respectively and their extension contexts are empty.
 \end{example}
 
-Next, akin to a signature, a binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities.
-This also includes the set $\Xi$ of type variables that might be present in the binding arity, each operation is assigned the sort $\Type_{\Sigma}(\Xi)$:
+Next, akin to a signature, a binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities:
+%Also associated with every operation is the set~$\Xi$ of type variables that might be present in the operation's binding arity, and the sort of the binding arity is $\Type_{\Sigma}(\Xi)$:
 \begin{definition}\label{def:binding-signature}
   For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
   \[
@@ -90,14 +90,14 @@ This also includes the set $\Xi$ of type variables that might be present in the 
   \]
 \end{definition}
 That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variables and a binding arity $\arity(o)$ with the sort $\Type_{\Sigma}(\Xi)$, denoted by $\bop$.
-By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature $\Sigma$ and a binding signature $\Omega$.
 
-The inclusion of a set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays a crucial role in type synthesis.
-For a typing rule like $\ChkRule{Abs}$, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
-But, we must first identify for which type variables to substitute.
-As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include an instantiation to assign concrete types to variables.
+The set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays a somewhat important role:
+To use a rule like $\Rule{Abs}$ in an actual typing derivation, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
+In our formulation of substitution~(\cref{def:substitution}), we must first identify for which type variables to substitute.
+As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include functions from~$\Xi$ to concrete types specifying how to instantiate typing rules by substitution.
 
-For a simply typed language, first we define its raw terms.
+By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature~$\Sigma$ and a binding signature~$\Omega$.
+Given a simply typed language, first we define its raw terms.
 
 \begin{definition}
 \begin{figure}
@@ -127,7 +127,7 @@ For a simply typed language, first we define its raw terms.
 Before defining typing derivations, we need a definition of typing contexts.
 
 \begin{definition}
-A \emph{typing context} $\Gamma \colon \Cxt_{\Sigma}$ is formed by $\cdot$ for the empty context and $\Gamma, x : A$ for an additional variable~$x$ associated with a type $A : \Type_{\Sigma}(\emptyset)$.
+A \emph{typing context} $\Gamma \colon \Cxt_{\Sigma}$ is formed by $\cdot$ for the empty context and $\Gamma, x : A$ for an additional variable~$x$ with a concrete type $A : \Type_{\Sigma}(\emptyset)$.
 The list of variables in~$\Gamma$ is denoted~$\erase\Gamma$.
 %The substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution to each $A$ in $\Gamma$.
 \end{definition}
@@ -182,7 +182,7 @@ Therefore, to define a bidirectional type system, we enrich the concept of bindi
   \[
     \left(T^* \times T \times \Mode \right)^* \times T \times \Mode.
   \]
-  For clarity, an arity is denoted by $\biarity$.
+  For clarity, a bidirectional binding arity is denoted by $\biarity$.
 \end{definition}
 
 \begin{example}
@@ -200,8 +200,6 @@ Likewise, the $\SynRule{App}$ rule has the arity ${(A \bto B)^{\syn}, A^{\chk}} 
 We write $\biop$ for an operation $o$ with a variable set $\Xi$ and its bidirectional binding arity with sort $\Type_{\Sigma}(\Xi)$.
 We call it \emph{checking} if $d$ is ${\chk}$ or \emph{synthesising} if $d$ is ${\syn}$; similarly its $i$-th argument is checking if $d_i$ is $\chk$ and synthesising if $d_i$ is $\syn$.
 A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
-Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, called the \emph{(mode) erasure} of $\Omega$.
-Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typed language $(\Sigma, \erase{\Omega})$, including raw terms and typing derivations.
 
 \begin{definition}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
   \begin{figure}
@@ -255,6 +253,9 @@ Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typ
   A typing rule is \emph{checking} if its conclusion mode is $\chk$ and \emph{synthesising} if its conclusion mode is $\syn$.
 \end{definition}
 
+Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, called the \emph{(mode) erasure} of $\Omega$.
+Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typed language $(\Sigma, \erase{\Omega})$, including raw terms and typing derivations.
+
 \begin{example}\label{ex:signature-simply-typed-lambda}
 Having established generic definitions, we can now specify the simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
 \[
@@ -263,4 +264,4 @@ Having established generic definitions, we can now specify the simply typed $\la
   \aritysymbol{\mathsf{app}}{A, B}{(A \bto B)^{\syn}, A^{\chk}}{B^{\syn}}.
 \]
 \end{example}
-More importantly, we are able to reason about constructions and properties that hold for any bidirectional simple type system $(\Sigma, \Omega)$ once and for all.
+More importantly, we are able to reason about constructions and properties that hold for any simply typed language with a bidirectional type system once and for all by quantifying over $(\Sigma, \Omega)$.

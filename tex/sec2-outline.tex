@@ -61,7 +61,7 @@ Now we can define what it means to solve the type synthesis problem.
 
 \begin{definition}
 \label{def:STLC-type-synthesiser}
-Parametrised by an `excuse' predicate~$E$ on raw terms, a \emph{type synthesiser} takes a context~$\Gamma$ and a raw term $\erase\Gamma \vdash t$ (where $\erase\Gamma$~is the domain of~$\Gamma$) as input, and establishes one of the following outcomes:
+Parametrised by an `excuse' predicate~$E$ on raw terms, a \emph{type synthesiser} takes a context~$\Gamma$ and a raw term $\erase\Gamma \vdash t$ (where $\erase\Gamma$~is the list of variables in~$\Gamma$) as input, and establishes one of the following outcomes:
 \begin{enumerate}
 \item there exists a derivation of $\Gamma \vdash t : A$ for some type~$A$,
 \item there does not exist a derivation $\Gamma \vdash t : A$ for any type~$A$, or
@@ -138,7 +138,7 @@ This is called \emph{mode-correctness}, which we will formally define in \cref{s
 \end{figure}
 
 While it is possible for a bidirectional type synthesiser to do its job in one go, which can be thought of as adding both mode and typing information to a raw term and arriving at a bidirectional typing derivation, it is beneficial to have a preprocessing step which adds only mode information, based on which the synthesiser then continues to add typing information.
-More precisely, the preprocessing step attempts to produce \emph{mode derivations} as defined in \cref{fig:STLC-mode-derivations}, where the rules are exactly the mode part of the bidirectional typing rules~(\cref{fig:STLC-bidirectional-typing-derivations}).
+More precisely, the preprocessing step, which we call \emph{mode decoration}, attempts to produce \emph{mode derivations} as defined in \cref{fig:STLC-mode-derivations}, where the rules are exactly the mode part of the bidirectional typing rules~(\cref{fig:STLC-bidirectional-typing-derivations}).
 
 \begin{definition} \label{def:STLC-mode-decorator}
 A \emph{mode decorator} decides for any raw term~$V \vdash \isTerm{t}$ whether $V \vdash \isTerm{t}^{\syn}$.

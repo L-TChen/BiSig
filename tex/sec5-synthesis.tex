@@ -29,13 +29,13 @@ Now let us define mode-correctness rigorously.
 As we have outlined, the condition of mode-correctness for a synthesising rule is different from that of a checking rule, and the argument order also matters.
 Defining the condition directly for a rule, and thus in our setting for an operation, can be somewhat intricate.
 Instead, we choose to define the conditions for the argument list---more specifically, triples $\biargvec$ of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, for an operation, and subsequently for a signature.
-We also need some auxiliary definitions for the subset of variables of a type and of a context and the set of variables that have been synthesised:
+We also need some auxiliary definitions for the subset of variables of a type and of an extension context, and the set of variables that have been synthesised:
 \begin{definition}
   The finite subset\footnote{%
   There are various definitions for finite subsets of a set within Martin-L\"{o}f type theory.
   However, for our purposes, the choice among these definitions is not a matter of concern.}
   of \emph{(free) variables} of a type $A$ is denoted by $\fv(A)$.
-  The subset $\fv(\Gamma)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
+  The subset $\fv(\Delta)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
   For an argument list $\biargs$, define its set of \emph{synthesised type variables} inductively by 
   \begin{align}
     \label{eq:synvar1}\synvar(\cdot)                   & = \emptyset  \\
@@ -46,17 +46,17 @@ We also need some auxiliary definitions for the subset of variables of a type an
 This subset contains type variables of a synthesising argument and they are exactly those type variables that will be synthesised during type synthesis.
 
 \begin{definition}\label{def:mode-correctness-args}
-  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is defined as
+  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is defined by
   \begin{align}
     \label{eq:MC1} \MCas( \cdot ) & = \top \\
     \label{eq:MC3} \MCas\left(\biargvec, \chkbiarg[n]\right)
-                                  & = \fv(\Delta, A_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land \MCas\left(\biargvec\right) \\
+                                  & = \fv(\Delta_n, A_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land \MCas\left(\biargvec\right) \\
     \label{eq:MC2} \MCas\left(\biargvec, \synbiarg[n]\right) 
-                                  & = \phantom{, A_n} \fv(\Delta) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
+                                  & = \phantom{, A_n} \fv(\Delta_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
   \end{align}
   where \eqref{eq:MC1} means an empty list is always mode-correct.
 \end{definition}
-This definition encapsulates the idea that every `input' type variable, possibly derived from a context $\Delta$ or a checking argument $A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
+This definition encapsulates the idea that every `input' type variable, possibly derived from an extension context~$\Delta_n$ or a checking argument~$A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
 This condition must be met for every tail of the argument list as well to ensure that `output' variables accessible at each argument position are from preceding arguments only, hence an inductive definition.
 \begin{definition}\label{def:mode-correctness}
   An operation $\biop$ is \emph{mode-correct} if 
@@ -66,11 +66,12 @@ This condition must be met for every tail of the argument list as well to ensure
   \end{enumerate}
   A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
 \end{definition}
-For a checking operation, an `input' variable of an argument could be derived from $A_0$, as these are known during type checking as an input.
-Since every inhabitant of $\Xi$ can be located in either $A_0$ or synthesised variables, we can determine a concrete type for each inhabitant of $\Xi$ during type synthesis.
-On the other hand, for a synthesising operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to $\emptyset$.
-Also, the set of synthesised variables alone should include every type variable in $\Xi$ and particularly in $A_n$.
-It is also easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct according to our definition.
+For a checking operation, an `input' variable of an argument could be derived from~$A_0$, as these are known during type checking as an input.
+Since every inhabitant of~$\Xi$ can be located in either~$A_0$ or synthesised variables, we can determine a concrete type for each inhabitant of~$\Xi$ during type synthesis.
+On the other hand, for a synthesising operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to~$\emptyset$.
+Also, the set of synthesised variables alone should include every type variable in~$\Xi$ and particularly in~$A_n$.
+
+It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct according to our definition.
 
 \begin{remark}
   Mode-correctness is fundamentally a condition for bidirectional typing \emph{rules} themselves, not for derivations.
@@ -79,8 +80,8 @@ It is also easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{
 \end{remark}
 
 Now, we set out to show the uniqueness of synthesised types for a mode-correct bidirectional type system.
-For a specific system, its proof is typically a straightforward induction.
-However, given the mode-correctness---which incorporates an inductive definition on the argument list---we establish our proof through induction, both on typing derivations and on the argument list:
+For a specific system, its proof is typically a straightforward induction on the typing derivations.
+However, since mode-correctness is inductively defined on the argument list, our proof proceeds by induction on both the typing derivations and the argument list:
 \begin{lemma}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$, the synthesised types of any two derivations
   \[
@@ -137,11 +138,11 @@ Recall that a typing derivation for $\tmOpts$ contains a substitution $\rho\colo
 The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with an `accumulating' substitution: a substitution $\rho_0$ that is partially defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
 By mode-correctness, the accumulating substitution~$\rho_i$ will be defined on enough synthesised variables so that type synthesis or checking can be performed on $t_{i}$ with the context $\Gamma, \vars{x}_{i} : \simsub{\Delta_{i}}{\rho_{i}}$ based on its mode derivation $\erase{\Gamma}, \vars{x}_i |-_{\Sigma, \Omega} t_i^{\dir{d_i}}$.
 If we visit a synthesising argument $\synbiarg[i+1]$, then we may extend the domain of $\rho_i$ to include the synthesised variables $\fv(A_{i + 1})$ if type synthesis is successful and also that the synthesised type can be \emph{unified with $A_{i+ 1}$} and thereby \emph{extend} $\rho_i$ to $\bar{\rho_i} = \rho_{i+1}$ with the unifier.
-Then, if we go through every $t_i$ successfully, we will have a total substitution $\rho_n$ by mode-correctness and a derivation of $\Gamma, \vars{x}_i : \Delta_i |-_{\Sigma, \Omega} t_i :^{\dir{d_i}} \simsub{A}{\rho_n}$ for each subterm $t_i$.
+Then, if we go through every $t_i$ successfully, we will have a total substitution $\rho_n$ by mode-correctness and a derivation of $\Gamma, \vars{x}_i : \Delta_i |-_{\Sigma, \Omega} t_i :^{\dir{d_i}} \simsub{A}{\rho_n}$ for each sub-term $t_i$.
 
 \begin{remark}
 To make the argument above sound, it is necessary to compare types and solve a unification problem.
-Hence, we assume that the set\/ $\Xi$ of variables has a decidable equality, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
+Hence, we assume that the set~$\Xi$ of type variables has a decidable equality, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
 To simplify our choice, we could simply confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$, given that these sets have a decidable equality and the arity of a type construct is finite.
 Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in the definition of $\Type_{\Sigma}$ (see \Cref{sec:formalisation} for details).
 For the sake of clarity in presentation, though, we keep using named variables and just assume that $\Xi$ has a decidable equality.}
@@ -164,7 +165,7 @@ We are now ready for the decidability proof.
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis-checking}}]
   We prove this statement by induction on the mode derivation\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
   The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness.
-  The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
+  The case \ChkRule{Sub} invokes the uniqueness of synthesised types~(\cref{thm:unique-syn}) to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
   The first three cases follow essentially the same reasoning provided by \citet{Wadler2022}, but we still present the reasoning here for the sake of completeness.
   The last case \Rule{Op} is new and has been discussed above.
   For brevity we omit the subscript $(\Sigma, \Omega)$.
@@ -277,7 +278,7 @@ We are now ready for the decidability proof.
 
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.
 These programs either compute the typing derivation or provide a proof of contradiction.
-Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each subterm, as well as the unification process.
+Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each sub-term, as well as the unification process.
 If a contradiction proof is not of interest for implementation, these programs can be simplified by disregarding the cases that yield such contradiction proofs.
 Alternatively, we could consider generalising typing derivations instead, like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}).
 This could accommodate ill-typed cases and reformulate contradiction proofs positively to deliver more informative error messages.
@@ -285,15 +286,15 @@ This would assist programmers in resolving issues with ill-typed terms, rather t
 
 \subsection{Trichotomy on Raw Terms by Type Synthesis} \label{subsec:trichotomy}
 
-Combining the bidirectional synthesiser in \cref{subsec:bidirectional-synthesis-checking} with the mode decorator, soundness, and completeness in \cref{sec:pre-synthesis}, we can now construct a type synthesiser, which generalises \cref{thm:implementation}.
+Combining the bidirectional type synthesiser with the mode decorator, soundness, and completeness from \cref{sec:pre-synthesis}, we get a type synthesiser parameterised by $(\Sigma, \Omega)$, generalising \cref{thm:implementation}.
 
 \begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
   For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
   exactly one of the following holds:
   \begin{enumerate}
-    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$.
-    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but\/ $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$.
-    \item $\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
+    \item (\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and)\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$.
+    \item (\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but)\/ $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$.
+    \item \phantom{(\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$}\llap{$\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$\kern.5pt}.
   \end{enumerate}
 \end{corollary}
 \begin{proof}

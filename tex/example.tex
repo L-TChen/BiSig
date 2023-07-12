@@ -1,7 +1,7 @@
 %!TEX root = BiSig.tex
 
 \section{Examples}\label{sec:example}
-Our theory works for any simply typed language that can be specified in a syntax-directed manner by a bidirectional binding signature, and is not confined to a specific language.
+Our theory works for any language that can be specified by a bidirectional binding signature.
 To showcase its general applicability, we present two additional examples:
 \begin{enumerate}
 \item \PCF with products and let bindings, and
@@ -10,7 +10,7 @@ To showcase its general applicability, we present two additional examples:
 The first is a standard exercise in implementing a type synthesiser and the second is an example of a system with infinitely many operations.
 
 \subsection{PCF with Products and Let Bindings}\label{subsec:PCF}
-Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This has also been the case for parsing: while there are grammar and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
+Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This has also been the case for parsing: while there are grammars and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
 While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022}, which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding the following rules:
 \bgroup
 \small

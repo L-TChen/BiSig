@@ -514,7 +514,7 @@ By removing \ensuremath{\Varid{mode}} from these definitions, we retrieve the de
 \>[B]{}\Keyword{record}\;\Conid{OpD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Keyword{constructor}\;\Varid{ι}{}\<[E]%
+\>[3]{}\Varid{constructor}\;\Varid{ι}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{field}{}\<[E]%
@@ -548,7 +548,7 @@ By removing \ensuremath{\Varid{mode}} from these definitions, we retrieve the de
 \>[B]{}\Keyword{record}\;\Conid{SigD}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Keyword{constructor}\;\Varid{sigd}{}\<[E]%
+\>[3]{}\Varid{constructor}\;\Varid{sigd}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{field}{}\<[E]%
@@ -806,60 +806,53 @@ The signature endofunctor \ensuremath{\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}} f
 }
 This completes our definition of the signature functor for constructing extrinsic typing derivations.
 
-At last, we can define the type of bidirectional typing derivations for a signature \ensuremath{\Conid{D}} using \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}, similarly to how we handled simple types and raw terms. This involves the following four constructors:
-\LT{help}
+At last, we can define the type of bidirectional typing derivations for a signature \ensuremath{\Conid{D}} using \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}, similarly to how we handled simple types and raw terms. This involves the following four constructors, corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 {\small\begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{24}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{34}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{55}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{61}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{70}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{32}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{56}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{62}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{71}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\mathbin{:}\;\Conid{Fam}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{var}\;{}\<[9]%
-\>[9]{}\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[55]%
-\>[55]{}\Varid{\char95 ↑\char95 }\;{}\<[61]%
-\>[61]{}\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[70]%
-\>[70]{}\Varid{⇒}\;\Conid{B}\;{}\<[E]%
+\>[9]{}\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[32]%
+\>[32]{}\hspace{10em}{}\<[56]%
+\>[56]{}\Varid{\char95 ↑\char95 }\;{}\<[62]%
+\>[62]{}\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[71]%
+\>[71]{}\Varid{⇒}\;\Conid{B}\;{}\<[E]%
 \\
-\>[9]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[61]%
-\>[61]{}\Varid{→}\;\Conid{A}\;\Varid{≡}\;\Conid{B}\;{}\<[E]%
+\>[9]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[62]%
+\>[62]{}\Varid{→}\;\Conid{A}\;\Varid{≡}\;\Conid{B}\;{}\<[E]%
 \\
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}\;{}\<[61]%
-\>[61]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[70]%
-\>[70]{}\Varid{⇐}\;\Conid{A}{}\<[E]%
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}\;{}\<[62]%
+\>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[71]%
+\>[71]{}\Varid{⇐}\;\Conid{A}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{\char95 ∋\char95 }\;{}\<[9]%
-\>[9]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[55]%
-\>[55]{}\Varid{op}\;{}\<[61]%
-\>[61]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
+\>[9]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[56]%
+\>[56]{}\Varid{op}\;{}\<[62]%
+\>[62]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[24]%
-\>[24]{}\Varid{⇐}\;\Conid{A}\;{}\<[61]%
-\>[61]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;{}\<[E]%
+\>[24]{}\Varid{⇐}\;\Conid{A}\;{}\<[62]%
+\>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;{}\<[E]%
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;{}\<[24]%
-\>[24]{}\Varid{⇒}\;\Conid{A}{}\<[34]%
-\>[34]{}\hspace{2em}{}\<[E]%
+\>[24]{}\Varid{⇒}\;\Conid{A}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 }
-corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
-
-As an illustration, consider the soundness proof, i.e.\ the `if' part of \Cref{lem:soundness-completeness}.
-Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-For the $\SynRule{Sub}$, the induction hypothesis \ensuremath{\Varid{soundness}\;\Varid{t}} is invoked directly from \ensuremath{\Varid{t}\;\Varid{↑}\;\Varid{refl}}.
-\begin{figure}[b]
+\begin{figure}
   \codefigure
   \begin{minipage}[b]{.44\textwidth}
 \begin{hscode}\SaveRestoreHook
@@ -995,5 +988,11 @@ For the $\SynRule{Sub}$, the induction hypothesis \ensuremath{\Varid{soundness}\
 \caption{The soundness proof in \Agda}
 \label{fig:formal-soundness}
 \end{figure}
+
+Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+
+As an illustration, consider the soundness proof in \cref{fig:formal-soundness}, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
+Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+For the $\SynRule{Sub}$ case, the induction hypothesis \ensuremath{\Varid{soundness}\;\Varid{t}} is invoked directly.
 
 \end{document}

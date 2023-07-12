@@ -241,29 +241,22 @@ The signature endofunctor |⟦ Δ ⟧ᵃ| for an extension context |Δ| maps a p
 \end{code}}
 This completes our definition of the signature functor for constructing extrinsic typing derivations.
 
-At last, we can define the type of bidirectional typing derivations for a signature |D| using |⟦ D ⟧|, similarly to how we handled simple types and raw terms. This involves the following four constructors:
-\LT{help}
+At last, we can define the type of bidirectional typing derivations for a signature |D| using |⟦ D ⟧|, similarly to how we handled simple types and raw terms. This involves the following four constructors, corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 {\small\begin{code}
 data _⊢_[_]_ : Fam Raw where
 
-  var   : (i : A ∈ Γ)                                 _↑_   : Γ ⊢ r  ⇒ B
-        → L.index i ≡ j                                     → A ≡ B
-        → Γ ⊢ (` j) ⇒ A                                     → Γ ⊢ r  ⇐ A
+  var   : (i : A ∈ Γ)          {-"\hspace{10em}"-}     _↑_   : Γ ⊢ r  ⇒ B
+        → L.index i ≡ j                                      → A ≡ B
+        → Γ ⊢ (` j) ⇒ A                                      → Γ ⊢ r  ⇐ A
                                                                                          
-  _∋_   : (A : Ty)                                    op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ rs d A
-        → Γ ⊢ r        ⇐ A                                  → Γ ⊢ op rs [ d ] A
-        → Γ ⊢ (A ∋ r)  ⇒ A       {-"\hspace{2em}"-}             
+  _∋_   : (A : Ty)                                     op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ rs d A
+        → Γ ⊢ r        ⇐ A                                   → Γ ⊢ op rs [ d ] A
+        → Γ ⊢ (A ∋ r)  ⇒ A                    
     \end{code}}
-corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
-
-As an illustration, consider the soundness proof, i.e.\ the `if' part of \Cref{lem:soundness-completeness}.
-Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-For the $\SynRule{Sub}$, the induction hypothesis |soundness t| is invoked directly from |t ↑ refl|.
-\begin{figure}[b]
+\begin{figure}
   \codefigure
   \begin{minipage}[b]{.44\textwidth}
 \begin{code}
@@ -307,5 +300,11 @@ mutual
 \caption{The soundness proof in \Agda}
 \label{fig:formal-soundness}
 \end{figure}
+
+Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+
+As an illustration, consider the soundness proof in \cref{fig:formal-soundness}, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
+Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+For the $\SynRule{Sub}$ case, the induction hypothesis |soundness t| is invoked directly.
 
 \end{document}

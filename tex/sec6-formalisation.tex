@@ -283,6 +283,7 @@
 \DeclareUnicodeCharacter{27E6}{\ensuremath{\llbracket}}
 \DeclareUnicodeCharacter{27E7}{\ensuremath{\rrbracket}}
 \DeclareUnicodeCharacter{2200}{\ensuremath{\forall}}
+\DeclareUnicodeCharacter{2218}{\ensuremath{\circ}}
 
 \DeclareUnicodeCharacter{2294}{\ensuremath{\sqcup}}
 
@@ -352,72 +353,80 @@
 \begin{document}
 
 \section{Formalisation} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro}, our theory was initially developed with \Agda using \AxiomK and has been later translated into the mathematical vernacular.
-While the translation is reasonably straightforward, understanding the design of the formalisation itself could pose some difficulty.
-If the reader is already comfortable with the informal theory presented so far and assured by the existence of its formalisation, they may choose to skip this section.
+As we have mentioned in \Cref{sec:intro}, our theory was initially developed with \Agda.
+While the translation to the natural language is reasonably straightforward, understanding the formalisation itself could pose some difficulty.
+If the reader is comfortable with the informal presentation and assured by the existence of its formalisation, they may feel free to skip this section.
 
 \paragraph{Revisiting language formalisation frameworks}
-Unlike prior frameworks~\citep{Allais2021,Fiore2022,Ahrens2022} that have primarily focused on meta-properties centred around substitution and term traversal for intrinsically-typed terms, our theory of bidirectional type synthesis does not require term substitution but structural induction for extrinsically-typed terms.
-The formal definitions of extrinsic typing in bidirectional type systems, including bidirectional typing derivations and mode derivations, are more complex than their intrinsic counterparts.
+Unlike prior frameworks~\citep{Allais2021,Fiore2022,Ahrens2022} that have primarily focused on meta-properties centred around substitution for intrinsically-typed terms, our theory of bidirectional type synthesis does not require term substitution but structural induction for extrinsically-typed terms.
+The formal definitions of extrinsic typing are more complex than their intrinsic counterparts.
 For a specific language such as \PCF, \citet{Wadler2022} noted that `extrinsically-typed terms require about 1.6 times as much code as intrinsically-typed' for their formalisation of type safety.
-Take the formal type-theoretic definition of typing derivations $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ (\Cref{fig:extrinsic-typing}) as an example.
+For our generic definitions, take the formal type-theoretic definition of typing derivations $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ as an example.
 Its intrinsic definition consists of of just one family of sets of intrinsically-typed terms indexed by $A$ and $\Gamma$, but its extrinsic counterpart is a generic family of sets indexed by additionally a generic raw term $t$, involving constructions of two different layers.
 
 \paragraph{Category-theoretic analysis of well-typed terms}
-\citet{Fiore1999}{'s} theory of abstract syntax and variable binding forms the foundation of \citet{Fiore2022}'s framework and inspires frameworks by \citet{Allais2021,Ahrens2022}. 
-We may sketch the idea of their analysis as follows.
+The difference between intrinsic typing and extrinsic typing could be partly manifested by its categorical analysis.
+\citet{Fiore1999}{'s} theory of abstract syntax and variable binding forms the foundation of \citet{Fiore2022}'s framework and inspires frameworks by \citet{Allais2021,Ahrens2022}.
+Let us take a closer look of their idea.
 The set of (untyped) abstract syntax trees for a language can be understood as
 \begin{enumerate*}
   \item a family of sets $\Term_{\Gamma}$ of well-scoped terms under a context~$\Gamma$ with
-  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, and
-  \item an \emph{initial} algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$ of variables to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts, the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the binding arities of constructs, and the initiality amounts to structural recursion, i.e.\ \emph{term traversal}.
+  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, with
+  \item an \emph{initial} algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$ of variables to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts and the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the binding arities of constructs. 
+  The initiality amounts to structural recursion on terms, namely \emph{term traversal}.
 \end{enumerate*}
-Substitution is modelled as some monoid multiplication with the notion of strength and a suitable monoidal structural on the category of presheaves.
+Substitution is modelled as a monoid multiplication with the notion of strength and a suitable monoidal structure on the category of presheaves.
 To put it succinctly, it is the free $\mathbb{\Sigma}$-monoid over the presheaf~$V$ of variables.
 
+Such an initial algebra can be constructed as the least fixpoint of a sequence of objects defined via iteratively applying the signature functor by the Initial Algebra Theorem~\cite{Trnkova1975}.
+
 \paragraph{Type-theoretic construction of well-typed terms}
-Fortunately, in type theory, constructing the initial algebra of well-typed terms boils down to defining an inductive type with a few constructors that align primitive rules (such as $\Rule{Var}$) and a rule schema; term traversal can be defined by as usual pattern matching for the inductive type~\citep{Fiore2022}.
+Fortunately, in type theory, constructing the initial algebra of well-typed terms boils down to defining an inductive type with a few constructors that align primitive rules (such as $\Rule{Var}$) and a rule schema; term traversal can be defined by pattern matching as usual for the inductive type~\citep{Fiore2022}.
 
-\paragraph{Whither a theory of extrinsic typing?}
-In \citep{Fiore1999} or existing frameworks, extrinsic typing is not studied.
-Our formalisation is inspired by \varcitet{Hermida1998}{'s} interpretation of structural induction as algebras on the category of predicates, viewing extrinsic definitions as endofunctors on the category of predicates.
-However, a category-theoretic analysis of our formal constructions in line with \varcitet{Fiore1999}{'s} theory requires proficiency in category theory, which falls outside the scope of this paper.
+\paragraph{Lack of a theory for extrinsic typing}
+While the theory of \citet{Fiore1999} and others provide significant insights, they do not consider extrinsic typing.
+We find inspiration in the interpretation of structural induction as algebras for an endofunctor on the category of predicates over a base category, as put forward by \citet{Hermida1998}.
+From this perspective, we interpret extrinsic typing as a signature `functor' on the category of predicates consisting of a $\N$-indexed family $X$ of sets and another family $Y$ of sets over $X$; constructing typing derivations as its initial algebra over well-scoped terms.
+Our formal construction appears novel and we believe that a theoretic understanding of our construction and its connection to intrinsic typing as a bridge between raw terms and well-typed terms deserve some attention.
+However, carrying out a category-theoretic analysis requires expertise in category theory, which goes beyond the scope of this paper.
 
-As such, in this section, we will merely provide an overview of our design and explain the construction of simple types in \Cref{subsec:formal-simple-types} and bidirectional typing rules in \Cref{subsec:formal-extrinsic-typing} intuitively.
-On the other hand, the formal proofs closely mirror their informal description presented so far, thus we will only illustrate the `if' part of \Cref{lem:soundness-completeness} as an example in \Cref{subsec:formal-proofs}. 
+Therefore, in this section, we will primarily provide an overview of our design and offer intuitive explanations.
+We will discuss the construction of simple types in \Cref{subsec:formal-simple-types}, raw terms in~\Cref{subsec:formal-raw-terms}, and bidirectional typing rules in \Cref{subsec:formal-bidirectional-typing}.
+Since the formal proofs largely reflect their informal presentation, we will limit our illustration to the 'if' part of \Cref{lem:soundness-completeness} as an example in \Cref{subsec:formal-proofs}.
 
 \subsection{Defining Simple Types}\label{subsec:formal-simple-types}
 
-We begin the formal definition of signatures and simple types (\Cref{def:simple-signature}):
-\begin{figure}[H]
+
+\begin{figure}
+  \codefigure
   \small
   \begin{minipage}[t]{.45\textwidth}
     \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{16}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Keyword{record}\;\Conid{Desc}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\>[B]{}\Keyword{record}\;\Conid{SigD}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{field}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Conid{Op}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;{}\<[19]%
-\>[19]{}\Conid{Set}{}\<[E]%
+\>[5]{}\Conid{Op}\;{}\<[13]%
+\>[13]{}\mathbin{:}\;{}\<[16]%
+\>[16]{}\Conid{Set}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\{\kern-.9pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-1.5pt\;\Varid{decEq}\;\kern-1.5pt\vrule width .75pt height 7.125pt depth 1.975pt\kern-.9pt\}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;{}\<[19]%
-\>[19]{}\Conid{DecEq}\;\Conid{Op}{}\<[E]%
+\>[5]{}\Varid{decEq}\;{}\<[13]%
+\>[13]{}\mathbin{:}\;{}\<[16]%
+\>[16]{}\Conid{DecEq}\;\Conid{Op}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{rules}\;{}\<[16]%
-\>[16]{}\mathbin{:}\;{}\<[19]%
-\>[19]{}\Conid{Op}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\>[5]{}\Varid{ar}\;{}\<[13]%
+\>[13]{}\mathbin{:}\;{}\<[16]%
+\>[16]{}\Conid{Op}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
@@ -428,9 +437,9 @@ We begin the formal definition of signatures and simple types (\Cref{def:simple-
 \column{8}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{24}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;\Conid{Desc}\;\Varid{→}\;\Conid{Set}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;\Conid{SigD}\;\Varid{→}\;\Conid{Set}\;\Varid{→}\;\Conid{Set}{}\<[E]%
 \\
-\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\mathrel{=}\;\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Conid{X}\;\hat{}\;(\Conid{D}\;\Varid{.rules}\;\Varid{i}){}\<[E]%
+\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\mathrel{=}\;\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Conid{X}\;\hat{}\;(\Conid{D}\;\Varid{.ar}\;\Varid{i}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Keyword{data}\;\Conid{Ty}\;(\Conid{Ξ}\;\mathbin{:}\;\Conid{ℕ})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
 \\
@@ -446,25 +455,23 @@ We begin the formal definition of signatures and simple types (\Cref{def:simple-
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
+  \caption{Simple types in \Agda}
+  \label{fig:formal-simple-type}
 \end{figure}
-This definition mirrors our informal counterpart, with the exception of \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} for a signature~\ensuremath{\Conid{D}}.
-As we are defining simple types inductively, the arity \ensuremath{(\Varid{rules}\;\Varid{o})} is intended to denote the number of \ensuremath{\Conid{Ty}} arguments, referring back to what we are in the process of defining.
-To circumvent this self-reference, we first define \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} on an arbitrary \ensuremath{\Conid{Set}} rather than \ensuremath{\Conid{Ty}} itself.
-Consequently, the inductive type of types specified by a signature can be defined using two constructors, \ensuremath{\text{\textasciigrave}\anonymous } and \ensuremath{\Varid{op}}.
-A variable is represented by \ensuremath{\text{\textasciigrave}\Varid{n}} for some inhabitant \ensuremath{\Varid{n}} of the type \ensuremath{\Conid{Fin}\;\Conid{Ξ}} of natural numbers less than~\ensuremath{\Conid{Ξ}}.
-Each inhabitant \ensuremath{\Varid{op}\;(\Varid{i}\;\Varid{,}\;\Varid{ts})} consists of an operation symbol \ensuremath{\Varid{i}} and a $n$-tuple \ensuremath{\Varid{ts}}.
+We start with the formal definition of signatures and simple types (\Cref{fig:formal-simple-type}), which parallels its informal counterpart (\Cref{def:simple-signature}), with the exception of \ensuremath{\Varid{⟦\char95 ⟧}}.
+To prevent circular references during the inductive definition of simple types, we initially define \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} on an arbitrary \ensuremath{\Conid{Set}} instead of \ensuremath{\Conid{Ty}}.
+Thus, types specified by a signature can be defined using two constructors--- \ensuremath{\text{\textasciigrave}\anonymous }\ and \ensuremath{\Varid{op}}---where a variable is represented by \ensuremath{\text{\textasciigrave}\;\Varid{n}} for some \ensuremath{\Varid{n}} less than \ensuremath{\Conid{Ξ}}, and each inhabitant \ensuremath{\Varid{op}\;(\Varid{i}\;\Varid{,}\;\Varid{ts})} is a pair of an operation symbol \ensuremath{\Varid{i}} and a list \ensuremath{\Varid{ts}} of length $n$.
 
-From a categorical perspective, \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} can be understood as the functor from \ensuremath{\Conid{Set}} to \ensuremath{\Conid{Set}} which maps $X$ to a $O$-indexed coproduct $\sum_{i \in O} X ^ {\arity(o)}$ of products.
-The type \ensuremath{\Conid{Ty}} is then the free \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}-algebra over the type \ensuremath{\Conid{Fin}\;\Conid{Ξ}} or the initial algebra for the functor \ensuremath{\Conid{Fin}\;\Conid{Ξ}\;\Varid{+}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}.
+From a categorical standpoint, \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} acts as a functor from \ensuremath{\Conid{Set}} to \ensuremath{\Conid{Set}}, mapping $X$ to an $\Conid{Op}$-indexed coproduct $\sum_{i \in \Conid{Op}} X ^ {\Conid{ar}(i)}$ of products of $X$.
+The type \ensuremath{\Conid{Ty}} is the free \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}-algebra over the type \ensuremath{\Conid{Fin}\;\Conid{Ξ}} or the initial algebra for the functor \ensuremath{\Conid{Fin}\;\Conid{Ξ}\;\Varid{+}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}.
 
-In short, to define terms by a signature, we define additionally a \emph{signature functor} \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}.
+Finally, to account for indices when defining raw terms and bidirectional typing derivations by a signature, we define a corresponding signature functor \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}} for a (bidirectional) binding signature.
 
-\subsection{Defining Raw Terms}\label{subsec:formal-extrinsic-typing}
-
-The following record types represent the type \ensuremath{\Conid{ArgD}} for arguments $[\Delta]A^{\dir{d}}$, the type \ensuremath{\Conid{ConD}} for operations $\biop$, and the type \ensuremath{\Conid{Desc}} for bidirectional binding signatures, respectively, verbatim.
-Removing \ensuremath{\Varid{mode}} from these definitions recover the definitions of binding arguments, arities, and signatures.
-\begin{figure}[H]
-  \small
+\subsection{Defining Raw Terms}\label{subsec:formal-raw-terms}
+As shown in \Cref{fig:formal-bibisig}, we establish \ensuremath{\Conid{ArgD}}, \ensuremath{\Conid{OpD}}, and \ensuremath{\Conid{SigD}} to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
+By removing \ensuremath{\Varid{mode}} from these definitions, we retrieve the definitions of binding arguments, arities, and signatures.
+\begin{figure}
+  \codefigure
   \begin{minipage}[t]{.3\textwidth}
   \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -491,6 +498,8 @@ Removing \ensuremath{\Varid{mode}} from these definitions recover the definition
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\dir{\Varid{mode}}\;{}\<[19]%
 \>[19]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Conid{ArgsD}\;\mathrel{=}\;\Conid{List}\;\Varid{∘}\;\Conid{ArgD}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
@@ -499,9 +508,10 @@ Removing \ensuremath{\Varid{mode}} from these definitions recover the definition
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{18}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Keyword{record}\;\Conid{ConD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\>[B]{}\Keyword{record}\;\Conid{OpD}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{constructor}\;\Varid{ι}{}\<[E]%
@@ -510,20 +520,21 @@ Removing \ensuremath{\Varid{mode}} from these definitions recover the definition
 \>[3]{}\Keyword{field}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\{\mskip1.5mu \Varid{vars}\mskip1.5mu\}\;{}\<[18]%
-\>[18]{}\mathbin{:}\;\Conid{ℕ}{}\<[E]%
+\>[5]{}\{\mskip1.5mu \Varid{tvars}\mskip1.5mu\}\;{}\<[21]%
+\>[21]{}\mathbin{:}\;\Conid{ℕ}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{args}\;{}\<[18]%
-\>[18]{}\mathbin{:}\;\Conid{List}\;(\Conid{ArgD}\;\Varid{vars}){}\<[E]%
+\>[5]{}\dir{\Varid{mode}}\;{}\<[21]%
+\>[21]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{type}\;{}\<[18]%
-\>[18]{}\mathbin{:}\;\Conid{Ty}\;\Varid{vars}{}\<[E]%
+\>[5]{}\Varid{type}\;{}\<[21]%
+\>[21]{}\mathbin{:}\;\Conid{TExp}\;{}\<[29]%
+\>[29]{}\Varid{tvars}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\dir{\Varid{mode}}\;{}\<[18]%
-\>[18]{}\mathbin{:}\;\Conid{Mode}{}\<[E]%
+\>[5]{}\Varid{args}\;{}\<[21]%
+\>[21]{}\mathbin{:}\;\Conid{ArgsD}\;\Varid{tvars}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
@@ -532,33 +543,40 @@ Removing \ensuremath{\Varid{mode}} from these definitions recover the definition
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Keyword{record}\;\Conid{Desc}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\>[B]{}\Keyword{record}\;\Conid{SigD}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{constructor}\;\Varid{sigd}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Keyword{field}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Conid{Op}\;{}\<[17]%
-\>[17]{}\mathbin{:}\;\Conid{Set}{}\<[E]%
+\>[5]{}\Conid{Op}\;{}\<[15]%
+\>[15]{}\mathbin{:}\;\Conid{Set}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{rules}\;{}\<[17]%
-\>[17]{}\mathbin{:}\;\Conid{Op}\;\Varid{→}\;\Conid{ConD}{}\<[E]%
+\>[5]{}\Varid{ar}\;{}\<[15]%
+\>[15]{}\mathbin{:}\;\Conid{Op}\;\Varid{→}\;\Conid{OpD}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
   \end{minipage}
+  \caption{Bidirectional binding signature in \Agda}
+  \label{fig:formal-bibisig}
 \end{figure}
-Our raw terms, being well-scoped and indexed by a list $V$ of free variables, requires another definition of a signature functor for their construction.
-This involves mapping \ensuremath{\Conid{Fam}} to \ensuremath{\Conid{Fam}}, where \ensuremath{\Conid{Fam}\;\mathrel{=}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}} represents the family of sets indexed by a number (representing the number of free variables).
-The signature endofunctor for constructing raw terms shares similarities with the signature functor used for defining simple types, but rather than using a single functor, we employ four distinct functors that are defined separately for the extension context, arguments, constructs, and the coproduct indexed by constructs.
-Each of these corresponds to a variant of \ensuremath{\Varid{⟦\char95 ⟧}}:
-\begin{figure}[H]
-  \small 
-  \begin{minipage}[t]{.52\textwidth}
+To construct well-scoped raw terms indexed by a list $V$ of free variables, we introduce another signature functor mapping \ensuremath{\Conid{Fam}} to \ensuremath{\Conid{Fam}}, where \ensuremath{\Conid{Fam}} is the family of sets defined as \ensuremath{\Conid{ℕ}\;\Varid{→}\;\Conid{Set}}, indexed by a natural number indicating the number of free variables.
+This signature endofunctor for raw term construction resembles the one for defining simple types.
+However, we define four distinct functors instead of defining one directly.
+These are \ensuremath{\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}} for an extension context \ensuremath{\Conid{Δ}}, \ensuremath{\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}} for an argument list \ensuremath{\Conid{Ds}}, \ensuremath{\Varid{⟦}\;\Varid{ι}\;\Conid{Ds}\;\anonymous \;\Varid{⟧ᶜ}} for an operation (\ensuremath{\Varid{ι}\;\Conid{Ds}\;\Conid{A}}), and \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᶜ}} for a binding signature $D$.
+Notably, the functor \ensuremath{\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}} extends the context by $\erase{\Delta}$ variables by mapping the family of sets \ensuremath{\Conid{X}\;\Varid{n}} to \ensuremath{\Conid{X}\;(\Varid{length}\;\Conid{Δ}\;\Varid{+}\;\Varid{n})}.
+\begin{figure}
+  \codefigure
+\begin{minipage}[t]{.33\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{8}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{17}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{19}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -572,7 +590,10 @@ Each of these corresponds to a variant of \ensuremath{\Varid{⟦\char95 ⟧}}:
 \>[B]{}\Varid{⟦}\;\Conid{Δ}\;{}\<[17]%
 \>[17]{}\Varid{⟧ᵃ}\;{}\<[22]%
 \>[22]{}\Conid{X}\;\Varid{n}\;{}\<[27]%
-\>[27]{}\mathrel{=}\;\Conid{X}\;(\Varid{length}\;\Conid{Δ}\;\Varid{ʳ+}\;\Varid{n}){}\<[E]%
+\>[27]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{X}\;(\Varid{length}\;\Conid{Δ}\;\Varid{+}\;\Varid{n}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;{}\<[8]%
 \>[8]{}\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ}\;{}\<[19]%
@@ -586,43 +607,48 @@ Each of these corresponds to a variant of \ensuremath{\Varid{⟦\char95 ⟧}}:
 \>[B]{}\Varid{⟦}\;(\Conid{Δ}\;\Varid{⊢}\;\Conid{A})\;\Varid{∷}\;\Conid{Ds}\;{}\<[17]%
 \>[17]{}\Varid{⟧ᵃˢ}\;{}\<[22]%
 \>[22]{}\Conid{X}\;\Varid{n}\;{}\<[27]%
-\>[27]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Varid{n}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Varid{n}{}\<[E]%
+\>[27]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Varid{n}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Varid{n}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-  \end{minipage}
-  \begin{minipage}[t]{.47\textwidth}
+\end{minipage}
+\begin{minipage}[t]{.3\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{8}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{10}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{16}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{20}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;{}\<[8]%
-\>[8]{}\mathbin{:}\;\Conid{ConD}\;{}\<[16]%
-\>[16]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
+\>[8]{}\mathbin{:}\;\Conid{OpD}\;{}\<[15]%
+\>[15]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
 \\
-\>[B]{}\Varid{⟦}\;\Varid{ι}\;\Conid{D}\;\anonymous \;{}\<[10]%
-\>[10]{}\Varid{⟧ᶜ}\;{}\<[14]%
-\>[14]{}\Conid{X}\;{}\<[19]%
-\>[19]{}\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}{}\<[E]%
+\>[B]{}\Varid{⟦}\;\Varid{ι}\;\Conid{Ds}\;\anonymous \;{}\<[11]%
+\>[11]{}\Varid{⟧ᶜ}\;{}\<[15]%
+\>[15]{}\Conid{X}\;{}\<[20]%
+\>[20]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{⟦\char95 ⟧}\;{}\<[8]%
-\>[8]{}\mathbin{:}\;\Conid{Desc}\;{}\<[16]%
+\>[8]{}\mathbin{:}\;\Conid{SigD}\;{}\<[16]%
 \>[16]{}\Varid{→}\;\Conid{Fam}\;\Varid{→}\;\Conid{Fam}{}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Conid{D}\;{}\<[10]%
-\>[10]{}\Varid{⟧}\;{}\<[14]%
-\>[14]{}\Conid{X}\;\Varid{n}\;{}\<[19]%
-\>[19]{}\mathrel{=}\;\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Varid{n}{}\<[E]%
+\>[10]{}\Varid{⟧}\;{}\<[15]%
+\>[15]{}\Conid{X}\;\Varid{n}\;{}\<[20]%
+\>[20]{}\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{Σ[}\;\Varid{i}\;\Varid{∈}\;\Conid{D}\;\Varid{.Op}\;\mskip1.5mu]\;\Varid{⟦}\;\Conid{D}\;\Varid{.ar}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Varid{n}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-  \end{minipage}
-\end{figure}
-The inductive type of raw terms indexed by a list of free variables can now be defined by 
-\begin{figure}[H]
-  \small
+\end{minipage}
+\begin{minipage}[t]{.33\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -649,43 +675,90 @@ The inductive type of raw terms indexed by a list of free variables can now be d
 \>[33]{}\Varid{→}\;\Conid{Raw}\;\Varid{n}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+\end{minipage}
+\caption{Signature functor for raw terms and raw terms in \Agda}
+\label{fig:formal-raw-term-functor}
+\label{fig:formal-raw-terms}
 \end{figure}
-and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Conid{A}\;\Varid{∋}\;\Varid{t}} corresponds to the raw term $t \annotate A$.
 
-\subsection{Defining Extrinsic Bidirectional Typing Derivations}
-\begin{figure}[H]
-  \small
-% bidirectionally typed terms
-%Fam : (ℓ′ : Level) (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
-%Fam ℓ′ X = (Γ : Cxt 0) → X (length Γ) → Mode → Ty → Set ℓ′
-%
+The inductive type of raw terms, indexed by a list of free variables, is defined as shown in \Cref{fig:formal-raw-terms}.
+This mirrors our informal definition (\Cref{fig:raw-terms}), where \ensuremath{\Conid{A}\;\Varid{∋}\;\Varid{t}} corresponds to the raw term $t \annotate A$.
+These definitions align closely with those found in other referenced frameworks.
+
+\subsection{Defining Extrinsic Bidirectional Typing Derivations}\label{subsec:formal-bidirectional-typing}
+Formally defining extrinsic derivations is arguably the most complex aspect of our formalisation.
+This requires defining a family of sets, indexed by context, type, mode, and notably, a raw term.
+This definition involves another signature endofunctor, requiring consistency with the functor used for constructing raw terms. 
+
+We begin with the family of sets on which the functor acts.
+A typing judgement $\Gamma \vdash_{\Sigma, \Omega} t :^{\dir{d}} A$ can be viewed as a predicate over raw terms with four indices: a context, a $\N$-indexed family of sets, a mode, and a type.
+The type of this predicate can be generalised to a family of sets over the $\N$-indexed family of sets, as follows:
+{\small
 \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Fam}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{→}\;\Conid{Set}\;\anonymous {}\<[E]%
+\\
+\>[B]{}\Conid{Fam}\;\Conid{X}\;{}\<[8]%
+\>[8]{}\mathrel{=}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Mode}\;\Varid{→}\;\Conid{Ty}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+Observe that the second index \ensuremath{\Conid{X}} depends on the length of the first index \ensuremath{\Conid{Γ}}.
+This is because a typing derivation for a raw term $V \vdash_{\Sigma, \erase{\Omega}} t$ requires the same number of variables as in $V$.
+
+In a similar vein, we define four functors for the construction of bidirectional typing derivations, albeit in a top-down manner.
+For an endofunctor on predicates, each functor must act as a \emph{lifting} of the functor on its domain, illustrated below.
+The signature endofunctor \ensuremath{\Varid{⟦\char95 ⟧}} for a bidirectional binding signature is defined as follows:
+{\small
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧}\;{}\<[6]%
+\>[6]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{SigD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;(\Varid{o}\;\Varid{,}\;\Varid{ts})\;\Varid{d}\;\Conid{A}\;\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{.ar}\;\Varid{o}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{ts}\;\Varid{d}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+This functor maps a predicate \ensuremath{\Conid{Y}} over \ensuremath{\Conid{X}} into a predicate \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\Conid{Y}} over \ensuremath{\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}}.
+Here, \ensuremath{\Varid{erase}\;\Conid{D}} represents the mode erasure of \ensuremath{\Conid{D}}, and the prefix \ensuremath{\Conid{R}} in \ensuremath{\Conid{R.⟦\char95 ⟧}} indicates the signature endofunctor used in raw term construction.
+
+The functor \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{.ar}\;\Varid{o}\;\Varid{⟧ᶜ}} is defined for an operation symbol $\biop$:
+{\small\begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{OpD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;\Conid{X})\;{}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{A₀}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}\;\mathrel{=}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{d}\;\Varid{≡}\;\Varid{d′}\;\Varid{×}\;\Conid{Σ[}\;\Varid{p}\;\Varid{∈}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\mskip1.5mu]\;\Conid{A₀}\;\Varid{⟨}\;\Varid{p}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}\;\Varid{×}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+A set within the family is only inhabited if the indices correspond with the mode and the type as specified by the operation.
+Therefore, in defining the set \ensuremath{\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{A₀}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}}, it takes identity proofs for \ensuremath{\Varid{d}\;\Varid{≡}\;\Varid{d′}} and \ensuremath{\Conid{A₀}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}}, with \ensuremath{\Conid{A₀}} instantiated by a substitution \ensuremath{\Varid{σ}} from $\Xi$ to $\emptyset$.
+This ensures that the set is inhabited only if the indices align with what the arity (\ensuremath{\Conid{D}\;\Varid{.ar}\;\Varid{o}}) specifies.
+
+The signature endofunctor for an argument list \ensuremath{\Conid{Ds}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ}} is defined in a manner that it maps a predicate to a family of sets indexed by a context and a family of product sets, considering that each premise in a typing derivation shares a common context $\Gamma$ and a term from a list of subterms.
+{\small\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{8}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{20}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{27}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{30}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{33}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{36}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{46}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[7]%
-\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set})\;{}\<[E]%
-\\
-\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
-\\
-\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[10]%
-\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
-\>[24]{}\mathrel{=}\;\Conid{Y}\;\Conid{Γ}\;\Varid{t}{}\<[E]%
-\\
-\>[B]{}\Varid{⟦}\;\Conid{A}\;\Varid{∷}\;\Conid{Δ}\;{}\<[10]%
-\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
-\>[24]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;((\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩})\;\Varid{∷}\;\Conid{Γ})\;\Varid{t}{}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{⟦\char95 ⟧ᵃˢ}\;{}\<[8]%
 \>[8]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;{}\<[E]%
 \\
@@ -705,94 +778,90 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \>[30]{}\Varid{σ}\;{}\<[33]%
 \>[33]{}\Conid{Γ}\;{}\<[36]%
 \>[36]{}(\Varid{x}\;\Varid{,}\;\Varid{xs})\;{}\<[46]%
-\>[46]{}\mathrel{=}\;{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{→}\;\Conid{Y}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{d}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
-\\
-\>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{B}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}\;\mathrel{=}\;{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{d}\;\Varid{≡}\;\Varid{d′}\;\Varid{×}\;\Conid{Σ[}\;\Varid{σ}\;\Varid{∈}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\mskip1.5mu]\;\Conid{B}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}\;\Varid{≡}\;\Conid{A}\;\Varid{×}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{⟦\char95 ⟧}\;\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{Desc})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;(\Conid{R.⟦}\;\Varid{erase}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}){}\<[E]%
-\\
-\>[B]{}\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;(\Varid{i}\;\Varid{,}\;\Varid{xs})\;\Varid{d}\;\Conid{A}\;\mathrel{=}\;\Varid{⟦}\;\Conid{D}\;\Varid{.rules}\;\Varid{i}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d}\;\Conid{A}{}\<[E]%
+\>[46]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{→}\;\Conid{Y}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{x}^\prime}\;\Varid{d}\;(\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩}))\;\Varid{σ}\;\Conid{Γ}\;\Varid{x}\;\Varid{×}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{xs}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{figure}
-%
-\begin{figure}[H]
-  \small 
-\begin{minipage}[t]{.48\textwidth}
-%
-%  _⊢_⇐_ _⊢_⇒_
-%    : (Γ : Cxt 0) → Raw (length Γ) → Ty → Set
-%  Γ ⊢ r ⇐ A  = Γ ⊢ r [ Chk ] A
-%  Γ ⊢ r ⇒ A  = Γ ⊢ r [ Syn ] A
-%
-\begin{hscode}\SaveRestoreHook
+}
+The signature endofunctor \ensuremath{\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}} for an extension context \ensuremath{\Conid{Δ}} maps a predicate $Y$ over a $\N$-indexed family $X$ of sets into a predicate (\ensuremath{\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}}) whose context is extended by the types in \ensuremath{\Conid{Δ}}.
+{\small\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⟦\char95 ⟧ᵃ}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{Cxt}\;\Conid{Ξ})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam})\;(\Conid{Y}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set})\;{}\<[E]%
+\\
+\>[7]{}\Varid{→}\;\Conid{TSub}\;\Conid{Ξ}\;\Varid{0}\;\Varid{→}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt}\;\Varid{0})\;\Varid{→}\;\Conid{R.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;(\Varid{length}\;\Conid{Γ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Varid{[]}\;{}\<[10]%
+\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
+\>[24]{}\mathrel{=}\;\Conid{Y}\;\Conid{Γ}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\Varid{⟦}\;\Conid{A}\;\Varid{∷}\;\Conid{Δ}\;{}\<[10]%
+\>[10]{}\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;\Conid{Γ}\;\Varid{t}\;{}\<[24]%
+\>[24]{}\mathrel{=}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;\Conid{X}\;\Conid{Y}\;\Varid{σ}\;((\Conid{A}\;\Varid{⟨}\;\Varid{σ}\;\Varid{⟩})\;\Varid{∷}\;\Conid{Γ})\;\Varid{t}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+This completes our definition of the signature functor for constructing extrinsic typing derivations.
+
+At last, we can define the type of bidirectional typing derivations for a signature \ensuremath{\Conid{D}} using \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{⟧}}, similarly to how we handled simple types and raw terms. This involves the following four constructors:
+\LT{help}
+{\small\begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{34}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{55}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{61}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{70}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Keyword{mutual}{}\<[E]%
-\\
+\>[B]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\mathbin{:}\;\Conid{Fam}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\mathbin{:}\;\Conid{Fam₀}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
+\>[3]{}\Varid{var}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[55]%
+\>[55]{}\Varid{\char95 ↑\char95 }\;{}\<[61]%
+\>[61]{}\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[70]%
+\>[70]{}\Varid{⇒}\;\Conid{B}\;{}\<[E]%
+\\
+\>[9]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[61]%
+\>[61]{}\Varid{→}\;\Conid{A}\;\Varid{≡}\;\Conid{B}\;{}\<[E]%
+\\
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}\;{}\<[61]%
+\>[61]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[70]%
+\>[70]{}\Varid{⇐}\;\Conid{A}{}\<[E]%
 \\[\blanklineskip]%
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{var}\;\mathbin{:}\;(\Varid{i}\;\mathbin{:}\;\Conid{A}\;\Varid{∈}\;\Conid{Γ})\;{}\<[E]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 ∋\char95 }\;{}\<[9]%
+\>[9]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[55]%
+\>[55]{}\Varid{op}\;{}\<[61]%
+\>[61]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
 \\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{L.index}\;\Varid{i}\;\Varid{≡}\;\Varid{j}\;{}\<[E]%
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[24]%
+\>[24]{}\Varid{⇐}\;\Conid{A}\;{}\<[61]%
+\>[61]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;{}\<[E]%
 \\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}{}\<[E]%
-\\[\blanklineskip]%
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{\char95 ∋\char95 }\;\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[E]%
-\\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇐}\;\Conid{A}\;{}\<[E]%
-\\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;\Varid{⇒}\;\Conid{A}{}\<[E]%
+\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;{}\<[24]%
+\>[24]{}\Varid{⇒}\;\Conid{A}{}\<[34]%
+\>[34]{}\hspace{2em}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{minipage}
-\begin{minipage}[t]{.48\textwidth}
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[5]{}\Varid{\char95 ↑\char95 }\;\mathbin{:}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇒}\;\Conid{B}\;{}\<[E]%
-\\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{A}\;\Varid{≡}\;\Conid{B}\;{}\<[E]%
-\\
-\>[5]{}\hsindent{4}{}\<[9]%
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⇐}\;\Conid{A}{}\<[E]%
-\\[\blanklineskip]%
-\>[5]{}\Varid{op}\;{}\<[9]%
-\>[9]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
-\\
-\>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}{}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
-  
-\end{minipage}
-\end{figure}
-\subsection{Formal Proofs: Soundness as an Example}\label{subsec:formal-proofs}
+}
+corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 
-\begin{figure}[H]
-  \small
-% soundness proof
-\begin{minipage}{.48\textwidth}
+\subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
+
+Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+
+As an illustration, consider the soundness proof, i.e.\ the `if' part of \Cref{lem:soundness-completeness}.
+Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+For the $\SynRule{Sub}$, the induction hypothesis \ensuremath{\Varid{soundness}\;\Varid{t}} is invoked directly from \ensuremath{\Varid{t}\;\Varid{↑}\;\Varid{refl}}.
+\begin{figure}[b]
+  \codefigure
+  \begin{minipage}[b]{.44\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -832,7 +901,7 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \>[3]{}\Varid{soundnessᶜ}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{ConD})\;{}\<[E]%
+\>[5]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{OpD})\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
@@ -849,7 +918,7 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \ColumnHook
 \end{hscode}\resethooks
 \end{minipage}
-\begin{minipage}{.5\textwidth}
+\begin{minipage}[b]{.55\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -864,6 +933,9 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \column{45}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{50}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\vphantom{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃˢ}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
@@ -879,19 +951,19 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \>[27]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;{}\<[40]%
 \>[40]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}{}\<[E]%
 \\
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃˢ}\;\Varid{[]}\;{}\<[35]%
 \>[35]{}\anonymous \;{}\<[45]%
-\>[45]{}\mathrel{=}\;{}\<[E]%
+\>[45]{}\mathrel{=}\;\Varid{tt}{}\<[E]%
 \\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{tt}{}\<[E]%
-\\
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃˢ}\;((\Conid{Δ}\;\Varid{⊢[}\;\anonymous \;\mskip1.5mu]\;\anonymous )\;\Varid{∷}\;\Conid{Ds})\;(\Varid{t}\;\Varid{,}\;\Varid{ts})\;{}\<[45]%
 \>[45]{}\mathrel{=}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;\Conid{Ds}\;\Varid{ts}{}\<[E]%
 \\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃ}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
@@ -907,18 +979,21 @@ and mirrors our informal definition (\Cref{fig:raw-terms}) where \ensuremath{\Co
 \>[17]{}\Conid{Raw}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{r}^\prime}\;\Varid{→}\;\iden{\Conid{Γ}^\prime}\;\Varid{⊢}\;\iden{\Varid{r}^\prime}\;\Varid{⦂}\;\Conid{A})\;{}\<[50]%
 \>[50]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}{}\<[E]%
 \\
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃ}\;\Varid{[]}\;{}\<[23]%
 \>[23]{}\Varid{t}\;{}\<[26]%
 \>[26]{}\mathrel{=}\;\Varid{soundness}\;{}\<[41]%
 \>[41]{}\Varid{t}{}\<[E]%
 \\
+\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃ}\;(\anonymous \;\Varid{∷}\;\Conid{Δ})\;{}\<[23]%
 \>[23]{}\Varid{t}\;{}\<[26]%
 \>[26]{}\mathrel{=}\;\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \end{minipage}
-
+\caption{The soundness proof in \Agda}
+\label{fig:formal-soundness}
 \end{figure}
 
 \end{document}

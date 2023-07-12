@@ -37,6 +37,7 @@
 \DeclareUnicodeCharacter{27E6}{\ensuremath{\llbracket}}
 \DeclareUnicodeCharacter{27E7}{\ensuremath{\rrbracket}}
 \DeclareUnicodeCharacter{2200}{\ensuremath{\forall}}
+\DeclareUnicodeCharacter{2218}{\ensuremath{\circ}}
 
 \DeclareUnicodeCharacter{2294}{\ensuremath{\sqcup}}
 

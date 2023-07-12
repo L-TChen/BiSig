@@ -25,8 +25,7 @@ record ArgD (Ξ : ℕ) : Set where
     mode : Mode
     type : TExp Ξ
 
-ArgsD : ℕ → Set
-ArgsD Ξ = List (ArgD Ξ)
+ArgsD = List ∘ ArgD
 
 record OpD : Set where
   constructor ι

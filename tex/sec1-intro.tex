@@ -25,7 +25,7 @@ Moreover, introducing long-distance unification constraints would even undermine
 %In light of these considerations, bidirectional type synthesis can be deemed as a type-checking technique that is more fundamental than unification, as it is capable of handling a broad spectrum of programming languages.%
 %\todo{Reorganise into two paragraphs, one on old approaches and the other exclusively on bidirectional type synthesis?}
 
-Despite sharing the same basic idea, bidirectional typing has only been developed on a case-by-case basis without a theory; this situation is in stark contrast to parsing, which has a comprehensive theory together with widely applicable techniques and practical tools, notably parser generators.%
+Despite sharing the same basic idea, bidirectional typing has only been developed on a case-by-case basis without a theory; this situation is in stark contrast to parsing, which has general theories together with widely applicable techniques and practical tools, notably parser generators.%
 \footnote{The same could even be said for type checking in general, not just for bidirectional type systems.
 While there are some efforts to generate type checkers grounded in unification~\citep{Gast2004,Grewe2015}, it should be noted that unification-based approaches are not suited to more complex type theories.
 Moreover, their algorithms are not proved complete.}
@@ -121,8 +121,7 @@ We first present a concrete overview of our theory using simply typed $\lambda$-
 Following this, we discuss mode decoration and related properties in \cref{sec:pre-synthesis}.
 The most heavyweight technical contribution lies in \cref{sec:type-synthesis}, where we introduce mode-correctness and bidirectional type synthesis.
 Some examples other than simply typed $\lambda$-calculus are given in \Cref{sec:example}.
-We briefly sketch our \Agda formalisation in \cref{sec:formalisation}.
-Finally, in \cref{sec:future} we reflect on techniques that may improve the formal development and potential challenges in extending our theory to a more general setting.
+We briefly sketch the design of our formalisation in \cref{sec:formalisation} and conclude in \cref{sec:future} with potential challenges in extending our theory to a more general setting.
 
 %\todo[inline,caption={}]{\begin{enumerate}
 %\item `Input' and `output' of our theory, comparing with grammars and parsing

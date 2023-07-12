@@ -47,6 +47,8 @@
 
 \newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
 \newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
+\newcommand{\codefigure}{\small\setlength{\parindent}{0em}\setlength{\mathindent}{0em}\setlength{\abovedisplayskip}{0ex}\setlength{\belowdisplayskip}{0ex}}
+
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
@@ -90,7 +92,7 @@ The whole theory works as a verified type-synthesiser generator for syntax-direc
 From a signature that specifies a simply typed language with a bidirectional type system, the theory produces a type synthesiser that decides whether an input abstract syntax tree has a typing derivation or reports that the input does not have enough type annotations.
 Within the theory, we formally define soundness, completeness, and mode-correctness, which are sufficient conditions for deriving a correct type synthesiser.
 We also propose a preprocessing step called `mode decoration', which helps the user to deal with missing type annotations and streamlines the theory.
-The entire theory is formulated constructively, and has been formalised in the proof assistant \Agda with \AxiomK.
+The entire theory is formulated constructively and has been formalised in the proof assistant \Agda with \AxiomK.
 
 \end{abstract}
 \begin{document}

@@ -158,7 +158,7 @@ Here we choose to include a substitution $\rho$ from the local context $\Xi$ to 
   \begin{enumerate}
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotate A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
-    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for $\bop$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i |-_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
+    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for $\bop$ if there is $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} |-_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing} respectively.
 \end{definition}
@@ -246,11 +246,11 @@ A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signat
           \[
             \Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}
           \]
-          has a derivation for $\biop$ in $\Omega$ if there is a function $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \Delta_i \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
+          has a derivation for $\biop$ in $\Omega$ if there is $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
     \item the set of \emph{mode derivations} of $V |-_{\Sigma, \Omega} t^\dir{d}$, indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$, is defined in \Cref{fig:mode-derivations}.
   \end{itemize}
-  {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A}$} and {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A}$} are shorthands for ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$ respectively.
-  A typing rule is \emph{checking} if its conclusion mode is $\chk$ and \emph{synthesising} if its conclusion mode is $\syn$.
+  The judgements {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A}$} and {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A}$} are shorthands for ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$, respectively.
+  A typing rule is \emph{checking} if its conclusion mode is $\chk$ or \emph{synthesising} otherwise.
 \end{definition}
 
 Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, called the \emph{(mode) erasure} of $\Omega$.

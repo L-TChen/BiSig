@@ -13,7 +13,7 @@ As \citet{Dunfield2021} outlined, mode-correctness for a bidirectional typing ru
 \item each `input' type variable in a premise must be an `output' variable in `earlier' premises, or provided by the conclusion if the rule is checking;
 \item each `output' type variable in the conclusion should be some `output' variable in a premise if the rule is synthesising.
 \end{enumerate*}
-Here `input' variables refer to variables in an extension context and in the type of a premise in checking mode.
+Here `input' variables refer to variables in an extension context and in a checking premise.
 It is important to note that the order of premises in a bidirectional typing rule also matters, since synthesised type variables are instantiated incrementally during type synthesis.
 
 Consider the rule $\ChkRule{Abs}$ (\Cref{fig:STLC-bidirectional-typing-derivations}) as an example.
@@ -61,8 +61,8 @@ This condition must be met for every tail of the argument list as well to ensure
 \begin{definition}\label{def:mode-correctness}
   An operation $\biop$ is \emph{mode-correct} if 
   \begin{enumerate}
-    \item either $d$ is $\chk$, its argument list is mode-correct w.r.t.\ $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\biargvec)$ contains every inhabitant of $\Xi$;
-    \item or $d$ is $\syn$, its argument list is mode-correct w.r.t.\ $\emptyset$, and the finite subset $\synvar(\biargvec)$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
+    \item either $d$ is $\chk$, its argument list is mode-correct with respect to $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\biargvec)$ contains every inhabitant of $\Xi$;
+    \item or $d$ is $\syn$, its argument list is mode-correct with respect to $\emptyset$, and $\synvar(\biargvec)$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
   \end{enumerate}
   A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
 \end{definition}
@@ -103,7 +103,7 @@ However, since mode-correctness is inductively defined on the argument list, our
       \begin{enumerate}
         \item For the empty list, the statement is vacuously true by \Cref{eq:synvar1}.
         \item If $\dir{d_{i+1}}$ is~$\chk$, then the statement holds for \Cref{eq:synvar2} by induction hypothesis.
-        \item If $\dir{d_{i+1}}$ is~$\syn$, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ by mode-correctness \Cref{eq:MC2} and induction hypothesis (of the list).
+        \item If $\dir{d_{i+1}}$ is~$\syn$, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ by \Cref{eq:MC2} and induction hypothesis (of the list).
           Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar(\biargs)$, as required for \Cref{eq:synvar3} in the definition of $\synvar$.
       \end{enumerate}
     \vspace{-\topsep-\baselineskip}

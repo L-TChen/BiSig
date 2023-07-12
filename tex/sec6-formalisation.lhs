@@ -30,13 +30,13 @@ If the reader is comfortable with the informal presentation and assured by the e
 \paragraph{Revisiting language formalisation frameworks}
 Unlike prior frameworks~\citep{Allais2021,Fiore2022,Ahrens2022} that have primarily focused on meta-properties centred around substitution for intrinsically-typed terms, our theory of bidirectional type synthesis does not require term substitution but structural induction for extrinsically-typed terms.
 The formal definitions of extrinsic typing are more complex than their intrinsic counterparts.
-For a specific language such as \PCF, \citet{Wadler2022} noted that `extrinsically-typed terms require about 1.6 times as much code as intrinsically-typed' for their formalisation of type safety.
-For our generic definitions, take the formal type-theoretic definition of typing derivations $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ as an example.
-Its intrinsic definition consists of of just one family of sets of intrinsically-typed terms indexed by $A$ and $\Gamma$, but its extrinsic counterpart is a generic family of sets indexed by additionally a generic raw term $t$, involving constructions of two different layers.
+%For a specific language such as \PCF, \citet{Wadler2022} noted that `extrinsically-typed terms require about 1.6 times as much code as intrinsically-typed' for their formalisation of type safety.
+%For our generic definitions,
+Take our formal definition of typing derivations $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ as an example.
+Its intrinsic definition is just one family of sets of typed terms indexed by $A$ and $\Gamma$, but its extrinsic counterpart is a generic family of sets indexed by additionally a generic raw term $t$, involving constructions of two different layers.
 
 \paragraph{Category-theoretic analysis of well-typed terms}
-The difference between intrinsic typing and extrinsic typing could be partly manifested by its categorical analysis.
-\citet{Fiore1999}{'s} theory of abstract syntax and variable binding forms the foundation of \citet{Fiore2022}'s framework and inspires frameworks by \citet{Allais2021,Ahrens2022}.
+The difference between intrinsic typing and extrinsic typing could be partly manifested by \citet{Fiore1999}{'s} theory of abstract syntax and variable binding which forms the foundation of \citet{Fiore2022}'s framework and inspires other referenced frameworks.
 Let us take a closer look of their idea.
 The set of (untyped) abstract syntax trees for a language can be understood as
 \begin{enumerate*}
@@ -45,10 +45,10 @@ The set of (untyped) abstract syntax trees for a language can be understood as
   \item an \emph{initial} algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$ of variables to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts and the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the binding arities of constructs. 
   The initiality amounts to structural recursion on terms, namely \emph{term traversal}.
 \end{enumerate*}
-Substitution is modelled as a monoid multiplication with the notion of strength and a suitable monoidal structure on the category of presheaves.
+Substitution for $\Term$ is modelled as a monoid in the category of presheaves.
 To put it succinctly, it is the free $\mathbb{\Sigma}$-monoid over the presheaf~$V$ of variables.
 
-Such an initial algebra can be constructed as the least fixpoint of a sequence of objects defined via iteratively applying the signature functor by the Initial Algebra Theorem~\cite{Trnkova1975}.
+Such an initial algebra can be constructed by the Initial Algebra Theorem~\cite{Trnkova1975}.
 
 \paragraph{Type-theoretic construction of well-typed terms}
 Fortunately, in type theory, constructing the initial algebra of well-typed terms boils down to defining an inductive type with a few constructors that align primitive rules (such as $\Rule{Var}$) and a rule schema; term traversal can be defined by pattern matching as usual for the inductive type~\citep{Fiore2022}.
@@ -93,15 +93,14 @@ data Ty (Ξ : ℕ) : Set where
   \label{fig:formal-simple-type}
 \end{figure}
 We start with the formal definition of signatures and simple types (\Cref{fig:formal-simple-type}), which parallels its informal counterpart (\Cref{def:simple-signature}), with the exception of |⟦_⟧|.
-To prevent circular references during the inductive definition of simple types, we initially define |⟦ D ⟧| on an arbitrary |Set| instead of |Ty|.
-Thus, types specified by a signature can be defined using two constructors--- |`_|\ and |op|---where a variable is represented by |` n| for some |n| less than |Ξ|, and each inhabitant |op (i , ts)| is a pair of an operation symbol |i| and a list |ts| of length $n$.
+To prevent circular references during the inductive definition of simple types, we initially define |⟦ D ⟧| on an arbitrary |Set| instead of\/ |Ty|.
+Thus, types specified by a signature can be defined inductively where each inhabitant |op (i , ts)| for the $\Rule{Op}$ rule is a pair of an operation symbol and a list of length $n$.
 
-From a categorical standpoint, |⟦ D ⟧| acts as a functor from |Set| to |Set|, mapping $X$ to an $\Conid{Op}$-indexed coproduct $\sum_{i \in \Conid{Op}} X ^ {\Conid{ar}(i)}$ of products of $X$.
+From a categorical view, |⟦ D ⟧| is a functor from |Set| to |Set|, mapping $X$ to an $\Conid{Op}$-indexed coproduct $\sum_{i \in \Conid{Op}} X ^ {\Conid{ar}(i)}$ of products of $X$.
 The type |Ty| is the free |⟦ D ⟧|-algebra over the type |Fin Ξ| or the initial algebra for the functor |Fin Ξ + ⟦ D ⟧|.
 
-Finally, to account for indices when defining raw terms and bidirectional typing derivations by a signature, we define a corresponding signature functor |⟦ D ⟧| for a (bidirectional) binding signature.
-
 \subsection{Defining Raw Terms}\label{subsec:formal-raw-terms}
+
 As shown in \Cref{fig:formal-bibisig}, we establish |ArgD|, |OpD|, and |SigD| to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
 By removing |mode| from these definitions, we retrieve the definitions of binding arguments, arities, and signatures.
 \begin{figure}
@@ -141,11 +140,12 @@ record SigD : Set₁ where
   \caption{Bidirectional binding signature in \Agda}
   \label{fig:formal-bibisig}
 \end{figure}
+
 To construct well-scoped raw terms indexed by a list $V$ of free variables, we introduce another signature functor mapping |Fam| to |Fam|, where |Fam| is the family of sets defined as |ℕ → Set|, indexed by a natural number indicating the number of free variables.
-This signature endofunctor for raw term construction resembles the one for defining simple types.
-However, we define four distinct functors instead of defining one directly.
+This functor for raw term construction resembles the one for defining simple types.
+However, we define four distinct functors instead of directly defining one .
 These are |⟦ Δ ⟧ᵃ| for an extension context |Δ|, |⟦ Ds ⟧ᵃˢ| for an argument list |Ds|, |⟦ ι Ds _ ⟧ᶜ | for an operation (|ι Ds A|), and |⟦ D ⟧ᶜ| for a binding signature $D$.
-Notably, the functor |⟦ Δ ⟧ᵃ| extends the context by $\erase{\Delta}$ variables by mapping the family of sets |X n| to |X (length Δ + n)|.
+Notably, the functor |⟦ Δ ⟧ᵃ| extends the context by mapping the family of sets |X n| to |X (length Δ + n)|.
 \begin{figure}
   \codefigure
 \begin{minipage}[t]{.33\textwidth}
@@ -188,9 +188,8 @@ This mirrors our informal definition (\Cref{fig:raw-terms}), where |A ∋ t| cor
 These definitions align closely with those found in other referenced frameworks.
 
 \subsection{Defining Extrinsic Bidirectional Typing Derivations}\label{subsec:formal-bidirectional-typing}
-Formally defining extrinsic derivations is arguably the most complex aspect of our formalisation.
-This requires defining a family of sets, indexed by context, type, mode, and notably, a raw term.
-This definition involves another signature endofunctor, requiring consistency with the functor used for constructing raw terms. 
+Formally defining extrinsic derivations is much trickier.
+This requires defining a family of sets, indexed by context, type, mode, and notably, a raw term, involving another signature endofunctor alone with the functor used for constructing raw terms. 
 
 We begin with the family of sets on which the functor acts.
 A typing judgement $\Gamma \vdash_{\Sigma, \Omega} t :^{\dir{d}} A$ can be viewed as a predicate over raw terms with four indices: a context, a $\N$-indexed family of sets, a mode, and a type.
@@ -204,8 +203,7 @@ Observe that the second index |X| depends on the length of the first index |Γ|.
 This is because a typing derivation for a raw term $V \vdash_{\Sigma, \erase{\Omega}} t$ requires the same number of variables as in $V$.
 
 In a similar vein, we define four functors for the construction of bidirectional typing derivations, albeit in a top-down manner.
-For an endofunctor on predicates, each functor must act as a \emph{lifting} of the functor on its domain, illustrated below.
-The signature endofunctor |⟦_⟧| for a bidirectional binding signature is defined as follows:
+An endofunctor on predicates must act as a \emph{lifting} of the functor on its domain, illustrated by the signature endofunctor |⟦_⟧| for a bidirectional binding signature:
 {\small
 \begin{code}
 ⟦_⟧  : (D : SigD) (X : R.Fam) (Y : Fam X) → Fam (R.⟦ erase D ⟧ X)
@@ -214,7 +212,7 @@ The signature endofunctor |⟦_⟧| for a bidirectional binding signature is def
 This functor maps a predicate |Y| over |X| into a predicate |⟦ D ⟧ X Y| over |R.⟦ erase D ⟧ X|.
 Here, |erase D| represents the mode erasure of |D|, and the prefix |R| in |R.⟦_⟧| indicates the signature endofunctor used in raw term construction.
 
-The functor |⟦ D .ar o ⟧ᶜ| is defined for an operation symbol $\biop$:
+The functor |⟦ D .ar o ⟧ᶜ| is defined for an operation $\biop$:
 {\small\begin{code}
 ⟦_⟧ᶜ  : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
       → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
@@ -225,12 +223,13 @@ A set within the family is only inhabited if the indices correspond with the mod
 Therefore, in defining the set |⟦ ι {Ξ} d A₀ D ⟧ᶜ X Y Γ xs d′ A|, it takes identity proofs for |d ≡ d′| and |A₀ ⟨ σ ⟩ ≡ A|, with |A₀| instantiated by a substitution |σ| from $\Xi$ to $\emptyset$.
 This ensures that the set is inhabited only if the indices align with what the arity (|D .ar o|) specifies.
 
-The signature endofunctor for an argument list |Ds : ArgsD Ξ| is defined in a manner that it maps a predicate to a family of sets indexed by a context and a family of product sets, considering that each premise in a typing derivation shares a common context $\Gamma$ and a term from a list of subterms.
+The signature endofunctor for an argument list |Ds| is defined in a manner that it maps a predicate to a family of sets indexed by a context and a family of product sets, considering that each premise in a typing derivation shares a common context $\Gamma$ and a term from a list of subterms.
 {\small\begin{code}
 ⟦_⟧ᵃˢ  : (D : ArgsD Ξ) (X : R.Fam) (Y : Fam X)
        → TSub Ξ 0 → (Γ : Cxt 0) → R.⟦ eraseᵃˢ D ⟧ᵃˢ X (length Γ) → Set
 ⟦ []               ⟧ᵃˢ _  _  _  _  _         = ⊤
-⟦ Δ ⊢[ d ] A ∷ Ds  ⟧ᵃˢ X  Y  σ  Γ  (x , xs)  = ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' d (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
+⟦ Δ ⊢[ d ] A ∷ Ds  ⟧ᵃˢ X  Y  σ  Γ  (x , xs)  =
+  ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' d (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 \end{code}}
 The signature endofunctor |⟦ Δ ⟧ᵃ| for an extension context |Δ| maps a predicate $Y$ over a $\N$-indexed family $X$ of sets into a predicate (|⟦ Δ ⟧ᵃ X Y|) whose context is extended by the types in |Δ|.
 {\small\begin{code}
@@ -241,7 +240,8 @@ The signature endofunctor |⟦ Δ ⟧ᵃ| for an extension context |Δ| maps a p
 \end{code}}
 This completes our definition of the signature functor for constructing extrinsic typing derivations.
 
-At last, we can define the type of bidirectional typing derivations for a signature |D| using |⟦ D ⟧|, similarly to how we handled simple types and raw terms. This involves the following four constructors, corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
+At last, we can define the type of bidirectional typing derivations for a signature |D|, similarly to how we have defined simple types and raw terms.
+This involves the following four constructors, corresponding to rules $\SynRule{Var}$, $\SynRule{Anno}$, $\ChkRule{Sub}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing}.
 {\small\begin{code}
 data _⊢_[_]_ : Fam Raw where
 

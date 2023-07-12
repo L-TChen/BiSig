@@ -249,7 +249,7 @@ A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signat
           has a derivation for $\biop$ in $\Omega$ if there is $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} \vdash_{\Sigma, \Omega} \isTerm{t_i} :^{\dir{d_i}} \simsub{A_i}{\rho}$ for each $i$;
     \item the set of \emph{mode derivations} of $V |-_{\Sigma, \Omega} t^\dir{d}$, indexed by a list $V$ of variables, a raw term $\isTerm{t}$ under $V$, and a mode $d$, is defined in \Cref{fig:mode-derivations}.
   \end{itemize}
-  The judgements {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A}$} and {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A}$} are shorthands for ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$, respectively.
+  The two judgements {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \syn A}$} and {\small$\boxed{\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} \chk A}$} stand for ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\syn} A}$ and ${\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}$, respectively.
   A typing rule is \emph{checking} if its conclusion mode is $\chk$ or \emph{synthesising} otherwise.
 \end{definition}
 

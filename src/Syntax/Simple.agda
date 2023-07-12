@@ -1,6 +1,6 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.Simple (SD : S.Desc) where
+module Syntax.Simple (SD : S.SigD) where
 
 open import Syntax.Simple.Term                   SD public
   renaming (Tm to TExp; Tm₀ to Ty; Tms to TExps

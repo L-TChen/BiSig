@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Theory.Pre.Term {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.Pre.Term {SD : S.SigD} (BD : B.SigD SD) where
 
 open import Prelude
 
@@ -30,9 +30,9 @@ mutual
   toPre (` i)         = ` i
   toPre (A ∋ p)       = A ∋ toPre p
   toPre (p ↑)         = toPre p ↑
-  toPre (op (_ , ps)) = op (toPreᶜ (BD .rules _) ps)
+  toPre (op (_ , ps)) = op (toPreᶜ (BD .ar _) ps)
 
-  toPreᶜ : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw n}
+  toPreᶜ : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw n}
          → G.⟦ D ⟧ᶜ Raw Pre? true d rs
          → P.⟦ D ⟧ᶜ Raw Pre d rs
   toPreᶜ (ι _ _ Ds) (vs , a , deq , ps) = deq , toPreᵃˢ Ds vs a ps
@@ -58,11 +58,11 @@ mutual
   to¬Pre (A ∋ p)       (.A ∋ q) = to¬Pre p q
   to¬Pre (p ↑)         q        = to¬Pre-Chk p q
   to¬Pre (?∋ p)        q        = to¬Pre-Syn p q
-  to¬Pre (op (_ , ps)) (op qs)  = to¬Preᶜ (BD .rules _) ps qs
+  to¬Pre (op (_ , ps)) (op qs)  = to¬Preᶜ (BD .ar _) ps qs
   to¬Pre (op (_ , _ , _ , d≡Chk , _)) (op (d≡Syn , _) ↑) = Chk≢Syn (trans (sym d≡Chk) d≡Syn)
 
   to¬Preᶜ
-    : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw n}
+    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw n}
     →   G.⟦ D ⟧ᶜ Raw Pre? false d rs
     → ¬ P.⟦ D ⟧ᶜ Raw Pre        d rs
   to¬Preᶜ (ι _ _ Ds) (vs , a , _ , ps) (_ , qs) = to¬Preᵃˢ Ds vs a ps qs

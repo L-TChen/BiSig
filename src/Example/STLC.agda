@@ -7,7 +7,7 @@ variable
   n : ℕ
   d : Mode
 
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
 data ΛₜOp : Set where
   base imp : ΛₜOp
@@ -23,8 +23,8 @@ instance
       dec imp  base = no λ ()
       dec imp  imp  = yes refl
 
-ΛₜD : S.Desc
-ΛₜD = S.desc ΛₜOp λ { base → 0; imp → 2 }
+ΛₜD : S.SigD
+ΛₜD = S.sigd ΛₜOp λ { base → 0; imp → 2 }
 
 {-
 data Λₜ : Set where
@@ -47,7 +47,7 @@ infixr 8 _↣_
 pattern b       = op (base , [])
 pattern _↣_ A B = op (imp , A ∷ B ∷ [])
 
-open import Syntax.BiTyped.Description ΛₜD
+open import Syntax.BiTyped.Signature ΛₜD
 
 data ΛOp : Set where
   `app `abs : ΛOp
@@ -61,21 +61,22 @@ decΛOp = record { _≟_ = dec }
     dec `abs `app = no λ ()
     dec `abs `abs = yes refl
 
-Λ⇔D : Desc
+Λ⇔D : SigD
 Λ⇔D = record
   { Op    = ΛOp
   ; decOp = decΛOp
-  ; rules = λ { `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` # 1 ]
+  ; ar    = λ { `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` # 1 ]
                            ρ[ [] ⊢[ Syn ] ` # 1 ↣ ` # 0 ] [] ⇒ ` # 0
                     -- Γ ⊢ t : A → B    Γ ⊢ u : A
                     -------------------------------
                     -- Γ ⊢ t u ⇒ B
+
               ; `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Chk ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0) } }
                     -- Γ , x : A ⊢ t ⇐ B
                     ------------------------
                     -- Γ ⊢ λ x . t ⇐ A → B
 
-open import Theory.ModeCorrectness.Description ΛₜD
+open import Theory.ModeCorrectness.Signature ΛₜD
 
 mcΛ⇔D : ModeCorrect Λ⇔D
 mcΛ⇔D `app = (λ { zero → there (here refl); (suc zero) → here refl })

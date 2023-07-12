@@ -1,10 +1,10 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-import Theory.ModeCorrectness.Description as MC
+import Theory.ModeCorrectness.Signature as MC
 
 module Theory.ModeCorrectness.Synthesis
-  {SD : S.Desc} (D : B.Desc SD) (mc : MC.ModeCorrect SD D) where
+  {SD : S.SigD} (D : B.SigD SD) (mc : MC.ModeCorrect SD D) where
 
 open import Prelude
 
@@ -51,7 +51,7 @@ module _ where mutual
   ... | no  ⊬t = no λ where (A , ._ ∋ ⊢t) → ⊬t ⊢t
   ... | yes ⊢t = yes (A , _ ∋ ⊢t)
 
-  synthesise Γ (op ts) with synthesiseᶜ (Desc.rules D _) (mc _) Γ ts
+  synthesise Γ (op ts) with synthesiseᶜ (SigD.ar D _) (mc _) Γ ts
   ... | no  ⊬t       = no λ where (A , op ⊢t) → ⊬t (A , ⊢t)
   ... | yes (A , ⊢t) = yes (A , op ⊢t)
 
@@ -65,14 +65,14 @@ module _ where mutual
   ... | no ¬A=B = no (¬switch ⊢t ¬A=B)
   ... | yes A=B = yes (⊢t ↑ A=B)
 
-  check Γ (op ts@(d≡Chk , _)) A with checkᶜ (Desc.rules D _) (mc _) Γ ts A
+  check Γ (op ts@(d≡Chk , _)) A with checkᶜ (SigD.ar D _) (mc _) Γ ts A
   ... | no ⊬t = no λ where
     (op (d≡Syn , _) ↑ _) → Chk≢Syn (trans (sym d≡Chk) d≡Syn)
     (op ⊢t)              → ⊬t ⊢t
   ... | yes ⊢t = yes (op ⊢t)
 
   checkᶜ
-    : (D : ConD) → ModeCorrectᶜ D
+    : (D : OpD) → ModeCorrectᶜ D
     → (Γ : Cxt 0) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     → P.⟦ D ⟧ᶜ Raw Pre Chk rs → (A : Ty) → Dec (⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs Chk A)
   checkᶜ (ι Chk A₀ Ds) (⊆A∪Ds , SDs) Γ (refl , ts) A with cmp A₀ A
@@ -104,7 +104,7 @@ module _ where mutual
          ∎) , Sub⊆⊢ᵃˢ→⊢ᵃˢ ⊢ts)
 
   synthesiseᶜ
-    : (D : ConD) → ModeCorrectᶜ D
+    : (D : OpD) → ModeCorrectᶜ D
     → (Γ : Cxt 0) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     → P.⟦ D ⟧ᶜ Raw Pre Syn rs → Dec (∃[ A ] ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs Syn A)
   synthesiseᶜ (ι Syn A Ds) (Ds⊆Ξ , SDs , A⊆Ds) Γ (refl , ts)

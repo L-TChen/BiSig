@@ -1,13 +1,13 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.BiTyped.Functor (SD : S.Desc) where
+module Syntax.BiTyped.Functor (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple              SD
 open import Syntax.Context             SD
 import      Syntax.Typed.Raw.Functor   SD as R
-open import Syntax.BiTyped.Description SD as B
+open import Syntax.BiTyped.Signature SD as B
 open import Theory.Erasure
 
 Fam : (ℓ′ : Level) (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
@@ -30,9 +30,9 @@ private variable
 ⟦ Δ ⊢[ d ] A ∷ Ds ⟧ᵃˢ X Y σ Γ (x , xs) =
   ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' d (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 
-⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
+⟦_⟧ᶜ : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
 ⟦ ι {Ξ} d B D ⟧ᶜ X Y Γ xs d′ A =
   d ≡ d′ × Σ[ σ ∈ TSub Ξ 0 ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ xs
 
-⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ erase D ⟧ X)
-⟦ D ⟧ X Y Γ (i , xs) d A = ⟦ D .rules i ⟧ᶜ X Y Γ xs d A
+⟦_⟧ : (D : SigD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ erase D ⟧ X)
+⟦ D ⟧ X Y Γ (i , xs) d A = ⟦ D .ar i ⟧ᶜ X Y Γ xs d A

@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Syntax.BiTyped.Pre.Generalised.Term {SD : S.Desc} (D : B.Desc SD) where
+module Syntax.BiTyped.Pre.Generalised.Term {SD : S.SigD} (D : B.SigD SD) where
 
 open import Prelude
 

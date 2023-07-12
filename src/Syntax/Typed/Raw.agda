@@ -1,7 +1,7 @@
-import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as T
+import Syntax.Simple.Signature as S
+import Syntax.Typed.Signature  as T
 
-module Syntax.Typed.Raw {SD : S.Desc} (D : T.Desc SD) where
+module Syntax.Typed.Raw {SD : S.SigD} (D : T.SigD SD) where
 
 module R where
   open import Syntax.Typed.Raw.Functor SD public

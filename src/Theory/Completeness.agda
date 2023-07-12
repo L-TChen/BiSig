@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Theory.Completeness {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.Completeness {SD : S.SigD} (BD : B.SigD SD) where
 
 open import Prelude
 
@@ -33,10 +33,10 @@ mutual
   completeness (` j) (var i eq) = var i eq
   completeness (A ∋ p) (.A ∋ t) = A ∋ completeness p t
   completeness (p ↑)   t        = completeness p t ↑ refl
-  completeness (op ps) (op ts)  = op (completenessᶜ (BD .rules _) ps ts)
+  completeness (op ps) (op ts)  = op (completenessᶜ (BD .ar _) ps ts)
 
   completenessᶜ
-    : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
+    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     → P.⟦        D ⟧ᶜ Raw Pre   d   rs
     → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_   Γ rs   A
     →   ⟦        D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A

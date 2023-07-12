@@ -1,6 +1,6 @@
-open import Syntax.Simple.Description
+open import Syntax.Simple.Signature
 
-module Syntax.Simple.Term (D : Desc) where
+module Syntax.Simple.Term (D : SigD) where
 
 open import Prelude
 
@@ -88,7 +88,7 @@ infix 4 _∈ᵥ_ _∈ᵥₛ_ _∈ᵥ?_ _∈ᵥₛ?_ _∉ᵥ_ _∉ᵥₛ_
 mutual
   data _∈ᵥ_ (x : Fin Θ) : Tm Θ → Set where
     here : {y : Fin Θ} → x ≡ y → x ∈ᵥ ` y
-    op   : {i : D .Op} {ts : Tm Θ ^ D .rules i}
+    op   : {i : D .Op} {ts : Tm Θ ^ D .ar i}
       → (x∈ : x ∈ᵥₛ ts) → x ∈ᵥ op (i , ts)
 
   data _∈ᵥₛ_ (x : Fin Θ) : Tm Θ ^ n → Set where

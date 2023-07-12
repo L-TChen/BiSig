@@ -1,10 +1,10 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-import Theory.ModeCorrectness.Description as MC
+import Theory.ModeCorrectness.Signature as MC
 
-module Theory.ModeCorrectness.Properties {SD : S.Desc}
-  (D : B.Desc SD) (mc : MC.ModeCorrect SD D) where
+module Theory.ModeCorrectness.Properties {SD : S.SigD}
+  (D : B.SigD SD) (mc : MC.ModeCorrect SD D) where
 
 open import Prelude
 

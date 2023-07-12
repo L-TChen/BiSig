@@ -1,12 +1,12 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.BiTyped.Pre.Generalised.Functor (SD : S.Desc) where
+module Syntax.BiTyped.Pre.Generalised.Functor (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple              SD
 import      Syntax.Typed.Raw.Functor   SD as R
-open import Syntax.BiTyped.Description SD
+open import Syntax.BiTyped.Signature SD
 
 open import Theory.Erasure
 
@@ -29,9 +29,9 @@ Fam₀ = Fam 0ℓ
 ⟦ []                ⟧ᵃˢ _ _ _        _        = ⊤
 ⟦ (Δ ⊢[ d ] _) ∷ Ds ⟧ᵃˢ X Y (v ∷ vs) (x , xs) = ⟦ Δ ⟧ᵃ X Y v d x × ⟦ Ds ⟧ᵃˢ X Y vs xs
 
-⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
+⟦_⟧ᶜ : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
      → (valid : Bool) → Mode → {n : ℕ} → R.⟦ eraseᶜ D ⟧ᶜ X n → Set ℓ′
 ⟦ ι d  _ Ds ⟧ᶜ X Y v d' ts = ∃[ vs ] And (toList vs) v × d ≡ d' × ⟦ Ds ⟧ᵃˢ X Y vs ts
 
-⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ erase D ⟧ X)
-⟦ D ⟧ X Y v e d (i , xs) = e ≡ true × ⟦ D .rules i ⟧ᶜ X Y v d xs
+⟦_⟧ : (D : SigD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ erase D ⟧ X)
+⟦ D ⟧ X Y v e d (i , xs) = e ≡ true × ⟦ D .ar i ⟧ᶜ X Y v d xs

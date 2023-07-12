@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Theory.Pre.TypingErasure {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.Pre.TypingErasure {SD : S.SigD} (BD : B.SigD SD) where
 
 open import Prelude
 
@@ -31,10 +31,10 @@ mutual
   typingErasure (var i {j} _) = ` j
   typingErasure (A ∋ t) = A ∋ typingErasure t
   typingErasure (t ↑ _) = (typingErasure t) ↑
-  typingErasure (op ts) = op (typingErasureᶜ (BD .rules _) ts)
+  typingErasure (op ts) = op (typingErasureᶜ (BD .ar _) ts)
 
   typingErasureᶜ
-    : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
+    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     →   ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
     → P.⟦ D ⟧ᶜ Raw Pre   d   rs
   typingErasureᶜ (ι _ _ Ds) (deq , _ , _ , ts) = deq , typingErasureᵃˢ Ds ts

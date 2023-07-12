@@ -1,11 +1,11 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Theory.ModeCorrectness.Description (SD : S.Desc) where
+module Theory.ModeCorrectness.Signature (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple              SD
-open import Syntax.BiTyped.Description SD
+open import Syntax.BiTyped.Signature SD
 
 private variable
   Ξ : ℕ
@@ -31,12 +31,12 @@ ModeCorrectᵃˢ _  []       = ⊤
 ModeCorrectᵃˢ xs (D ∷ Ds) =
   ModeCorrectᵃ (xs ∪ known Ds) D × ModeCorrectᵃˢ xs Ds
 
-ModeCorrectᶜ : ConD → Set
+ModeCorrectᶜ : OpD → Set
 ModeCorrectᶜ (ι {Ξ} Chk A Ds) =
   ((i : Fin Ξ) → i #∈ (vars A ∪ known Ds)) × ModeCorrectᵃˢ (vars A) Ds
 ModeCorrectᶜ (ι {Ξ} Syn A Ds) =
   ((i : Fin Ξ) → i #∈ known Ds) × ModeCorrectᵃˢ [] Ds × vars A #⊆ known Ds
   -- Every i exists in some variable of inferred types
 
-ModeCorrect : Desc → Set
-ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .rules i)
+ModeCorrect : SigD → Set
+ModeCorrect D = (i : D .Op) → ModeCorrectᶜ (D .ar i)

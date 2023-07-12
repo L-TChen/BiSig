@@ -1,6 +1,6 @@
-open import Syntax.Simple.Description
+open import Syntax.Simple.Signature
 
-module Syntax.Simple.Properties (D : Desc) where
+module Syntax.Simple.Properties (D : SigD) where
 
 open import Prelude
   hiding (_+_)
@@ -136,11 +136,11 @@ instance
 ------------------------------------------------------------------------------
 -- Trivial proofs
 
-var≢op : {x : Fin Θ} {i : D .Op} {ts : Tm Θ ^ D .rules i}
+var≢op : {x : Fin Θ} {i : D .Op} {ts : Tm Θ ^ D .ar i}
   → op (i , ts) ≢ ` x
 var≢op ()
 
-op≢var : {x : Fin Θ} {i : D .Op} {ts : Tm Θ ^ D .rules i}
+op≢var : {x : Fin Θ} {i : D .Op} {ts : Tm Θ ^ D .ar i}
   → ` x ≢ op (i , ts)
 op≢var()
 
@@ -158,13 +158,13 @@ op-inj₁₂
 op-inj₁₂ refl = refl
 
 op-inj₃
-  : {i : D .Op} {ts us : Tm Ξ ^ D .rules i}
+  : {i : D .Op} {ts us : Tm Ξ ^ D .ar i}
   → _≡_ {A = Tm Ξ} (op (i , ts)) (op (i , us))
   → ts ≡ us
 op-inj₃ refl = refl -- refl
 
 op-cong⇔ : {i : D .Op}
-  → {ts us : (Tm Ξ) ^ (D .rules i)}
+  → {ts us : (Tm Ξ) ^ (D .ar i)}
   → ts ≡ us ⇔ _≡_ {A = Tm Ξ} (op (i , ts)) (op (i , us))
 op-cong⇔ {i = i} = record
   { to   = cong λ ts → op (i , ts)
@@ -485,7 +485,7 @@ failure-propagate ρ ρ̅ (min-con Pρ̅ minρ̅) ¬Q σ (ext-con ρ≤σ (Pσ ,
 
 -- Simple facts about unification
 ts≈us⇔opts≈opus
-  : ∀ {i} (ts : Tm Ξ ^ D .rules i) (us : Tm 0 ^ D .rules i)
+  : ∀ {i} (ts : Tm Ξ ^ D .ar i) (us : Tm 0 ^ D .ar i)
   → (ρ : ∃Sub⊆ Ξ)
   → (ts ≈ⁿ us) ρ ⇔ (op (i , ts) ≈ op (i , us)) ρ
 ts≈us⇔opts≈opus {_} {i} ts us ρ = record

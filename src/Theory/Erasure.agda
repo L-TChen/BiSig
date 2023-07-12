@@ -1,11 +1,11 @@
-import Syntax.Simple.Description  as S
+import Syntax.Simple.Signature  as S
 
-module Theory.Erasure {SD : S.Desc} where
+module Theory.Erasure {SD : S.SigD} where
 
 open import Prelude
 
-open import Syntax.Typed.Description   SD as T
-open import Syntax.BiTyped.Description SD as B
+open import Syntax.Typed.Signature   SD as T
+open import Syntax.BiTyped.Signature SD as B
 
 private variable
   Ξ : ℕ
@@ -16,8 +16,8 @@ eraseᵃ (Δ ⊢[ _ ] B)= Δ ⊢ B
 eraseᵃˢ : B.ArgsD Ξ → T.ArgsD Ξ
 eraseᵃˢ = L.map eraseᵃ
 
-eraseᶜ : B.ConD → T.ConD
+eraseᶜ : B.OpD → T.OpD
 eraseᶜ (ι _ A D) = ι A (eraseᵃˢ D)
 
-erase : B.Desc → T.Desc
-erase (desc Op rules) = desc Op (eraseᶜ ∘ rules)
+erase : B.SigD → T.SigD
+erase (sigd Op ar) = sigd Op (eraseᶜ ∘ ar)

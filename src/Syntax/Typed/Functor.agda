@@ -1,12 +1,12 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.Typed.Functor (SD : S.Desc) where
+module Syntax.Typed.Functor (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple            SD
 open import Syntax.Context           SD
-open import Syntax.Typed.Description SD
+open import Syntax.Typed.Signature SD
 import      Syntax.Typed.Raw.Functor SD as R
 
 Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
@@ -29,8 +29,8 @@ private variable
 ⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X Y σ Γ (x , xs) =
   ⟦ Δ ⟧ᵃ X (λ Γ' x' → Y Γ' x' (A ⟨ σ ⟩)) σ Γ x × ⟦ Ds ⟧ᵃˢ X Y σ Γ xs
 
-⟦_⟧ᶜ : (D : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ᶜ X)
+⟦_⟧ᶜ : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ᶜ X)
 ⟦ ι {Ξ} B D ⟧ᶜ X Y Γ xs A = Σ[ σ ∈ TSub Ξ 0 ] B ⟨ σ ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ xs
 
-⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
-⟦ D ⟧ X Y Γ (i , xs) A = ⟦ D .rules i ⟧ᶜ X Y Γ xs A
+⟦_⟧ : (D : SigD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
+⟦ D ⟧ X Y Γ (i , xs) A = ⟦ D .ar i ⟧ᶜ X Y Γ xs A

@@ -1,11 +1,11 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.Typed.Raw.Ordering.Functor (SD : S.Desc) where
+module Syntax.Typed.Raw.Ordering.Functor (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple            SD
-open import Syntax.Typed.Description SD
+open import Syntax.Typed.Signature SD
 import      Syntax.Typed.Raw.Functor SD as R
 
 Fam : (ℓ′ : Level) → (X : R.Fam ℓ) → Set (ℓ ⊔ lsuc ℓ′)
@@ -21,10 +21,10 @@ private variable
 ⟦ []     ⟧ᵃˢ _ _ _        _          = ⊤
 ⟦ _ ∷ Ds ⟧ᵃˢ X Y (x , xs) (x' , xs') = Y x x' × ⟦ Ds ⟧ᵃˢ X Y xs xs'
 
-⟦_,_⟧ᶜ : (D D′ : ConD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
+⟦_,_⟧ᶜ : (D D′ : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
        → D ≡ D′ → {n : ℕ} → R.⟦ D ⟧ᶜ X n → R.⟦ D′ ⟧ᶜ X n → Set ℓ′
 ⟦ ι _ Ds , ._ ⟧ᶜ X Y refl xs xs' = ⟦ Ds ⟧ᵃˢ X Y xs xs'
 
-⟦_⟧ : (D : Desc) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
+⟦_⟧ : (D : SigD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ D ⟧ X)
 ⟦ D ⟧ X Y (i , xs) (i' , xs') =
-  Σ[ ieq ∈ i ≡ i' ] ⟦ D .rules i , D .rules i' ⟧ᶜ X Y (cong (rules D) ieq) xs xs'
+  Σ[ ieq ∈ i ≡ i' ] ⟦ D .ar i , D .ar i' ⟧ᶜ X Y (cong (ar D) ieq) xs xs'

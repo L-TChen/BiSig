@@ -1,6 +1,6 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.Typed.Description (SD : S.Desc)  where
+module Syntax.Typed.Signature (SD : S.SigD)  where
 
 open import Prelude
 
@@ -15,21 +15,21 @@ record ArgD (Ξ : ℕ) : Set where
 ArgsD : ℕ → Set
 ArgsD Ξ = List (ArgD Ξ)
 
-record ConD : Set where
+record OpD : Set where
   constructor ι
   field
     {tvars} : ℕ            -- the number of type variables
     type    : TExp  tvars  -- the target type
     args    : ArgsD tvars  -- the arguments of a typing rule
 
-record Desc : Set₁ where
-  constructor desc
+record SigD : Set₁ where
+  constructor sigd
   field
     Op        : Set
     ⦃ decOp ⦄ : DecEq Op
-    rules     : Op → ConD
+    ar        : Op → OpD
 
-open Desc public
+open SigD public
 
 ρ-syntax : ∀ {Ξ} → ArgD Ξ → ArgsD Ξ → ArgsD Ξ
 ρ-syntax D Ds = D ∷ Ds

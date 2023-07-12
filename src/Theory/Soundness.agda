@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Theory.Soundness {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.Soundness {SD : S.SigD} (BD : B.SigD SD) where
 
 open import Prelude
 
@@ -32,10 +32,10 @@ mutual
   soundness (var i eq) = var i eq
   soundness (A ∋ t)    = A ∋ soundness t
   soundness (t ↑ refl) = soundness t
-  soundness (op ts)    = op (soundnessᶜ (BD .rules _) ts)
+  soundness (op ts)    = op (soundnessᶜ (BD .ar _) ts)
 
   soundnessᶜ
-    : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
+    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     → ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
     → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
   soundnessᶜ (ι _ _ Ds) (_ , σ , σ-eq , ts) = σ , σ-eq , soundnessᵃˢ Ds ts

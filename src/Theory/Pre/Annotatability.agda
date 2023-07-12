@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B'
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B'
 
-module Theory.Pre.Annotatability {SD : S.Desc} (BD : B'.Desc SD) where
+module Theory.Pre.Annotatability {SD : S.SigD} (BD : B'.SigD SD) where
 
 open import Prelude
 
@@ -46,11 +46,11 @@ mutual
   ... | _ , r≤r' , t' = _ , r≤r' , t' ↑ refl
   annotatability (?∋ p) t with annotatability p t
   ... | _ , r≤r' , t' = _ , _ ∋⁺ r≤r' , _ ∋ t'
-  annotatability (op (_ , ps)) (op ts) with annotatabilityᶜ (BD .rules _) ps ts
+  annotatability (op (_ , ps)) (op ts) with annotatabilityᶜ (BD .ar _) ps ts
   ... | _ , rs≤rs' , ts' = _ , op (refl , rs≤rs') , op ts'
 
   annotatabilityᶜ
-    : (D : ConD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw _}
+    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw _}
     → G.⟦ D ⟧ᶜ Raw Pre? v d rs
     → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
     → ∃[ rs' ] O.⟦ eraseᶜ D , eraseᶜ D ⟧ᶜ Raw _≤ᴬ_ refl rs rs'

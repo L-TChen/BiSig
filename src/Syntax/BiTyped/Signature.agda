@@ -2,9 +2,9 @@
 
 open import Prelude
 
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Syntax.BiTyped.Description (SD : S.Desc) where
+module Syntax.BiTyped.Signature (SD : S.SigD) where
 
 open import Syntax.Context
 open import Syntax.Simple.Term SD as Ty
@@ -28,7 +28,7 @@ record ArgD (Ξ : ℕ) : Set where
 ArgsD : ℕ → Set
 ArgsD Ξ = List (ArgD Ξ)
 
-record ConD : Set where
+record OpD : Set where
   constructor ι
   field
     {tvars} : ℕ
@@ -36,14 +36,14 @@ record ConD : Set where
     type    : TExp  tvars
     args    : ArgsD tvars
 
-record Desc : Set₁ where
-  constructor desc
+record SigD : Set₁ where
+  constructor sigd
   field
     Op        : Set
     ⦃ decOp ⦄ : DecEq Op
-    rules     : Op → ConD
+    ar        : Op → OpD
 
-open Desc public
+open SigD public
 
 ρ-syntax : ArgD Ξ → ArgsD Ξ → ArgsD Ξ
 ρ-syntax D Ds = D ∷ Ds
@@ -52,10 +52,10 @@ syntax ρ-syntax D Ds = ρ[ D ] Ds
 
 infix  6 ι
 
-_▷_⇒_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
+_▷_⇒_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → OpD
 Ξ ▷ D ⇒ A = ι Syn A D
 
-_▷_⇐_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → ConD
+_▷_⇐_ : (Ξ : ℕ) (D : ArgsD Ξ) (A : TExp Ξ) → OpD
 Ξ ▷ D ⇐ A = ι Chk A D
 
 modeArgD : ArgD Ξ → Mode

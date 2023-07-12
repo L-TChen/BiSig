@@ -1,30 +1,30 @@
 open import Prelude
 
-module Syntax.Simple.Description where
+module Syntax.Simple.Signature where
 
 private variable
   X Y : Set
 
-record Desc : Set₁ where
-  constructor desc
+record SigD : Set₁ where
+  constructor sigd
   field
     Op        : Set
     ⦃ decEq ⦄ : DecEq Op
-    rules     : Op → ℕ
-open Desc public
+    ar        : Op → ℕ
+open SigD public
 
-⟦_⟧ : Desc → Set → Set
-⟦ D ⟧ X = Σ[ i ∈ D .Op ] X ^ D .rules i
+⟦_⟧ : SigD → Set → Set
+⟦ D ⟧ X = Σ[ i ∈ D .Op ] X ^ D .ar i
 
 mapⁿ : {X Y : Set} {n : ℕ} (f : X → Y)
   → X ^ n → Y ^ n
 mapⁿ f xs = V.map f xs
 
-fmap : (D : Desc) (f : X → Y)
+fmap : (D : SigD) (f : X → Y)
   → ⟦ D ⟧ X → ⟦ D ⟧ Y
 fmap Ds f (i , xs) = i , mapⁿ f xs
 
-record _-Alg (D : Desc) (X : ℕ → Set) : Set₁ where
+record _-Alg (D : SigD) (X : ℕ → Set) : Set₁ where
   field
     var : Fin       ⇒₁ X
     alg : ⟦ D ⟧ ∘ X ⇒₁ X

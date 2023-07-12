@@ -1,9 +1,9 @@
-import Syntax.Simple.Description          as S
-import Syntax.BiTyped.Description         as B
-import Theory.ModeCorrectness.Description as MC
+import Syntax.Simple.Signature          as S
+import Syntax.BiTyped.Signature         as B
+import Theory.ModeCorrectness.Signature as MC
 
 module Theory.ModeCorrectness.UniqueSynthesised
-  {SD : S.Desc} (D : B.Desc SD) (mc : MC.ModeCorrect SD D) where
+  {SD : S.SigD} (D : B.SigD SD) (mc : MC.ModeCorrect SD D) where
 
 open import Prelude
 
@@ -47,10 +47,10 @@ mutual
   uniq-⇒ (var i ieq) (var j jeq) = uniq-⇒-var i j (trans ieq (sym jeq))
   uniq-⇒ (A ∋ t) (.A ∋ u) = refl
   uniq-⇒ {r = op (i , rs)} (op (deq , _ , refl , ts)) (op (_ , _ , refl , us)) =
-    uniq-⇒ᶜ (Desc.rules D i) deq (mc i) ts us
+    uniq-⇒ᶜ (SigD.ar D i) deq (mc i) ts us
 
   uniq-⇒ᶜ
-    : (D@(ι d A Ds) : ConD) → d ≡ Syn → ModeCorrectᶜ D
+    : (D@(ι d A Ds) : OpD) → d ≡ Syn → ModeCorrectᶜ D
     → ∀ {rs ρ₁ ρ₂}
     → ⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ ρ₁ Γ rs
     → ⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ ρ₂ Γ rs

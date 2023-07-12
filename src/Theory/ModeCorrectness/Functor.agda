@@ -1,19 +1,19 @@
-import Syntax.Simple.Description as S
+import Syntax.Simple.Signature as S
 
-module Theory.ModeCorrectness.Functor (SD : S.Desc) where
+module Theory.ModeCorrectness.Functor (SD : S.SigD) where
 
 open import Prelude
 
 open import Syntax.Simple  SD
 open import Syntax.Context SD
 
-open import Syntax.BiTyped.Description SD
+open import Syntax.BiTyped.Signature SD
 import      Syntax.Typed.Raw.Functor   SD as R
 import      Syntax.BiTyped.Functor     SD as B
 
 open import Theory.Erasure
 
-open import Theory.ModeCorrectness.Description SD
+open import Theory.ModeCorrectness.Signature SD
 
 private variable
   Ξ : ℕ

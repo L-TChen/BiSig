@@ -1,6 +1,6 @@
-open import Syntax.Simple.Description
+open import Syntax.Simple.Signature
 
-module Syntax.Simple.Unif (D : Desc) where
+module Syntax.Simple.Unif (D : SigD) where
 
 open import Prelude
 

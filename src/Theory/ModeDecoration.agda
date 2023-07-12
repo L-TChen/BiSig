@@ -1,7 +1,7 @@
-import Syntax.Simple.Description  as S
-import Syntax.BiTyped.Description as B
+import Syntax.Simple.Signature  as S
+import Syntax.BiTyped.Signature as B
 
-module Theory.ModeDecoration {SD : S.Desc} (BD : B.Desc SD) where
+module Theory.ModeDecoration {SD : S.SigD} (BD : B.SigD SD) where
 
 open import Prelude
 
@@ -34,11 +34,11 @@ mutual
   decorate' (` i) = _ , _ , ` i
   decorate' (A ∋ r) with adjustMode Chk (decorate' r)
   ... | _ , _ , p = _ , _ , A ∋ p
-  decorate' (op (i , rs)) with decorateᶜ (BD .rules i) rs
+  decorate' (op (i , rs)) with decorateᶜ (BD .ar i) rs
   ... | _ , _ , p = _ , _ , op (refl , p)
 
   decorateᶜ
-    : (D : ConD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)
+    : (D : OpD) (rs : T.⟦ eraseᶜ D ⟧ᶜ Raw n)
     → ∃[ v ] ∃[ d ] P.⟦ D ⟧ᶜ Raw Pre? v d rs
   decorateᶜ (ι d _ Ds) rs with decorateᵃˢ Ds rs
   ... | vs , v , a , p = v , d , vs , a , refl , p

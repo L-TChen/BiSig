@@ -15,18 +15,18 @@ import Example.Outline
 
 -- Section 3
 
-import Syntax.Simple.Description   -- Definition 3.1
+import Syntax.Simple.Signature     -- Definition 3.1
 import Syntax.Simple.Term          -- Figure 5 (Definition 3.1)
 import Syntax.Simple.Properties    -- Definition 3.3
 
-import Syntax.Typed.Description    -- Definitions 3.4 & 3.6
+import Syntax.Typed.Signature      -- Definitions 3.4 & 3.6
 import Syntax.Typed.Raw.Term       -- Figure 6 (Definition 3.7)
 import Syntax.Typed.Raw.Functor
 import Syntax.Context              -- Definition 3.8
 import Syntax.Typed.Term           -- Figure 7 (Definitions 3.9)
 import Syntax.Typed.Functor
 
-import Syntax.BiTyped.Description  -- Definition 3.11 & 3.13
+import Syntax.BiTyped.Signature    -- Definition 3.11 & 3.13
 import Theory.Erasure              -- (Mode) erasure
 import Syntax.BiTyped.Term         -- Figure 8 (Definition 3.14)
 import Syntax.BiTyped.Functor
@@ -52,7 +52,7 @@ import Theory.Pre.Annotatability       -- Proposition 4.7
 
 -- Section 5
 
-import Theory.ModeCorrectness.Description  -- Definitions 5.1 & 5.3
+import Theory.ModeCorrectness.Signature    -- Definitions 5.1 & 5.3
 import Theory.ModeCorrectness.Functor      -- Definition 5.2
 import Theory.ModeCorrectness.UniqueSynthesised  -- Lemma 5.5
 

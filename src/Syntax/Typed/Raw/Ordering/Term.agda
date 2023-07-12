@@ -1,7 +1,7 @@
-import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as T
+import Syntax.Simple.Signature as S
+import Syntax.Typed.Signature  as T
 
-module Syntax.Typed.Raw.Ordering.Term {SD : S.Desc} (D : T.Desc SD) where
+module Syntax.Typed.Raw.Ordering.Term {SD : S.SigD} (D : T.SigD SD) where
 
 open import Prelude
 

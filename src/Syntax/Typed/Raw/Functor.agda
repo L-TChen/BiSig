@@ -1,7 +1,7 @@
-import Syntax.Simple.Description as S
-import Syntax.Typed.Description  as T
+import Syntax.Simple.Signature as S
+import Syntax.Typed.Signature  as T
 
-module Syntax.Typed.Raw.Functor (SD : S.Desc) where
+module Syntax.Typed.Raw.Functor (SD : S.SigD) where
 
 open import Prelude
 
@@ -24,8 +24,8 @@ Fam₀ = Fam 0ℓ
 ⟦ []           ⟧ᵃˢ _ _ = ⊤
 ⟦ (Δ ⊢ A) ∷ Ds ⟧ᵃˢ X n = ⟦ Δ ⟧ᵃ X n × ⟦ Ds ⟧ᵃˢ X n
 
-⟦_⟧ᶜ : (D : ConD) (X : Fam ℓ) → Fam ℓ
+⟦_⟧ᶜ : (D : OpD) (X : Fam ℓ) → Fam ℓ
 ⟦ ι _ D ⟧ᶜ X = ⟦ D ⟧ᵃˢ X
 
-⟦_⟧ : (D : Desc) → Fam ℓ → Fam ℓ
-⟦ D ⟧ X n = Σ[ i ∈ D .Op ] ⟦ D .rules i ⟧ᶜ X n
+⟦_⟧ : (D : SigD) → Fam ℓ → Fam ℓ
+⟦ D ⟧ X n = Σ[ i ∈ D .Op ] ⟦ D .ar i ⟧ᶜ X n

@@ -24,7 +24,7 @@
 
 \section{Formalisation} \label{sec:formalisation}
 As we have mentioned in \Cref{sec:intro}, our theory was initially developed with \Agda.
-While the translation to the natural language is reasonably straightforward, understanding the formalisation itself could pose some difficulty.
+While the translation to the natural language is reasonably straightforward, understanding the formalisation itself could be difficult.
 If the reader is comfortable with the informal presentation and assured by the existence of its formalisation, they may feel free to skip this section.
 
 \paragraph{Revisiting language formalisation frameworks}
@@ -41,7 +41,7 @@ Let us take a closer look of their idea.
 The set of (untyped) abstract syntax trees for a language can be understood as
 \begin{enumerate*}
   \item a family of sets $\Term_{\Gamma}$ of well-scoped terms under a context~$\Gamma$ with
-  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, with
+  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, and
   \item an \emph{initial} algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$ of variables to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts and the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the binding arities of constructs. 
   The initiality amounts to structural recursion on terms, namely \emph{term traversal}.
 \end{enumerate*}
@@ -101,7 +101,7 @@ The type |Ty| is the free |⟦ D ⟧|-algebra over the type |Fin Ξ| or the init
 
 \subsection{Defining Raw Terms}\label{subsec:formal-raw-terms}
 
-As shown in \Cref{fig:formal-bibisig}, we establish |ArgD|, |OpD|, and |SigD| to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
+As shown in \Cref{fig:formal-bibisig}, we define |ArgD|, |OpD|, and |SigD| to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
 By removing |mode| from these definitions, we retrieve the definitions of binding arguments, arities, and signatures.
 \begin{figure}
   \codefigure
@@ -214,8 +214,7 @@ Here, |erase D| represents the mode erasure of |D|, and the prefix |R| in |R.⟦
 
 The functor |⟦ D .ar o ⟧ᶜ| is defined for an operation $\biop$:
 {\small\begin{code}
-⟦_⟧ᶜ  : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X)
-      → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
+⟦_⟧ᶜ  : (D : OpD) (X : R.Fam ℓ) (Y : Fam ℓ′ X) → Fam ℓ′ (R.⟦ eraseᶜ D ⟧ᶜ X)
 ⟦ ι {Ξ} d A₀ D ⟧ᶜ X Y Γ xs d′ A =
   d ≡ d′ × Σ[ p ∈ TSub Ξ 0 ] A₀ ⟨ p ⟩ ≡ A × ⟦ D ⟧ᵃˢ X Y σ Γ xs
 \end{code}}
@@ -249,62 +248,60 @@ data _⊢_[_]_ : Fam Raw where
         → L.index i ≡ j                                      → A ≡ B
         → Γ ⊢ (` j) ⇒ A                                      → Γ ⊢ r  ⇐ A
                                                                                          
-  _∋_   : (A : Ty)                                     op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ rs d A
-        → Γ ⊢ r        ⇐ A                                   → Γ ⊢ op rs [ d ] A
+        _∋_   : (A : Ty)                               op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ  rs  {-"\phantom{[}"-}  d    A
+        → Γ ⊢ r        ⇐ A                                   → Γ ⊢ op rs                [                  d ]  A
         → Γ ⊢ (A ∋ r)  ⇒ A                    
-    \end{code}}
+\end{code}}
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-\begin{figure}
+Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+
+As an illustration, consider the formal proof of soundness below, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
+Its formal proof is defined in a module which has signatures as its parameters:
+{\small\begin{code}
+module Theory.Soundness {SD : S.SigD} (BD : B.SigD SD) where
+\end{code}}
+Then, the induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+(The definition |soundnessᵃ| might be further removed if \Agda's termination checker 
+The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof |refl| and use the induction hypothesis (|soundness t|) directly:
+\begin{figure}[H]
   \codefigure
-  \begin{minipage}[b]{.44\textwidth}
+  \begin{minipage}[t]{.55\textwidth}
 \begin{code}
 mutual
 
   soundness : Γ ⊢ r [ d ] A  →  Γ ⊢ r ⦂ A
-  soundness (var i eq)   = var i eq
-  soundness (A ∋ t)      = A ∋ soundness t
-  soundness (t ↑ refl)   = soundness t
-  soundness (op ts)      =
-    op (soundnessᶜ (BD .rules _) ts)
-
-  soundnessᶜ
-    : (D : OpD)
-    → ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
-    → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
-  soundnessᶜ (ι _ _ Ds) (_ , σ , σ-eq , ts)  =
-    σ , σ-eq , soundnessᵃˢ Ds ts
-\end{code}
-\end{minipage}
-\begin{minipage}[b]{.55\textwidth}
-\begin{code}
-{-"\vphantom{where}"-}
+  soundness (var i eq) = var i eq
+  soundness (A ∋ t)    = A ∋ soundness t
+  soundness (t ↑ refl) = soundness t
+  soundness (op {rs = i , _} (_ , σ , σ-eq , ts)) =
+    op (σ , σ-eq , soundnessᵃˢ (BD .ar i .args) ts)
 
   soundnessᵃˢ
-    : (Ds : ArgsD Ξ) 
-    → ⟦ Ds ⟧ᵃˢ            Raw _⊢_[_]_  σ Γ rs
-    → T.⟦ eraseᵃˢ Ds ⟧ᵃˢ  Raw _⊢_⦂_    σ Γ rs
+    :  (Ds : ArgsD Ξ) 
+    →  ⟦ Ds ⟧ᵃˢ            Raw _⊢_[_]_  σ Γ rs
+    →  T.⟦ eraseᵃˢ Ds ⟧ᵃˢ  Raw _⊢_⦂_    σ Γ rs
   soundnessᵃˢ []                  _         = tt
   soundnessᵃˢ ((Δ ⊢[ _ ] _) ∷ Ds) (t , ts)  =
     soundnessᵃ Δ t , soundnessᵃˢ Ds ts
-
+\end{code}
+\end{minipage}
+\begin{minipage}[t]{.44\textwidth}
+\begin{code}
+  {-" \phantom{mutual} "-}
   soundnessᵃ
-    : (Δ : TExps Ξ) 
-    → ⟦ Δ ⟧ᵃ    Raw (λ Γ' r' → Γ' ⊢ r' [ d ] A)  σ Γ r
-    → T.⟦ Δ ⟧ᵃ  Raw (λ Γ' r' → Γ' ⊢ r' ⦂ A)      σ Γ r
+    :  (Δ : TExps Ξ) 
+    →  ⟦ Δ ⟧ᵃ    Raw (_⊢_[  d ]  A)  σ Γ r
+    →  T.⟦ Δ ⟧ᵃ  Raw (_⊢_⦂       A)  σ Γ r
   soundnessᵃ []       t  = soundness    t
   soundnessᵃ (_ ∷ Δ)  t  = soundnessᵃ Δ t
 \end{code}
 \end{minipage}
-\caption{The soundness proof in \Agda}
-\label{fig:formal-soundness}
+%\caption{The soundness proof in \Agda}
+%\label{fig:formal-soundness}
 \end{figure}
-
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
-
-As an illustration, consider the soundness proof in \cref{fig:formal-soundness}, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
-Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-For the $\SynRule{Sub}$ case, the induction hypothesis |soundness t| is invoked directly.
-
+Compared to an induction proof tailored for a specific system, the size of a generic induction proof remains the same, regardless of the signature.
+This makes it manageable even in a proof assistant like \Agda, which lacks extensive tactics for automating theorem proving.
+Hence, we achieve more by doing less.
 \end{document}

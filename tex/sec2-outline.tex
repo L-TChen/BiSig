@@ -170,17 +170,15 @@ The construction is straightforward:
 Run the mode decorator on the input term~$\erase\Gamma \vdash t$.
 If there is no synthesising mode derivation, report that $t$~is not in synthesising mode (the third outcome).
 Otherwise $\erase\Gamma \vdash t^{\syn}$, and we can run the bidirectional type synthesiser.
-If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}).
-
-\begin{lemma}[Soundness]
-If\/ $\Gamma \vdash t \syn A$, then $\Gamma \vdash t : A$.
-\end{lemma}
-
-If there is no derivation of $\Gamma \vdash t \syn A$ for any type~$A$, report that there is no derivation of $\Gamma \vdash t : A$ for any~$A$ either (the second outcome), because the bidirectional typing is \emph{complete} with respect to the original typing.
-
-\begin{lemma}[Completeness] \label{thm:STLC-completeness}
-If\/ $\erase\Gamma \vdash t^{\syn}$ and\/ $\Gamma \vdash t : A$, then $\Gamma \vdash t \syn A$.
-\end{lemma}
+If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}); if there is no derivation of $\Gamma \vdash t \syn A$ for any type~$A$, then there is no derivation of $\Gamma \vdash t : A$ for any~$A$ either (the second outcome), because the bidirectional typing is \emph{complete}:
+\begin{theorem}[Soundness and Completeness]
+$\Gamma \vdash t \syn A$ if and only if\/ $\erase\Gamma \vdash t^{\syn}$ and\/ $\Gamma \vdash t : A$.
+\end{theorem}
+%
+%
+%\begin{lemma}[Completeness] \label{thm:STLC-completeness}
+%If\/ $\Gamma \vdash t : A$, then $\Gamma \vdash t \syn A$.
+%\end{lemma}
 
 We will construct a mode decorator~(\cref{sec:mode-decoration}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
 To quantify over all such systems, we need their generic definitions, which we formulate next.

@@ -4,16 +4,19 @@
 This section provides generic definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
-of simple types, simply typed languages, and bidirectional type systems, using simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
-(These definitions may look dense, especially on first reading.
-The reader may choose to skim through this section, in particular the figures, and still get some rough ideas from later sections.)
+of simple types, simply typed languages, and bidirectional type systems, and uses simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
+These definitions may look dense, especially on first reading.
+The reader may choose to skim through this section, in particular the figures, and still get some rough ideas from later sections.
 
 The definitions are formulated in two steps:
 \begin{enumerate*}
-  \item first we introduce a notion of arity and a notion of signature which includes a set of operation symbols and an assignment of arities to symbols;
-\item then, given a signature, we define raw terms and typing derivations by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operation symbol~$o$.
+  \item first we introduce a notion of arity and a notion of signature which includes a set\footnote{%
+    Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
+    Also, as we assume \AxiomK, all types are legitimately sets in the sense of homotopy type theory.
+  } of operation symbols and an assignment of arities to symbols;
+\item then, given a signature, we define raw terms and typing derivations inductively by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operation symbol~$o$.
 \end{enumerate*}
-All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
+%All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
 As we move from simple types to bidirectional typing, the notion of arity, initially as the number of arguments of an operation, is enriched to incorporate an extension context for variable binding and the mode for the direction of type information flow.
 
 \subsection{Signatures and Simple Types} \label{subsec:simple-types}
@@ -31,11 +34,7 @@ For simple types, the only datum needed for specifying a type construct is its n
       \caption{Simple types}
       \label{fig:simple-type}
   \end{figure}
-  A \emph{signature} $\Sigma$ for simple types consists of a set\footnote{%
-    Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
-    Also, as we assume \AxiomK, all types are legitimate sets in the sense of homotopy type theory.
-  }
-  $I$ with a decidable equality and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
+  A \emph{signature} $\Sigma$ for simple types consists of a set $I$ with a decidable equality and an \emph{arity} function $\arity\colon I \to \mathbb{N}$.
   For a signature $\Sigma$, a \emph{type} $A : \Type_{\Sigma}(\Xi)$ over a variable set $\Xi$ is either
   \begin{enumerate}
     \item a variable in $\Xi$ or
@@ -44,8 +43,7 @@ For simple types, the only datum needed for specifying a type construct is its n
 \end{definition}
 
 \begin{example} \label{ex:type-signature-for-function-type}
-  Simply typed $\lambda$-calculus includes function types $A \bto B$ and typically a base type~$\mathtt{b}$ to ensure that the set of all types without type variables is non-empty.
-  The type signature $\Sigma_{\bto}$ used to define types in simply typed $\lambda$-calculus consists of a binary operation $\mathsf{fun}$ and a nullary operation $\mathsf{b}$ where $\arity(\mathsf{fun}) = 2$ and $\arity(\mathsf{b}) = 0$.
+  Function types $A \bto B$ and typically a base type~$\mathtt{b}$ are included in simply typed $\lambda$-calculus and can be specified by the type signature $\Sigma_{\bto}$ consisting of operations $\mathsf{fun}$ and $\mathsf{b}$ where $\arity(\mathsf{fun}) = 2$ and $\arity(\mathsf{b}) = 0$.
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 

@@ -354,7 +354,7 @@
 
 \section{Formalisation} \label{sec:formalisation}
 As we have mentioned in \Cref{sec:intro}, our theory was initially developed with \Agda.
-While the translation to the natural language is reasonably straightforward, understanding the formalisation itself could pose some difficulty.
+While the translation to the natural language is reasonably straightforward, understanding the formalisation itself could be difficult.
 If the reader is comfortable with the informal presentation and assured by the existence of its formalisation, they may feel free to skip this section.
 
 \paragraph{Revisiting language formalisation frameworks}
@@ -371,7 +371,7 @@ Let us take a closer look of their idea.
 The set of (untyped) abstract syntax trees for a language can be understood as
 \begin{enumerate*}
   \item a family of sets $\Term_{\Gamma}$ of well-scoped terms under a context~$\Gamma$ with
-  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, with
+  \item variable renaming for a function $\sigma\colon \Gamma \to \Delta$ between variables acting as a functorial map from $\Term_{\Gamma}$ to $\Term_{\Delta}$, i.e.\ a presheaf $\Term\colon \mathbb{F} \to \mathsf{Set}$, and
   \item an \emph{initial} algebra $[\mathsf{v}, \mathsf{op}]$ on~$\Term$ given by the variable rule as a map $\mathsf{v}$ from the presheaf $V\colon \mathbb{F} \hookrightarrow \mathsf{Set}$ of variables to $\Term$ and other constructs as $\mathsf{op}\colon \mathbb{\Sigma}\Term \to \Term$ where $\mathbb{F}$ is the category of contexts and the functor $\mathbb{\Sigma}\colon \mathsf{Set}^\mathbb{F} \to \mathsf{Set}^\mathbb{F}$ encodes the binding arities of constructs. 
   The initiality amounts to structural recursion on terms, namely \emph{term traversal}.
 \end{enumerate*}
@@ -467,7 +467,7 @@ The type \ensuremath{\Conid{Ty}} is the free \ensuremath{\Varid{⟦}\;\Conid{D}\
 
 \subsection{Defining Raw Terms}\label{subsec:formal-raw-terms}
 
-As shown in \Cref{fig:formal-bibisig}, we establish \ensuremath{\Conid{ArgD}}, \ensuremath{\Conid{OpD}}, and \ensuremath{\Conid{SigD}} to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
+As shown in \Cref{fig:formal-bibisig}, we define \ensuremath{\Conid{ArgD}}, \ensuremath{\Conid{OpD}}, and \ensuremath{\Conid{SigD}} to represent arguments $[\Delta]A^{\dir{d}}$, bidirectional binding operations $\biop$, and bidirectional binding signatures, respectively, in line with their informal definitions.
 By removing \ensuremath{\Varid{mode}} from these definitions, we retrieve the definitions of binding arguments, arities, and signatures.
 \begin{figure}
   \codefigure
@@ -731,9 +731,7 @@ The functor \ensuremath{\Varid{⟦}\;\Conid{D}\;\Varid{.ar}\;\Varid{o}\;\Varid{�
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{⟦\char95 ⟧ᶜ}\;{}\<[7]%
-\>[7]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{OpD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;\Conid{X})\;{}\<[E]%
-\\
-\>[7]{}\Varid{→}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
+\>[7]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{OpD})\;(\Conid{X}\;\mathbin{:}\;\Conid{R.Fam}\;\Varid{ℓ})\;(\Conid{Y}\;\mathbin{:}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;\Conid{X})\;\Varid{→}\;\Conid{Fam}\;\iden{\Varid{ℓ}^\prime}\;(\Conid{R.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}){}\<[E]%
 \\
 \>[B]{}\Varid{⟦}\;\Varid{ι}\;\{\mskip1.5mu \Conid{Ξ}\mskip1.5mu\}\;\Varid{d}\;\Conid{A₀}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{X}\;\Conid{Y}\;\Conid{Γ}\;\Varid{xs}\;\Varid{d′}\;\Conid{A}\;\mathrel{=}\;{}\<[E]%
 \\
@@ -814,11 +812,16 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{24}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{32}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{56}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{62}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{71}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{85}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{89}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{108}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{113}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{data}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\mathbin{:}\;\Conid{Fam}\;\Conid{Raw}\;\Keyword{where}{}\<[E]%
 \\[\blanklineskip]%
@@ -835,17 +838,23 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}\;{}\<[62]%
 \>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[71]%
-\>[71]{}\Varid{⇐}\;\Conid{A}{}\<[E]%
+\>[71]{}\Varid{⇐}\;\Conid{A}\;{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{\char95 ∋\char95 }\;{}\<[9]%
-\>[9]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[56]%
+\>[9]{}\Varid{\char95 ∋\char95 }\;{}\<[15]%
+\>[15]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[56]%
 \>[56]{}\Varid{op}\;{}\<[62]%
-\>[62]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
+\>[62]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;{}\<[85]%
+\>[85]{}\Varid{rs}\;{}\<[89]%
+\>[89]{}\phantom{[}{}\<[108]%
+\>[108]{}\Varid{d}\;{}\<[113]%
+\>[113]{}\Conid{A}\;{}\<[E]%
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[24]%
 \>[24]{}\Varid{⇐}\;\Conid{A}\;{}\<[62]%
-\>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A}\;{}\<[E]%
+\>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{op}\;\Varid{rs}\;{}\<[89]%
+\>[89]{}[\mskip1.5mu \;{}\<[108]%
+\>[108]{}\Varid{d}\;\mskip1.5mu]\;{}\<[113]%
+\>[113]{}\Conid{A}\;{}\<[E]%
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\Conid{A}\;\Varid{∋}\;\Varid{r})\;{}\<[24]%
 \>[24]{}\Varid{⇒}\;\Conid{A}{}\<[E]%
@@ -855,17 +864,35 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-\begin{figure}
+Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+
+As an illustration, consider the formal proof of soundness below, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
+Its formal proof is defined in a module which has signatures as its parameters:
+{\small\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{module}\;\Conid{Theory.Soundness}\;\{\mskip1.5mu \Conid{SD}\;\mathbin{:}\;\Conid{S.SigD}\mskip1.5mu\}\;(\Conid{BD}\;\mathbin{:}\;\Conid{B.SigD}\;\Conid{SD})\;\Keyword{where}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+}
+Then, the induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+(The definition \ensuremath{\Varid{soundnessᵃ}} might be further removed if \Agda's termination checker 
+The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof \ensuremath{\Varid{refl}} and use the induction hypothesis (\ensuremath{\Varid{soundness}\;\Varid{t}}) directly:
+\begin{figure}[H]
   \codefigure
-  \begin{minipage}[b]{.44\textwidth}
+  \begin{minipage}[t]{.55\textwidth}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{30}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{33}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{46}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{41}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{45}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{mutual}{}\<[E]%
 \\[\blanklineskip]%
@@ -875,77 +902,39 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \>[33]{}\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundness}\;(\Varid{var}\;\Varid{i}\;\Varid{eq})\;{}\<[26]%
-\>[26]{}\mathrel{=}\;\Varid{var}\;\Varid{i}\;\Varid{eq}{}\<[E]%
+\>[3]{}\Varid{soundness}\;(\Varid{var}\;\Varid{i}\;\Varid{eq})\;\mathrel{=}\;\Varid{var}\;\Varid{i}\;\Varid{eq}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundness}\;(\Conid{A}\;\Varid{∋}\;\Varid{t})\;{}\<[26]%
-\>[26]{}\mathrel{=}\;\Conid{A}\;\Varid{∋}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
+\>[3]{}\Varid{soundness}\;(\Conid{A}\;\Varid{∋}\;\Varid{t})\;{}\<[24]%
+\>[24]{}\mathrel{=}\;\Conid{A}\;\Varid{∋}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundness}\;(\Varid{t}\;\Varid{↑}\;\Varid{refl})\;{}\<[26]%
-\>[26]{}\mathrel{=}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
+\>[3]{}\Varid{soundness}\;(\Varid{t}\;\Varid{↑}\;\Varid{refl})\;\mathrel{=}\;\Varid{soundness}\;\Varid{t}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundness}\;(\Varid{op}\;\Varid{ts})\;{}\<[26]%
-\>[26]{}\mathrel{=}\;{}\<[E]%
+\>[3]{}\Varid{soundness}\;(\Varid{op}\;\{\mskip1.5mu \Varid{rs}\;\mathrel{=}\;\Varid{i}\;\Varid{,}\;\anonymous \mskip1.5mu\}\;(\anonymous \;\Varid{,}\;\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{ts}))\;\mathrel{=}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{op}\;(\Varid{soundnessᶜ}\;(\Conid{BD}\;\Varid{.rules}\;\anonymous )\;\Varid{ts}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundnessᶜ}\;{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\mathbin{:}\;(\Conid{D}\;\mathbin{:}\;\Conid{OpD})\;{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Varid{d}\;\Conid{A}\;{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Varid{eraseᶜ}\;\Conid{D}\;\Varid{⟧ᶜ}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;\Conid{Γ}\;\Varid{rs}\;\Conid{A}{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{soundnessᶜ}\;(\Varid{ι}\;\anonymous \;\anonymous \;\Conid{Ds})\;(\anonymous \;\Varid{,}\;\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{ts})\;{}\<[46]%
-\>[46]{}\mathrel{=}\;{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;\Conid{Ds}\;\Varid{ts}{}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
-\end{minipage}
-\begin{minipage}[b]{.55\textwidth}
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{40}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{41}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{45}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{50}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\vphantom{where}{}\<[E]%
+\>[5]{}\Varid{op}\;(\Varid{σ}\;\Varid{,}\;\Varid{σ-eq}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;(\Conid{BD}\;\Varid{.ar}\;\Varid{i}\;\Varid{.args})\;\Varid{ts}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃˢ}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\mathbin{:}\;(\Conid{Ds}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;{}\<[E]%
+\>[5]{}\mathbin{:}\;{}\<[8]%
+\>[8]{}(\Conid{Ds}\;\mathbin{:}\;\Conid{ArgsD}\;\Conid{Ξ})\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[27]%
-\>[27]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;{}\<[40]%
-\>[40]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}\;{}\<[E]%
+\>[5]{}\Varid{→}\;{}\<[8]%
+\>[8]{}\Varid{⟦}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[28]%
+\>[28]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;{}\<[41]%
+\>[41]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Varid{eraseᵃˢ}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[27]%
-\>[27]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;{}\<[40]%
-\>[40]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}{}\<[E]%
+\>[5]{}\Varid{→}\;{}\<[8]%
+\>[8]{}\Conid{T.⟦}\;\Varid{eraseᵃˢ}\;\Conid{Ds}\;\Varid{⟧ᵃˢ}\;{}\<[28]%
+\>[28]{}\Conid{Raw}\;\Varid{\char95 ⊢\char95 ⦂\char95 }\;{}\<[41]%
+\>[41]{}\Varid{σ}\;\Conid{Γ}\;\Varid{rs}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃˢ}\;\Varid{[]}\;{}\<[35]%
@@ -958,44 +947,61 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}\;\Varid{,}\;\Varid{soundnessᵃˢ}\;\Conid{Ds}\;\Varid{ts}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\hsindent{3}{}\<[3]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{minipage}
+\begin{minipage}[t]{.44\textwidth}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{18}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{34}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{38}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{41}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[3]{} \phantom{mutual} {}\<[E]%
+\\
 \>[3]{}\Varid{soundnessᵃ}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\mathbin{:}\;(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;{}\<[E]%
+\>[5]{}\mathbin{:}\;{}\<[8]%
+\>[8]{}(\Conid{Δ}\;\mathbin{:}\;\Conid{TExps}\;\Conid{Ξ})\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[17]%
-\>[17]{}\Conid{Raw}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{r}^\prime}\;\Varid{→}\;\iden{\Conid{Γ}^\prime}\;\Varid{⊢}\;\iden{\Varid{r}^\prime}\;[\mskip1.5mu \;\Varid{d}\;\mskip1.5mu]\;\Conid{A})\;{}\<[50]%
-\>[50]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}\;{}\<[E]%
+\>[5]{}\Varid{→}\;{}\<[8]%
+\>[8]{}\Varid{⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[18]%
+\>[18]{}\Conid{Raw}\;(\Varid{\char95 ⊢\char95 [}\;{}\<[29]%
+\>[29]{}\Varid{d}\;\mskip1.5mu]\;{}\<[34]%
+\>[34]{}\Conid{A})\;{}\<[38]%
+\>[38]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}\;{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{→}\;\Conid{T.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[17]%
-\>[17]{}\Conid{Raw}\;(\Varid{λ}\;\iden{\Conid{Γ}^\prime}\;\iden{\Varid{r}^\prime}\;\Varid{→}\;\iden{\Conid{Γ}^\prime}\;\Varid{⊢}\;\iden{\Varid{r}^\prime}\;\Varid{⦂}\;\Conid{A})\;{}\<[50]%
-\>[50]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}{}\<[E]%
+\>[5]{}\Varid{→}\;{}\<[8]%
+\>[8]{}\Conid{T.⟦}\;\Conid{Δ}\;\Varid{⟧ᵃ}\;{}\<[18]%
+\>[18]{}\Conid{Raw}\;(\Varid{\char95 ⊢\char95 ⦂}\;{}\<[34]%
+\>[34]{}\Conid{A})\;{}\<[38]%
+\>[38]{}\Varid{σ}\;\Conid{Γ}\;\Varid{r}{}\<[E]%
 \\
-\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃ}\;\Varid{[]}\;{}\<[23]%
 \>[23]{}\Varid{t}\;{}\<[26]%
 \>[26]{}\mathrel{=}\;\Varid{soundness}\;{}\<[41]%
 \>[41]{}\Varid{t}{}\<[E]%
 \\
-\>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{soundnessᵃ}\;(\anonymous \;\Varid{∷}\;\Conid{Δ})\;{}\<[23]%
 \>[23]{}\Varid{t}\;{}\<[26]%
 \>[26]{}\mathrel{=}\;\Varid{soundnessᵃ}\;\Conid{Δ}\;\Varid{t}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \end{minipage}
-\caption{The soundness proof in \Agda}
-\label{fig:formal-soundness}
+%\caption{The soundness proof in \Agda}
+%\label{fig:formal-soundness}
 \end{figure}
-
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
-
-As an illustration, consider the soundness proof in \cref{fig:formal-soundness}, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
-Each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-For the $\SynRule{Sub}$ case, the induction hypothesis \ensuremath{\Varid{soundness}\;\Varid{t}} is invoked directly.
-
+Compared to an induction proof tailored for a specific system, the size of a generic induction proof remains the same, regardless of the signature.
+This makes it manageable even in a proof assistant like \Agda, which lacks extensive tactics for automating theorem proving.
+Hence, we achieve more by doing less.
 \end{document}

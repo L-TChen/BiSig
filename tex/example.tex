@@ -7,11 +7,12 @@ To showcase its general applicability, we present two additional examples:
 \item \PCF with products and let bindings, and
 \item spine calculus, a simply typed $\lambda$-calculus with applications in spine form.
 \end{enumerate}
-The first is a standard exercise in implementing a type synthesiser and the second is an example of a system with infinitely many operations.
+The first is a standard exercise in implementing a type synthesiser.
+The second example includes not only infinitely many operations but also a type which is not formed by solely one type construct~$\tyOp$.
 
 \subsection{PCF with Products and Let Bindings}\label{subsec:PCF}
 Although we have developed a theory for presenting a bidirectional type system and a condition for the decidability of bidirectional type synthesis, designing a bidirectional type system, or its signature, remains a creative activity.\footnote{This has also been the case for parsing: while there are grammars and parser generators, one still has to design a grammar to parse or disambiguate an ambiguous grammar.}
-While the focus of this paper is not to design bidirectional type systems, we adopt the example of a bidirectional \PCF from \citet{Wadler2022}, which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding the following rules:
+While the focus of this paper is not to design bidirectional type systems, we simply adopt the example of a bidirectional \PCF from \citet{Wadler2022}, which extends bidirectional simply typed $\lambda$-calculus in \Cref{sec:key-ideas} by adding the following rules:
 \bgroup
 \small
   \begin{mathpar}
@@ -66,13 +67,12 @@ To illustrate this, let us consider the following rule:
 \bgroup
 \small
   \begin{mathpar}
-    \inferrule{\Gamma \vdash t \syn \textstyle{\prod_{i = 1}^{n}} A_i \bto B \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
+    \inferrule{\Gamma \vdash t \syn A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right) \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
   \end{mathpar}
 \egroup
-The type signature $\Sigma_{\bto}$ can be extended with $\mathsf{fun}_n$ where $\arity({\mathsf{fun}_n}) = n$ for each $n : \N$.
-Similarly, the bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ can be extended with 
+We use the same type signature $\Sigma_{\bto}$ but extend the bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with 
 \[
-  \aritysymbol{\mathsf{app}_n}{A_1,\ldots, A_n, B}{\tyOp_{\mathsf{fun}_n}(A_1, \ldots, A_n) \bto B^{\syn}, A_1^{\chk}, \ldots, A_n^{\chk}}{B}
+  \aritysymbol{\mathsf{app}_n}{A_1,\ldots, A_n, B}{A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right)^{\syn}, A_1^{\chk}, \ldots, A_n^{\chk}}{B}
 \]
-also for each $n : \N$.
+for each $n : \N$.
 Then each spine application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$.

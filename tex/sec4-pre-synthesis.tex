@@ -33,7 +33,6 @@ For \SynRule{Var}, \SynRule{Anno}, and \Rule{Op}, the outermost rule used in the
 The \ChkRule{Sub} case is similar but slightly simpler: the induction hypothesis directly gives us a derivation of $\Gamma |-_{\Sigma,\Omega} t \syn A$, to which we apply $\ChkRule{Sub}$.
 \end{proof}
 
-
 \subsection{Generalised Mode Decoration}
 \label{sec:mode-decoration}
 
@@ -212,7 +211,7 @@ By \cref{thm:generalised-mode-decoration}, there is a derivation of $V |-_{\Sigm
   \label{fig:annotation-ordering}
 \end{figure}
 
-\citet[Section~3.2]{Dunfield2021} formulated completeness differently from ours (\cref{thm:STLC-completeness,sec:soundness-and-completeness}) and proposed \emph{annotatability} as a more suitable name.
+\citet[Section~3.2]{Dunfield2021} formulated completeness differently from our \cref{lem:soundness-completeness} and proposed \emph{annotatability} as a more suitable name.
 In our theory, we may formulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}

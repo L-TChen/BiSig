@@ -46,7 +46,7 @@ We also need some auxiliary definitions for the subset of variables of a type an
 This subset contains type variables of a synthesising argument and they are exactly those type variables that will be synthesised during type synthesis.
 
 \begin{definition}\label{def:mode-correctness-args}
-  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is defined by
+  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a (proof-relevant) predicate defined by \LT{is it a prop?}
   \begin{align}
     \label{eq:MC1} \MCas( \cdot ) & = \top \\
     \label{eq:MC3} \MCas\left(\biargvec, \chkbiarg[n]\right)
@@ -121,14 +121,8 @@ We have arrived at the main technical contribution of this paper.
 \begin{theorem}[Decidability of Bidirectional Type Synthesis and Checking] \label{thm:bidirectional-type-synthesis-checking}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
   \begin{enumerate}
-    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether there is~$A$ such that
-      \[
-        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A;
-      \]
-    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\chk}$, then it is decidable for any~$A$ whether
-      \[
-        \Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A.
-      \]
+    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether there is~$A$ such that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$;
+    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\chk}$, then it is decidable for any~$A$ whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A$.
   \end{enumerate}
 \end{theorem}
 
@@ -164,8 +158,8 @@ We are now ready for the decidability proof.
 
 \begin{proof}[Proof of {\Cref{thm:bidirectional-type-synthesis-checking}}]
   We prove this statement by induction on the mode derivation\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
-  The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and have nothing to do with mode-correctness.
-  The case \ChkRule{Sub} invokes the uniqueness of synthesised types~(\cref{thm:unique-syn}) to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
+  The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and independent of mode-correctness.
+  The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
   The first three cases follow essentially the same reasoning provided by \citet{Wadler2022}, but we still present the reasoning here for the sake of completeness.
   The last case \Rule{Op} is new and has been discussed above.
   For brevity we omit the subscript $(\Sigma, \Omega)$.
@@ -178,8 +172,8 @@ We are now ready for the decidability proof.
         \item If $\Gamma |/- t \chk A$ but $\Gamma |- \isTerm{t \annotate A} \syn$, then by inversion $\Gamma |- t \chk A$, leading to a contradiction.
       \end{itemize}
       
-    \item \ChkRule{Sub}: If $\erase{\Gamma} |-t^{\chk}$ by the rule $\ChkRule{Sub}$, then $\Gamma |- t^{\syn}$ by inversion.
-      By induction hypothesis, it is decidable whether $\Gamma |- t \syn B$ for some $B$:
+    \item \ChkRule{Sub}: If $\erase{\Gamma} |-t^{\chk}$, then $\Gamma |- t^{\syn}$ by inversion.
+      By induction hypothesis, we have two cases: %it is decidable whether $\Gamma |- t \syn B$ for some $B$:
       \begin{itemize}
         \item If $\Gamma |/- t \syn C$ for any $C$ but $\Gamma |- t \chk A$, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
         \item If $\Gamma |- t \syn B$ for some $B$, then by decidable equality on $\Type_{\Sigma}(\Xi)$ either $A = B$ or $A \neq B$: 
@@ -258,7 +252,7 @@ We are now ready for the decidability proof.
                     \begin{enumerate}
                       \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |/- \isTerm{t_{m+1}} \syn A$ for any $A$ but there is $\gamma \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m+1$, then $\gamma \geq \ext{\rho}$.
                         Therefore $\simsub{\Delta_{m+1}}{\ext{\rho}} = \simsub{\Delta_{m+1}}{\gamma}$ and we derive a contradiction because $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
-                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$, then by \Cref{lem:unify} we have two cases: %we unify $A$ with $A_{m+1}$ extending $\ext{\rho}$.
+                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$, then by \Cref{lem:unify}: % we have two cases: %we unify $A$ with $A_{m+1}$ extending $\ext{\rho}$.
                         \begin{itemize}
                           \item Suppose no $\sigma \geq \ext{\rho}$ such that $\simsub{A_{m+1}}{\sigma} = A$ but an extension $\gamma \geq \rho$ such that \eqref{eq:claim} holds for $1 \leq i \leq m + 1$. 
                             Then, $\gamma \geq \ext{\rho}$ by the minimality of $\ext{\rho}$ and thus
@@ -291,12 +285,10 @@ Combining the bidirectional type synthesiser with the mode decorator, soundness,
 \begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
   For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
   exactly one of the following holds:
+  \LT{Why downplay the pre-condition?}
   \begin{enumerate}
     \item (\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and)\/ $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$.
     \item (\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but)\/ $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$.
     \item \phantom{(\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$}\llap{$\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$\kern.5pt}.
   \end{enumerate}
 \end{corollary}
-\begin{proof}
-  Combine \cref{thm:bidirectional-type-synthesis-checking} with \cref{lem:soundness-completeness,thm:mode-decoration}.
-\end{proof}

@@ -32,13 +32,8 @@ mutual
   soundness (var i eq) = var i eq
   soundness (A ∋ t)    = A ∋ soundness t
   soundness (t ↑ refl) = soundness t
-  soundness (op ts)    = op (soundnessᶜ (BD .ar _) ts)
-
-  soundnessᶜ
-    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
-    → ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
-    → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_ Γ rs A
-  soundnessᶜ (ι _ _ Ds) (_ , σ , σ-eq , ts) = σ , σ-eq , soundnessᵃˢ Ds ts
+  soundness (op {rs = i , _} (_ , σ , σ-eq , ts)) =
+    op (σ , σ-eq , soundnessᵃˢ (BD .ar i .args) ts)
 
   soundnessᵃˢ
     : (Ds : ArgsD Ξ) {rs : R.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw (length Γ)} {σ : TSub Ξ 0}
@@ -49,7 +44,7 @@ mutual
 
   soundnessᵃ
     : (Δ : TExps Ξ) {r : R.⟦ Δ ⟧ᵃ Raw (length Γ)} {σ : TSub Ξ 0}
-    → ⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' [ d ] A) σ Γ r
-    → T.⟦ Δ ⟧ᵃ Raw (λ Γ' r' → Γ' ⊢ r' ⦂ A) σ Γ r
+    → ⟦ Δ ⟧ᵃ   Raw (_⊢_[ d ] A) σ Γ r
+    → T.⟦ Δ ⟧ᵃ Raw (_⊢_⦂ A)     σ Γ r
   soundnessᵃ []      t = soundness    t
   soundnessᵃ (_ ∷ Δ) t = soundnessᵃ Δ t

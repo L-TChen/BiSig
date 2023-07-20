@@ -255,16 +255,15 @@ data _⊢_[_]_ : Fam Raw where
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+Our formal induction proofs typically consist of mutual definitions for the inductive type of derivations, for a list of arguments, for an extension context, and sometimes for an operation separately.
 
 As an illustration, consider the formal proof of soundness below, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
 Its formal proof is defined in a module which has signatures as its parameters:
 {\small\begin{code}
 module Theory.Soundness {SD : S.SigD} (BD : B.SigD SD) where
 \end{code}}
-Then, the induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-(The definition |soundnessᵃ| might be further removed if \Agda's termination checker 
-The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof |refl| and use the induction hypothesis (|soundness t|) directly:
+The induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof |refl| and use the induction hypothesis |soundness t| directly:
 \begin{figure}[H]
   \codefigure
   \begin{minipage}[t]{.55\textwidth}

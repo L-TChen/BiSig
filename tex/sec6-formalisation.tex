@@ -864,7 +864,7 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 
 \subsection{A Formal Proof Example: Soundness}\label{subsec:formal-proofs}
 
-Induction proofs in our formalisation typically consist of three mutual definitions---one for the inductive type of derivations, one for a list of arguments, and one for an extension context.
+Our formal induction proofs typically consist of mutual definitions for the inductive type of derivations, for a list of arguments, for an extension context, and sometimes for an operation separately.
 
 As an illustration, consider the formal proof of soundness below, i.e.\ the `if' part of \cref{lem:soundness-completeness}.
 Its formal proof is defined in a module which has signatures as its parameters:
@@ -875,9 +875,8 @@ Its formal proof is defined in a module which has signatures as its parameters:
 \ColumnHook
 \end{hscode}\resethooks
 }
-Then, the induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
-(The definition \ensuremath{\Varid{soundnessᵃ}} might be further removed if \Agda's termination checker 
-The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof \ensuremath{\Varid{refl}} and use the induction hypothesis (\ensuremath{\Varid{soundness}\;\Varid{t}}) directly:
+The induction proof is nothing more than a function defined by pattern matching for each case: each constructor of bidirectional typing derivations is mapped to a corresponding constructor of typing derivations.
+The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding the identity proof \ensuremath{\Varid{refl}} and use the induction hypothesis \ensuremath{\Varid{soundness}\;\Varid{t}} directly:
 \begin{figure}[H]
   \codefigure
   \begin{minipage}[t]{.55\textwidth}

@@ -33,15 +33,8 @@ mutual
   completeness (` j) (var i eq) = var i eq
   completeness (A ∋ p) (.A ∋ t) = A ∋ completeness p t
   completeness (p ↑)   t        = completeness p t ↑ refl
-  completeness (op ps) (op ts)  = op (completenessᶜ (BD .ar _) ps ts)
-
-  completenessᶜ
-    : (D : OpD) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
-    → P.⟦        D ⟧ᶜ Raw Pre   d   rs
-    → T.⟦ eraseᶜ D ⟧ᶜ Raw _⊢_⦂_   Γ rs   A
-    →   ⟦        D ⟧ᶜ Raw _⊢_[_]_ Γ rs d A
-  completenessᶜ (ι _ _ Ds) (deq , ps) (σ , σeq , ts) =
-    deq , σ , σeq , completenessᵃˢ Ds ps ts
+  completeness (op {rs = i , _} (dep , ps)) (op (σ , σeq , ts)) =
+    op (dep , σ , σeq , completenessᵃˢ (BD .ar i .args) ps ts)
 
   completenessᵃˢ
     : (Ds : ArgsD Ξ) {rs : R.⟦ eraseᵃˢ Ds ⟧ᵃˢ Raw (length Γ)} {σ : TSub Ξ 0}

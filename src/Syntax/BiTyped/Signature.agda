@@ -34,6 +34,7 @@ record OpD : Set where
     mode    : Mode
     type    : TExp  tvars
     args    : ArgsD tvars
+open OpD public
 
 record SigD : Set₁ where
   constructor sigd

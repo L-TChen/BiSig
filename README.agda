@@ -62,4 +62,5 @@ import Theory.Trichotomy                   -- Corollary 5.10
 
 -- Section 6
 
+import Example.PCF
 import Example.Spine

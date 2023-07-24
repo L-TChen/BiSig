@@ -9,6 +9,8 @@ README: README.agda
 .PHONY: listings
 listings: README.agda
 	$(AGDA_EXEC) -i. -isrc --html README.agda -v0
+	rm -rf docs
+	mv html docs
 
 # setup: Everything.agda
 # 

@@ -121,7 +121,7 @@ We have arrived at the main technical contribution of this paper.
 \begin{theorem}[Decidability of Bidirectional Type Synthesis and Checking] \label{thm:bidirectional-type-synthesis-checking}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
   \begin{enumerate}
-    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether there is~$A$ such that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$;
+    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$ for some $A$;
     \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\chk}$, then it is decidable for any~$A$ whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A$.
   \end{enumerate}
 \end{theorem}

@@ -39,7 +39,7 @@ module F where
   open import Data.Fin.Literals   public
   open import Data.Fin.Properties public
 open F public
-  using (Fin; #_; zero; suc; fromℕ; _↑ˡ_; _↑ʳ_; punchIn; punchOut)
+  using (Fin; zero; suc; fromℕ; _↑ˡ_; _↑ʳ_; punchIn; punchOut)
 
 module L where
   open import Data.List                          public

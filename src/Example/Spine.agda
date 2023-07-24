@@ -9,23 +9,16 @@ variable
 
 import Syntax.Simple.Signature as S
 
--- data Λₜ : Set where
---   b   :              Λₜ
---   _↣_ : (A B : Λₜ) → Λₜ
-
 data ΛₜOp : Set where
   base imp : ΛₜOp
 
 instance
 
   decΛₜOp : DecEq ΛₜOp
-  decΛₜOp = record { _≟_ = dec }
-    where
-      dec : (x y : ΛₜOp) → Dec (x ≡ y)
-      dec base base = yes refl
-      dec base imp  = no λ ()
-      dec imp  base = no λ ()
-      dec imp  imp  = yes refl
+  (decΛₜOp .DecEq._≟_) base base = yes refl
+  (decΛₜOp .DecEq._≟_) imp  imp  = yes refl
+  (decΛₜOp .DecEq._≟_) base imp  = no λ ()
+  (decΛₜOp .DecEq._≟_) imp  base = no λ ()
 
 ΛₜD : S.SigD
 ΛₜD = S.sigd ΛₜOp λ { base → 0; imp → 2 }
@@ -77,12 +70,19 @@ SpineD : SigD
 SpineD = record
   { Op    = SpineOp
   ; decOp = decSpineOp
-  ; ar    = λ { `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Chk ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0)
+  ; ar    = λ { `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0)
                     -- Γ , x : A ⊢ t ⇐ B
                     ------------------------
                     -- Γ ⊢ λ x . t ⇐ A → B
               ; (`app n) → suc n ▷ (chkArgs argTypes
-                                   (ρ[ [] ⊢[ Syn ] Π argTypes (` # 0) ] [])) ⇒ ` # 0 } }
+                                   (ρ[ [] ⊢[ Syn ] Π argTypes (` 0) ] [])) ⇒ ` 0 } }
                     -- Γ ⊢ t ⇒ A₁ → ... → Aₙ → A    Γ ⊢ u₁ ⇐ A₁    ...    Γ ⊢ uₙ ⇐ Aₙ
                     -------------------------------------------------------------------
                     -- Γ ⊢ t u₁ ... uₙ ⇒ A
+
+open import Theory.ModeCorrectness.Signature    ΛₜD
+open import Theory.ModeCorrectness.Decidability ΛₜD
+
+-- mcSpineD : ModeCorrect SpineD
+-- mcSpineD `abs     = from-yes (ModeCorrectᶜ? (SpineD .ar `abs))
+-- mcSpineD (`app n) = {!   !}

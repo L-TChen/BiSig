@@ -273,7 +273,7 @@ We are now ready for the decidability proof.
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.
 These programs either compute the typing derivation or provide a proof of contradiction.
 Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each sub-term, as well as the unification process.
-If a contradiction proof is not of interest for implementation, these programs can be simplified by disregarding the cases that yield such contradiction proofs.
+If a contradiction proof is not of interest for implementation, these programs can be simplified by discarding the cases that yield such contradiction proofs.
 Alternatively, we could consider generalising typing derivations instead, like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}).
 This could accommodate ill-typed cases and reformulate contradiction proofs positively to deliver more informative error messages.
 This would assist programmers in resolving issues with ill-typed terms, rather than simply returning a blatant `no'.

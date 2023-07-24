@@ -13,7 +13,7 @@ open import Data.Empty.Polymorphic             public
 open import Relation.Nullary                      public
   using (Dec; yes; no; _because_; ¬_; ¬?)
 open import Relation.Nullary.Decidable            public
-  using (map′)
+  using (map′; from-yes)
 open import Relation.Binary                       public
   using (Decidable; Rel; IsEquivalence)
 open import Relation.Binary.PropositionalEquality public
@@ -52,40 +52,28 @@ module L where
   open import Data.List.Membership.Propositional public
     using (_∈_)
   open import Data.List.Membership.Propositional.Properties public
-  module A where
-    open import Data.List.Relation.Unary.All            public
-    open import Data.List.Relation.Unary.All.Properties public
-  open A using (All; []; _∷_) public
-
   open import Data.List.Relation.Binary.Subset.Propositional public
     using (_⊆_)
 
-  index-∈-lookup
-    : ∀ {ℓ} {A : Set ℓ} (xs : List A) (i : Fin (length xs))
-    → index (∈-lookup {xs = xs} i) ≡ i
-  index-∈-lookup (x ∷ xs) zero    = refl
-  index-∈-lookup (x ∷ xs) (suc i) = cong suc (index-∈-lookup xs i)
+  module A where
+    open import Data.List.Relation.Unary.All            public
+    open import Data.List.Relation.Unary.All.Properties public
+  open A using (All; []; _∷_; all?) public
+
 open L public using
   ( List; []; _∷_; length; _++_; zip
-  ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺
+  ; any; here; there; ∈-++⁺ˡ; ∈-++⁺ʳ; ∈-++⁻; ∈-map⁺; ∈-lookup
+  ; index
+  ; all?
   )
   renaming (_∈_ to infix 5 _∈_)
 
 open import Data.Bool                          public
   using (Bool; true; false)
 
-data And : List Bool → Bool → Set where
-  nil :                       And []           true
-  hd  : ∀ {bs}              → And (false ∷ bs) false
-  tl  : ∀ {bs b} → And bs b → And (true  ∷ bs) b
-
 module V where
   open import Data.Vec            public
   open import Data.Vec.Properties public
---  open import Data.Vec.Relation.Unary.Any       public
---    using (Any; here; there; index)
---  open import Data.Vec.Relation.Unary.All      public
---    using (All; []; _∷_)
   open import Data.Vec.Membership.Propositional public
 open V public using
   (Vec; []; _∷_; toList; lookup)
@@ -140,6 +128,16 @@ _ʳ+_ : ℕ → ℕ → ℕ
 zero  ʳ+ m = m
 suc n ʳ+ m = n ʳ+ (suc m)
 
+data And : List Bool → Bool → Set where
+  nil :                       And []           true
+  hd  : ∀ {bs}              → And (false ∷ bs) false
+  tl  : ∀ {bs b} → And bs b → And (true  ∷ bs) b
+
+index-∈-lookup
+  : ∀ {ℓ} {A : Set ℓ} (xs : List A) (i : Fin (length xs))
+  → index (∈-lookup {xs = xs} i) ≡ i
+index-∈-lookup (x ∷ xs) zero    = refl
+index-∈-lookup (x ∷ xs) (suc i) = cong suc (index-∈-lookup xs i)
 ------------------------------------------------------------------------------
 -- Properties of _≗_
 

@@ -206,7 +206,7 @@ module TypeSynthesis⇔ where
 
   mutual
     synthesise : TypeSynthesis⇔
-    synthesise Γ (` i) = yes (L.lookup Γ i , var (L.∈-lookup i) (sym (L.index-∈-lookup Γ i)))
+    synthesise Γ (` i) = yes (L.lookup Γ i , var (∈-lookup i) (sym (index-∈-lookup Γ i)))
     synthesise Γ (A ∋ t) with check Γ A t
     ... | no ¬⊢t = no λ where (B , B ∋ ⊢t) → ¬⊢t ⊢t
     ... | yes ⊢t = yes (A , (A ∋ ⊢t))

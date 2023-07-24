@@ -35,7 +35,7 @@ ModeCorrectᶜ : OpD → Set
 ModeCorrectᶜ (ι {Ξ} Chk A Ds) =
   ((i : Fin Ξ) → i #∈ (vars A ∪ known Ds)) × ModeCorrectᵃˢ (vars A) Ds
 ModeCorrectᶜ (ι {Ξ} Syn A Ds) =
-  ((i : Fin Ξ) → i #∈ known Ds) × ModeCorrectᵃˢ [] Ds × vars A #⊆ known Ds
+  ((i : Fin Ξ) → i #∈ known Ds)            × ModeCorrectᵃˢ [] Ds
   -- Every i exists in some variable of inferred types
 
 ModeCorrect : SigD → Set

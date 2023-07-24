@@ -45,7 +45,7 @@ module _ where mutual
     : (Γ : Cxt 0) {r : Raw (length Γ)}
     → Pre Chk r → (A : Ty) → Dec (Γ ⊢ r ⇐ A)
 
-  synthesise Γ (` x) = yes (L.lookup Γ x , var (L.∈-lookup x) (L.index-∈-lookup Γ x))
+  synthesise Γ (` x) = yes (L.lookup Γ x , var (∈-lookup x) (index-∈-lookup Γ x))
 
   synthesise Γ (A ∋ t) with check Γ t A
   ... | no  ⊬t = no λ where (A , ._ ∋ ⊢t) → ⊬t ⊢t
@@ -107,7 +107,7 @@ module _ where mutual
     : (D : OpD) → ModeCorrectᶜ D
     → (Γ : Cxt 0) {rs : R.⟦ eraseᶜ D ⟧ᶜ Raw (length Γ)}
     → P.⟦ D ⟧ᶜ Raw Pre Syn rs → Dec (∃[ A ] ⟦ D ⟧ᶜ Raw _⊢_[_]_ Γ rs Syn A)
-  synthesiseᶜ (ι Syn A Ds) (Ds⊆Ξ , SDs , A⊆Ds) Γ (refl , ts)
+  synthesiseᶜ (ι Syn A Ds) (Ds⊆Ξ , SDs) Γ (refl , ts)
     with synthesiseⁿ Ds SDs Γ ts empty (λ ())
   ... | noₘ   ¬Pσ = no λ where
     (A , _ , σ , refl , ⊢ts) → ¬Pσ (_ , Sub⇒Sub⊆ σ) (ext-con ∅≤ρ ((λ {x} x∈ → ⊆enum x) , ⊢ᵃˢ→Sub⊆⊢ᵃˢ ⊢ts))

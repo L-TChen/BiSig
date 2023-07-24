@@ -96,6 +96,26 @@ module Decidable {A : Set} ⦃ _ : DecEq A ⦄ where
   ... | inj₁ x#xs = inj₁ (neq , x#xs)
   ... | inj₂ x∈xs = inj₂ (there x∈xs)
 
+  _#∈?_ : (x : A) (xs : List# A) → Dec (x #∈ xs)
+  _#∈?_ x []               = no λ ()
+  _#∈?_ x (cons y ys _) with x ≟ y
+  ... | yes p = yes (here p)
+  ... | no ¬p with x #∈? ys
+  ... | yes q = yes (there q)
+  ... | no ¬q = no λ where
+    (here eq)  → ¬p eq
+    (there x∈) → ¬q x∈
+
+  _#⊆?_ : (xs ys : List# A) → Dec (xs #⊆ ys)
+  _#⊆?_ []            ys = yes λ ()
+  _#⊆?_ (cons x xs _) ys with x #∈? ys
+  ... | no ¬p = no λ ⊆ys → ¬p (⊆ys (here refl))
+  ... | yes p with xs #⊆? ys
+  ... | no ¬q = no λ ⊆ys → ¬q (λ x∈ → ⊆ys (there x∈))
+  ... | yes q = yes λ where
+    (here refl) → p
+    (there x∈)  → q x∈
+
   infixr 8 _∪_
 
   _∪_     : (xs ys : List# A) → List# A

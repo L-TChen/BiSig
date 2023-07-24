@@ -3,9 +3,6 @@
 -- Checked with Agda 2.6.3
 -- and Standard Library version 7c5f3ff9 (included under agda-stdlib/)
 
--- The HTML version of this file (with hyperlinks to the imported files)
--- can be found at html/README.html.
-
 {-# OPTIONS --safe --with-K #-}
 -- The two options are also turned on globally in BiSig.agda-lib.
 

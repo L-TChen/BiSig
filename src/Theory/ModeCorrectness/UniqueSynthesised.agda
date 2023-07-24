@@ -55,8 +55,8 @@ mutual
     → ⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ ρ₁ Γ rs
     → ⟦ Ds ⟧ᵃˢ Raw _⊢_[_]_ ρ₂ Γ rs
     → A ⟨ ρ₁ ⟩ ≡ A ⟨ ρ₂ ⟩
-  uniq-⇒ᶜ (ι Syn A Ds) refl (_ , SDs , C⊆xs) ts us =
-    ≡-fv A λ x → uniq-⇒ⁿ Ds SDs ts us (C⊆xs (∈ᵥ→∈vars x))
+  uniq-⇒ᶜ (ι Syn A Ds) refl (⊆xs , SDs) ts us =
+    ≡-fv A λ x → uniq-⇒ⁿ Ds SDs ts us (⊆xs _)
 
   uniq-⇒ⁿ
     : (Ds : ArgsD Ξ) → ModeCorrectᵃˢ [] Ds

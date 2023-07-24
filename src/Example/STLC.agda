@@ -65,26 +65,23 @@ decΛOp = record { _≟_ = dec }
 Λ⇔D = record
   { Op    = ΛOp
   ; decOp = decΛOp
-  ; ar    = λ { `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` # 1 ]
-                           ρ[ [] ⊢[ Syn ] ` # 1 ↣ ` # 0 ] [] ⇒ ` # 0
+  ; ar    = λ { `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` 1 ]
+                           ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ] [] ⇒ ` 0
                     -- Γ ⊢ t : A → B    Γ ⊢ u : A
                     -------------------------------
                     -- Γ ⊢ t u ⇒ B
 
-              ; `abs → 2 ▷ ρ[ (` # 1 ∷ []) ⊢[ Chk ] ` # 0 ] [] ⇐ (` # 1) ↣ (` # 0) } }
+              ; `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0) } }
                     -- Γ , x : A ⊢ t ⇐ B
                     ------------------------
                     -- Γ ⊢ λ x . t ⇐ A → B
 
-open import Theory.ModeCorrectness.Signature ΛₜD
+open import Theory.ModeCorrectness.Signature    ΛₜD
+open import Theory.ModeCorrectness.Decidability ΛₜD
 
 mcΛ⇔D : ModeCorrect Λ⇔D
-mcΛ⇔D `app = (λ { zero → there (here refl); (suc zero) → here refl })
-           , ((λ { (here refl) → here refl }) ∷ [] , [] , _)
-           , (λ { (here refl) → there (here refl) })
-mcΛ⇔D `abs = (λ { zero → there (here refl); (suc zero) → here refl })
-           , (λ { (here refl) → there (here refl) })
-           ∷ (λ { (here refl) → here refl }) ∷ [] , _
+mcΛ⇔D `app = from-yes (ModeCorrectᶜ? (Λ⇔D .ar `app))
+mcΛ⇔D `abs = from-yes (ModeCorrectᶜ? (Λ⇔D .ar `abs))
 
 open import Theory.Erasure
 

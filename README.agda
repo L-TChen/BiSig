@@ -50,6 +50,7 @@ import Theory.Pre.Annotatability       -- Proposition 4.7
 -- Section 5
 
 import Theory.ModeCorrectness.Signature    -- Definitions 5.1 & 5.3
+import Theory.ModeCorrectness.Decidability -- 
 import Theory.ModeCorrectness.Functor      -- Definition 5.2
 import Theory.ModeCorrectness.UniqueSynthesised  -- Lemma 5.5
 

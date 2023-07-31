@@ -28,7 +28,7 @@ While the focus of this paper is not to design bidirectional type systems, we si
     \and
     \inferrule{\Gamma \vdash u \syn A \times B}{\Gamma \vdash \mathtt{proj}_2(u) \syn A}
     \\
-    \inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, x \chk A}
+    \inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, t \chk A}
     \and
     \inferrule{\Gamma \vdash t \syn A \and \Gamma, x : A \vdash u \chk B}{\Gamma \vdash \mathtt{let}\;x = t\;\mathtt{in}\;u\chk B}
   \end{mathpar}
@@ -40,7 +40,7 @@ To do so, we extend $\Sigma_{\bto}$ (as shown in \Cref{ex:type-signature-for-fun
 \[
   \arity({\mathsf{nat}}) = 0 \quad\text{and}\quad \arity({\mathsf{times}}) = 2
 \]
-enabling the introduction of $\mathtt{nat}$ and $A \times B$ as $\tyOp_{\mathsf{nat}}$ and $\tyOp_{\mathsf{times}}(A, B)$, respectively.
+introducing $\mathtt{nat}$ and $A \times B$ as $\tyOp_{\mathsf{nat}}$ and $\tyOp_{\mathsf{times}}(A, B)$, respectively.
 Following this, we also extend the bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with an operation for each rule above:
 \begin{flalign*}
   &  \aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}

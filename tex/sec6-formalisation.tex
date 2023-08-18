@@ -812,7 +812,6 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{24}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{32}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{56}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -838,10 +837,11 @@ This involves the following four constructors, corresponding to rules $\SynRule{
 \\
 \>[9]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;(\text{\textasciigrave}\;\Varid{j})\;\Varid{⇒}\;\Conid{A}\;{}\<[62]%
 \>[62]{}\Varid{→}\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;{}\<[71]%
-\>[71]{}\Varid{⇐}\;\Conid{A}\;{}\<[E]%
+\>[71]{}\Varid{⇐}\;\Conid{A}{}\<[E]%
 \\[\blanklineskip]%
-\>[9]{}\Varid{\char95 ∋\char95 }\;{}\<[15]%
-\>[15]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[56]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 ∋\char95 }\;{}\<[9]%
+\>[9]{}\mathbin{:}\;(\Conid{A}\;\mathbin{:}\;\Conid{Ty})\;{}\<[56]%
 \>[56]{}\Varid{op}\;{}\<[62]%
 \>[62]{}\mathbin{:}\;\Varid{⟦}\;\Conid{D}\;\Varid{⟧}\;\Conid{Raw}\;\Varid{\char95 ⊢\char95 [\char95 ]\char95 }\;\Conid{Γ}\;{}\<[85]%
 \>[85]{}\Varid{rs}\;{}\<[89]%
@@ -1000,7 +1000,7 @@ The only (slightly) interesting case $\ChkRule{Sub}$ is proved by disregarding t
 %\caption{The soundness proof in \Agda}
 %\label{fig:formal-soundness}
 \end{figure}
-Compared to an induction proof tailored for a specific system, the size of a generic induction proof remains the same, regardless of the signature.
-This makes it manageable even in a proof assistant like \Agda, which lacks extensive tactics for automating theorem proving.
-Hence, we achieve more by doing less.
+Each construct in an induction proof tailored for a specific system such as \PCF has to be scrutinised, so its size increases as the system in question has more constructs.
+On the other hand, the size of a generic induction proof remains the same and is manageable in a proof assistant that lacks extensive tactics for automating theorem proving, like \Agda.
+We have achieved more by doing no ad hoc proofs.
 \end{document}

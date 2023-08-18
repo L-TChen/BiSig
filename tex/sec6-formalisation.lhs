@@ -248,7 +248,7 @@ data _⊢_[_]_ : Fam Raw where
         → L.index i ≡ j                                      → A ≡ B
         → Γ ⊢ (` j) ⇒ A                                      → Γ ⊢ r  ⇐ A
                                                                                          
-        _∋_   : (A : Ty)                               op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ  rs  {-"\phantom{[}"-}  d    A
+  _∋_   : (A : Ty)                                     op    : ⟦ D ⟧ Raw _⊢_[_]_ Γ  rs  {-"\phantom{[}"-}  d    A
         → Γ ⊢ r        ⇐ A                                   → Γ ⊢ op rs                [                  d ]  A
         → Γ ⊢ (A ∋ r)  ⇒ A                    
 \end{code}}
@@ -300,7 +300,7 @@ mutual
 %\caption{The soundness proof in \Agda}
 %\label{fig:formal-soundness}
 \end{figure}
-Compared to an induction proof tailored for a specific system, the size of a generic induction proof remains the same, regardless of the signature.
-This makes it manageable even in a proof assistant like \Agda, which lacks extensive tactics for automating theorem proving.
-Hence, we achieve more by doing less.
+Each construct in an induction proof tailored for a specific system such as \PCF has to be scrutinised, so its size increases as the system in question has more constructs.
+On the other hand, the size of a generic induction proof remains the same and is manageable in a proof assistant that lacks extensive tactics for automating theorem proving, like \Agda.
+We have achieved more by doing no ad hoc proofs.
 \end{document}

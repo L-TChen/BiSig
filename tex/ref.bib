@@ -457,8 +457,8 @@
 }
 
 @article{Trnkova1975,
-  author =          {Trnkov{\'a}, V{\v e}ra, Ad{\'a}mek Ji{\v r}{\'\i} Koubek
-  V{\'a}clav Reiterman Jan},
+  author =        {Trnkov{\'a}, V{\v e}ra and Ad{\'a}mek, Ji{\v r}{\'\i} and
+                   Koubek, V{\'a}clav and Reiterman, Jan},
   journal =       {Commentationes Mathematicae Universitatis Carolinae},
   number =        {2},
   pages =         {339--351},
@@ -501,6 +501,65 @@
   doi =           {10.1006/inco.1998.2725},
   issn =          {08905401},
   url =           {http://dx.doi.org/10.1006/inco.1998.2725},
+}
+
+@inproceedings{Dunfield2013,
+  address =       {New York, NY, USA},
+  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
+  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
+                   Conference on Functional Programming},
+  pages =         {429--442},
+  publisher =     {Association for Computing Machinery},
+  series =        {ICFP '13},
+  title =         {Complete and easy bidirectional typechecking for
+                   higher-rank polymorphism},
+  year =          {2013},
+  abstract =      {Bidirectional typechecking, in which terms either
+                   synthesize a type or are checked against a known
+                   type, has become popular for its scalability (unlike
+                   Damas-Milner type inference, bidirectional typing
+                   remains decidable even for very expressive type
+                   systems), its error reporting, and its relative ease
+                   of implementation. Following design principles from
+                   proof theory, bidirectional typing can be applied to
+                   many type constructs. The principles underlying a
+                   bidirectional approach to polymorphism, however, are
+                   less obvious. We give a declarative, bidirectional
+                   account of higher-rank polymorphism, grounded in
+                   proof theory; this calculus enjoys many properties
+                   such as eta-reduction and predictability of
+                   annotations. We give an algorithm for implementing
+                   the declarative system; our algorithm is remarkably
+                   simple and well-behaved, despite being both sound and
+                   complete.},
+  doi =           {10.1145/2500365.2500582},
+  isbn =          {9781450323260},
+  url =           {https://doi.org/10.1145/2500365.2500582},
+}
+
+@inproceedings{Xie2018,
+  address =       {Cham},
+  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
+  booktitle =     {Programming Languages and Systems. ESOP 2018},
+  editor =        {Ahmed, Amal},
+  pages =         {272--299},
+  publisher =     {Springer International Publishing},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Let arguments go first},
+  volume =        {10801},
+  year =          {2018},
+  abstract =      {Bi-directional type checking has proved to be an
+                   extremely useful and versatile tool for type checking
+                   and type inference. The conventional presentation of
+                   bi-directional type checking consists of two modes:
+                   inference mode and checked mode. In traditional
+                   bi-directional type-checking, type annotations are
+                   used to guide (via the checked mode) the type
+                   inference/checking procedure to determine the type of
+                   an expression, and type information flows from
+                   functions to arguments.},
+  doi =           {10.1007/978-3-319-89884-1_10},
+  isbn =          {978-3-319-89884-1},
 }
 
 @inproceedings{Fiore2013,
@@ -602,64 +661,5 @@
   year =          {2023},
   isbn =          {978-91-7905-850-0},
   url =           {https://research.chalmers.se/en/publication/535726},
-}
-
-@inproceedings{Dunfield2013,
-  address =       {New York, NY, USA},
-  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
-  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
-                   Conference on Functional Programming},
-  pages =         {429--442},
-  publisher =     {Association for Computing Machinery},
-  series =        {ICFP '13},
-  title =         {Complete and easy bidirectional typechecking for
-                   higher-rank polymorphism},
-  year =          {2013},
-  abstract =      {Bidirectional typechecking, in which terms either
-                   synthesize a type or are checked against a known
-                   type, has become popular for its scalability (unlike
-                   Damas-Milner type inference, bidirectional typing
-                   remains decidable even for very expressive type
-                   systems), its error reporting, and its relative ease
-                   of implementation. Following design principles from
-                   proof theory, bidirectional typing can be applied to
-                   many type constructs. The principles underlying a
-                   bidirectional approach to polymorphism, however, are
-                   less obvious. We give a declarative, bidirectional
-                   account of higher-rank polymorphism, grounded in
-                   proof theory; this calculus enjoys many properties
-                   such as eta-reduction and predictability of
-                   annotations. We give an algorithm for implementing
-                   the declarative system; our algorithm is remarkably
-                   simple and well-behaved, despite being both sound and
-                   complete.},
-  doi =           {10.1145/2500365.2500582},
-  isbn =          {9781450323260},
-  url =           {https://doi.org/10.1145/2500365.2500582},
-}
-
-@inproceedings{Xie2018,
-  address =       {Cham},
-  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
-  booktitle =     {Programming Languages and Systems. ESOP 2018},
-  editor =        {Ahmed, Amal},
-  pages =         {272--299},
-  publisher =     {Springer International Publishing},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Let arguments go first},
-  volume =        {10801},
-  year =          {2018},
-  abstract =      {Bi-directional type checking has proved to be an
-                   extremely useful and versatile tool for type checking
-                   and type inference. The conventional presentation of
-                   bi-directional type checking consists of two modes:
-                   inference mode and checked mode. In traditional
-                   bi-directional type-checking, type annotations are
-                   used to guide (via the checked mode) the type
-                   inference/checking procedure to determine the type of
-                   an expression, and type information flows from
-                   functions to arguments.},
-  doi =           {10.1007/978-3-319-89884-1_10},
-  isbn =          {978-3-319-89884-1},
 }
 

@@ -2,13 +2,13 @@
 paper: BiSig.pdf
 
 BiSig.pdf: *.tex agda.fmt *.lhs
-	latexmk -pdf -auxdir=aux BiSig
+	latexmk -pdf BiSig
 
 .PHONY: watch
 watch: tex
-	latexmk -pdf -pvc -auxdir=aux BiSig
+	latexmk -pdf -pvc BiSig
 
 .PHONY: clean
 clean:
-	latexmk -CA -auxdir=aux
+	latexmk -CA
 	rm sec6-formalisation.tex agda-lhs2tex.sty

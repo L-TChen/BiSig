@@ -90,8 +90,8 @@ The entire development is formalised in \Agda and can be further integrated with
 
 \bibliographystyle{splncs04nat}
 
-\bibliography{../reference.bib}
-%\IfFileExists{../reference.bib}{%
-%}{\bibliography{ref}}
+\IfFileExists{reference}{
+\bibliography{reference}
+}{\bibliography{ref}}
 
 \end{document}

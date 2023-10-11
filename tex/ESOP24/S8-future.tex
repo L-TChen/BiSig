@@ -1,0 +1,72 @@
+%!TEX root = BiSig.tex
+
+\section{Discussion and Future work} \label{sec:future}
+
+\subsection{Related work}
+\citet{Harper1993a,Harper2007}
+
+Our general definitions are akin to the definitions used in other language formalisation frameworks~\citep{Ahrens2022,Allais2021,Fiore2022} in a proof assistant---the concept of a signature is at object level (i.e.\ an inhabitant of a record type in \Agda).
+This allows us to exploit the expressive power of our meta-language while defining a language, so it is possible to express a construct that takes an indeterminate number of arguments such as spine application.
+%\todo[inline,caption={}]{\begin{enumerate}
+%\item `Input' and `output' of our theory, comparing with grammars and parsing
+%\item A more comprehensive theory than Wadler et al., and more formal and refined than Dunfield et al.'
+%\item Restrictions to simple types (not individual language features) and syntax-directedness
+%\end{enumerate}}
+
+%which together describe an \emph{extrinsically typed} and \emph{syntax-directed} bidirectional simple type system~(\cref{fig:raw-terms,fig:bidirectional-typing-derivations}).
+%
+%There are many ways and extensions for designing bidirectional typing rules, .
+%Yet, once the definition of a bidirectional type system is in place, deriving an algorithm becomes straightforward.
+%Accordingly, our theory's objective is not to formulate rules for various language features, but to introduce a formalism for bidirectional typing.
+%\todo{Looks like we should have axiomatised what types we can deal with; left as future work}
+\paragraph{More characteristics of bidirectional typing}
+
+We have formalised some of the most important concepts discussed by \citet{Dunfield2021}.
+There are other concepts that may be formalisable with some more effort, for example Pfenning's recipe for bidirectionalising typing rules.
+We believe that our theory lays the foundation for further formalising these concepts.
+There are some other concepts that may be more difficult to pin down, notably `annotation character', which is roughly about how easy it is for the user to write annotated programs.
+These may continue to require creativity from the designer of type systems.
+
+%\paragraph{Beyond syntax-directed type systems}
+%
+%As a first theory of bidirectional type synthesis, our work focuses on syntax-directed type systems.
+%To explore more general settings, an extreme possibility is to independently specify an ordinary type system and a bidirectional one over the same raw terms and then investigate possible relationships between the two systems, but a more manageable and practical setting suitable for a next step is probably one that only mildly generalises ours: 
+%for each raw term construct, there can be several ordinary typing rules, and each typing rule can be refined to several bidirectional typing rules with different mode assignments.
+%Even for this mildly generalised setting, there is already a lot more work to do:
+%Both the mode decorator and the bidirectional type synthesiser will have to backtrack, and become significantly more complex.
+%For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and type information, but the completeness direction will pose a problem---for every node of a raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.
+%There should be ways to fix this problem while retaining the mode decoration phase---for example, one idea is to make the mode decorator produce all possible mode derivations, and refine completeness to say that any typing derivation can be combined with one of these mode derivations into a bidirectional typing derivation.
+%All these considerations are rather too complex for a first theory, however.
+%
+%%\Josh[inline, caption={}]{Getting rid of the assumption of being syntax-directed (the triangular picture) --- 0.5p
+%%\begin{enumerate}
+%%\item In general: two independently formulated type systems over raw terms
+%%\item More sensible next step: a `refinement chain'
+%%\item Backtracking algorithms are required. for both mode decoration and bidirectional type synthesis.
+%%\item The idea of separating and combining mode and type information should still work, but requires more care in the completeness direction.
+%%\item Too complex for a first theory, and left as future work
+%%\end{enumerate}}
+%
+\paragraph{Beyond simple types}
+We leave the problem of presenting bidirectional typing for more general and advanced language features as future work (such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}).
+While algebraic approaches to polymorphic types have been developed~\citep{Fiore2013,Hamana2011}, these approaches do not take subtyping into account.
+Subtyping is essential for formulating important concepts such as \emph{principal types} in type synthesis.
+
+%%\paragraph{Whither extrinsic typing?}
+%
+%%\todo[inline]{We leave the problem of presenting bidirectional typing for more general and advanced language features as future work (such as those related to polymorphic types~\citep{Pierce2000,Peyton-Jones2007,Dunfield2013,Xie2018}), which requires advancement in language formalisation~(\cref{sec:language-formalisation}) that is orthogonal to our work.}
+%
+%%\Josh[inline]{Optional: ornaments (0.25p), NDGP (0.25p)}
+%
+%%\subsubsection{Theories of abstract syntax with variable binding}
+%%\label{sec:theory-of-syntax}
+%%
+%
+%%Substitution is also modelled categorically, but it does not play a role in this paper.%
+%%\todo{Reveal a bit about this paper?}
+%
+%%\begin{remark} \label{re:type-signature}
+%%Most of existing theories treat types independently of terms, thereby excluding them from signatures.
+%%To the best of our knowledge, the only exception to this approach is found in the work of~\citet{Arkor2020}, which incorporates signatures for both terms and types.
+%%Interestingly, this inclusion is also critical for type synthesis for comparing a concrete type $N \bto N$ with an abstract type $A \bto B$, where $A$ and $B$ are type variables in a typing rule.
+%%\end{remark}

@@ -1,0 +1,97 @@
+\documentclass[orivec,envcountsame,envcountsect,envcountreset,oribibl]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[british]{babel}
+\usepackage[numbers,sort&compress]{natbib}
+
+\usepackage{soul}
+\usepackage{subfiles}
+\usepackage{xurl} % allow line breaks anywhere in a URL string
+\usepackage[colorlinks,urlcolor=blue,citecolor=blue]{hyperref}
+
+\usepackage{bbold}
+\newcommand{\hmmax}{0}
+\newcommand{\bmmax}{0}
+\usepackage{bm}
+\usepackage{mathtools}
+\input{mathlig}
+\usepackage{mathpartir}
+
+\usepackage{xspace}
+\usepackage[capitalise,noabbrev]{cleveref}
+
+
+% Used for typesetting Agda code
+\usepackage{agda-lhs2tex}
+\newcommand{\cons}[1]{\mathbf{#1}}
+\newcommand{\iden}{\mathit}
+
+\usepackage{xifthen}
+\newcommand{\varcitet}[3][]{\citeauthor{#2}#3~\ifthenelse{\isempty{#1}}{\cite{#2}}{\cite[#1]{#2}}}
+
+\usepackage[inline]{enumitem} % for environment enumerate*
+\newlist{inlineenum}{enumerate*}{1}
+\setlist[inlineenum]{label=(\roman*)}
+
+\setlength{\marginparwidth}{2cm}
+\usepackage[obeyFinal,color=yellow,textsize=scriptsize]{todonotes}
+
+\usepackage{microtype}
+\microtypesetup{babel}
+
+\newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
+\newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
+\newcommand{\codefigure}{\small\setlength{\parindent}{0em}\setlength{\mathindent}{0em}\setlength{\abovedisplayskip}{0ex}\setlength{\belowdisplayskip}{0ex}}
+
+\input{type-notation} %% for type theory notation copied from HoTT Book
+\input{macros}
+
+%\author{Liang-Ting Chen
+%\orcidID{0000-0002-3250-1331}
+%\and 
+%Hsiang-Shang Ko
+%\orcidID{0000-0002-2439-1048}}
+%
+%\institute{Institute of Information Science, Academia Sinica, Taiwan}
+
+\title{A formal treatment of bidirectional typing}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+There has been much progress in designing bidirectional type systems and associated type synthesis algorithms, but mostly on a case-by-case basis.
+This situation is in stark contrast to parsing, for which there have been general theories and widely applicable tools such as parser generators.
+To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing, and provides a \emph{verified} generator of \emph{proof-relevant} type synthesisers for syntax-directed simply typed languages: For every signature that specifies a bidirectionally typed language, there exists a proof-relevant type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
+Soundness, completeness, and mode-correctness are studied universally for any simply typed language, which are sufficient conditions for deriving a correct type synthesiser.
+We propose a preprocessing step called `mode decoration', which helps the user to deal with missing type annotations.
+The entire development is formalised in \Agda and can be further integrated with other language-formalisation frameworks.
+\end{abstract}
+
+\input{S1-intro}
+\input{S2-outline}
+\input{S3-defs.tex}
+\input{S4-pre-synthesis}
+\input{S5-synthesis}
+\input{S6-example}
+%\subfile{S7-formalisation}
+\input{S8-future}
+\appendix
+%\input{appendix}
+
+%\begin{acks}
+%%We thank Nathanael Arkor for the useful conversation.
+%We thank Kuen-Bang {Hou (Favonia)} for his comments and suggestions.
+%The work is supported by the \grantsponsor{NSTC}{National Science and Technology Council of Taiwan}{https://www.nstc.gov.tw/} under grant \grantnum{NSTC}{NSTC 112-2221-E-001-003-MY3}.
+%\end{acks}
+
+\bibliographystyle{splncs04nat}
+
+\bibliography{../reference.bib}
+%\IfFileExists{../reference.bib}{%
+%}{\bibliography{ref}}
+
+\end{document}

@@ -1,0 +1,106 @@
+%!TEX root = BiSig.tex
+
+% requires bbold package
+\DeclareSymbolFont{bbsymbol}{U}{bbold}{m}{n}
+\DeclareMathSymbol{\bbcolon}{\mathrel}{bbsymbol}{"3A}
+
+\newcommand{\mathsc}[1]{\textnormal{\textsc{#1}}}
+
+\newcommand{\Agda}{\textsc{Agda}\xspace}
+\newcommand{\SystemF}{{System~\textsf{F}}\xspace}
+\newcommand{\PCF}{\textsf{PCF}\xspace}
+\newcommand{\PoplMark}{\textsc{PoplMark}\xspace}
+\newcommand{\AxiomK}{Axiom~\textsf{K}\xspace}
+
+
+
+\newcommand{\arity}{\mathit{ar}}
+
+\newcommand{\xto}[1]{\xrightarrow{#1}}
+  
+\newcommand{\fv}{\mathit{fv}}
+\newcommand{\dom}{\mathit{dom}}
+
+\newcommand{\tmOp}{\mathsf{op}}
+\newcommand{\tyOp}{\mathsf{op}}
+
+\mathchardef\mhyphen="2D % hyphen in mathmode
+
+\newcommand{\Type}{\mathsf{Ty}}
+\newcommand{\Term}{\mathsf{Tm}}
+\newcommand{\Cxt}{\mathsf{Cxt}}
+\newcommand{\Mode}{\mathsf{Mode}}
+
+\newcommand{\bto}{\mathbin{\bm{\supset}}}
+\newcommand{\btimes}{\mathbin{\bm{\wedge}}}
+
+\newcommand{\simsub}[2]{{#1}\!\left<{#2}\right>}
+
+\newcommand{\Identifier}{\mathsf{Id}}
+
+\newcommand{\annotate}{\bbcolon}
+\newcommand{\subsum}{\mathord{\uparrow}}
+
+\newcommand{\Sub}[2]{\mathsf{Sub}_{\Sigma}(#1,#2)}
+\newcommand{\PSub}[2]{\mathsf{PSub}_{\Sigma}(#1,#2)}
+\newcommand{\Ren}[2]{\mathsf{Ren}(#1, #2)}
+
+\definecolor{dRed}{rgb}{0.45, 0.0, 0.0}
+\definecolor{dBlue}{rgb}{0.0, 0.0, 0.65}
+\definecolor{dPurple}{rgb}{0.45, 0.0, 0.65}
+\definecolor{dDark}{rgb}{0.2, 0.2, 0.2}
+
+\newcommand{\isTerm}[1]{{\textcolor{dDark}{#1}}}
+\newcommand{\isType}[1]{#1}
+\newcommand{\isCxt}[1]{#1}
+\newcommand{\isDir}[1]{\mathrel{#1}}
+
+\newcommand{\dir}[1]{{\color{dPurple}{#1}}}
+\newcommand{\chk}{\mathrel{\color{dBlue}{\Leftarrow}}}
+\newcommand{\syn}{\mathrel{\color{dRed}{\Rightarrow}}}
+\newcommand{\Rule}[1]{\ensuremath{\mathsc{#1}}}
+\newcommand{\SynRule}[1]{\ensuremath{\mathsc{#1}^{\syn}}}
+\newcommand{\ChkRule}[1]{\ensuremath{\mathsc{#1}^{\chk}}}
+\newcommand{\MC}{\mathsf{MC}}
+\newcommand{\MCas}{\MC_{\mathit{as}}}
+
+\newcommand{\ext}[1]{\bar{#1}}
+\newcommand{\erase}[1]{\left|#1\right|}
+
+\newcommand{\synvar}{\fv^{\syn}}
+
+\newcommand{\abs}{\mathsf{abs}}
+\newcommand{\app}{\mathsf{app}}
+
+\mathlig{|-}{\mathrel{\vdash}} 
+\mathlig{|/-}{\mathrel{\nvdash}} 
+\newcommand{\judgbox}[2]{{\raggedright $\boxed{#1}$ \quad \text{#2}}}
+
+
+\newcommand{\BTrue}{\ensuremath{\mathbf{T}}}
+\newcommand{\BFalse}{\ensuremath{\mathbf{F}}}
+
+% Some shortcuts
+\newcommand{\vars}[1]{\vec{\isTerm{#1}}}
+\newcommand{\tmOpts}{\isTerm{\tmOp}_o(\vars{x}_\isTerm{1}.\, \isTerm{t_1}; \ldots;\vars{x}_\isTerm{n}.\, \isTerm{t_n})}
+\newcommand{\tmOpus}{\isTerm{\tmOp}_o(\vars{x}_\isTerm{1}.\, \isTerm{u_1}; \ldots;\vars{x}_\isTerm{n}.\, \isTerm{u_n})}
+
+
+\newcommand{\aritysymbol}[4]{#1\colon #2 \mathrel{\rhd} #3 \to #4}
+\newcommand{\formatarg}[2]{[#1]#2}
+\newcommand{\formatbiarg}[3]{\formatarg{#1}{#2}^{\dir{#3}}}
+
+\newcommand{\barg}[1][]{\formatarg{\Delta_{#1}}{A_{#1}}}
+\newcommand{\bargs}{\barg[1], \ldots, \barg[n]}
+\newcommand{\bop}{\aritysymbol{o}{\Xi}{\bargs}{A_0}}
+
+\newcommand{\as}{\mathit{as}}
+\newcommand{\chkbiarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{\chk}}
+\newcommand{\synbiarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{\syn}}
+\newcommand{\biarg}[1][]{\formatbiarg{\Delta_{#1}}{A_{#1}}{d_{#1}}}
+\newcommand{\biargs}{\biarg[1], \ldots, \biarg[n]}
+\newcommand{\biarity}{\biargs\to A_0^{\dir{d}}}
+\newcommand{\biargvec}{\overrightarrow{\biarg[i]}}
+\newcommand{\synop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\syn}}}
+\newcommand{\chkop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\chk}}}
+\newcommand{\biop}{\aritysymbol{o}{\Xi}{\biargs}{A_0^{\dir{d}}}}

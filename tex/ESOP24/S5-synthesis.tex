@@ -35,28 +35,23 @@ We also need some auxiliary definitions for the subset of variables of a type an
   There are various definitions for finite subsets of a set within type theory, but for our purposes the choice among these definitions is not a matter of concern.}
   of \emph{(free) variables} of a type $A$ is denoted by $\fv(A)$.
   The subset $\fv(\Delta)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
-  For an argument list $\biargs$, define its set of \emph{synthesised type variables} inductively by 
-  \begin{align}
-    \label{eq:synvar1}\synvar(\cdot)                   & = \emptyset  \\
-    \label{eq:synvar2}\synvar(\biargs, \chkbiarg[n+1]) & = \phantom{\fv(A_{n+1}) \cup {}} \synvar(\biargs) \\
-    \label{eq:synvar3}\synvar(\biargs, \synbiarg[n+1]) & = \fv(A_{n+1}) \cup           \synvar(\biargs).
-  \end{align}
+  For an argument list $\biargs$, its set of \emph{synthesised type variables} is denoted by $\synvar(\biargs)$.
 \end{definition}
 This subset contains type variables of a synthesising argument and they are exactly those type variables that will be synthesised during type synthesis.
 
 \begin{definition}\label{def:mode-correctness-args}
-  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a (proof-relevant) predicate defined by
-  \begin{align}
-    \label{eq:MC1} \MCas( \cdot ) & = \top \\
-    \label{eq:MC3} \MCas\left(\biargvec, \chkbiarg[n]\right)
+  The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a predicate defined by
+  \begin{align*}
+    \MCas( \cdot ) & = \top \\
+    \MCas\left(\biargvec, \chkbiarg[n]\right)
                                   & = \fv(\Delta_n, A_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land \MCas\left(\biargvec\right) \\
     \label{eq:MC2} \MCas\left(\biargvec, \synbiarg[n]\right) 
                                   & = \phantom{, A_n} \fv(\Delta_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
-  \end{align}
-  where \eqref{eq:MC1} means an empty list is always mode-correct.
+  \end{align*}
+  where $\top$ means an empty list is always mode-correct.
 \end{definition}
 This definition encapsulates the idea that every `input' type variable, possibly derived from an extension context~$\Delta_n$ or a checking argument~$A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
-This condition must be met for every tail of the argument list as well to ensure that `output' variables accessible at each argument position are from preceding arguments only, hence an inductive definition.
+This condition must also be met for every tail of the argument list to ensure that `output' variables accessible at each argument are from preceding arguments only, hence an inductive definition.
 \begin{definition}\label{def:mode-correctness}
   An operation $\biop$ is \emph{mode-correct} if 
   \begin{enumerate}
@@ -70,19 +65,22 @@ Since every inhabitant of~$\Xi$ can be located in either~$A_0$ or synthesised va
 On the other hand, for a synthesising operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to~$\emptyset$.
 Also, the set of synthesised variables alone should include every type variable in~$\Xi$ and particularly in~$A_n$.
 
-It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct according to our definition.
-
 \begin{remark}
   Mode-correctness is fundamentally a condition for bidirectional typing \emph{rules}, not for derivations.
   Thus, this property cannot be formalised without treating rules as some mathematical object, such as the notion of bidirectional binding signature presented in \Cref{sec:defs}.
   This contrasts with the properties in \Cref{sec:pre-synthesis}, which can still be specified for individual systems even in the absence of a generic definition of bidirectional type systems.
 \end{remark}
 
-\LT{decidability of mode-correctness}
+It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct manually by definition or automatically by the following lemma:
+\begin{lemma}
+  It is decidable if an operation $\biop$ is mode-correct or not.
+\end{lemma}
+
+
 Now, we set out to show the uniqueness of synthesised types for a mode-correct bidirectional type system.
 For a specific system, its proof is typically a straightforward induction on the typing derivations.
 However, since mode-correctness is inductively defined on the argument list, our proof proceeds by induction on both the typing derivations and the argument list:
-\begin{lemma}[Uniqueness of Synthesised Types]\label{thm:unique-syn}
+\begin{lemma}[Uniqueness of synthesised types]\label{thm:unique-syn}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$, the synthesised types of any two derivations
   \[
     \Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A
@@ -101,10 +99,10 @@ However, since mode-correctness is inductively defined on the argument list, our
       To prove that any two typing derivations has the same synthesised type, it suffices to show that those substitutions $\rho_1$~and~$\rho_2$ of $d_1$~and~$d_2$, respectively, agree on variables in $\synvar(\biargs)$ so that $\simsub{A_0}{\rho_1} = \simsub{A_0}{\rho_2}$.
       We prove it by induction on the argument list:
       \begin{enumerate}
-        \item For the empty list, the statement is vacuously true by \Cref{eq:synvar1}.
-        \item If $\dir{d_{i+1}}$ is~$\chk$, then the statement holds for \Cref{eq:synvar2} by induction hypothesis.
-        \item If $\dir{d_{i+1}}$ is~$\syn$, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ by \Cref{eq:MC2} and induction hypothesis (of the list).
-          Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar(\biargs)$, as required for \Cref{eq:synvar3} in the definition of $\synvar$.
+        \item For the empty list, the statement is vacuously true.
+        \item If $\dir{d_{i+1}}$ is~$\chk$, then the statement holds by induction hypothesis.
+        \item If $\dir{d_{i+1}}$ is~$\syn$, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ and induction hypothesis (of the list).
+          Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar(\biargs)$.
       \end{enumerate}
   \end{itemize}
 \end{proof}
@@ -153,36 +151,15 @@ By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we 
   \end{enumerate}
 \end{lemma}
 This lemma can be inferred from the correctness of first-order unification~\citep{McBride2003,McBride2003a}, or be proved directly without unification.
-We are now ready for the promised proof.
+We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
 
 \begin{proof}[of {\Cref{thm:bidirectional-type-synthesis-checking}}]
   We prove this statement by induction on the mode derivation\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
   The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and independent of mode-correctness.
   The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
-  The first three cases follow essentially the same reasoning provided by \citet{Wadler2022}, but we still present the reasoning here for the sake of completeness.
-  The last case \Rule{Op} is new and has been discussed above.
+  The first three cases follow essentially the same reasoning provided by \citet{Wadler2022}, so we only detail the last case \Rule{Op} which is new and has been discussed informally above.
   For brevity we omit the subscript $(\Sigma, \Omega)$.
-  \begin{itemize}
-    \item \SynRule{Var}: If $\erase{\Gamma} |- \isTerm{t}^{\syn}$, then $(x : A) \in \Gamma$ and thus $\Gamma |- \isTerm{x} \syn A$.
 
-    \item \SynRule{Anno}: For $\erase{\Gamma} |- (\isTerm{t} \annotate A)^{\syn}$, it is decidable whether $\Gamma |- \isTerm{t} \chk A$ by induction hypothesis.
-      \begin{itemize}
-        \item If $\Gamma |- \isTerm{t} \chk A$, then $\Gamma |- \isTerm{t \annotate A} \syn A$.
-        \item If $\Gamma |/- t \chk A$ but $\Gamma |- \isTerm{t \annotate A} \syn$, then by inversion $\Gamma |- t \chk A$, leading to a contradiction.
-      \end{itemize}
-      
-    \item \ChkRule{Sub}: If $\erase{\Gamma} |-t^{\chk}$, then $\Gamma |- t^{\syn}$ by inversion.
-      By induction hypothesis, we have two cases: %it is decidable whether $\Gamma |- t \syn B$ for some $B$:
-      \begin{itemize}
-        \item If $\Gamma |/- t \syn C$ for any $C$ but $\Gamma |- t \chk A$, then by inversion $\Gamma |- t \syn B$ for some $B = A$, thus a contradiction.
-        \item If $\Gamma |- t \syn B$ for some $B$, then by decidable equality on $\Type_{\Sigma}(\Xi)$ either $A = B$ or $A \neq B$: 
-          \begin{itemize}
-            \item if $A = B$ then we have\/ $\Gamma |- t \chk A$;
-            \item if $A \neq B$ but $\Gamma |- t \chk A$, then by inversion $\Gamma |- t \syn A$.
-              However, by \Cref{thm:unique-syn}, synthesised types $A$ and $B$ must be equal, so we derive a contradiction.
-          \end{itemize}
-      \end{itemize}
-    \item \Rule{Op}:
       For a mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$, we first claim:
       \begin{claim}\label{lem:args-induction}
         For an argument list $\biargs$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
@@ -190,11 +167,11 @@ We are now ready for the promised proof.
           \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
             \begin{equation} \label{eq:claim}
               \dom(\ext{\rho}) \supseteq \synvar(\biargs)
-              \quad\text{and}\quad
+              \;\text{and}\;
 %              \text{the domain of $\ext{\rho}$ contains $\synvar(\biargs)$ and\/} \quad
               \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |- \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
-              \quad\text{for $i = 1, \ldots, n$};
             \end{equation}
+            for $i = 1, \ldots, n$
           \item or there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
         \end{enumerate}
       \end{claim}
@@ -228,7 +205,7 @@ We are now ready for the promised proof.
                   \[
                     \Gamma |- \tmOpts \chk \simsub{A_0}{\ext{\ext{\rho}}}
                   \]
-                  where $\simsub{A_0}{\ext{\ext{\rho}}} = \simsub{A_0}{\ext{\rho}} = A$ since $\ext{\ext{\rho}}(x) = \ext{\rho}$ for every $x$ in the domain of $\ext{\rho}$.
+                  where $\simsub{A_0}{\ext{\ext{\rho}}} = \simsub{A_0}{\ext{\rho}} = A$ since $\ext{\ext{\rho}}(x) = \ext{\rho}$ for every $x$ in $\dom(\ext{\rho})$.
               \end{enumerate}
           \end{enumerate}
       \end{itemize}
@@ -266,7 +243,7 @@ We are now ready for the promised proof.
         Therefore, we have proved our claim for any argument list by induction.\hfill
         $\blacksquare$
       \end{proof}
-  \end{itemize}
+%  \end{itemize}
   We have completed the proof by induction on the mode derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$.\qed
 \end{proof}
 
@@ -282,12 +259,12 @@ This would assist programmers in resolving issues with ill-typed terms, rather t
 
 Combining the bidirectional type synthesiser with the mode decorator, soundness, and completeness from \cref{sec:pre-synthesis}, we get a type synthesiser parameterised by $(\Sigma, \Omega)$, generalising \cref{thm:implementation}.
 
-\begin{corollary}[Trichotomy on Raw Terms]\label{cor:trichotomy}
+\begin{corollary}[Trichotomy on raw terms]\label{cor:trichotomy}
   For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
   exactly one of the following holds:
   \begin{enumerate}
-    \item $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$.
-    \item $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$.
-    \item \phantom{(\/$\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$}\llap{$\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$\kern.5pt}.
+    \item $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$,
+    \item $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$, or 
+    \item $\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
   \end{enumerate}
 \end{corollary}

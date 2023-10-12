@@ -119,8 +119,8 @@ With strictness coming into play, non-genuine derivations are now `truly non-gen
 
 Now we are ready to construct a generalised mode decorator.
 
-\begin{theorem}[Generalised Mode Preprocessing]\label{thm:generalised-mode-decoration}
-For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
+\begin{theorem}[Generalised mode preprocessing]\label{thm:generalised-mode-decoration}
+For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
 \end{theorem}
 
 The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term~$\isTerm{t}$ and apply mode casts depending on which mode~$\dir{d}$ is required.
@@ -131,7 +131,7 @@ For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
 \begin{equation}\label{eq:strict-derivation}
 V |-_{\Sigma,\Omega} t^{\dir{d'}\,g'\,\BTrue} \quad\text{for some mode~$\dir{d'}$ and boolean~$g'$}
 \end{equation}
-then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some booleans $g$~and~$s$.
+then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
 \end{lemma}
 
 %\begin{proof}
@@ -140,14 +140,14 @@ then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^
 %\end{proof}
 
 
-\begin{proof}[\cref{thm:generalised-mode-decoration}]
+\begin{proof}[of \cref{thm:generalised-mode-decoration}]
 By \cref{thm:adjustment}, it suffices to prove~\eqref{eq:strict-derivation} by induction on~$t$.
 
 \begin{itemize}
 \item $\Rule{Var}$ is mapped to $\SynRule{Var}$.
 \item $\Rule{Anno}$:
 Let $t = (t' \bbcolon A)$.
-By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some booleans $g$~and~$s$, to which we apply $\SynRule{Anno}$.
+By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some $g$~and~$s$, to which we apply $\SynRule{Anno}$.
 \item $\Rule{Op}$:
 Let $t = \tmOpts$.
 By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ to all the derivations.
@@ -156,8 +156,8 @@ By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of 
 
 Finally, having constructed a generalised mode decorator, it is easy to derive an ordinary one.
 
-\begin{corollary}[Mode Preprocessing]\label{thm:mode-decoration}
-  It is decidable whether\/ $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.%for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$
+\begin{corollary}[Mode preprocessing]\label{thm:mode-decoration}
+  It is decidable whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.%for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$
 \end{corollary}
 
 %\begin{proof}
@@ -220,7 +220,7 @@ Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsups
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
 In our theory, \cref{thm:annotatability} can be easily proved with generalised mode decoration.
 
-\begin{proof}[Proof of \cref{thm:annotatability}]
+\begin{proof}[of \cref{thm:annotatability}]
 By \cref{thm:generalised-mode-decoration}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
 Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are determined by the derivations and omitted here).
 \begin{itemize}

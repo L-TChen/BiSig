@@ -9,13 +9,13 @@ These definitions may look dense, especially on first reading.
 The reader may choose to skim through this section, in particular the figures, and still get some rough ideas from later sections.
 
 The definitions are formulated in two steps:
-\begin{enumerate*}
+\begin{inlineenum}
   \item first we introduce a notion of arity and a notion of signature which includes a set\footnote{%
     Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
     Also, as we assume \AxiomK, all types are legitimately sets in the sense of homotopy type theory.
   } of operation symbols and an assignment of arities to symbols;
 \item then, given a signature, we define raw terms and typing derivations inductively by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operation symbol~$o$.
-\end{enumerate*}
+\end{inlineenum}
 %All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
 As we move from simple types to bidirectional typing, the notion of arity, initially as the number of arguments of an operation, is enriched to incorporate an extension context for variable binding and the mode for the direction of type information flow.
 
@@ -54,10 +54,10 @@ The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$
 \subsection{Binding signatures and simply typed languages} \label{subsec:binding-sig}
 
 A simply typed language specifies
-\begin{enumerate*}
+\begin{inlineenum}
   \item a family of sets of raw terms $\isTerm{t}$ indexed by a list~$V$ of variables (that are currently in scope) where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
   \item a family of sets of typing derivations indexed by a typing context~$\Gamma$, a raw term~$\isTerm{t}$, and a type~$A$.
-\end{enumerate*}
+\end{inlineenum}
 Therefore, to specify a term construct, we enrich the notion of arity with some sort for typing and extension context for variable binding.
 
 \begin{definition}\label{def:binding-arity}
@@ -114,11 +114,11 @@ Given a simply typed language, first we define its raw terms.
   \label{fig:raw-terms}
 \end{figure}
   For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{raw terms} indexed by a list~$V$ of variables consists of
-  \begin{enumerate*}
+  \begin{inlineenum}
     \item variables in $V$,
     \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ in $V$ and a type $A$, and
     \item a construct $\tmOpts$ for some $\bop$ in~$O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$, and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$.
-  \end{enumerate*}
+  \end{inlineenum}
   These correspond to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
 \end{definition}
 
@@ -130,7 +130,7 @@ The list of variables in~$\Gamma$ is denoted~$\erase\Gamma$.
 %The substitution $\simsub{\Gamma}{\rho}$ of a context $\Gamma$ is defined by applying substitution to each $A$ in $\Gamma$.
 \end{definition}
 
-The definition of typing derivations is a bit more involved.
+The definition of typing derivations is more involved.
 We need some information to compare types on the object level during type synthesis and substitute those type variables in a typing derivation $\Gamma \vdash \tmOpts : A$ for an operation $o$ in $\Omega$ at some point.
 Here we choose to include a substitution $\rho$ from the local context $\Xi$ to $\emptyset$ as part of its typing derivation explicitly:
 
@@ -199,45 +199,28 @@ We write $\biop$ for an operation $o$ with a variable set $\Xi$ and its bidirect
 We call it \emph{checking} if $d$ is ${\chk}$ or \emph{synthesising} if $d$ is ${\syn}$; similarly its $i$-th argument is checking if $d_i$ is $\chk$ and synthesising if $d_i$ is $\syn$.
 A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
 
+\begin{figure}
+  \centering
+  \small
+  \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{$\isTerm{t}$ has a type $A$ in mode $\dir{d}$ under $\Gamma$ for a bidirectional system $(\Sigma, \Omega)$} 
+  \begin{mathpar}
+    \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
+    \and
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) :^{\syn}  A}\,\SynRule{Anno}
+    \and
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
+    \\
+    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\vars{x}_\isTerm{1} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
+      \cdots \\
+    \Gamma, \simsub{\vars{x}_\isTerm{n} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
+    {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\mathsf{Op}
+    \\ \text{for $\biop$ in $\Omega$}
+  \end{mathpar}
+  \caption{Bidirectional typing derivations}
+  \label{fig:bidirectional-typing-derivations}
+\end{figure}
+
 \begin{definition}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
-  \begin{figure}
-    \centering
-    \small
-    \judgbox{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^\dir{d} A}{$\isTerm{t}$ has a type $A$ in mode $\dir{d}$ under $\Gamma$ for a bidirectional system $(\Sigma, \Omega)$} 
-    \begin{mathpar}
-      \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
-      \and
-      \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) :^{\syn}  A}\,\SynRule{Anno}
-      \and
-      \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
-      \\
-      \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\vars{x}_\isTerm{1} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
-        \cdots \\
-      \Gamma, \simsub{\vars{x}_\isTerm{n} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
-      {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\mathsf{Op}
-      \\ \text{for $\biop$ in $\Omega$}
-    \end{mathpar}
-    \caption{Bidirectional typing derivations}
-    \label{fig:bidirectional-typing-derivations}
-  \end{figure}
-  \begin{figure}
-    \centering
-    \small
-    \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$\isTerm{t}$ is in mode $d$ with free variables in $V$ for $(\Sigma, \Omega)$}
-    \begin{mathpar}
-      \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
-      \and
-      \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
-      \and
-      \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
-      \and
-      \inferrule{V, \vars{x}_1 |-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \\ \cdots \\ V, \vars{x}_{n} |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
-      {V |-_{\Sigma, \Omega} \tmOpts^\dir{d}}\,\Rule{Op}
-      \and \text{for $\biop$}
-    \end{mathpar}
-    \caption{Mode derivations}
-    \label{fig:mode-derivations}
-  \end{figure}
   For a bidirectional type system $(\Sigma, \Omega)$,
   \begin{itemize}
     \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, indexed by a typing context $\Gamma$, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$, is defined in \Cref{fig:bidirectional-typing-derivations} and particularly
@@ -251,6 +234,24 @@ A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signat
   A typing rule is \emph{checking} if its conclusion mode is $\chk$ or \emph{synthesising} otherwise.
 \end{definition}
 
+\begin{figure}[b]
+  \centering
+  \small
+  \judgbox{V |-_{\Sigma, \Omega} \isTerm{t}^\dir{d}}{$\isTerm{t}$ is in mode $d$ with free variables in $V$ for $(\Sigma, \Omega)$}
+  \begin{mathpar}
+    \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
+    \and
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
+    \and
+    \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
+    \and
+    \inferrule{V, \vars{x}_1 |-_{\Sigma, \Omega} \isTerm{t_1}^\dir{d_1} \\ \cdots \\ V, \vars{x}_{n} |-_{\Sigma, \Omega} \isTerm{t_n}^\dir{d_n}}
+    {V |-_{\Sigma, \Omega} \tmOpts^\dir{d}}\,\Rule{Op}
+    \and \text{for $\biop$}
+  \end{mathpar}
+  \caption{Mode derivations}
+  \label{fig:mode-derivations}
+\end{figure}
 Every bidirectional binding signature $\Omega$ gives rise to a binding signature $\erase{\Omega}$ if we erase modes from $\Omega$, called the \emph{(mode) erasure} of $\Omega$.
 Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typed language $(\Sigma, \erase{\Omega})$, including raw terms and typing derivations.
 

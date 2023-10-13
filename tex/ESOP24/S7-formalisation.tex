@@ -291,6 +291,7 @@
 \DeclareUnicodeCharacter{1D9C}{\ensuremath{^c}}
 \DeclareUnicodeCharacter{02B3}{\ensuremath{^r}}
 \DeclareUnicodeCharacter{02E2}{\ensuremath{^s}}
+\DeclareUnicodeCharacter{209C}{\ensuremath{_t}}
 
 \DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
 \DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
@@ -315,16 +316,22 @@
 \DeclareUnicodeCharacter{03B9}{\ensuremath{\iota}}
 \DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
 \DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
 \DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
 \DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
 
 \DeclareUnicodeCharacter{2032}{\ensuremath{{}^\prime}}
 \DeclareUnicodeCharacter{2113}{\ensuremath{\ell}}
+\DeclareUnicodeCharacter{2203}{\ensuremath{\exists}}
 \DeclareUnicodeCharacter{2207}{\ensuremath{\nabla}}
 \DeclareUnicodeCharacter{220B}{\ensuremath{\ni}}
+\DeclareUnicodeCharacter{228E}{\ensuremath{\uplus}}
 \DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{21A3}{\ensuremath{\rightarrowtail}}
 \DeclareUnicodeCharacter{21D0}{\ensuremath{\Leftarrow}}
 \DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{21D4}{\ensuremath{\Leftrightarrow}}
+\DeclareUnicodeCharacter{25B7}{\ensuremath{\rhd}}
 \DeclareUnicodeCharacter{22A2}{\ensuremath{\vdash}}
 \DeclareUnicodeCharacter{22A4}{\ensuremath{\top}}
 \DeclareUnicodeCharacter{22A5}{\ensuremath{\bot}}
@@ -353,6 +360,115 @@
 \begin{document}
 
 \section{Formalisation} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro}, our theory is developed with \Agda.
+As we have mentioned in \Cref{sec:intro} that our theory was developed in \Agda, the formal counterparts of our development can be used as programs directly.
+In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
+We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
 
+\paragraph{Specifying a language}
+To specify the type signature $\Sigma_{\bto}$, we define a type of operations, its decidable equality of type \ensuremath{(\Varid{x}\;\Varid{y}\;\mathbin{:}\;\Conid{ΛₜOp})\;\Varid{→}\;\Conid{Dec}\;(\Varid{x}\;\Varid{≡}\;\Varid{y})} with arities
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{ΛₜOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\Varid{base}\;\Varid{imp}\;\mathbin{:}\;\Conid{ΛₜOp}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Conid{ΛₜD}\;\mathbin{:}\;\Conid{S.SigD}{}\<[E]%
+\\
+\>[B]{}\Conid{ΛₜD}\;\mathrel{=}\;\Varid{sigd}\;\Conid{ΛₜOp}\;\Varid{λ}\;\{\mskip1.5mu \Varid{base}\;\Varid{→}\;\Varid{0};\Varid{imp}\;\Varid{→}\;\Varid{2}\mskip1.5mu\}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+where \ensuremath{\Conid{S.SigD}} is the \Agda type of type signatures.
+Similarly, to specify the bidirectional binding signature $\Omega^{\Leftrightarrow}$, we define a set of operation symbols 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{ΛOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\Varid{`app}\;\Varid{`abs}\;\mathbin{:}\;\Conid{ΛOp}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+and its decidable equality \ensuremath{\Varid{decΛOp}\;\mathbin{:}\;\Conid{DecEq}\;\Conid{ΛOp}}.
+The type \ensuremath{\Conid{SigD}} of bidirectional binding signatures is defined in a module parametrised by a type signature
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Syntax.BiTyped.Signature}\;\Conid{ΛₜD}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+and the bidirectional binding signature $\Lambda^{\Leftrightarrow}$ can be specified readily:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{5E}{@{}l@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{36}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{79}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Λ⇔D}\;\mathbin{:}\;\Conid{SigD}{}\<[E]%
+\\
+\>[B]{}\Conid{Λ⇔D}\;\mathrel{=}\;\Keyword{record}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\{\mskip1.5mu \Conid{Op}\;{}\<[13]%
+\>[13]{}\mathrel{=}\;\Conid{ΛOp};\Varid{decOp}\;{}\<[29]%
+\>[29]{}\mathrel{=}\;\Varid{decΛOp}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{};\Varid{ar}\;{}\<[13]%
+\>[13]{}\mathrel{=}\;\Varid{λ}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\{\mskip1.5mu {}\<[5E]%
+\>[8]{}\Varid{`app}\;{}\<[14]%
+\>[14]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\Varid{[]}\;{}\<[36]%
+\>[36]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\mskip1.5mu]\;\Varid{ρ[}\;\Varid{[]}\;\Varid{⊢[}\;\Conid{Syn}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\Varid{↣}\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[79]%
+\>[79]{}\Varid{[]}\;\Varid{⇒}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{};{}\<[5E]%
+\>[8]{}\Varid{`abs}\;{}\<[14]%
+\>[14]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;(\text{\textasciigrave}\;\Varid{1}\;\Varid{∷}\;\Varid{[]})\;{}\<[36]%
+\>[36]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[79]%
+\>[79]{}\Varid{[]}\;\Varid{⇐}\;(\text{\textasciigrave}\;\Varid{1})\;\Varid{↣}\;(\text{\textasciigrave}\;\Varid{0})\mskip1.5mu\}\mskip1.5mu\}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+where the set $\Fin(n)$ of naturals less than $n$ is used for type variables, and \ensuremath{\Varid{2}} above indicates the number of variables in each construct and \ensuremath{\text{\textasciigrave}\;\Varid{i}} the $i$-th variable.
+
+\paragraph{Proving mode-correctness}
+To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ is mode-correct, we simply invoke \cref{lem:decidability-mode-correctness} for each construct:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Theory.ModeCorrectness.Decidability}\;\Conid{ΛₜD}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{mcΛ⇔D}\;\mathbin{:}\;\Conid{ModeCorrect}\;\Conid{Λ⇔D}{}\<[E]%
+\\
+\>[B]{}\Varid{mcΛ⇔D}\;\Varid{`app}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\Varid{`app})){}\<[E]%
+\\
+\>[B]{}\Varid{mcΛ⇔D}\;\Varid{`abs}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\Varid{`abs})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+where \ensuremath{\Varid{from-yes}} extracts the positive witness from an inhabitant of the \ensuremath{\Conid{Dec}} type.
+
+\paragraph{Instantiating a type synthesiser}
+Now we have completed the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with the proof obligation~\ensuremath{\Varid{mcΛ⇔D}} for mode-correctness, so we can instantiate the type synthesiser, i.e.\ \cref{cor:trichotomy}, by importing the module
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Theory.Trichotomy}\;\Conid{Λ⇔D}\;\Varid{mcΛ⇔D}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+where the type synthesiser is defined:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{synthesise}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt})\;(\Varid{r}\;\mathbin{:}\;\Conid{Raw}\;(\Varid{length}\;\Conid{Γ}))\;\Varid{→}\;\Conid{Dec}\;(\Varid{∃[}\;\Conid{A}\;\mskip1.5mu]\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A})\;\Varid{⊎}\;\Varid{¬}\;\Conid{Pre}\;\Conid{Syn}\;\Varid{r}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+As nothing is postulated in our formal development, the proof \ensuremath{\Varid{synthesise}} can actually run!
+Moreover, we do not need to worry about its correctness which has been guaranteed by its type.
 \end{document}

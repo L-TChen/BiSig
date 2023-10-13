@@ -65,13 +65,13 @@ Also, the set of synthesised variables alone should include every type variable 
 
 \begin{remark}
   Mode-correctness is fundamentally a condition for bidirectional typing \emph{rules}, not for derivations.
-  Thus, this property cannot be formalised without treating rules as some mathematical object, such as the notion of bidirectional binding signature presented in \Cref{sec:defs}.
-  This contrasts with the properties in \Cref{sec:pre-synthesis}, which can still be specified for individual systems even in the absence of a generic definition of bidirectional type systems.
+  Thus, this property cannot be formulated without treating rules as some mathematical object such as those general definitions in \Cref{sec:defs}.
+  This contrasts with the properties in \Cref{sec:pre-synthesis}, which can still be specified for individual systems in the absence of a general definition.
 \end{remark}
 
-It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) in \Cref{ex:signature-simply-typed-lambda} for simply typed $\lambda$-calculus is mode-correct manually by definition or automatically by the following lemma:
-\begin{lemma}
-  It is decidable if an operation $\biop$ is mode-correct or not.
+It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) for simply typed $\lambda$-calculus is mode-correct by definition or by the following lemma:
+\begin{lemma}\label{lem:decidability-mode-correctness}
+  It is decidable whether an operation $\biop$ is mode-correct.
 \end{lemma}
 
 

@@ -3,6 +3,9 @@
 -- Checked with Agda 2.6.3
 -- and Standard Library version 7c5f3ff9 (included under agda-stdlib/)
 
+-- The HTML version of this file (with hyperlinks to the imported files)
+-- can be found at docs/README.html
+
 {-# OPTIONS --safe --with-K #-}
 -- The two options are also turned on globally in BiSig.agda-lib.
 
@@ -49,19 +52,18 @@ import Theory.Pre.Annotatability       -- Proposition 4.7
 
 -- Section 5
 
-import Theory.ModeCorrectness.Signature    -- Definitions 5.1 & 5.3
-import Theory.ModeCorrectness.Decidability -- 
-import Theory.ModeCorrectness.Functor      -- Definition 5.2
-import Theory.ModeCorrectness.UniqueSynthesised  -- Lemma 5.5
+import Theory.ModeCorrectness.Signature    -- Definitions 5.1, 5.2, 5.3
+import Theory.ModeCorrectness.Decidability -- Lemma 5.5
+import Theory.ModeCorrectness.UniqueSynthesised  -- Lemma 5.6
 
-import Theory.ModeCorrectness.Synthesis    -- Theorem 5.6
+import Theory.ModeCorrectness.Synthesis    -- Theorem 5.7
 import Theory.ModeCorrectness.Properties
-import Syntax.Simple.Term                  -- Definition 5.8
-import Syntax.Simple.Unif                  -- Lemma 5.9
+import Syntax.Simple.Term                  -- Definition 5.9
+import Syntax.Simple.Unif                  -- Lemma 5.10
 
-import Theory.Trichotomy                   -- Corollary 5.10
+import Theory.Trichotomy                   -- Corollary 5.11
 
 -- Section 6
 
-import Example.PCF
 import Example.Spine
+import Example.PCF

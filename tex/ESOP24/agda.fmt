@@ -45,6 +45,7 @@
 \DeclareUnicodeCharacter{1D9C}{\ensuremath{^c}}
 \DeclareUnicodeCharacter{02B3}{\ensuremath{^r}}
 \DeclareUnicodeCharacter{02E2}{\ensuremath{^s}}
+\DeclareUnicodeCharacter{209C}{\ensuremath{_t}}
 
 \DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
 \DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
@@ -69,16 +70,22 @@
 \DeclareUnicodeCharacter{03B9}{\ensuremath{\iota}}
 \DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
 \DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
 \DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
 \DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
 
 \DeclareUnicodeCharacter{2032}{\ensuremath{{}^\prime}}
 \DeclareUnicodeCharacter{2113}{\ensuremath{\ell}}
+\DeclareUnicodeCharacter{2203}{\ensuremath{\exists}}
 \DeclareUnicodeCharacter{2207}{\ensuremath{\nabla}}
 \DeclareUnicodeCharacter{220B}{\ensuremath{\ni}}
+\DeclareUnicodeCharacter{228E}{\ensuremath{\uplus}}
 \DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{21A3}{\ensuremath{\rightarrowtail}}
 \DeclareUnicodeCharacter{21D0}{\ensuremath{\Leftarrow}}
 \DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{21D4}{\ensuremath{\Leftrightarrow}}
+\DeclareUnicodeCharacter{25B7}{\ensuremath{\rhd}}
 \DeclareUnicodeCharacter{22A2}{\ensuremath{\vdash}}
 \DeclareUnicodeCharacter{22A4}{\ensuremath{\top}}
 \DeclareUnicodeCharacter{22A5}{\ensuremath{\bot}}

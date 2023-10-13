@@ -1,32 +1,32 @@
 %!TEX root = BiSig.tex
 
 \section{Examples}\label{sec:example}
-In this section, we use two more examples to exhibit the applicability of our approach.
-This first one has infinitely many operations and the second one includes many more constructs than simply typed $\lambda$-calculus with some common features in a programming language.
+Now we use two more examples to exhibit the applicability of our approach.
+This first one has infinitely many operations and the second one includes many more constructs than simply typed $\lambda$-calculus with some common features in a programming language to justify the practical needs for a general development.
 
 \subsection{Spine application}\label{subsec:spine}
 A spine application $t\;u_1\;\ldots\;u_n$ is a variant form of application that consists of a head term $t$ and an indeterminate number of arguments $u_1\;u_2\;\dots\;u_n$.
 This arrangement allows direct access to the head term, making it practical in various applications.
 For instance, \Agda's core language employs this form of application, as does its reflected syntax used for metaprogramming.
 
-At first glance, accommodating this form of application may seem impossible, given that the number of arguments a construct can accept has to be fixed in a signature.
-Nonetheless, there is no constraint on the total number of operation symbols a signature can have, allowing us to establish corresponding constructs for each number $n$ of arguments, thereby exhibiting the necessity of having an arbitrary set (with decidable equality) for operation symbols.
-
-To illustrate this, let us consider the following rule:
+At first glance, accommodating this form of application may seem impossible, given that the number of arguments for a construct is finite and has to be fixed.
+Nonetheless, there is no constraint on the total number of operation symbols a signature can have, allowing us to establish a corresponding construct for each number $n$ of arguments, i.e.\ viewing the following rule
 \bgroup
 \small
   \begin{mathpar}
     \inferrule{\Gamma \vdash t \syn A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right) \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
   \end{mathpar}
 \egroup
-We use the same type signature $\Sigma_{\bto}$ but extend the signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with 
+as a rule schema parametrised by $n$.
+Then, we use the same type signature~$\Sigma_{\bto}$ but extend the signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with 
 \[
   \aritysymbol{\mathsf{app}_n}{A_1,\ldots, A_n, B}{A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right)^{\syn}, A_1^{\chk}, \ldots, A_n^{\chk}}{B}
 \]
-for each $n : \N$, so each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$.
+so each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$, thereby exhibiting the necessity of having an arbitrary set for operation symbols.
+
 \subsection{Computational calculi}\label{subsec:PCF}
 The code size of a type synthesiser grows proportionally to the number of type constructs and the number of arguments for each language construct, making it a tedious task to implement.
-Even for a simply typed language which is generally straightforward to implement a synthesiser individually, having a generator can reduce the effort significantly.
+Even for a simply typed language which is generally straightforward to implement a synthesiser individually, having a generator can still reduce the effort significantly.
 For illustrative purposes, let us consider the Moggi's computational $\lambda$-calculus~\cite{Moggi1989} with additional constructs.
 
 We first introduce additional type constructs apart from $\bto$ by extending $\Sigma_{\bto}$ (as shown in \Cref{ex:type-signature-for-function-type}) with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
@@ -69,4 +69,6 @@ The bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then
 \egroup
 
 The extended language has `only' 15 constructs, far fewer than what the surface language of a programming language in use would have. 
-However, if we implement a proof-relevant type synthesiser following \citet{Wadler2022}, then there will be nearly 100 cases to check on top of other auxiliary definitions.
+However, if we implement a proof-relevant type synthesiser in the style of \citet{Wadler2022}, then there will be nearly 100 cases to check on top of other auxiliary definitions.
+On the other hand, similar to a parser generator, a type-synthesiser generator only needs a language specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
+We will see in the next section how the actual formalisation is used.

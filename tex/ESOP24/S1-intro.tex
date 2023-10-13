@@ -36,7 +36,7 @@ To mitigate the above problem, we develop with the proof assistant \Agda a gener
 \subsubsection{Proof-relevance in type synthesis}
 \label{sec:PLFA}
 
-Our work adopts a proof-relevant approach to (bidirectional) type synthesis, as illustrated by \citet{Wadler2022} for simply typed $\lambda$-calculus with natural numbers.
+Our work adopts a proof-relevant approach to (bidirectional) type synthesis, as illustrated by \citet{Wadler2022} for \PCF.
 The proof-relevant formulation deviates from the usual one:
 traditionally, a type synthesis algorithm is presented as \emph{algorithmic rules}, for example in the form $\Gamma |- \isTerm{t} \syn A \mapsto \isTerm{t}'$, which denotes that annotations can be added to~$\isTerm{t}$ in the surface language%
 \Josh{The algorithm adds annotations to the input term?}
@@ -112,7 +112,7 @@ Nevertheless, we briefly discuss a possible extension which includes polymorphic
 In short, we develop a general and formal theory of bidirectional type synthesis for simply typed languages, including 
 \begin{enumerate}
   \item general definitions for bidirectional type systems and mode-correctness;
-  \item mode derivations for explicitly dealing with annotations in the theory (in particular leading to a more natural and useful version of completeness than \varcitet{Dunfield2021}{'s annotatability}), and mode decoration for helping the user to work with annotations in practice;
+  \item mode derivations for explicitly dealing with annotations in the theory (in particular leading to a more natural and useful version of completeness than annotatability~\cite{Dunfield2021}), and mode decoration for helping the user to work with annotations in practice;
   \item rigorously proven consequences of mode-correctness---the uniqueness of synthesised types and the decidability of bidirectional type synthesis, which amounts to
   \item a fully verified generator for proof-relevant type-synthesisers.
 \end{enumerate}

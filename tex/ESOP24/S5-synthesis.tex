@@ -31,13 +31,11 @@ Defining the condition directly for a rule, and thus in our setting for an opera
 Instead, we choose to define the conditions for the argument list---more specifically, triples $\biargvec$ of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, for an operation, and subsequently for a signature.
 We also need some auxiliary definitions for the subset of variables of a type and of an extension context, and the set of variables that have been synthesised:
 \begin{definition}
-  The finite subset\footnote{%
+  The finite subsets\footnote{%
   There are various definitions for finite subsets of a set within type theory, but for our purposes the choice among these definitions is not a matter of concern.}
-  of \emph{(free) variables} of a type $A$ is denoted by $\fv(A)$.
-  The subset $\fv(\Delta)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
-  For an argument list $\biargs$, its set of \emph{synthesised type variables} is denoted by $\synvar(\biargs)$.
+  of \emph{(free) variables} of a type $A$ and of variables in an extension context~$\Delta$ are denoted by $\fv(A)$ and $\fv(\Delta)$ respectively.
+  For an argument list $\biargs$ the set of type variables $A_{i}^{\dir{d_i}}$ with $d_i$ being $\syn$ is denoted by $\synvar(\biargs)$, i.e.\ $\synvar$ gives the set of type variables that will be synthesised during type synthesis.
 \end{definition}
-This subset contains type variables of a synthesising argument and they are exactly those type variables that will be synthesised during type synthesis.
 
 \begin{definition}\label{def:mode-correctness-args}
   The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a predicate defined by
@@ -244,7 +242,7 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
         $\blacksquare$
       \end{proof}
 %  \end{itemize}
-  We have completed the proof by induction on the mode derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$.\qed
+  We have completed the proof by induction on the derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$.\qed
 \end{proof}
 
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.

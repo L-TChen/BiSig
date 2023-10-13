@@ -84,8 +84,6 @@ The entire development is formalised in \Agda and can be further integrated with
 \input{S6-example}
 \subfile{S7-formalisation}
 \input{S8-future}
-\appendix
-\input{appendix}
 
 %\begin{acks}
 %%We thank Nathanael Arkor for the useful conversation.
@@ -95,8 +93,11 @@ The entire development is formalised in \Agda and can be further integrated with
 
 \bibliographystyle{splncs04nat}
 
-\IfFileExists{reference}{
+\IfFileExists{reference.bib}{
 \bibliography{reference}
 }{\bibliography{ref}}
+
+\appendix
+\input{appendix}
 
 \end{document}

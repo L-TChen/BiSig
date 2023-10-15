@@ -17,7 +17,7 @@ We can also remove typing and retain mode information, arriving at a mode deriva
 Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation, which is completeness.
 In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
 %Formulating the notion of mode derivation helps to complete this clean picture.
-Technically, all these can be summarised in one theorem.
+Technically, all these can be summarised in one theorem (proved by routine induction).
 
 \begin{theorem}\label{lem:soundness-completeness}
 $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
@@ -119,7 +119,7 @@ With strictness coming into play, non-genuine derivations are now `truly non-gen
 
 Now we are ready to construct a generalised mode decorator.
 
-\begin{theorem}[Generalised mode preprocessing]\label{thm:generalised-mode-decoration}
+\begin{theorem}[Generalised mode decoration]\label{thm:generalised-mode-decoration}
 For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
 \end{theorem}
 
@@ -139,24 +139,23 @@ then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^
 %Note that it is permissible to add an outermost mode cast because the antecedent~(\ref{eq:strict-derivation}) requires the given derivation to be strict.
 %\end{proof}
 
-
-\begin{proof}[of \cref{thm:generalised-mode-decoration}]
-By \cref{thm:adjustment}, it suffices to prove~\eqref{eq:strict-derivation} by induction on~$t$.
-
-\begin{itemize}
-\item $\Rule{Var}$ is mapped to $\SynRule{Var}$.
-\item $\Rule{Anno}$:
-Let $t = (t' \bbcolon A)$.
-By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some $g$~and~$s$, to which we apply $\SynRule{Anno}$.
-\item $\Rule{Op}$:
-Let $t = \tmOpts$.
-By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ to all the derivations.
-\end{itemize}\qed
-\end{proof}
+%\begin{proof}[of \cref{thm:generalised-mode-decoration}]
+%By \cref{thm:adjustment}, it suffices to prove~\eqref{eq:strict-derivation} by induction on~$t$.
+%
+%\begin{itemize}
+%\item $\Rule{Var}$ is mapped to $\SynRule{Var}$.
+%\item $\Rule{Anno}$:
+%Let $t = (t' \bbcolon A)$.
+%By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of $V |-_{\Sigma,\Omega} {t'}^{\chk\,g\,s}$ for some $g$~and~$s$, to which we apply $\SynRule{Anno}$.
+%\item $\Rule{Op}$:
+%Let $t = \tmOpts$.
+%By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ to all the derivations.
+%\end{itemize}
+%\end{proof}
 
 Finally, having constructed a generalised mode decorator, it is easy to derive an ordinary one.
 
-\begin{corollary}[Mode preprocessing]\label{thm:mode-decoration}
+\begin{corollary}[Mode decoration]\label{thm:mode-decoration}
   It is decidable whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.%for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$
 \end{corollary}
 
@@ -198,7 +197,8 @@ If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/
 
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
-In our theory, \cref{thm:annotatability} can be easily proved with generalised mode decoration.
+In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation produced by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.
+The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$, adding to the term a type annotation that comes from the given typing derivation.
 
 \begin{figure}[h]
   \centering\small
@@ -220,18 +220,6 @@ In our theory, \cref{thm:annotatability} can be easily proved with generalised m
   \caption{Annotation ordering between raw terms}
   \label{fig:annotation-ordering}
 \end{figure}
-\begin{proof}[of \cref{thm:annotatability}]
-By \cref{thm:generalised-mode-decoration}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
-Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are determined by the derivations and omitted here).
-\begin{itemize}
-\item $\SynRule{Var}$, $\SynRule{Anno}$, and $\Rule{Op}$:
-The outermost rule of the given typing derivation must be the corresponding one; apply the corresponding bidirectional typing rule to the induction hypotheses.
-\item $\ChkRule{Sub}$:
-Apply $\ChkRule{Sub}$ to the induction hypothesis.
-\item $\SynRule{Missing}$:
-This is the interesting case where we map a $\SynRule{Missing}$ rule to an $\SynRule{Anno}$ rule and add to the term a type annotation, which comes from the given typing derivation.
-\end{itemize}\qed
-\end{proof}
 
 On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), our completeness is much simpler to use than annotatability, which requires the bidirectional type synthesiser to produce more complex evidence when the synthesis fails.
 Annotatability also does not help the user to deal with missing annotations like (generalised) mode decoration does: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.

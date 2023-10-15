@@ -95,13 +95,6 @@
   issn =          {0360-0300},
 }
 
-@unpublished{Felicissimo2023,
-  author =        {Felicissimo, Thiago},
-  title =         {A framework for erased syntax and bidirectional
-                   typing},
-  year =          {2023},
-}
-
 @book{Wadler2022,
   author =        {Wadler, Philip and Kokke, Wen and Siek, Jeremy G.},
   month =         aug,
@@ -139,6 +132,18 @@
                    Correctness proof},
   year =          {2003},
   url =           {http://www.strictlypositive.org/foubsr-website/},
+}
+
+@inproceedings{Moggi1989,
+  address =       {Los Alamitos, Calif.},
+  author =        {Moggi, Eugenio},
+  booktitle =     {Proceedings of the 4th Symposium on Logic in Computer
+                   Science (LICS'89)},
+  pages =         {14--23},
+  publisher =     {IEEE Computer Society Press},
+  title =         {Computational lambda-calculus and monads},
+  year =          {1989},
+  doi =           {10.1109/LICS.1989.39155},
 }
 
 @article{Harper1993a,
@@ -188,6 +193,50 @@
   doi =           {10.1017/S0956796807006430},
 }
 
+@phdthesis{Uemura2021,
+  author =        {Uemura, Taichi},
+  month =         {July},
+  note =          {ISBN: 978-94-6421-376-8},
+  school =        {University of Amsterdam},
+  title =         {Abstract and Concrete Type Theories},
+  year =          {2021},
+  abstract =      {In this thesis, we study abstract and concrete type
+                   theories. We introduce an abstract notion of a type
+                   theory to obtain general results in the semantics of
+                   type theories, but we also provide a syntactic way of
+                   presenting a type theory to allow us a further
+                   investigation into a concrete type theory to obtain
+                   consistency and independence results.},
+  url =           {https://hdl.handle.net/11245.1/41ff0b60-64d4-4003-8182-
+                  c244a9afab3b},
+}
+
+@unpublished{Bauer2020,
+  author =        {Bauer, Andrej and Haselwarter, Philipp G. and
+                   Lumsdaine, Peter LeFanu},
+  title =         {A general definition of dependent type theories},
+  year =          {2020},
+  doi =           {10.48550/arXiv.2009.05539},
+}
+
+@misc{Haselwarter2021,
+  author =        {Haselwarter, Philipp G. and Bauer, Andrej},
+  title =         {Finitary type theories with and without contexts},
+  year =          {2021},
+}
+
+@article{Bauer2022a,
+  author =        {Bauer, Andrej and Komel, Anja Petkovi{\'c}},
+  journal =       {Logical Methods in Computer Science},
+  month =         jan,
+  number =        {1},
+  title =         {An extensible equality checking algorithm for
+                   dependent type theories},
+  volume =        {18},
+  year =          {2022},
+  doi =           {10.46298/lmcs-18(1:17)2022},
+}
+
 @inproceedings{Ahrens2022,
   address =       {New York, NY, USA},
   author =        {Ahrens, Benedikt and Matthes, Ralph and
@@ -232,8 +281,6 @@
                    particular, a certified monadic substitution
                    operation.},
   doi =           {10.1145/3497775.3503678},
-  isbn =          {9781450391825},
-  url =           {https://doi.org/10.1145/3497775.3503678},
 }
 
 @article{Allais2021,
@@ -273,8 +320,6 @@
                    https://github.com/gallais/generic-syntax .},
   doi =           {10.1017/S0956796820000076},
   issn =          {0956-7968},
-  url =           {https://www.cambridge.org/core/product/identifier/
-                  S0956796820000076/type/journal_article},
 }
 
 @article{Fiore2022,
@@ -299,123 +344,14 @@
                    foundations.},
   doi =           {10.1145/3498715},
   issn =          {2475-1421},
-  url =           {https://dl.acm.org/doi/10.1145/3498715},
 }
 
-@article{Pierce2000,
-  address =       {New York, NY, USA},
-  author =        {Pierce, Benjamin C. and Turner, David N.},
-  journal =       {ACM Transactions on Programming Languages and
-                   Systems},
-  month =         {jan},
-  number =        {1},
-  pages =         {1--44},
-  publisher =     {Association for Computing Machinery},
-  title =         {Local type inference},
-  volume =        {22},
-  year =          {2000},
-  abstract =      {We study two partial type inference methods for a
-                   language combining subtyping and impredicative
-                   polymorphism. Both methods are local in the sense
-                   that missing annotations are recovered using only
-                   information from adjacent nodes in the syntax tree,
-                   without long-distance constraints such as unification
-                   variables. One method infers type arguments in
-                   polymorphic applications using a local constraint
-                   solver. The other infers annotations on bound
-                   variables in function abstractions by propagating
-                   type constraints downward from enclosing application
-                   nodes. We motivate our design choices by a
-                   statistical analysis of the uses of type inference in
-                   a sizable body of existing ML code.},
-  doi =           {10.1145/345099.345100},
-  issn =          {0164-0925},
-}
-
-@article{Peyton-Jones2007,
-  author =        {Peyton Jones, Simon and Vytiniotis, Dimitrios and
-                   Weirich, Stephanie and Shields, Mark},
-  journal =       {Journal of Functional Programming},
-  number =        {1},
-  pages =         {1--82},
-  publisher =     {Cambridge University Press},
-  title =         {Practical type inference for arbitrary-rank types},
-  volume =        {17},
-  year =          {2007},
-  doi =           {10.1017/S0956796806006034},
-}
-
-@inproceedings{Dunfield2013,
-  address =       {New York, NY, USA},
-  author =        {Dunfield, Jana and Krishnaswami, Neelakantan R.},
-  booktitle =     {Proceedings of the 18th ACM SIGPLAN International
-                   Conference on Functional Programming},
-  pages =         {429--442},
-  publisher =     {Association for Computing Machinery},
-  series =        {ICFP '13},
-  title =         {Complete and easy bidirectional typechecking for
-                   higher-rank polymorphism},
-  year =          {2013},
-  abstract =      {Bidirectional typechecking, in which terms either
-                   synthesize a type or are checked against a known
-                   type, has become popular for its scalability (unlike
-                   Damas-Milner type inference, bidirectional typing
-                   remains decidable even for very expressive type
-                   systems), its error reporting, and its relative ease
-                   of implementation. Following design principles from
-                   proof theory, bidirectional typing can be applied to
-                   many type constructs. The principles underlying a
-                   bidirectional approach to polymorphism, however, are
-                   less obvious. We give a declarative, bidirectional
-                   account of higher-rank polymorphism, grounded in
-                   proof theory; this calculus enjoys many properties
-                   such as eta-reduction and predictability of
-                   annotations. We give an algorithm for implementing
-                   the declarative system; our algorithm is remarkably
-                   simple and well-behaved, despite being both sound and
-                   complete.},
-  doi =           {10.1145/2500365.2500582},
-  isbn =          {9781450323260},
-}
-
-@inproceedings{Xie2018,
-  address =       {Cham},
-  author =        {Xie, Ningning and Oliveira, Bruno C. d. S.},
-  booktitle =     {Programming Languages and Systems. ESOP 2018},
-  editor =        {Ahmed, Amal},
-  pages =         {272--299},
-  publisher =     {Springer International Publishing},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Let arguments go first},
-  volume =        {10801},
-  year =          {2018},
-  abstract =      {Bi-directional type checking has proved to be an
-                   extremely useful and versatile tool for type checking
-                   and type inference. The conventional presentation of
-                   bi-directional type checking consists of two modes:
-                   inference mode and checked mode. In traditional
-                   bi-directional type-checking, type annotations are
-                   used to guide (via the checked mode) the type
-                   inference/checking procedure to determine the type of
-                   an expression, and type information flows from
-                   functions to arguments.},
-  doi =           {10.1007/978-3-319-89884-1_10},
-  isbn =          {978-3-319-89884-1},
-}
-
-@inproceedings{Fiore2013,
-  address =       {New Orleans, LA, USA},
-  author =        {Fiore, Marcelo and Hamana, Makoto},
-  booktitle =     {2013 28th Annual ACM/IEEE Symposium on Logic in
-                   Computer Science},
-  pages =         {520--529},
-  publisher =     {IEEE},
-  title =         {Multiversal polymorphic algebraic theories: Syntax,
-                   semantics, translations, and equational Logic},
-  year =          {2013},
-  doi =           {10.1109/LICS.2013.59},
-  isbn =          {978-1-4799-0413-6},
-  issn =          {10436871},
+@misc{Felicissimo2023,
+  author =        {Felicissimo, Thiago},
+  title =         {A framework for erased syntax and bidirectional
+                   typing},
+  year =          {2023},
+  doi =           {10.48550/arXiv.2307.08523},
 }
 
 @incollection{Hamana2011,

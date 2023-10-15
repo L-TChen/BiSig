@@ -41,7 +41,7 @@ In fact we will do better:
 If a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
 It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
 We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalised-mode-decoration}), which can be weakened to an ordinary mode decorator~(\cref{thm:mode-decoration}) if the additional explanation is not needed.%
-\footnote{To simplify the presentation, we use ordinary mode decoration elsewhere in this paper.}
+\footnote{For the sake of simplicity, we use ordinary mode decoration elsewhere in this paper.}
 
 \begin{figure}
   \centering
@@ -151,7 +151,7 @@ By the induction hypothesis and \cref{thm:adjustment}, there is a derivation of 
 \item $\Rule{Op}$:
 Let $t = \tmOpts$.
 By the induction hypotheses and \cref{thm:adjustment}, there is a derivation of $V, \vec x_i |-_{\Sigma,\Omega} {t_i}^{\dir{d_i}\,g_i\,s_i}$ for each sub-term~$t_i$; apply $\Rule{Op}$ to all the derivations.
-\end{itemize}
+\end{itemize}\qed
 \end{proof}
 
 Finally, having constructed a generalised mode decorator, it is easy to derive an ordinary one.
@@ -188,7 +188,19 @@ Finally, having constructed a generalised mode decorator, it is easy to derive a
 \subsection{Annotatability}
 \label{sec:annotatability}
 
-\begin{figure}
+
+\citet[Section~3.2]{Dunfield2021} formulated completeness differently from our \cref{lem:soundness-completeness} and proposed \emph{annotatability} as a more suitable name.
+In our theory, we may formulate annotatability as follows.
+
+\begin{proposition}[Annotatability]\label{thm:annotatability}
+If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
+\end{proposition}
+
+Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
+In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
+In our theory, \cref{thm:annotatability} can be easily proved with generalised mode decoration.
+
+\begin{figure}[h]
   \centering\small
   \judgbox{\isTerm{t} \sqsupseteq \isTerm{u}}{A raw term $t$ is more annotated than $u$}
   \begin{mathpar}
@@ -208,18 +220,6 @@ Finally, having constructed a generalised mode decorator, it is easy to derive a
   \caption{Annotation ordering between raw terms}
   \label{fig:annotation-ordering}
 \end{figure}
-
-\citet[Section~3.2]{Dunfield2021} formulated completeness differently from our \cref{lem:soundness-completeness} and proposed \emph{annotatability} as a more suitable name.
-In our theory, we may formulate annotatability as follows.
-
-\begin{proposition}[Annotatability]\label{thm:annotatability}
-If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
-\end{proposition}
-
-Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
-In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
-In our theory, \cref{thm:annotatability} can be easily proved with generalised mode decoration.
-
 \begin{proof}[of \cref{thm:annotatability}]
 By \cref{thm:generalised-mode-decoration}, there is a generalised mode derivation of $V |-_{\Sigma,\erase\Omega} t^{\dir{d}\,g\,s}$ for some mode~$\dir{d}$ and booleans $g$~and~$s$.
 Perform induction on this generalised mode derivation to construct a bidirectional typing derivation in the same mode (and also the term~$t'$ and a proof of $t' \sqsupseteq t$, which are determined by the derivations and omitted here).
@@ -230,7 +230,7 @@ The outermost rule of the given typing derivation must be the corresponding one;
 Apply $\ChkRule{Sub}$ to the induction hypothesis.
 \item $\SynRule{Missing}$:
 This is the interesting case where we map a $\SynRule{Missing}$ rule to an $\SynRule{Anno}$ rule and add to the term a type annotation, which comes from the given typing derivation.
-\end{itemize}
+\end{itemize}\qed
 \end{proof}
 
 On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), our completeness is much simpler to use than annotatability, which requires the bidirectional type synthesiser to produce more complex evidence when the synthesis fails.

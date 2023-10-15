@@ -102,7 +102,7 @@ However, since mode-correctness is inductively defined on the argument list, our
         \item If $\dir{d_{i+1}}$ is~$\syn$, then $\simsub{\Delta_{i+1}}{\rho_1} = \simsub{\Delta_{i+1}}{\rho_2}$ and induction hypothesis (of the list).
           Therefore, under the same context $\Gamma, \simsub{\Delta_{i+1}}{\rho_1} = \Gamma, \simsub{\Delta_{i+1}}{\rho_2}$ the term $t_{i+1}$ must have the same synthesised type $\simsub{A_{i+1}}{\rho_1} = \simsub{A_{i+1}}{\rho_1}$ by induction hypothesis (of the typing derivation), so $\rho_1$ and $\rho_2$ agree on $\fv(A_{i+1})$ in addition to $\synvar(\biargs)$.
       \end{enumerate}
-  \end{itemize}
+  \end{itemize}\qed
 \end{proof}
 
 %Uniqueness of the synthesised types is a prevalent property in bidirectional type systems, although the specific proofs can vary depending on the constructs in the system.

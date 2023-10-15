@@ -1,61 +1,49 @@
 %!TEX root = BiSig.tex
 
 \section{Examples}\label{sec:example}
-Now we use two more examples to exhibit the applicability of our approach.
-This first one has infinitely many operations and the second one includes many more constructs than simply typed $\lambda$-calculus with some common features in a programming language to justify the practical needs for a general development.
+To exhibit the applicability of our approach, we discuss two more examples:
+one has infinitely many operations and the other includes many more constructs than simply typed $\lambda$-calculus, exhibiting the practical side of a general treatment.
 
 \subsection{Spine application}\label{subsec:spine}
-A spine application $t\;u_1\;\ldots\;u_n$ is a variant form of application that consists of a head term $t$ and an indeterminate number of arguments $u_1\;u_2\;\dots\;u_n$.
-This arrangement allows direct access to the head term, making it practical in various applications.
-For instance, \Agda's core language employs this form of application, as does its reflected syntax used for metaprogramming.
+A spine application $t\;u_1\;\ldots\;u_n$ is a form of application that consists of a head term $t$ and an indeterminate number of arguments $u_1\;u_2\;\dots\;u_n$.
+This arrangement allows direct access to the head term, making it practical in various applications, and has been used by \Agda's core language. %employs this form of application, as does its reflected syntax used for metaprogramming.
 
 At first glance, accommodating this form of application may seem impossible, given that the number of arguments for a construct is finite and has to be fixed.
-Nonetheless, there is no constraint on the total number of operation symbols a signature can have, allowing us to establish a corresponding construct for each number $n$ of arguments, i.e.\ viewing the following rule
+Nonetheless, the total number of operation symbols a signature can have need not be finite, allowing us to establish a corresponding construct for each number $n$ of arguments, i.e.\ viewing the following rule
 \bgroup
 \small
   \begin{mathpar}
     \inferrule{\Gamma \vdash t \syn A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right) \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
   \end{mathpar}
 \egroup
-as a rule schema parametrised by $n$.
-Then, we use the same type signature~$\Sigma_{\bto}$ but extend the signature $\Omega_{\Lambda}^{\Leftrightarrow}$ with 
+as a rule schema parametrised by $n$, so the signature $\Omega_{\Lambda}^{\Leftrightarrow}$ can be extended with 
 \[
   \aritysymbol{\mathsf{app}_n}{A_1,\ldots, A_n, B}{A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right)^{\syn}, A_1^{\chk}, \ldots, A_n^{\chk}}{B}
 \]
-so each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$, thereby exhibiting the necessity of having an arbitrary set for operation symbols.
+Each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$, thereby exhibiting the necessity of having an arbitrary set for operation symbols.
 
 \subsection{Computational calculi}\label{subsec:PCF}
-The code size of a type synthesiser grows proportionally to the number of type constructs and the number of arguments for each language construct, making it a tedious task to implement.
-Even for a simply typed language which is generally straightforward to implement a synthesiser individually, having a generator can still reduce the effort significantly.
-For illustrative purposes, let us consider the Moggi's computational $\lambda$-calculus~\cite{Moggi1989} with additional constructs.
+Implementing a standalone type synthesizer for a simply typed language is typically a straightforward task.
+However, the code size increases proportionally to the number of type constructs and of arguments associated with each term construct.
+When dealing with a fixed number of $n$ type constructs, for each synthesising construct, there are two cases for a checking argument but $n + 1$ possible cases for each synthesising argument---the successful synthesis of the expected type, instances where it fails, or $n-1$ cases where the expected type does not match; similarly for a checking construct---making the task tedious and error-prone.
+Therefore, having a generator can be helpful and significantly reduce the effort for implementation.
 
-We first introduce additional type constructs apart from $\bto$ by extending $\Sigma_{\bto}$ (as shown in \Cref{ex:type-signature-for-function-type}) with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
-\[
-  \arity({\mathsf{nat}}) = 0\qquad
-  \arity({\mathsf{T}}) = 1\qquad
-  \arity({\mathsf{prod}}) = \arity({\mathsf{sum}}) = 2
-\]
-introducing $\mathtt{nat}$, $A \times B$, $A + B$, $T(A)$ as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
-The bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then extended with operations in following table.
-
-%\begin{table}
-\bgroup
-  \renewcommand{\arraystretch}{2}
-  \centering\small
+For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with additional constructs listed in \cref{tab:computational-calculus}.
+The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases already to consider during bidirectional type synthesis.
+\begin{table}[h!]
+  \renewcommand{\arraystretch}{2.5}
+  \setlength{\tabcolsep}{3pt}
+  \centering\footnotesize
 \begin{tabular}{c | l}
   Rules & Operations \\ \hline\hline
-  $\inferrule{}{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}$ &  $\aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}$ 
+  $\inferrule{ }{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}$ &  $\aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}$ 
   \\
  $\inferrule{\Gamma \vdash t \chk \mathtt{nat}}{\Gamma \vdash \mathtt{s}(t) \chk \mathtt{nat}}$ & $\aritysymbol{\mathsf{s}}{\cdot}{\mathtt{nat}^{\chk}}{\mathtt{nat}^{\chk}}$ \\
  $\inferrule{\Gamma \vdash t \syn \mathtt{nat} \and \Gamma \vdash t_0 \chk A \and \Gamma, x : \mathtt{nat} \vdash t_1 \chk A}{\Gamma \vdash \mathtt{ifz}(t_0; x.t_1)(t) \chk A}$ & $\aritysymbol{\mathsf{ifz}}{A}{\mathtt{nat}^{\syn}, A^{\chk}, A^{\chk}}{A^{\chk}}$ \\
  $\inferrule{\Gamma \vdash t \chk A \and \Gamma \vdash u \chk B}{\Gamma \vdash (t, u) \chk A \times B}$ & $\aritysymbol{\mathsf{pair}}{A, B}{A^{\chk}, B^{\chk}}{A \times B^{\chk}}$  \\
- $\inferrule{\Gamma \vdash t \syn A \times B}{\Gamma \vdash \mathtt{proj}_1(t) \syn A}$ & $\aritysymbol{\mathsf{proj}_1}{A, B}{A \times B^{\syn}}{A^{\syn}}$ \\
+ $\inferrule{\Gamma \vdash t \syn A_1 \times A_2}{\Gamma \vdash \mathtt{proj}_i(t) \syn A_i}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{proj}_i}{A_1, A_2}{A_1 \times A_2^{\syn}}{A_i^{\syn}}$ for $i = 1, 2$ \\
 
- $\inferrule{\Gamma \vdash u \syn A \times B}{\Gamma \vdash \mathtt{proj}_2(u) \syn A}$ & $\aritysymbol{\mathsf{proj}_2}{A, B}{A \times B^{\syn}}{B^{\chk}}$ \\
-
- $\inferrule{\Gamma \vdash t \chk A}{\Gamma \vdash \mathtt{inj}_1(t) \chk A + B}$ & $\aritysymbol{\mathsf{inj}_1}{A, B}{A^{\chk}}{A + B^{\chk}}$ \\
-
- $\inferrule{\Gamma \vdash u \chk B}{\Gamma \vdash \mathtt{inj}_2(u) \chk A + B}$ & $\aritysymbol{\mathsf{inj}_2}{A, B}{B^{\chk}}{A + B^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \chk A_i}{\Gamma \vdash \mathtt{inj}_i(t) \chk A_1 + A_2}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{inj}_i}{A_1, A_2}{A_i^{\chk}}{A_1 + A_2^{\chk}}$ for $i = 1, 2$ \\
 
  $\inferrule{\Gamma \vdash u \syn A + B \and \Gamma, x_1 : A \vdash t_1 \chk C \and \Gamma, x_2 : B \vdash t_2 \chk C}{\Gamma \vdash \mathtt{case}(u; x_1. t_1; x_2. t_2) \chk C}$ & $\aritysymbol{\mathsf{case}}{A, B, C}{{A + B}^{\syn}, [A]C^{\chk}, [B]C^{\chk}}{C^{\syn}}$ \\
 
@@ -66,9 +54,18 @@ The bidirectional binding signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then
  $\inferrule{\Gamma \vdash t \syn A}{\Gamma \vdash \mathtt{ret}(t) \syn T(A)}$ & $\aritysymbol{\mathsf{ret}}{A}{A^{\syn}}{T(A)^{\syn}}$ \\
  $\inferrule{\Gamma \vdash t \syn T(A) \and \Gamma, x : A \vdash u \syn T(B)}{\Gamma \vdash \mathtt{bind}(t; x.u) \syn T(B)}$ & $\aritysymbol{\mathsf{bind}}{A, B}{T(A)^{\syn}, [A]T(B)^{\syn}}{T(B)^{\syn}}$
 \end{tabular}
-\egroup
+\caption{A computational calculus with naturals, products, sums, and general recursion}
+\label{tab:computational-calculus}
+\end{table}
 
-The extended language has `only' 15 constructs, far fewer than what the surface language of a programming language in use would have. 
-However, if we implement a proof-relevant type synthesiser in the style of \citet{Wadler2022}, then there will be nearly 100 cases to check on top of other auxiliary definitions.
-On the other hand, similar to a parser generator, a type-synthesiser generator only needs a language specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
-We will see in the next section how the actual formalisation is used.
+On the other hand, similar to a parser generator, a type-synthesiser generator only needs a specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
+In more detail, such a specification can be derived by extending $\Sigma_{\bto}$ with additional type constructs with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
+\[
+  \arity({\mathsf{nat}}) = 0\qquad
+  \arity({\mathsf{T}}) = 1\qquad
+  \arity({\mathsf{prod}}) = \arity({\mathsf{sum}}) = 2.
+\]
+Types $\mathtt{nat}$, $A \times B$, $A + B$, and $T(A)$ are introduced as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
+The signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then extended with operations listed in \cref{tab:computational-calculus}.
+Finally, invoking \cref{cor:trichotomy} formally with the specification~$(\Sigma, \Omega)$ gives us a type synthesiser directly.\footnote{%
+See \cref{sec:formalisation} for a demonstration in \Agda.}

@@ -22,8 +22,8 @@
 
 \begin{document}
 
-\section{Formalisation} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro} that our theory was developed in \Agda, the formal counterparts of our development can be used as programs directly.
+\section{Demonstration} \label{sec:formalisation}
+As we have mentioned in \Cref{sec:intro}, our theory was developed in \Agda, so the formal counterparts of our development can be used as programs directly.
 In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
 We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
 
@@ -68,7 +68,7 @@ mcΛ⇔D `abs   = from-yes (ModeCorrectᶜ? (Λ⇔D .ar `abs))
 where |from-yes| extracts the positive witness from an inhabitant of the |Dec| type.
 
 \paragraph{Instantiating a type synthesiser}
-Now we have completed the definition |Λ⇔D| for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with the proof obligation~|mcΛ⇔D| for mode-correctness, so we can instantiate the type synthesiser, i.e.\ \cref{cor:trichotomy}, by importing the module
+Now we have the definition |Λ⇔D| for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with |mcΛ⇔D| for its mode-correctness, so we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
 \begin{code}
 open import Theory.Trichotomy Λ⇔D mcΛ⇔D
 \end{code}
@@ -76,6 +76,5 @@ where the type synthesiser is defined:
 \begin{code}
 synthesise : (Γ : Cxt) (r : Raw (length Γ)) → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
 \end{code}
-As nothing is postulated in our formal development, the proof |synthesise| can actually run!
-Moreover, we do not need to worry about its correctness which has been guaranteed by its type.
+Every statement in our development so far has been formally proved constructively, so the program |synthesise|, whose correctness has been established by construction, can actually compute!
 \end{document}

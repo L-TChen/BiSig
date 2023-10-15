@@ -359,8 +359,8 @@
 
 \begin{document}
 
-\section{Formalisation} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro} that our theory was developed in \Agda, the formal counterparts of our development can be used as programs directly.
+\section{Demonstration} \label{sec:formalisation}
+As we have mentioned in \Cref{sec:intro}, our theory was developed in \Agda, so the formal counterparts of our development can be used as programs directly.
 In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
 We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
 
@@ -455,7 +455,7 @@ To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$
 where \ensuremath{\Varid{from-yes}} extracts the positive witness from an inhabitant of the \ensuremath{\Conid{Dec}} type.
 
 \paragraph{Instantiating a type synthesiser}
-Now we have completed the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with the proof obligation~\ensuremath{\Varid{mcΛ⇔D}} for mode-correctness, so we can instantiate the type synthesiser, i.e.\ \cref{cor:trichotomy}, by importing the module
+Now we have the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with \ensuremath{\Varid{mcΛ⇔D}} for its mode-correctness, so we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -469,6 +469,5 @@ where the type synthesiser is defined:
 \>[B]{}\Varid{synthesise}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt})\;(\Varid{r}\;\mathbin{:}\;\Conid{Raw}\;(\Varid{length}\;\Conid{Γ}))\;\Varid{→}\;\Conid{Dec}\;(\Varid{∃[}\;\Conid{A}\;\mskip1.5mu]\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A})\;\Varid{⊎}\;\Varid{¬}\;\Conid{Pre}\;\Conid{Syn}\;\Varid{r}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-As nothing is postulated in our formal development, the proof \ensuremath{\Varid{synthesise}} can actually run!
-Moreover, we do not need to worry about its correctness which has been guaranteed by its type.
+Every statement in our development so far has been formally proved constructively, so the program \ensuremath{\Varid{synthesise}}, whose correctness has been established by construction, can actually compute!
 \end{document}

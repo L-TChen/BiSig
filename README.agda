@@ -33,7 +33,7 @@ import Syntax.BiTyped.Functor
 import Syntax.BiTyped.Pre.Term     -- Figure 9 (Definition 3.14)
 import Syntax.BiTyped.Pre.Functor
 
-import Example.STLC                -- STLC examples
+import Example.STLC                -- Appendix A
 
 -- Section 4
 

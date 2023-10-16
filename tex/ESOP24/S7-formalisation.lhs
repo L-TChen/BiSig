@@ -17,13 +17,15 @@
 %format ℓ' = "\iden{" ℓ "^\prime}"
 %format ℓ′ = "\iden{" ℓ "^\prime}"
 %format ℓ'' = "\iden{" ℓ "^{\prime\prime}}"
+%format `app = "\iden{" ` "}" app
+%format `abs = "\iden{" ` "}" abs
 
 %format (DIR(t)) = "\dir{" t "}"
 
 \begin{document}
 
 \section{Demonstration} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro}, our theory was developed in \Agda, so the formal counterparts of our development can be used as programs directly.
+As we have mentioned in \Cref{sec:intro}, our theory is developed with \Agda, so the formal counterparts of our development can be used as programs directly.
 In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
 We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
 
@@ -77,4 +79,290 @@ where the type synthesiser is defined:
 synthesise : (Γ : Cxt) (r : Raw (length Γ)) → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
 \end{code}
 Every statement in our development so far has been formally proved constructively, so the program |synthesise|, whose correctness has been established by construction, can actually compute!
+
+\paragraph{Running a type synthesiser}
+The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ can be imported from the module |Syntax.Typed.Raw.Term| by erasing modes from |Λ⇔D|.
+\begin{code}
+open import Theory.Erasure
+open import Syntax.Typed.Raw.Term (erase Λ⇔D)
+\end{code}
+
+As raw terms are defined generically, they may not be convenient to manipulate directly.
+We can alleviate this issue by using pattern synonyms and define raw terms in a form close to the informal presentation:
+\begin{code}
+infixl 8 _·_
+infixr 7 ƛ_
+
+pattern _·_ r s = op (`app , s , r , _)
+pattern ƛ_  r   = op (`abs , r , _)
+
+S : Raw n
+S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
+\end{code}
+Then, invoking the program |synthesise| with |S| and its required type annotation gives us a typing derivation as expected:
+\begin{code}
+⊢S? = synthesise [] (((b ↣ b ↣ b) ↣ (b ↣ b) ↣ b ↣ b) ∋ S)
+\end{code}
+
+%\begin{code}
+%inl
+%(yes
+% (op
+%  (imp ,
+%   op
+%   (imp ,
+%    op (base , []) ∷
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷ [])
+%   ∷
+%   op
+%   (imp ,
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷ [])
+%   ∷ [])
+%  ,
+%  (op
+%   (imp ,
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷ [])
+%    ∷
+%    op
+%    (imp ,
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷ [])
+%    ∷ [])
+%   ∋
+%   op
+%   ((λ x →
+%       extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%       (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%        (λ ()) tt
+%        (op
+%         (imp ,
+%          op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])
+%          ∷
+%          op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])
+%          ∷ [])))
+%       ((λ ()) , tt)
+%       (op
+%        (imp ,
+%         op (base , []) ∷
+%         op
+%         (imp ,
+%          op (base , []) ∷
+%          op (base , []) ∷ [])
+%         ∷ []))
+%       (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%        (λ x∈ →
+%           there
+%           (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%            (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%            | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%        (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%         (∀-cons (λ _ → there (here refl))
+%          (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%         | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | inl tt))
+%        | (∈-∪⁻ (cons (suc zero) [] tt)
+%           (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt))
+%           | inl ((λ ()) , tt))))
+%    ,
+%    refl ,
+%    op
+%    ((λ x →
+%        extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%        (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%         (λ ()) tt
+%         (op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])))
+%        ((λ ()) , tt)
+%        (op
+%         (imp ,
+%          op (base , []) ∷
+%          op (base , []) ∷ []))
+%        (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%         (λ x∈ →
+%            there
+%            (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%             (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%             | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%         (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%          (∀-cons (λ _ → there (here refl))
+%           (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%          | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%             (∀-cons (λ _ → there (here refl))
+%              (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%             | inl tt))
+%         | (∈-∪⁻ (cons (suc zero) [] tt)
+%            (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%             (∀-cons (λ _ → there (here refl))
+%              (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%             | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%                (∀-cons (λ _ → there (here refl))
+%                 (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%                | inl tt))
+%            | inl ((λ ()) , tt))))
+%     ,
+%     refl ,
+%     op
+%     ((λ x →
+%         extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%         (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%          (λ ()) tt (op (base , [])))
+%         ((λ ()) , tt) (op (base , []))
+%         (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%          (λ x∈ →
+%             there
+%             (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%              (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%              | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%          (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%           (∀-cons (λ _ → there (here refl))
+%            (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%           | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | inl tt))
+%          | (∈-∪⁻ (cons (suc zero) [] tt)
+%             (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%                 (∀-cons (λ _ → there (here refl))
+%                  (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%                 | inl tt))
+%             | inl ((λ ()) , tt))))
+%      ,
+%      refl ,
+%      op
+%      ((λ x →
+%          extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%          (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (λ ()) tt (op (base , [])))
+%          ((λ ()) , tt) (op (base , []))
+%          (∪-⊆⁺
+%           (λ x∈ →
+%              ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%              (λ x∈₁ →
+%                 there
+%                 (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                  (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                  | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%              x∈
+%              | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%           (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%           (∀-cons (λ _ → there (here refl))
+%            (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%           | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | inl tt)))
+%       ,
+%       refl ,
+%       op
+%       ((λ x →
+%           extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%            (λ ()) tt (op (base , [])))
+%           ((λ ()) , tt) (op (base , []))
+%           (∪-⊆⁺
+%            (λ x∈ →
+%               ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%               (λ x∈₁ →
+%                  there
+%                  (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                   (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                   | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%               x∈
+%               | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%            (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt)))
+%        ,
+%        refl ,
+%        var (here refl) refl ,
+%        var (there (here refl)) refl , tt)
+%       ,
+%       _⊢_⦂_.op
+%       ((λ x →
+%           extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%            (λ ()) tt
+%            (op
+%             (imp ,
+%              op (base , []) ∷
+%              op (base , []) ∷ [])))
+%           ((λ ()) , tt) (op (base , []))
+%           (∪-⊆⁺
+%            (λ x∈ →
+%               ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%               (λ x∈₁ →
+%                  there
+%                  (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                   (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                   | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%               x∈
+%               | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%            (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt)))
+%        ,
+%        refl ,
+%        var (here refl) refl ,
+%        var (there (there (here refl))) refl , tt)
+%       , tt)
+%      , tt)
+%     , tt)
+%    , tt))))
+%\end{code}
+
 \end{document}

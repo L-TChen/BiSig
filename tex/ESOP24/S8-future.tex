@@ -2,8 +2,8 @@
 
 \section{Discussion} \label{sec:future}
 We believe that our formal treatment lays a foundation for further investigation, as the essential aspects of bidirectional typing have been studied rigorously. 
-While our current development is based on simply typed languages to highlight the core ideas, it is evident that many concepts and extensions remain unexplored.
-In this section we discuss related work and outline potential directions for future research.
+While our current development is based on simply typed languages to highlight the core ideas, it is evident that many concepts and aspects remain unexplored.
+In this section we discuss related work and potential directions for future research.
 \subsubsection{Language formalisation frameworks}
 Many general definitions of logics and type theories and frameworks for defining them have been proposed.
 
@@ -12,53 +12,21 @@ Many general definitions of logics and type theories and frameworks for defining
 \cite{Bauer2020,Haselwarter2021,Bauer2022a}
 Our general definitions are akin to the definitions used in other language formalisation frameworks~\citep{Ahrens2022,Allais2021,Fiore2022} in a proof assistant---the concept of a signature is at object level.
 
-%\subsubsection{Generic bidirectional type synthesis beyond simple types}
-%Clearly, bidirectional type synthesis becomes prominent because it can scale up to deal with more complex types than simple types.
-%As for a general treatment for another class of languages, one has to devise a general definition of languages, which may have been used by existing language-formalisation frameworks.
-%Then, one could enrich the general definition with modes and adopt the definition of mode-correctness accordingly. 
-%Soundness and completeness of our formulation should carry over, since they are only about the separation and combination of mode and typing information for a given raw term (in a syntax-directed formulation).
-%Mode decoration is about annotating a raw term with modes and marking missing annotations, used for guiding the direction during bidirectional type synthesis, so it should also carry over.
-%What makes the general development of bidirectional type synthesis challenging is inherent to the tension between expressiveness and usability for type synthesis and the general treatment for other language facilities.
-%We discusses the cases for dependent types and for polymorphic types below.
-%
-%\paragraph{Dependent types} Type synthesis for a dependent type theory involves term equality check for type equality problem, so a generic decidable bidirectional type synthesis relies on the decidability of the term equality check which in turn requires the ability of specifying computation rules within a language specification.
-%\varcitet{Felicissimo2023}{'s computational LF} is capable of defining dependent type theories with computational rules like \textsc{Dedukti}~\cite{Assaf2016} and generic bidirectional type synthesis.
-%Apart from their more general definition targeting dependent type theories, generic bidirectional type synthesis \cite[Theorem~3.12]{Felicissimo2023} that is decidable, sound, and complete (with respect to decorated terms) is possible under the assumption that a given language specification is mode-correct (or well-typed \cite[Section~3.2]{Felicissimo2023}) and equality check is well-behaved: the specified computation rules are type-preserving, confluent, and strongly normalising.
-%Yet, the last assumption is hard to establish even for a specific language and still lacks a general consideration.
-%
-%\paragraph{Polymorphic types} For \SystemF and other languages where type-level variable binding is allowed, we can start with the notion of polymorphic signature $(\Sigma, \Omega)$ by~\citet{Hamana2011} whereas the arity of each type construct $\sigma$ in $\Sigma$ becomes a binding arity with a single sort $*$ and accordingly a term construct can specify a pair of extension contexts~$\left<\Xi\right>[\Delta]$ for term variables $\Delta$ and type variables $\Xi$.
-%It is not hard to see how general definitions for bidirectional typing rules and mode derivations can be extended from \varcitet[Section~3.4]{Hamana2011}{'s definitions}.
-%For example, the universal type $\forall \alpha.\, A$ and type abstraction in \SystemF can then be specified as operations
-%\[
-%  \mathsf{all}\colon *\rhd [*]* \to *
-%  \quad\text{and}\quad
-%  \mathsf{tabs}\colon [*]A \rhd \left< * \right>A^{\chk} \to
-%  \tyOp_{\mathsf{all}}(\alpha.\, A)^{\chk}
-%\]
-%\Cref{thm:bidirectional-type-synthesis-checking} should also carry over, since no equation is imposed on types and no guess work is needed.
-%However, explicit type application is unusable in practice but implicit application results the \emph{instantiation problem}~\cite[Section~5]{Dunfield2021} which amounts to replacing type equality check with checking the subtyping relation $A <: B$ in rule $\ChkRule{Sub}$ and type synthesis with the guess of $B$ in $\forall \alpha.\, A <: A[B/\alpha]$. 
-%A satisfactory theory for bidirectional typing with polymorphism and subtyping should be neutral and thus accommodate various solutions to the instantiation problem, which is still under development.
-%
-\subsubsection{Generic bidirectional type synthesis beyond simple types}
+\subsubsection{General theory of bidirectional type synthesis beyond simple types}
 
-Bidirectional type synthesis plays a crucial role in handling more complex types than simple types.
-To provide a formal treatment for a broader class of languages, we need a general definition of languages in question, which may have been used in existing theories or frameworks.
-Then, this general definition can be augmented with modes and the concept of mode-correctness can be introduced.
-Soundness and completeness (\cref{lem:soundness-completeness}) should naturally extend, as they pertain solely to the separation and combination of mode and typing information within a given raw term in a syntax-directed formulation.
-Mode decoration (\cref{sec:mode-decoration}) involves annotating a raw term with modes and marking missing annotations should also work.
-The challenge in developing bidirectional type synthesis on a more general case comes from striking the right balance between expressiveness and usability for type synthesis while considering other language features.
-We discuss cases involving dependent types and polymorphic types below.
+Bidirectional type synthesis plays a crucial role in handling more complex types than simple types, and we sketch how our theory can be extended to treat a broader class of languages.
+We need a general definition of languages in question (\cref{subsec:simple-types,subsec:binding-sig}).
+Then, this general definition can be augmented with modes (\cref{subsec:bidirectional-system}) and the formal definition of mode-correctness can be adapted (\cref{def:mode-correctness}).
+Soundness and completeness (\cref{lem:soundness-completeness}) should still hold, as they amount to the separation and combination of mode and typing information for a given raw term (in a syntax-directed formulation).
+Mode decoration (\cref{sec:mode-decoration}) involves annotating a raw term with modes and marking missing annotations, and should also work.
+As for the decidability of bidirectional type synthesis, we discuss two cases involving polymorphic types and dependent types below.
 
-\paragraph{Dependent Types}
-In the context of dependent type theory, type synthesis entails a term equality check for type equality.
-Achieving generic decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
-
-\varcitet{Felicissimo2023}{'s computation LF} is capable of defining dependent type theories with computational rules, similar to \Dedukti, and enabling generic bidirectional type synthesis.
-Generic bidirectional type synthesis, as presented in Felicissimo's work, is decidable, sound, and complete with respect to decorated terms, provided that the underlying language specification is mode-correct, and the equality check is well-behaved, i.e.\ type-preserving, confluent, and strongly normalising.
-However, the last assumption is challenging to establish, even for specific languages and lacks a comprehensive general understanding.
-
-\paragraph{Polymorphic Types}
-In the case of languages like \SystemF and others that permit type-level variable binding, we can start with the notion of a polymorphic signature, as introduced by Hamana---each type construct in a signature is specified by a binding arity with a single sort $*$ and a term construct can employ a pair of extension contexts for term variables and type variables.
+\paragraph{Polymorphic types}
+In the case of languages like \SystemF and others that permit type-level variable binding, we can start with the notion of a polymorphic signature, as introduced by \citet{Hamana2011}:
+\begin{inlineenum}
+  \item each type construct in a signature is specified by a binding arity with a single sort $*$, and
+  \item a term construct can employ a pair of extension contexts for term variables and type variables.
+\end{inlineenum}
 
 Extending general definitions for bidirectional typing and mode derivations from \citeauthor{Hamana2011}'s work is straightforward. 
 For example, the universal type $\forall \alpha.\, A$ and type abstraction in \SystemF can be specified as operations:
@@ -69,14 +37,52 @@ For example, the universal type $\forall \alpha.\, A$ and type abstraction in \S
 \]
 The decidability of bidirectional type synthesis (\cref{thm:bidirectional-type-synthesis-checking}) should also carry over, as no equations are imposed on types and no guessing (for type application) is required.
 Adding subtyping $A \mathrel{<:} B$ to languages can be done by replacing type equality with a subtyping relation $\mathrel{<:}$ and type equality check with subtyping check, so polymorphically typed languages with subtyping such as \SystemFsub can be specified.
-The main idea of bidirectional typing does not change, so the formal development should extend without further assumptions as well.
+The main idea of bidirectional typing does not change, so it should be possible to extend the formal theory without further assumptions too.
 
 However, explicit type application is impractical but its implicit counterpart results in the \emph{instantiation problem} which amounts to transforming the implicit type application (a stationary rule) to guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$.
-A general theory for bidirectional typing that accommodates various solutions to the instantiation problem as an assumption is still under development.
+A general theory for bidirectional typing that accommodates various solutions to the instantiation problem as an assumption is left as future work.
+
+\paragraph{Dependent types}
+In the context of dependent type theory, type synthesis entails a term equality check for type equality.
+Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
+
+Extending the logical framework \Dedukti, \varcitet{Felicissimo2023}{'s \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
+\LT{compare his work with ours}
+Generic bidirectional type synthesis, as presented in Felicissimo's work, is decidable, sound, and complete with respect to mode-decorated terms, provided that the underlying language specification is mode-correct, and the equality check is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
+However, the last assumption is challenging to establish even for specific languages and lacks a comprehensive general understanding.
+
 
 \subsubsection{More characteristics of bidirectional typing}
 
-\subsubsection{Conclusion}
 There are still many concepts that are possible to articulate such as, for example, Pfenning's recipe for bidirectionalising typing rules.
+
 In contrast, there are concepts that may be hard to pin down, notably `annotation character'~\cite{Dunfield2021}, which is roughly about how easy it is for the user to write annotated programs.
 These considerations may continue to require creativity from the designer of type systems whereas its implementation could be automated entirely.
+
+\begin{table}[ht]
+  \renewcommand{\arraystretch}{2.5}
+  \setlength{\tabcolsep}{3pt}
+  \centering\footnotesize
+\begin{tabular}{c | l}
+  Rules & Operations \\ \hline\hline
+  $\inferrule{ }{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}$ &  $\aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}$ 
+  \\
+ $\inferrule{\Gamma \vdash t \chk \mathtt{nat}}{\Gamma \vdash \mathtt{s}(t) \chk \mathtt{nat}}$ & $\aritysymbol{\mathsf{s}}{\cdot}{\mathtt{nat}^{\chk}}{\mathtt{nat}^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \syn \mathtt{nat} \\\\ \Gamma \vdash t_0 \chk A \and \Gamma, x : \mathtt{nat} \vdash t_1 \chk A}{\Gamma \vdash \mathtt{ifz}(t_0; x.t_1)(t) \chk A}$ & $\aritysymbol{\mathsf{ifz}}{A}{\mathtt{nat}^{\syn}, A^{\chk}, A^{\chk}}{A^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \chk A \and \Gamma \vdash u \chk B}{\Gamma \vdash (t, u) \chk A \times B}$ & $\aritysymbol{\mathsf{pair}}{A, B}{A^{\chk}, B^{\chk}}{A \times B^{\chk}}$  \\
+ $\inferrule{\Gamma \vdash t \syn A_1 \times A_2}{\Gamma \vdash \mathtt{proj}_i(t) \syn A_i}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{proj}_i}{A_1, A_2}{A_1 \times A_2^{\syn}}{A_i^{\syn}}$ for $i = 1, 2$ \\
+
+ $\inferrule{\Gamma \vdash t \chk A_i}{\Gamma \vdash \mathtt{inj}_i(t) \chk A_1 + A_2}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{inj}_i}{A_1, A_2}{A_i^{\chk}}{A_1 + A_2^{\chk}}$ for $i = 1, 2$ \\
+
+ $\inferrule{\Gamma \vdash u \syn A + B \\\\ \Gamma, x_1 : A \vdash t_1 \chk C \and \Gamma, x_2 : B \vdash t_2 \chk C}{\Gamma \vdash \mathtt{case}(u; x_1. t_1; x_2. t_2) \chk C}$ & $\aritysymbol{\mathsf{case}}{A, B, C}{{A + B}^{\syn}, [A]C^{\chk}, [B]C^{\chk}}{C^{\syn}}$ \\
+
+ $\inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, t \chk A}$ & $\aritysymbol{\mathsf{mu}}{A}{[A]A^{\chk}}{A^{\chk}}$ \\
+
+ $\inferrule{\Gamma \vdash t \syn A \and \Gamma, x : A \vdash u \chk B}{\Gamma \vdash \mathtt{let}\;x = t\;\mathtt{in}\;u\chk B}$ & 
+  $\aritysymbol{\mathsf{let}}{A, B}{A^{\syn},[A]B^{\chk}}{B^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \syn A}{\Gamma \vdash \mathtt{ret}(t) \syn T(A)}$ & $\aritysymbol{\mathsf{ret}}{A}{A^{\syn}}{T(A)^{\syn}}$ \\
+ $\inferrule{\Gamma \vdash t \syn T(A) \and \Gamma, x : A \vdash u \syn T(B)}{\Gamma \vdash \mathtt{bind}(t; x.u) \syn T(B)}$ & $\aritysymbol{\mathsf{bind}}{A, B}{T(A)^{\syn}, [A]T(B)^{\syn}}{T(B)^{\syn}}$
+\end{tabular}
+\caption{A computational calculus with naturals, products, sums, and general recursion}
+\label{tab:computational-calculus}
+\end{table}

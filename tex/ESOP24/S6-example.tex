@@ -23,13 +23,13 @@ as a rule schema parametrised by $n$, so the signature $\Omega_{\Lambda}^{\Leftr
 Each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}_n}(t; u_1; \ldots; u_n)$, thereby exhibiting the necessity of having an arbitrary set for operation symbols.
 
 \subsection{Computational calculi}\label{subsec:PCF}
-Implementing a standalone type synthesizer for a simply typed language is typically a straightforward task.
+Implementing a stand-alone type synthesiser for a simply typed language is typically a straightforward task.
 However, the code size increases proportionally to the number of type constructs and of arguments associated with each term construct.
-When dealing with a fixed number of $n$ type constructs, for each synthesising construct, there are two cases for a checking argument but $n + 1$ possible cases for each synthesising argument---the successful synthesis of the expected type, instances where it fails, or $n-1$ cases where the expected type does not match; similarly for a checking construct---making the task tedious and error-prone.
-Therefore, having a generator can be helpful and significantly reduce the effort for implementation.
+When dealing with a fixed number $n$ of type constructs, for each synthesising construct, there are two cases for a checking argument but $n + 1$ cases for each synthesising argument---the successful synthesis of the expected type, an instance where it fails, or $n-1$ cases where the expected type does not match; similarly for a checking construct---making the task tedious.
+Thus, having a generator is helpful and can significantly reduce the effort for implementation.
 
 For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with additional constructs listed in \cref{tab:computational-calculus}.
-The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases already to consider during bidirectional type synthesis.
+The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases to consider in bidirectional type synthesis.
 
 On the other hand, similar to a parser generator, a type-synthesiser generator only needs a specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
 In more detail, such a specification can be derived by extending $\Sigma_{\bto}$ with additional type constructs with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
@@ -38,7 +38,7 @@ In more detail, such a specification can be derived by extending $\Sigma_{\bto}$
   \arity({\mathsf{T}}) = 1\qquad
   \arity({\mathsf{prod}}) = \arity({\mathsf{sum}}) = 2.
 \]
-Types $\mathtt{nat}$, $A \times B$, $A + B$, and $T(A)$ are introduced as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
+Types $\mathtt{nat}$, $A \times B$, $A + B$, and $T(A)$ are given as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
 The signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then extended with operations listed in \cref{tab:computational-calculus}.
-Finally, invoking \cref{cor:trichotomy} formally with the specification~$(\Sigma, \Omega)$ gives us a type synthesiser directly.\footnote{%
-See \cref{sec:formalisation} for a demonstration in \Agda.}
+Mode-correctness can be proved by applying \cref{lem:decidability-mode-correctness} and its type synthesiser is derived directly by \cref{cor:trichotomy} with the specification~$(\Sigma, \Omega)$.
+For a demonstration in \Agda, see \cref{sec:formalisation}.

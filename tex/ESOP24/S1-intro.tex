@@ -84,7 +84,7 @@ The type synthesis problem is not just about deciding whether a raw term is typa
 To solve the type synthesis problem, before attempting to decide typability (using a bidirectional type synthesiser), we should first decide whether the raw term has sufficient annotations, which corresponds to whether the term has a mode derivation.
 Our theory gives a (proof-relevant) \emph{mode decorator}, which constructs a mode derivation for a raw term or provide information that refutes the existence of any mode derivation and helps the user to pinpoint missing annotations.
 Then a bidirectional type synthesiser is required to decide the typability of only mode-decorated raw terms instead of all raw terms.
-Soundness and completeness of bidirectional typing is reformulated as a one-to-one correspondence between bidirectional typing derivations and pairs of a typing derivation and a mode derivation for the same raw term; this reformulation is more natural and useful than \varcitet[Section~3.2]{Dunfield2021}{'s annotatability}.
+Soundness and completeness of bidirectional typing is reformulated as a one-to-one correspondence between bidirectional typing derivations and pairs of a typing derivation and a mode derivation for the same raw term; this reformulation is more natural and useful than annotatability~\cite[Section~3.2]{Dunfield2021} which is typically formulated in the literature of bidirectional typing.
 
 %As raw terms may not be sufficiently annotated, we propose a preprocessing step called \emph{mode decoration} to determine whether a raw term can be processed by a bidirectional type synthesiser later.
 %A bidirectional type synthesiser and a type synthesiser differ in their domain---bidirectional type synthesis only works for mode-decorated raw terms instead of all raw terms.
@@ -107,7 +107,7 @@ The proof of the latter theorem amounts to a generator of proof-relevant bidirec
 
 To make our exposition accessible, the theory in this paper focuses on simply typed languages with a syntax-directed bidirectional type system, so that the decidability of bidirectional type synthesis can be established without any other technical assumptions.
 %the idea of extending a signature with bidirectionality should be clear enough for further generalisation.
-By adding assumptions, it should be possible to extend the theory to deal with more expressive type systems; for instance, we briefly discuss how the theory can handle polymorphically typed languages such as \SystemF with additional assumptions in \cref{sec:future}.
+By adding assumptions, it should be possible to extend the theory to deal with more expressive type systems; for instance, we briefly discuss how the theory can handle polymorphically typed languages such as \SystemF and \SystemFsub with additional assumptions in \cref{sec:future}.
 
 \subsubsection{Contributions and plan of this paper}
 

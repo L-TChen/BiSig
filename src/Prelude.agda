@@ -85,7 +85,7 @@ open import Data.Product                       public
 open import Data.Product.Properties            public
   hiding (≡-dec)
 open import Data.Sum                           public
-  using (_⊎_; [_,_])
+  using (_⊎_; [_,_]; from-inj₁; from-inj₂)
   renaming (inj₁ to inl; inj₂ to inr; map to ⊎-map)
 
 module WF where

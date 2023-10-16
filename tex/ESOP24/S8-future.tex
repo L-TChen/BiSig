@@ -3,7 +3,7 @@
 \section{Discussion} \label{sec:future}
 We believe that our formal treatment lays a foundation for further investigation, as the essential aspects of bidirectional typing have been studied rigorously. 
 While our current development is based on simply typed languages to highlight the core ideas, it is evident that many concepts and extensions remain unexplored.
-We will discuss related work and outline potential directions for future research.
+In this section we discuss related work and outline potential directions for future research.
 \subsubsection{Language formalisation frameworks}
 Many general definitions of logics and type theories and frameworks for defining them have been proposed.
 
@@ -53,7 +53,7 @@ We discuss cases involving dependent types and polymorphic types below.
 In the context of dependent type theory, type synthesis entails a term equality check for type equality.
 Achieving generic decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
 
-\varcitet{Felicissimo2023}{'s computation LF} is capable of defining dependent type theories with computational rules, similar to Dedukti, and enabling generic bidirectional type synthesis.
+\varcitet{Felicissimo2023}{'s computation LF} is capable of defining dependent type theories with computational rules, similar to \Dedukti, and enabling generic bidirectional type synthesis.
 Generic bidirectional type synthesis, as presented in Felicissimo's work, is decidable, sound, and complete with respect to decorated terms, provided that the underlying language specification is mode-correct, and the equality check is well-behaved, i.e.\ type-preserving, confluent, and strongly normalising.
 However, the last assumption is challenging to establish, even for specific languages and lacks a comprehensive general understanding.
 
@@ -67,10 +67,12 @@ For example, the universal type $\forall \alpha.\, A$ and type abstraction in \S
 \quad\text{and}\quad
 \mathsf{tabs} : [*] A \rhd \left< * \right> A^{\chk} \to \tyOp_{\mathsf{all}}(\alpha. A)^{\chk}
 \]
-The decidability of bidirectional type synthesis checking (\cref{thm:bidirectional-type-synthesis-checking}) should also carry over, as no equations are imposed on types and no guessing is required.
+The decidability of bidirectional type synthesis (\cref{thm:bidirectional-type-synthesis-checking}) should also carry over, as no equations are imposed on types and no guessing (for type application) is required.
+Adding subtyping $A \mathrel{<:} B$ to languages can be done by replacing type equality with a subtyping relation $\mathrel{<:}$ and type equality check with subtyping check, so polymorphically typed languages with subtyping such as \SystemFsub can be specified.
+The main idea of bidirectional typing does not change, so the formal development should extend without further assumptions as well.
 
-However, explicit type application is impractical but implicit application results in the \emph{instantiation problem} which amounts to replacing type equality checks $A = B$ with checking subtyping $A <: B$ and guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$ in the presence of universal quantification.
-A general theory for bidirectional typing with polymorphism and subtyping that accommodates various solutions to the instantiation problem is still under development.
+However, explicit type application is impractical but its implicit counterpart results in the \emph{instantiation problem} which amounts to transforming the implicit type application (a stationary rule) to guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$.
+A general theory for bidirectional typing that accommodates various solutions to the instantiation problem as an assumption is still under development.
 
 \subsubsection{More characteristics of bidirectional typing}
 

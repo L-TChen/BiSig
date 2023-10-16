@@ -47,6 +47,8 @@
 \input{type-notation} %% for type theory notation copied from HoTT Book
 \input{macros}
 
+\numberwithin{table}{section}
+
 %\let\theorem\relax
 %\let\definition\relax
 %\spnewtheorem{theorem}{Theorem}[section]{\bfseries}{}
@@ -60,7 +62,9 @@
 %
 %\institute{Institute of Information Science, Academia Sinica, Taiwan}
 
-\title{A formal treatment of bidirectional typing}
+\title{A formal treatment of bidirectional typing%
+%  \thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}
+}
 
 
 \begin{document}
@@ -84,11 +88,6 @@ The entire development is formalised in \Agda and can be further integrated with
 \input{S6-example}
 \input{S8-future}
 
-%\begin{acks}
-%%We thank Nathanael Arkor for the useful conversation.
-%We thank Kuen-Bang {Hou (Favonia)} for his comments and suggestions.
-%The work is supported by the \grantsponsor{NSTC}{National Science and Technology Council of Taiwan}{https://www.nstc.gov.tw/} under grant \grantnum{NSTC}{NSTC 112-2221-E-001-003-MY3}.
-%\end{acks}
 
 \bibliographystyle{splncs04nat}
 
@@ -98,7 +97,7 @@ The entire development is formalised in \Agda and can be further integrated with
 
 \appendix
 
-%\input{appendix}
 \subfile{S7-formalisation}
+\input{appendix}
 
 \end{document}

@@ -25,38 +25,36 @@
 \begin{document}
 
 \section{Demonstration} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro}, our theory is developed with \Agda, so the formal counterparts of our development can be used as programs directly.
-In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
-We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
+As our theory is developed with \Agda constructively, the formal counterparts of our development can be used as programs directly.
+We sketch their use with our running example, simply typed $\lambda$-calculus, by specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$, showing it mode-correct, and then instantiating its type synthesiser.
 
 \paragraph{Specifying a language}
-To specify the type signature $\Sigma_{\bto}$, we define a type of operations, its decidable equality of type |(x y : ΛₜOp) → Dec (x ≡ y)| with arities
+Signatures |ΛₜD| and |Λ⇔D| are defined for $\Sigma_{\bto}$ and $\Omega^{\Leftrightarrow}$: 
 \begin{code}
 data ΛₜOp : Set where base imp : ΛₜOp
 
 ΛₜD : S.SigD
-ΛₜD = sigd ΛₜOp λ { base → 0; imp → 2 }
-\end{code}
-where |S.SigD| is the \Agda type of type signatures.
-Similarly, to specify the bidirectional binding signature $\Omega^{\Leftrightarrow}$, we define a set of operation symbols 
-\begin{code}
-data ΛOp : Set where `app `abs : ΛOp
-\end{code}
-and its decidable equality |decΛOp : DecEq ΛOp|.
-The type |SigD| of bidirectional binding signatures is defined in a module parametrised by a type signature
-\begin{code}
+ΛₜD = sigd ΛₜOp λ where base → 0; imp → 2
+
 open import Syntax.BiTyped.Signature ΛₜD
-\end{code}
-and the bidirectional binding signature $\Lambda^{\Leftrightarrow}$ can be specified readily:
-\begin{code}
+
+data ΛOp : Set where `app `abs : ΛOp
+
 Λ⇔D : SigD
-Λ⇔D = record
-  { Op      = ΛOp ; decOp   = decΛOp
-  ; ar      = λ
-    {  `app  → 2 ▷ ρ[ []           ⊢[ Chk ] ` 1 ] ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ]  [] ⇒ ` 0
-    ;  `abs  → 2 ▷ ρ[ (` 1 ∷ [])   ⊢[ Chk ] ` 0 ]                             [] ⇐ (` 1) ↣ (` 0) } }
+Λ⇔D .Op  = ΛOp
+Λ⇔D .ar  = λ where
+  `app   → 2 ▷ ρ[ []        ⊢[ Chk ] ` 1 ] ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ]  [] ⇒ ` 0
+  `abs   → 2 ▷ ρ[ ` 1 ∷ []  ⊢[ Chk ] ` 0 ]                             [] ⇐ (` 1) ↣ (` 0) 
 \end{code}
-where the set $\Fin(n)$ of naturals less than $n$ is used for type variables, and |2| above indicates the number of variables in each construct and |` i| the $i$-th variable.
+where
+\begin{inlineenum}
+  \item |S.SigD| is the type of type signatures,
+  \item |SigD| is the type of bidirectional binding signatures,
+  \item |2| indicates the number of type variable variables in an operation,
+  \item $`i$ the $i$-th type variable, 
+\end{inlineenum}
+and the definitions of decidable equality for |ΛₜOp| and |ΛOp| are omitted above.
+
 
 \paragraph{Proving mode-correctness}
 To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ is mode-correct, we simply invoke \cref{lem:decidability-mode-correctness} for each construct:
@@ -76,25 +74,27 @@ open import Theory.Trichotomy Λ⇔D mcΛ⇔D
 \end{code}
 where the type synthesiser is defined:
 \begin{code}
-synthesise : (Γ : Cxt) (r : Raw (length Γ)) → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
+synthesise
+  : (Γ : Cxt) (r : Raw (length Γ))
+  → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
 \end{code}
-Every statement in our development so far has been formally proved constructively, so the program |synthesise|, whose correctness has been established by construction, can actually compute!
+Every statement in our development so far has been formally proved constructively, so the proof |synthesise|r can actually compute as a program!
 
 \paragraph{Running a type synthesiser}
-The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ can be imported from the module |Syntax.Typed.Raw.Term| by erasing modes from |Λ⇔D|.
+The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ are defined in the module |Syntax.Typed.Raw.Term| with the mode-erased signature |erase Λ⇔D|:
 \begin{code}
 open import Theory.Erasure
 open import Syntax.Typed.Raw.Term (erase Λ⇔D)
 \end{code}
 
-As raw terms are defined generically, they may not be convenient to manipulate directly.
-We can alleviate this issue by using pattern synonyms and define raw terms in a form close to the informal presentation:
+As raw terms for operations are defined generically using a single constructor $|op|$, it is not so convenient to manipulate them directly.
+Hence, we use pattern synonyms and define raw terms in a form close to the informal presentation:
 \begin{code}
 infixl 8 _·_
 infixr 7 ƛ_
 
-pattern _·_ r s = op (`app , s , r , _)
-pattern ƛ_  r   = op (`abs , r , _)
+pattern _·_   r s = op (`app , s , r , _)
+pattern ƛ_    r   = op (`abs , r , _)
 
 S : Raw n
 S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)

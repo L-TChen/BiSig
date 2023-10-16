@@ -284,8 +284,15 @@
 \DeclareUnicodeCharacter{27E7}{\ensuremath{\rrbracket}}
 \DeclareUnicodeCharacter{2200}{\ensuremath{\forall}}
 \DeclareUnicodeCharacter{2218}{\ensuremath{\circ}}
+\DeclareUnicodeCharacter{2286}{\ensuremath{\subseteq}}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^+}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^-}}
+\DeclareUnicodeCharacter{222A}{\ensuremath{\cup}}
+
 
 \DeclareUnicodeCharacter{2294}{\ensuremath{\sqcup}}
+
+\DeclareUnicodeCharacter{019B}{\ensuremath{{\mkern0.75mu\mathchar '26\mkern -9.75mu\lambda}}}
 
 \DeclareUnicodeCharacter{1D43}{\ensuremath{^a}}
 \DeclareUnicodeCharacter{1D9C}{\ensuremath{^c}}
@@ -360,80 +367,58 @@
 \begin{document}
 
 \section{Demonstration} \label{sec:formalisation}
-As we have mentioned in \Cref{sec:intro}, our theory was developed in \Agda, so the formal counterparts of our development can be used as programs directly.
-In this section, we sketch their use with our running example---simply typed $\lambda$-calculus.
-We will specify the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ in \Agda, show it mode-correct, and then instantiate the corresponding type synthesiser.
+As our theory is developed with \Agda constructively, the formal counterparts of our development can be used as programs directly.
+We sketch their use with our running example, simply typed $\lambda$-calculus, by specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$, showing it mode-correct, and then instantiating its type synthesiser.
 
 \paragraph{Specifying a language}
-To specify the type signature $\Sigma_{\bto}$, we define a type of operations, its decidable equality of type \ensuremath{(\Varid{x}\;\Varid{y}\;\mathbin{:}\;\Conid{ΛₜOp})\;\Varid{→}\;\Conid{Dec}\;(\Varid{x}\;\Varid{≡}\;\Varid{y})} with arities
+Signatures \ensuremath{\Conid{ΛₜD}} and \ensuremath{\Conid{Λ⇔D}} are defined for $\Sigma_{\bto}$ and $\Omega^{\Leftrightarrow}$: 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{72}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{data}\;\Conid{ΛₜOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\Varid{base}\;\Varid{imp}\;\mathbin{:}\;\Conid{ΛₜOp}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Conid{ΛₜD}\;\mathbin{:}\;\Conid{S.SigD}{}\<[E]%
 \\
-\>[B]{}\Conid{ΛₜD}\;\mathrel{=}\;\Varid{sigd}\;\Conid{ΛₜOp}\;\Varid{λ}\;\{\mskip1.5mu \Varid{base}\;\Varid{→}\;\Varid{0};\Varid{imp}\;\Varid{→}\;\Varid{2}\mskip1.5mu\}{}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
-where \ensuremath{\Conid{S.SigD}} is the \Agda type of type signatures.
-Similarly, to specify the bidirectional binding signature $\Omega^{\Leftrightarrow}$, we define a set of operation symbols 
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Keyword{data}\;\Conid{ΛOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\Varid{`app}\;\Varid{`abs}\;\mathbin{:}\;\Conid{ΛOp}{}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
-and its decidable equality \ensuremath{\Varid{decΛOp}\;\mathbin{:}\;\Conid{DecEq}\;\Conid{ΛOp}}.
-The type \ensuremath{\Conid{SigD}} of bidirectional binding signatures is defined in a module parametrised by a type signature
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{ΛₜD}\;\mathrel{=}\;\Varid{sigd}\;\Conid{ΛₜOp}\;\Varid{λ}\;\Keyword{where}\;\Varid{base}\;\Varid{→}\;\Varid{0};\Varid{imp}\;\Varid{→}\;\Varid{2}{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Syntax.BiTyped.Signature}\;\Conid{ΛₜD}{}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
-and the bidirectional binding signature $\Lambda^{\Leftrightarrow}$ can be specified readily:
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}c<{\hspost}@{}}%
-\column{5E}{@{}l@{}}%
-\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{36}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{79}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\\[\blanklineskip]%
+\>[B]{}\Keyword{data}\;\Conid{ΛOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\iden{\text{\textasciigrave}}\Varid{app}\;\iden{\text{\textasciigrave}}\Varid{abs}\;\mathbin{:}\;\Conid{ΛOp}{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Conid{Λ⇔D}\;\mathbin{:}\;\Conid{SigD}{}\<[E]%
 \\
-\>[B]{}\Conid{Λ⇔D}\;\mathrel{=}\;\Keyword{record}{}\<[E]%
+\>[B]{}\Conid{Λ⇔D}\;\Varid{.Op}\;{}\<[10]%
+\>[10]{}\mathrel{=}\;\Conid{ΛOp}{}\<[E]%
+\\
+\>[B]{}\Conid{Λ⇔D}\;\Varid{.ar}\;{}\<[10]%
+\>[10]{}\mathrel{=}\;\Varid{λ}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\{\mskip1.5mu \Conid{Op}\;{}\<[13]%
-\>[13]{}\mathrel{=}\;\Conid{ΛOp};\Varid{decOp}\;{}\<[29]%
-\>[29]{}\mathrel{=}\;\Varid{decΛOp}{}\<[E]%
+\>[3]{}\iden{\text{\textasciigrave}}\Varid{app}\;{}\<[10]%
+\>[10]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\Varid{[]}\;{}\<[29]%
+\>[29]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\mskip1.5mu]\;\Varid{ρ[}\;\Varid{[]}\;\Varid{⊢[}\;\Conid{Syn}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\Varid{↣}\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[72]%
+\>[72]{}\Varid{[]}\;\Varid{⇒}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{};\Varid{ar}\;{}\<[13]%
-\>[13]{}\mathrel{=}\;\Varid{λ}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\{\mskip1.5mu {}\<[5E]%
-\>[8]{}\Varid{`app}\;{}\<[14]%
-\>[14]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\Varid{[]}\;{}\<[36]%
-\>[36]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\mskip1.5mu]\;\Varid{ρ[}\;\Varid{[]}\;\Varid{⊢[}\;\Conid{Syn}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\Varid{↣}\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[79]%
-\>[79]{}\Varid{[]}\;\Varid{⇒}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{};{}\<[5E]%
-\>[8]{}\Varid{`abs}\;{}\<[14]%
-\>[14]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;(\text{\textasciigrave}\;\Varid{1}\;\Varid{∷}\;\Varid{[]})\;{}\<[36]%
-\>[36]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[79]%
-\>[79]{}\Varid{[]}\;\Varid{⇐}\;(\text{\textasciigrave}\;\Varid{1})\;\Varid{↣}\;(\text{\textasciigrave}\;\Varid{0})\mskip1.5mu\}\mskip1.5mu\}{}\<[E]%
+\>[3]{}\iden{\text{\textasciigrave}}\Varid{abs}\;{}\<[10]%
+\>[10]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\text{\textasciigrave}\;\Varid{1}\;\Varid{∷}\;\Varid{[]}\;{}\<[29]%
+\>[29]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[72]%
+\>[72]{}\Varid{[]}\;\Varid{⇐}\;(\text{\textasciigrave}\;\Varid{1})\;\Varid{↣}\;(\text{\textasciigrave}\;\Varid{0}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-where the set $\Fin(n)$ of naturals less than $n$ is used for type variables, and \ensuremath{\Varid{2}} above indicates the number of variables in each construct and \ensuremath{\text{\textasciigrave}\;\Varid{i}} the $i$-th variable.
+where
+\begin{inlineenum}
+  \item \ensuremath{\Conid{S.SigD}} is the type of type signatures,
+  \item \ensuremath{\Conid{SigD}} is the type of bidirectional binding signatures,
+  \item \ensuremath{\Varid{2}} indicates the number of type variable variables in an operation,
+  \item $`i$ the $i$-th type variable, 
+\end{inlineenum}
+and the definitions of decidable equality for \ensuremath{\Conid{ΛₜOp}} and \ensuremath{\Conid{ΛOp}} are omitted above.
+
 
 \paragraph{Proving mode-correctness}
 To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ is mode-correct, we simply invoke \cref{lem:decidability-mode-correctness} for each construct:
@@ -445,11 +430,11 @@ To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$
 \\[\blanklineskip]%
 \>[B]{}\Varid{mcΛ⇔D}\;\mathbin{:}\;\Conid{ModeCorrect}\;\Conid{Λ⇔D}{}\<[E]%
 \\
-\>[B]{}\Varid{mcΛ⇔D}\;\Varid{`app}\;{}\<[14]%
-\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\Varid{`app})){}\<[E]%
+\>[B]{}\Varid{mcΛ⇔D}\;\iden{\text{\textasciigrave}}\Varid{app}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\iden{\text{\textasciigrave}}\Varid{app})){}\<[E]%
 \\
-\>[B]{}\Varid{mcΛ⇔D}\;\Varid{`abs}\;{}\<[14]%
-\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\Varid{`abs})){}\<[E]%
+\>[B]{}\Varid{mcΛ⇔D}\;\iden{\text{\textasciigrave}}\Varid{abs}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{from-yes}\;(\Conid{ModeCorrectᶜ?}\;(\Conid{Λ⇔D}\;\Varid{.ar}\;\iden{\text{\textasciigrave}}\Varid{abs})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 where \ensuremath{\Varid{from-yes}} extracts the positive witness from an inhabitant of the \ensuremath{\Conid{Dec}} type.
@@ -465,9 +450,320 @@ Now we have the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional typ
 where the type synthesiser is defined:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{synthesise}\;\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt})\;(\Varid{r}\;\mathbin{:}\;\Conid{Raw}\;(\Varid{length}\;\Conid{Γ}))\;\Varid{→}\;\Conid{Dec}\;(\Varid{∃[}\;\Conid{A}\;\mskip1.5mu]\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A})\;\Varid{⊎}\;\Varid{¬}\;\Conid{Pre}\;\Conid{Syn}\;\Varid{r}{}\<[E]%
+\>[B]{}\Varid{synthesise}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbin{:}\;(\Conid{Γ}\;\mathbin{:}\;\Conid{Cxt})\;(\Varid{r}\;\mathbin{:}\;\Conid{Raw}\;(\Varid{length}\;\Conid{Γ}))\;{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{→}\;\Conid{Dec}\;(\Varid{∃[}\;\Conid{A}\;\mskip1.5mu]\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A})\;\Varid{⊎}\;\Varid{¬}\;\Conid{Pre}\;\Conid{Syn}\;\Varid{r}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Every statement in our development so far has been formally proved constructively, so the program \ensuremath{\Varid{synthesise}}, whose correctness has been established by construction, can actually compute!
+Every statement in our development so far has been formally proved constructively, so the proof \ensuremath{\Varid{synthesise}}r can actually compute as a program!
+
+\paragraph{Running a type synthesiser}
+The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ are defined in the module \ensuremath{\Conid{Syntax.Typed.Raw.Term}} with the mode-erased signature \ensuremath{\Varid{erase}\;\Conid{Λ⇔D}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Theory.Erasure}{}\<[E]%
+\\
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{Syntax.Typed.Raw.Term}\;(\Varid{erase}\;\Conid{Λ⇔D}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+As raw terms for operations are defined generically using a single constructor $\ensuremath{\Varid{op}}$, it is not so convenient to manipulate them directly.
+Hence, we use pattern synonyms and define raw terms in a form close to the informal presentation:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infixl}\;\Varid{8}\;\Varid{\char95 ·\char95 }{}\<[E]%
+\\
+\>[B]{}\Keyword{infixr}\;\Varid{7}\;\Varid{ƛ\char95 }{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{pattern}\;\Varid{\char95 ·\char95 }\;{}\<[15]%
+\>[15]{}\Varid{r}\;\Varid{s}\;\mathrel{=}\;\Varid{op}\;(\iden{\text{\textasciigrave}}\Varid{app}\;\Varid{,}\;\Varid{s}\;\Varid{,}\;\Varid{r}\;\Varid{,}\;\anonymous ){}\<[E]%
+\\
+\>[B]{}\Varid{pattern}\;\Varid{ƛ\char95 }\;{}\<[15]%
+\>[15]{}\Varid{r}\;{}\<[19]%
+\>[19]{}\mathrel{=}\;\Varid{op}\;(\iden{\text{\textasciigrave}}\Varid{abs}\;\Varid{,}\;\Varid{r}\;\Varid{,}\;\anonymous ){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Conid{S}\;\mathbin{:}\;\Conid{Raw}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Conid{S}\;\mathrel{=}\;\Varid{ƛ}\;\Varid{ƛ}\;\Varid{ƛ}\;\text{\textasciigrave}\;\Varid{suc}\;(\Varid{suc}\;\Varid{zero})\;\Varid{·}\;\text{\textasciigrave}\;\Varid{zero}\;\Varid{·}\;(\text{\textasciigrave}\;\Varid{suc}\;\Varid{zero}\;\Varid{·}\;\text{\textasciigrave}\;\Varid{zero}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Then, invoking the program \ensuremath{\Varid{synthesise}} with \ensuremath{\Conid{S}} and its required type annotation gives us a typing derivation as expected:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{⊢S?}\;\mathrel{=}\;\Varid{synthesise}\;\Varid{[]}\;(((\Varid{b}\;\Varid{↣}\;\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{↣}\;(\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{↣}\;\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{∋}\;\Conid{S}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+%\begin{code}
+%inl
+%(yes
+% (op
+%  (imp ,
+%   op
+%   (imp ,
+%    op (base , []) ∷
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷ [])
+%   ∷
+%   op
+%   (imp ,
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op (base , []) ∷ [])
+%    ∷ [])
+%   ∷ [])
+%  ,
+%  (op
+%   (imp ,
+%    op
+%    (imp ,
+%     op (base , []) ∷
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷ [])
+%    ∷
+%    op
+%    (imp ,
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷
+%     op
+%     (imp ,
+%      op (base , []) ∷
+%      op (base , []) ∷ [])
+%     ∷ [])
+%    ∷ [])
+%   ∋
+%   op
+%   ((λ x →
+%       extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%       (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%        (λ ()) tt
+%        (op
+%         (imp ,
+%          op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])
+%          ∷
+%          op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])
+%          ∷ [])))
+%       ((λ ()) , tt)
+%       (op
+%        (imp ,
+%         op (base , []) ∷
+%         op
+%         (imp ,
+%          op (base , []) ∷
+%          op (base , []) ∷ [])
+%         ∷ []))
+%       (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%        (λ x∈ →
+%           there
+%           (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%            (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%            | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%        (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%         (∀-cons (λ _ → there (here refl))
+%          (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%         | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | inl tt))
+%        | (∈-∪⁻ (cons (suc zero) [] tt)
+%           (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt))
+%           | inl ((λ ()) , tt))))
+%    ,
+%    refl ,
+%    op
+%    ((λ x →
+%        extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%        (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%         (λ ()) tt
+%         (op
+%          (imp ,
+%           op (base , []) ∷
+%           op (base , []) ∷ [])))
+%        ((λ ()) , tt)
+%        (op
+%         (imp ,
+%          op (base , []) ∷
+%          op (base , []) ∷ []))
+%        (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%         (λ x∈ →
+%            there
+%            (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%             (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%             | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%         (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%          (∀-cons (λ _ → there (here refl))
+%           (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%          | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%             (∀-cons (λ _ → there (here refl))
+%              (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%             | inl tt))
+%         | (∈-∪⁻ (cons (suc zero) [] tt)
+%            (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%             (∀-cons (λ _ → there (here refl))
+%              (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%             | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%                (∀-cons (λ _ → there (here refl))
+%                 (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%                | inl tt))
+%            | inl ((λ ()) , tt))))
+%     ,
+%     refl ,
+%     op
+%     ((λ x →
+%         extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%         (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%          (λ ()) tt (op (base , [])))
+%         ((λ ()) , tt) (op (base , []))
+%         (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%          (λ x∈ →
+%             there
+%             (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%              (λ x∈₁ → there ((λ ()) x∈₁)) x∈
+%              | (∈-∪⁻ (cons zero [] tt) x∈ | inl tt)))
+%          (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%           (∀-cons (λ _ → there (here refl))
+%            (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%           | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | inl tt))
+%          | (∈-∪⁻ (cons (suc zero) [] tt)
+%             (∪-⊆⁺ (λ x₁ → x₁) []⊆xs
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%                 (∀-cons (λ _ → there (here refl))
+%                  (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%                 | inl tt))
+%             | inl ((λ ()) , tt))))
+%      ,
+%      refl ,
+%      op
+%      ((λ x →
+%          extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%          (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (λ ()) tt (op (base , [])))
+%          ((λ ()) , tt) (op (base , []))
+%          (∪-⊆⁺
+%           (λ x∈ →
+%              ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%              (λ x∈₁ →
+%                 there
+%                 (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                  (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                  | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%              x∈
+%              | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%           (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%           (∀-cons (λ _ → there (here refl))
+%            (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%           | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%              (∀-cons (λ _ → there (here refl))
+%               (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%              | inl tt)))
+%       ,
+%       refl ,
+%       op
+%       ((λ x →
+%           extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%            (λ ()) tt (op (base , [])))
+%           ((λ ()) , tt) (op (base , []))
+%           (∪-⊆⁺
+%            (λ x∈ →
+%               ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%               (λ x∈₁ →
+%                  there
+%                  (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                   (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                   | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%               x∈
+%               | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%            (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt)))
+%        ,
+%        refl ,
+%        var (here refl) refl ,
+%        var (there (here refl)) refl , tt)
+%       ,
+%       _⊢_⦂_.op
+%       ((λ x →
+%           extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%           (extend (sigd ΛₜOp (λ { base → 0 ; imp → 2 }))
+%            (λ ()) tt
+%            (op
+%             (imp ,
+%              op (base , []) ∷
+%              op (base , []) ∷ [])))
+%           ((λ ()) , tt) (op (base , []))
+%           (∪-⊆⁺
+%            (λ x∈ →
+%               ∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%               (λ x∈₁ →
+%                  there
+%                  (∪-⊆⁺ (λ { (here eq) → here eq ; (there ()) })
+%                   (λ x∈₂ → there ((λ ()) x∈₂)) x∈₁
+%                   | (∈-∪⁻ (cons zero [] tt) x∈₁ | inl tt)))
+%               x∈
+%               | (∈-∪⁻ (cons (suc zero) [] tt) x∈ | inl ((λ ()) , tt)))
+%            (λ x₁ → there (there ((λ ()) ([]⊆xs x₁))))
+%            (∀-cons (λ _ → there (here refl))
+%             (λ x₁ → ∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%            | (∈-∪⁻ (cons (suc zero) (cons zero [] tt) ((λ ()) , tt))
+%               (∀-cons (λ _ → there (here refl))
+%                (λ x₁ → F.∀-cons (λ _ → here refl) (λ x₂ {}) x₁) x tt₀)
+%               | inl tt)))
+%        ,
+%        refl ,
+%        var (here refl) refl ,
+%        var (there (there (here refl))) refl , tt)
+%       , tt)
+%      , tt)
+%     , tt)
+%    , tt))))
+%\end{code}
+
 \end{document}

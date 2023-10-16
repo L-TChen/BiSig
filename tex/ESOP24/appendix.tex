@@ -11,3 +11,31 @@
     \synvar(\biargs, \synbiarg[n+1]) & = \fv(A_{n+1}) \cup           \synvar(\biargs).
   \end{align*}
 \end{definition}
+
+\begin{table}[b]
+  \renewcommand{\arraystretch}{2.5}
+  \setlength{\tabcolsep}{3pt}
+  \centering\footnotesize
+\begin{tabular}{c | l}
+  Rules & Operations \\ \hline\hline
+  $\inferrule{ }{\Gamma \vdash \mathtt{z} \chk \mathtt{nat}}$ &  $\aritysymbol{\mathsf{z}}{\cdot}{\cdot}{\mathtt{nat}^{\chk}}$ 
+  \\
+ $\inferrule{\Gamma \vdash t \chk \mathtt{nat}}{\Gamma \vdash \mathtt{s}(t) \chk \mathtt{nat}}$ & $\aritysymbol{\mathsf{s}}{\cdot}{\mathtt{nat}^{\chk}}{\mathtt{nat}^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \syn \mathtt{nat} \\\\ \Gamma \vdash t_0 \chk A \and \Gamma, x : \mathtt{nat} \vdash t_1 \chk A}{\Gamma \vdash \mathtt{ifz}(t_0; x.t_1)(t) \chk A}$ & $\aritysymbol{\mathsf{ifz}}{A}{\mathtt{nat}^{\syn}, A^{\chk}, A^{\chk}}{A^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \chk A \and \Gamma \vdash u \chk B}{\Gamma \vdash (t, u) \chk A \times B}$ & $\aritysymbol{\mathsf{pair}}{A, B}{A^{\chk}, B^{\chk}}{A \times B^{\chk}}$  \\
+ $\inferrule{\Gamma \vdash t \syn A_1 \times A_2}{\Gamma \vdash \mathtt{proj}_i(t) \syn A_i}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{proj}_i}{A_1, A_2}{A_1 \times A_2^{\syn}}{A_i^{\syn}}$ for $i = 1, 2$ \\
+
+ $\inferrule{\Gamma \vdash t \chk A_i}{\Gamma \vdash \mathtt{inj}_i(t) \chk A_1 + A_2}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{inj}_i}{A_1, A_2}{A_i^{\chk}}{A_1 + A_2^{\chk}}$ for $i = 1, 2$ \\
+
+ $\inferrule{\Gamma \vdash u \syn A + B \\\\ \Gamma, x_1 : A \vdash t_1 \chk C \and \Gamma, x_2 : B \vdash t_2 \chk C}{\Gamma \vdash \mathtt{case}(u; x_1. t_1; x_2. t_2) \chk C}$ & $\aritysymbol{\mathsf{case}}{A, B, C}{{A + B}^{\syn}, [A]C^{\chk}, [B]C^{\chk}}{C^{\syn}}$ \\
+
+ $\inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, t \chk A}$ & $\aritysymbol{\mathsf{mu}}{A}{[A]A^{\chk}}{A^{\chk}}$ \\
+
+ $\inferrule{\Gamma \vdash t \syn A \and \Gamma, x : A \vdash u \chk B}{\Gamma \vdash \mathtt{let}\;x = t\;\mathtt{in}\;u\chk B}$ & 
+  $\aritysymbol{\mathsf{let}}{A, B}{A^{\syn},[A]B^{\chk}}{B^{\chk}}$ \\
+ $\inferrule{\Gamma \vdash t \syn A}{\Gamma \vdash \mathtt{ret}(t) \syn T(A)}$ & $\aritysymbol{\mathsf{ret}}{A}{A^{\syn}}{T(A)^{\syn}}$ \\
+ $\inferrule{\Gamma \vdash t \syn T(A) \and \Gamma, x : A \vdash u \syn T(B)}{\Gamma \vdash \mathtt{bind}(t; x.u) \syn T(B)}$ & $\aritysymbol{\mathsf{bind}}{A, B}{T(A)^{\syn}, [A]T(B)^{\syn}}{T(B)^{\syn}}$
+\end{tabular}
+\caption{A computational calculus with naturals, products, sums, and general recursion}
+\label{tab:computational-calculus}
+\end{table}

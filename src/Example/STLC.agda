@@ -23,7 +23,7 @@ instance
 import Syntax.Simple.Signature as S
 
 ΛₜD : S.SigD
-ΛₜD = S.sigd ΛₜOp λ { base → 0; imp → 2 }
+ΛₜD = S.sigd ΛₜOp λ where base → 0; imp → 2
 
 {-
 data Λₜ : Set where
@@ -62,18 +62,18 @@ instance
       dec `abs `abs = yes refl
 
 Λ⇔D : SigD
-Λ⇔D = record
-  { Op    = ΛOp -- ; decOp = decΛOp
-  ; ar    = λ { `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` 1 ]
-                           ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ] [] ⇒ ` 0
-                    -- Γ ⊢ t : A → B    Γ ⊢ u : A
-                    -------------------------------
-                    -- Γ ⊢ t u ⇒ B
+Λ⇔D .Op = ΛOp
+Λ⇔D .ar = λ where
+  `app → 2 ▷ ρ[ [] ⊢[ Chk ] ` 1 ]
+                         ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ] [] ⇒ ` 0
+                  -- Γ ⊢ t : A → B    Γ ⊢ u : A
+                  -------------------------------
+                  -- Γ ⊢ t u ⇒ B
 
-              ; `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0) } }
-                    -- Γ , x : A ⊢ t ⇐ B
-                    ------------------------
-                    -- Γ ⊢ λ x . t ⇐ A → B
+  `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0) 
+                  -- Γ , x : A ⊢ t ⇐ B
+                  ------------------------
+                  -- Γ ⊢ λ x . t ⇐ A → B
 
 open import Theory.ModeCorrectness.Signature    ΛₜD
 open import Theory.ModeCorrectness.Decidability ΛₜD

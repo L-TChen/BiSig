@@ -7,8 +7,8 @@ In this section we discuss related work and potential directions for future rese
 \subsubsection{Language formalisation frameworks}
 
 The study of presenting logics universally at least date back to universal algebra and model theory where structures are studied for certain notions of arities and signatures.
-In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an early example which is used to prove a general confluence theorem.
-There have been many more general definitions and frameworks of logics and type theories proposed, and we may classify those into two groups by where signatures are at the meta level or the object level:
+In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which is used to prove a general confluence theorem.
+Many general definitions and frameworks for defining logics and type theories have been proposed, and we classify them into two groups by where signatures reside: the meta level or the object level of a meta-language:
 \begin{enumerate}
 \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where the concept of signatures are on the \emph{meta level} and naturally capable of defining dependent type theories;
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory) where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.

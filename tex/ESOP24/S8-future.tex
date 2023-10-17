@@ -21,7 +21,7 @@ For the second group, theories developed within set theory often can be translat
 Such examples include frameworks developed by \citet{Ahrens2022,Allais2021,Fiore2022} in \Coq or \Agda, which are relatively correct to their meta-language, although their expressiveness is limited to simply typed theories.
 Our development belongs to the second group, as we aim for a formal treatment of bidirectional typing in a constructive type theory to minimise the gap between theory and implementation.
 
-\subsubsection{General theory of bidirectional type synthesis beyond simple types}
+\subsubsection{Beyond simple types}
 
 Bidirectional type synthesis plays a crucial role in handling more complex types than simple types, and we sketch how our theory can be (informally) extended to treat a broader class of languages.
 We need a general definition of languages in question (\cref{subsec:simple-types,subsec:binding-sig}).
@@ -58,12 +58,18 @@ Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo
 \citeauthor{Felicissimo2023} proposes a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.) and a definition of mode-correctness (called \emph{well-typed} op.\ cit.) and their algorithm of generic bidirectional type synthesis is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the equality check is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
 However, the last assumption is challenging to establish even for specific languages and lacks a comprehensive general theory.
 
-\subsubsection{More characteristics of bidirectional typing}
+\subsubsection{Beyond syntax-directed systems}
 
-There are still many concepts that are possible to articulate such as, for example, Pfenning's recipe for bidirectionalising typing rules.
+For non-syntax-directed systems, since there can be multiple moding or typing rules for a language construct, both the mode decorator and the bidirectional type synthesiser will need to backtrack, and the decorator may need to produce all possible mode derivations so as not to limit the synthesiser's choices.
+For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and type information, although bidirectional typing rules and pairs of a moding rule and a typing rule may no longer in perfect correspondence, and we may need to adapt the statement of completeness (for example by taking all possible mode derivations as input to guarantee that at least one can be paired with the input typing derivation).
 
-In contrast, there are concepts that may be hard to pin down, notably `annotation character'~\cite{Dunfield2021}, which is roughly about how easy it is for the user to write annotated programs.
-These considerations may continue to require creativity from the designer of type systems whereas its implementation could be automated entirely.
+
+\subsubsection{Towards a richer formal theory}
+
+There are more techniques in bidirectional typing that can be formally studied in general, with one notable example being the Pfenning recipe for bidirectionalising typing rules~\citep[Section~4]{Dunfield2021}.
+There are also concepts that may be hard to fully formalise, for example `annotation character'~\citep[Section~3.4]{Dunfield2021}, which is roughly about how easy it is for the user to write annotated programs, but it would be interesting to explore to what extent such concepts can be formalised.
+
+%Such aspects  may continue to require creativity from the designer of type systems whereas its implementation could be automated entirely.
 
 %\subsection*{Acknowledgement}
 %We thank Nathanael Arkor for the useful conversation.

@@ -10,17 +10,16 @@ The study of presenting logics universally at least date back to universal algeb
 In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which is used to prove a general confluence theorem.
 Many general definitions and frameworks for defining logics and type theories have been proposed, and we classify them into two groups by where signatures reside: the meta level or the object level of a meta-language:
 \begin{enumerate}
-\item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where the concept of signatures are on the \emph{meta level} and naturally capable of defining dependent type theories;
+\item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} (to name a few) are \emph{extensions} of Martin-L\"of type theory where signatures are on the \emph{meta level} and capable of specifying dependent type theories;
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory) where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.
 \end{enumerate}
 
-\LF is naturally expressive but each extension requires a different \LF and thus a different implementation.
-Formalising \LF and its variants is at least as hard as formalising a dependent type theory, so they are mostly implemented separately from their theory.
-To the best of our knowledge, we do not know any verified implementation of \LF in a type theory.
+\LF is naturally expressive but each extension requires a different \LF and thus a different implementation to check formal \LF proofs.
+Formalising \LF and its variants is at least as hard as formalising a dependent type theory, so they are mostly implemented separately from their theory and unverified.
 
-For the second group, theories developed within set theory often can be translated to type theory (with some effort) and thus manageable for formalisation in a type-theoretic proof assistant. 
-Such examples include frameworks developed by \citet{Ahrens2022,Allais2021,Fiore2022} in \Coq or \Agda, which are relatively correct to their meta-language, although there expressiveness is limited to simply typed languages.
-Our development belongs to the second group, as we aim for a formal treatment of bidirectional typing.
+For the second group, theories developed within set theory often can be translated to type theory and thus manageable for formalisation in a type-theoretic proof assistant. 
+Such examples include frameworks developed by \citet{Ahrens2022,Allais2021,Fiore2022} in \Coq or \Agda, which are relatively correct to their meta-language, although their expressiveness is limited to simply typed theories.
+Our development belongs to the second group, as we aim for a formal treatment of bidirectional typing in a constructive type theory to minimise the gap between theory and implementation.
 
 \subsubsection{General theory of bidirectional type synthesis beyond simple types}
 
@@ -55,9 +54,9 @@ A general theory for bidirectional typing that accommodates various solutions to
 In the context of dependent type theory, type synthesis entails a term equality check for type equality.
 Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
 
-Extending the logical framework \Dedukti, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
+Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
 \citeauthor{Felicissimo2023} proposes a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.) and a definition of mode-correctness (called \emph{well-typed} op.\ cit.) and their algorithm of generic bidirectional type synthesis is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the equality check is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
-However, the last assumption is challenging to establish even for specific languages and lacks a comprehensive general understanding.
+However, the last assumption is challenging to establish even for specific languages and lacks a comprehensive general theory.
 
 \subsubsection{More characteristics of bidirectional typing}
 

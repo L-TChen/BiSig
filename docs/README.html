@@ -5,7 +5,7 @@
 <a id="88" class="Comment">-- and Standard Library version 7c5f3ff9 (included under agda-stdlib/)</a>
 
 <a id="160" class="Comment">-- The HTML version of this file (with hyperlinks to the imported files)</a>
-<a id="233" class="Comment">-- can be found at html/README.html</a>
+<a id="233" class="Comment">-- can be found at docs/README.html</a>
 
 <a id="270" class="Symbol">{-#</a> <a id="274" class="Keyword">OPTIONS</a> <a id="282" class="Pragma">--safe</a> <a id="289" class="Pragma">--with-K</a> <a id="298" class="Symbol">#-}</a>
 <a id="302" class="Comment">-- The two options are also turned on globally in BiSig.agda-lib.</a>
@@ -34,38 +34,38 @@
 <a id="1104" class="Keyword">import</a> <a id="1111" href="Syntax.BiTyped.Pre.Term.html" class="Module">Syntax.BiTyped.Pre.Term</a>     <a id="1139" class="Comment">-- Figure 9 (Definition 3.14)</a>
 <a id="1169" class="Keyword">import</a> <a id="1176" href="Syntax.BiTyped.Pre.Functor.html" class="Module">Syntax.BiTyped.Pre.Functor</a>
 
-<a id="1204" class="Keyword">import</a> <a id="1211" href="Example.STLC.html" class="Module">Example.STLC</a>                <a id="1239" class="Comment">-- STLC examples</a>
+<a id="1204" class="Keyword">import</a> <a id="1211" href="Example.STLC.html" class="Module">Example.STLC</a>                <a id="1239" class="Comment">-- Appendix A</a>
 
-<a id="1257" class="Comment">-- Section 4</a>
+<a id="1254" class="Comment">-- Section 4</a>
 
-<a id="1271" class="Keyword">import</a> <a id="1278" href="Theory.Soundness.html" class="Module">Theory.Soundness</a>                <a id="1310" class="Comment">-- Theorem 4.1</a>
-<a id="1325" class="Keyword">import</a> <a id="1332" href="Theory.Pre.TypingErasure.html" class="Module">Theory.Pre.TypingErasure</a>
-<a id="1357" class="Keyword">import</a> <a id="1364" href="Theory.Completeness.html" class="Module">Theory.Completeness</a>
+<a id="1268" class="Keyword">import</a> <a id="1275" href="Theory.Soundness.html" class="Module">Theory.Soundness</a>                <a id="1307" class="Comment">-- Theorem 4.1</a>
+<a id="1322" class="Keyword">import</a> <a id="1329" href="Theory.Pre.TypingErasure.html" class="Module">Theory.Pre.TypingErasure</a>
+<a id="1354" class="Keyword">import</a> <a id="1361" href="Theory.Completeness.html" class="Module">Theory.Completeness</a>
 
-<a id="1385" class="Keyword">import</a> <a id="1392" href="Syntax.BiTyped.Pre.Generalised.Term.html" class="Module">Syntax.BiTyped.Pre.Generalised.Term</a>  <a id="1429" class="Comment">-- Figure 10</a>
-<a id="1442" class="Keyword">import</a> <a id="1449" href="Syntax.BiTyped.Pre.Generalised.Functor.html" class="Module">Syntax.BiTyped.Pre.Generalised.Functor</a>
-<a id="1488" class="Keyword">import</a> <a id="1495" href="Theory.Pre.Term.html" class="Module">Theory.Pre.Term</a>                 <a id="1527" class="Comment">-- Lemmas 4.2 &amp; 4.3</a>
-<a id="1547" class="Keyword">import</a> <a id="1554" href="Theory.ModeDecoration.html" class="Module">Theory.ModeDecoration</a>           <a id="1586" class="Comment">-- Theorem 4.4, Lemma 4.5, Corollary 4.6</a>
+<a id="1382" class="Keyword">import</a> <a id="1389" href="Syntax.BiTyped.Pre.Generalised.Term.html" class="Module">Syntax.BiTyped.Pre.Generalised.Term</a>  <a id="1426" class="Comment">-- Figure 10</a>
+<a id="1439" class="Keyword">import</a> <a id="1446" href="Syntax.BiTyped.Pre.Generalised.Functor.html" class="Module">Syntax.BiTyped.Pre.Generalised.Functor</a>
+<a id="1485" class="Keyword">import</a> <a id="1492" href="Theory.Pre.Term.html" class="Module">Theory.Pre.Term</a>                 <a id="1524" class="Comment">-- Lemmas 4.2 &amp; 4.3</a>
+<a id="1544" class="Keyword">import</a> <a id="1551" href="Theory.ModeDecoration.html" class="Module">Theory.ModeDecoration</a>           <a id="1583" class="Comment">-- Theorem 4.4, Lemma 4.5, Corollary 4.6</a>
 
-<a id="1628" class="Keyword">import</a> <a id="1635" href="Syntax.Typed.Raw.Ordering.Term.html" class="Module">Syntax.Typed.Raw.Ordering.Term</a>  <a id="1667" class="Comment">-- Figure 11</a>
-<a id="1680" class="Keyword">import</a> <a id="1687" href="Syntax.Typed.Raw.Ordering.Functor.html" class="Module">Syntax.Typed.Raw.Ordering.Functor</a>
-<a id="1721" class="Keyword">import</a> <a id="1728" href="Theory.Pre.Annotatability.html" class="Module">Theory.Pre.Annotatability</a>       <a id="1760" class="Comment">-- Proposition 4.7</a>
+<a id="1625" class="Keyword">import</a> <a id="1632" href="Syntax.Typed.Raw.Ordering.Term.html" class="Module">Syntax.Typed.Raw.Ordering.Term</a>  <a id="1664" class="Comment">-- Figure 11</a>
+<a id="1677" class="Keyword">import</a> <a id="1684" href="Syntax.Typed.Raw.Ordering.Functor.html" class="Module">Syntax.Typed.Raw.Ordering.Functor</a>
+<a id="1718" class="Keyword">import</a> <a id="1725" href="Theory.Pre.Annotatability.html" class="Module">Theory.Pre.Annotatability</a>       <a id="1757" class="Comment">-- Proposition 4.7</a>
 
-<a id="1780" class="Comment">-- Section 5</a>
+<a id="1777" class="Comment">-- Section 5</a>
 
-<a id="1794" class="Keyword">import</a> <a id="1801" href="Theory.ModeCorrectness.Signature.html" class="Module">Theory.ModeCorrectness.Signature</a>    <a id="1837" class="Comment">-- Definitions 5.1, 5.2, 5.3</a>
-<a id="1866" class="Keyword">import</a> <a id="1873" href="Theory.ModeCorrectness.Decidability.html" class="Module">Theory.ModeCorrectness.Decidability</a> <a id="1909" class="Comment">-- Lemma 5.5</a>
-<a id="1922" class="Keyword">import</a> <a id="1929" href="Theory.ModeCorrectness.UniqueSynthesised.html" class="Module">Theory.ModeCorrectness.UniqueSynthesised</a>  <a id="1971" class="Comment">-- Lemma 5.6</a>
+<a id="1791" class="Keyword">import</a> <a id="1798" href="Theory.ModeCorrectness.Signature.html" class="Module">Theory.ModeCorrectness.Signature</a>    <a id="1834" class="Comment">-- Definitions 5.1, 5.2, 5.3</a>
+<a id="1863" class="Keyword">import</a> <a id="1870" href="Theory.ModeCorrectness.Decidability.html" class="Module">Theory.ModeCorrectness.Decidability</a> <a id="1906" class="Comment">-- Lemma 5.5</a>
+<a id="1919" class="Keyword">import</a> <a id="1926" href="Theory.ModeCorrectness.UniqueSynthesised.html" class="Module">Theory.ModeCorrectness.UniqueSynthesised</a>  <a id="1968" class="Comment">-- Lemma 5.6</a>
 
-<a id="1985" class="Keyword">import</a> <a id="1992" href="Theory.ModeCorrectness.Synthesis.html" class="Module">Theory.ModeCorrectness.Synthesis</a>    <a id="2028" class="Comment">-- Theorem 5.7</a>
-<a id="2043" class="Keyword">import</a> <a id="2050" href="Theory.ModeCorrectness.Properties.html" class="Module">Theory.ModeCorrectness.Properties</a>
-<a id="2084" class="Keyword">import</a> <a id="2091" href="Syntax.Simple.Term.html" class="Module">Syntax.Simple.Term</a>                  <a id="2127" class="Comment">-- Definition 5.9</a>
-<a id="2145" class="Keyword">import</a> <a id="2152" href="Syntax.Simple.Unif.html" class="Module">Syntax.Simple.Unif</a>                  <a id="2188" class="Comment">-- Lemma 5.10</a>
+<a id="1982" class="Keyword">import</a> <a id="1989" href="Theory.ModeCorrectness.Synthesis.html" class="Module">Theory.ModeCorrectness.Synthesis</a>    <a id="2025" class="Comment">-- Theorem 5.7</a>
+<a id="2040" class="Keyword">import</a> <a id="2047" href="Theory.ModeCorrectness.Properties.html" class="Module">Theory.ModeCorrectness.Properties</a>
+<a id="2081" class="Keyword">import</a> <a id="2088" href="Syntax.Simple.Term.html" class="Module">Syntax.Simple.Term</a>                  <a id="2124" class="Comment">-- Definition 5.9</a>
+<a id="2142" class="Keyword">import</a> <a id="2149" href="Syntax.Simple.Unif.html" class="Module">Syntax.Simple.Unif</a>                  <a id="2185" class="Comment">-- Lemma 5.10</a>
 
-<a id="2203" class="Keyword">import</a> <a id="2210" href="Theory.Trichotomy.html" class="Module">Theory.Trichotomy</a>                   <a id="2246" class="Comment">-- Corollary 5.11</a>
+<a id="2200" class="Keyword">import</a> <a id="2207" href="Theory.Trichotomy.html" class="Module">Theory.Trichotomy</a>                   <a id="2243" class="Comment">-- Corollary 5.11</a>
 
-<a id="2265" class="Comment">-- Section 6</a>
+<a id="2262" class="Comment">-- Section 6</a>
 
-<a id="2279" class="Keyword">import</a> <a id="2286" href="Example.Spine.html" class="Module">Example.Spine</a>
-<a id="2300" class="Keyword">import</a> <a id="2307" href="Example.PCF.html" class="Module">Example.PCF</a>
+<a id="2276" class="Keyword">import</a> <a id="2283" href="Example.Spine.html" class="Module">Example.Spine</a>
+<a id="2297" class="Keyword">import</a> <a id="2304" href="Example.PCF.html" class="Module">Example.PCF</a>
 </pre></body></html>

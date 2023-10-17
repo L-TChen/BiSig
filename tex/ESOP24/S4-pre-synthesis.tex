@@ -200,7 +200,7 @@ In a sense, annotatability is a reasonable form of completeness: if a term of a 
 In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation produced by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.
 The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$, adding to the term a type annotation that comes from the given typing derivation.
 
-\begin{figure}[h]
+\begin{figure}
   \centering\small
   \judgbox{\isTerm{t} \sqsupseteq \isTerm{u}}{A raw term $t$ is more annotated than $u$}
   \begin{mathpar}
@@ -216,11 +216,9 @@ The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$
     \inferrule{\isTerm{t_1} \sqsupseteq \isTerm{u_1} \quad \cdots \quad \isTerm{t_n} \sqsupseteq{u_n}}
               {\tmOpts \sqsupseteq \tmOpus}
   \end{mathpar}
-  
   \caption{Annotation ordering between raw terms}
   \label{fig:annotation-ordering}
 \end{figure}
-
 On the other hand, when using a bidirectional type synthesiser to implement type synthesis~(\cref{thm:implementation}), our completeness is much simpler to use than annotatability, which requires the bidirectional type synthesiser to produce more complex evidence when the synthesis fails.
 Annotatability also does not help the user to deal with missing annotations like (generalised) mode decoration does: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
 %Therefore we believe that the notion of annotatability is too complex\LT{not clear what it means} for what it achieves, and our theory offers simpler and more useful alternatives.

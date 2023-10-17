@@ -222,7 +222,7 @@ More importantly, we are able to reason about constructions and properties that 
     \and
     \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) : A}\,\Rule{Anno}
     \and
-    \inferrule{\rho : \Sub{\Xi}{\emptyset} \\  \Gamma, \vec{\isTerm{x}}_\isTerm{1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \quad\cdots\quad \Gamma, \vec{\isTerm{x}}_\isTerm{n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
+    \inferrule{\rho : \Sub{\Xi}{\emptyset} \and  \Gamma, \vec{\isTerm{x}}_\isTerm{1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \and \cdots\and \Gamma, \vec{\isTerm{x}}_\isTerm{n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
     {\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}}\,\Rule{Op}
     \\
   \text{for $\bop$ in $\Omega$}
@@ -241,10 +241,10 @@ More importantly, we are able to reason about constructions and properties that 
     \and
     \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\
-    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \\ \Gamma, \simsub{\vars{x}_\isTerm{1} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \\
-      \cdots \\
+    \inferrule{\rho\colon \Sub{\Xi}{\emptyset} \and \Gamma, \simsub{\vars{x}_\isTerm{1} : \Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_{1}} :^\dir{d_1} \simsub{A_1}{\rho} \and
+      \cdots \and
     \Gamma, \simsub{\vars{x}_\isTerm{n} : \Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} :^{\dir{d_n}} \simsub{A_{n}}{\rho}}
-    {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\mathsf{Op}
+    {\Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}} \,\Rule{Op}
     \\ \text{for $\biop$ in $\Omega$}
   \end{mathpar}
   \caption{Bidirectional typing derivations}

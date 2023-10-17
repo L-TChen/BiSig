@@ -39,8 +39,6 @@
                    reserved.},
   doi =           {10.1016/S0168-0072(98)00047-5},
   issn =          {01680072},
-  url =           {https://linkinghub.elsevier.com/retrieve/pii/
-                  S0168007298000475},
 }
 
 @inproceedings{Dowek1993,
@@ -101,6 +99,36 @@
   title =         {Programming Language Foundations in \textsc{Agda}},
   year =          {2022},
   url =           {https://plfa.inf.ed.ac.uk/22.08/},
+}
+
+@article{Pierce2000,
+  address =       {New York, NY, USA},
+  author =        {Pierce, Benjamin C. and Turner, David N.},
+  journal =       {ACM Transactions on Programming Languages and
+                   Systems},
+  month =         {jan},
+  number =        {1},
+  pages =         {1--44},
+  publisher =     {Association for Computing Machinery},
+  title =         {Local type inference},
+  volume =        {22},
+  year =          {2000},
+  abstract =      {We study two partial type inference methods for a
+                   language combining subtyping and impredicative
+                   polymorphism. Both methods are local in the sense
+                   that missing annotations are recovered using only
+                   information from adjacent nodes in the syntax tree,
+                   without long-distance constraints such as unification
+                   variables. One method infers type arguments in
+                   polymorphic applications using a local constraint
+                   solver. The other infers annotations on bound
+                   variables in function abstractions by propagating
+                   type constraints downward from enclosing application
+                   nodes. We motivate our design choices by a
+                   statistical analysis of the uses of type inference in
+                   a sizable body of existing ML code.},
+  doi =           {10.1145/345099.345100},
+  issn =          {0164-0925},
 }
 
 @unpublished{Aczel1978,
@@ -178,7 +206,6 @@
                    editors and proof checkers, can be constructed.},
   doi =           {10.1145/138027.138060},
   issn =          {0004-5411},
-  url =           {https://doi.org/10.1145/138027.138060},
 }
 
 @article{Harper2007,
@@ -193,22 +220,24 @@
   doi =           {10.1017/S0956796807006430},
 }
 
-@phdthesis{Uemura2021,
-  author =        {Uemura, Taichi},
-  month =         {July},
-  note =          {ISBN: 978-94-6421-376-8},
-  school =        {University of Amsterdam},
-  title =         {Abstract and Concrete Type Theories},
-  year =          {2021},
-  abstract =      {In this thesis, we study abstract and concrete type
-                   theories. We introduce an abstract notion of a type
-                   theory to obtain general results in the semantics of
-                   type theories, but we also provide a syntactic way of
-                   presenting a type theory to allow us a further
-                   investigation into a concrete type theory to obtain
-                   consistency and independence results.},
-  url =           {https://hdl.handle.net/11245.1/41ff0b60-64d4-4003-8182-
-                  c244a9afab3b},
+@unpublished{Assaf2016,
+  author =        {Assaf, Ali and Burel, Guillaume and
+                   Cauderlier, Rapha{\"e}l and Delahaye, David and
+                   Dowek, Gilles and Dubois, Catherine and
+                   Gilbert, Fr{\'e}d{\'e}ric and Halmagrand, Pierre and
+                   Hermant, Olivier and Saillard, Ronan},
+  title =         {Dedukti: a logical framework based on the
+                   $\lambda$$\Pi$-calculus modulo theory},
+  year =          {2016},
+  url =           {http://www.lsv.fr/~dowek/Publi/expressing.pdf},
+}
+
+@misc{Felicissimo2023,
+  author =        {Felicissimo, Thiago},
+  title =         {A framework for erased syntax and bidirectional
+                   typing},
+  year =          {2023},
+  doi =           {10.48550/arXiv.2307.08523},
 }
 
 @unpublished{Bauer2020,
@@ -237,50 +266,218 @@
   doi =           {10.46298/lmcs-18(1:17)2022},
 }
 
-@inproceedings{Ahrens2022,
+@phdthesis{Uemura2021,
+  author =        {Uemura, Taichi},
+  month =         {July},
+  school =        {University of Amsterdam},
+  title =         {Abstract and Concrete Type Theories},
+  year =          {2021},
+  abstract =      {In this thesis, we study abstract and concrete type
+                   theories. We introduce an abstract notion of a type
+                   theory to obtain general results in the semantics of
+                   type theories, but we also provide a syntactic way of
+                   presenting a type theory to allow us a further
+                   investigation into a concrete type theory to obtain
+                   consistency and independence results.},
+  isbn =          {978-94-6421-376-8},
+  url =           {https://hdl.handle.net/11245.1/41ff0b60-64d4-4003-8182-
+                  c244a9afab3b},
+}
+
+@inproceedings{Fiore1999,
+  address =       {Trento, Italy},
+  author =        {Fiore, Marcelo P. and Plotkin, Gordon D. and
+                   Turi, Daniele},
+  booktitle =     {Proceedings. 14th Symposium on Logic in Computer
+                   Science},
+  pages =         {193--202},
+  publisher =     {IEEE},
+  title =         {Abstract syntax and variable binding},
+  year =          {1999},
+  doi =           {10.1109/LICS.1999.782615},
+  isbn =          {0-7695-0158-3},
+}
+
+@article{Tanaka2006,
+  author =        {Tanaka, Miki and Power, A. John},
+  journal =       {Higher-Order and Symbolic Computation},
+  month =         sep,
+  number =        {2-3},
+  pages =         {305--337},
+  title =         {Pseudo-distributive laws and axiomatics for variable
+                   binding},
+  volume =        {19},
+  year =          {2006},
+  doi =           {10.1007/s10990-006-8750-x},
+  issn =          {1388-3690},
+}
+
+@article{Tanaka2006a,
+  author =        {Tanaka, Miki and Power, John},
+  journal =       {Journal of Logic and Computation},
+  month =         {02},
+  number =        {1},
+  pages =         {5-25},
+  title =         {A Unified Category-theoretic Semantics for Binding
+                   Signatures in Substructural Logic},
+  volume =        {16},
+  year =          {2006},
+  abstract =      {{Generalizing Fiore et al.'s use of the category 𝔽
+                   of finite sets to model untyped Cartesian contexts
+                   and Tanaka's use of the category ℙ of permutations
+                   to model untyped linear contexts, we let S be an
+                   arbitrary pseudo-monad on Cat and let S1 model
+                   untyped contexts in general: this generality includes
+                   contexts for sub-structural logics such as the Logic
+                   of Bunched Implications and variants. Given a
+                   pseudo-distributive law of S over the (partial)
+                   pseudo-monad for free cocompletions, we define a
+                   canonical substitution monoidal structure on the
+                   category [(S1)op, Set], generalizing substitution
+                   monoidal structures for Cartesian and linear contexts
+                   and providing a natural substitution structure for
+                   Bunched Implications and its variants. We give a
+                   concrete description of the substitution monoidal
+                   structure. We then give an axiomatic definition of a
+                   binding signature, again extending the definitions
+                   for Cartesian and linear contexts. We investigate
+                   examples in detail, then prove the central result of
+                   the paper, yielding initial algebra semantics for
+                   binding signatures at the level of generality we
+                   propose.}},
+  doi =           {10.1093/logcom/exi070},
+  issn =          {0955-792X},
+}
+
+@inproceedings{Fiore2010,
+  address =       {Berlin, Heidelberg},
+  author =        {Fiore, Marcelo and Hur, Chung-Kil},
+  booktitle =     {Computer Science Logic. CSL 2010},
+  editor =        {Dawar, Anuj and Veith, Helmut},
+  pages =         {320--335},
+  publisher =     {Springer Berlin Heidelberg},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Second-order equational logic (extended abstract)},
+  volume =        {6247},
+  year =          {2010},
+  abstract =      {We extend universal algebra and its equational logic
+                   from first to second order as follows.},
+  doi =           {10.1007/978-3-642-15205-4_26},
+  isbn =          {978-3-642-15205-4},
+}
+
+@incollection{Hamana2011,
+  address =       {Berlin, Heidelberg},
+  author =        {Hamana, Makoto},
+  booktitle =     {Foundations of Software Science and Computational
+                   Structures. FoSSaCS 2011},
+  editor =        {Hofmann, Martin},
+  pages =         {381--395},
+  publisher =     {Springer},
+  series =        {Lecture Notes in Computer Science},
+  title =         {Polymorphic abstract syntax via {Grothendieck}
+                   construction},
+  volume =        {6604},
+  year =          {2011},
+  doi =           {10.1007/978-3-642-19805-2_26},
+}
+
+@inproceedings{Fiore2013,
+  address =       {New Orleans, LA, USA},
+  author =        {Fiore, Marcelo and Hamana, Makoto},
+  booktitle =     {2013 28th Annual ACM/IEEE Symposium on Logic in
+                   Computer Science},
+  pages =         {520--529},
+  publisher =     {IEEE},
+  title =         {Multiversal polymorphic algebraic theories: Syntax,
+                   semantics, translations, and equational Logic},
+  year =          {2013},
+  doi =           {10.1109/LICS.2013.59},
+  isbn =          {978-1-4799-0413-6},
+  issn =          {10436871},
+}
+
+@inproceedings{Arkor2020,
   address =       {New York, NY, USA},
-  author =        {Ahrens, Benedikt and Matthes, Ralph and
-                   M\"{o}rtberg, Anders},
-  booktitle =     {Proceedings of the 11th ACM SIGPLAN International
-                   Conference on Certified Programs and Proofs},
-  pages =         {307--323},
+  author =        {Arkor, Nathanael and Fiore, Marcelo},
+  booktitle =     {Proceedings of the 35th Annual ACM/IEEE Symposium on
+                   Logic in Computer Science},
+  pages =         {88--101},
   publisher =     {Association for Computing Machinery},
-  series =        {CPP 2022},
-  title =         {Implementing a category-theoretic framework for typed
-                   abstract syntax},
+  series =        {LICS '20},
+  title =         {Algebraic models of simple type theories: A
+                   polynomial approach},
+  year =          {2020},
+  abstract =      {We develop algebraic models of simple type theories,
+                   laying out a framework that extends universal algebra
+                   to incorporate both algebraic sorting and variable
+                   binding. Examples of simple type theories include the
+                   unityped and simply-typed λ-calculi, the
+                   computational λ-calculus, and predicate logic.Simple
+                   type theories are given models in presheaf
+                   categories, with structure specified by algebras of
+                   polynomial endofunctors that correspond to natural
+                   deduction rules. Initial models, which we construct,
+                   abstractly describe the syntax of simple type
+                   theories. Taking substitution structure into
+                   consideration, we further provide sound and complete
+                   semantics in structured cartesian multicategories.
+                   This development generalises Lambek's correspondence
+                   between the simply-typed λ-calculus and
+                   cartesian-closed categories, to arbitrary simple type
+                   theories.},
+  doi =           {10.1145/3373718.3394771},
+  isbn =          {9781450371049},
+}
+
+@article{Fiore2022,
+  author =        {Fiore, Marcelo and Szamozvancev, Dmitrij},
+  journal =       {Proceedings of the ACM on Programming Languages},
+  month =         jan,
+  number =        {POPL},
+  pages =         {1--29},
+  title =         {Formal metatheory of second-order abstract syntax},
+  volume =        {6},
   year =          {2022},
-  abstract =      {In previous work ("From signatures to monads in
-                   UniMath"),we described a category-theoretic
-                   construction of abstract syntax from a signature,
-                   mechanized in the UniMath library based on the Coq
-                   proof assistant. In the present work, we describe
-                   what was necessary to generalize that work to account
-                   for simply-typed languages. First, some definitions
-                   had to be generalized to account for the natural
-                   appearance of non-endofunctors in the simply-typed
-                   case. As it turns out, in many cases our mechanized
-                   results carried over to the generalized definitions
-                   without any code change. Second, an existing
-                   mechanized library on 𝜔-cocontinuous functors had
-                   to be extended by constructions and theorems
-                   necessary for constructing multi-sorted syntax.
-                   Third, the theoretical framework for the semantical
-                   signatures had to be generalized from a monoidal to a
-                   bicategorical setting, again to account for
-                   non-endofunctors arising in the typed case. This uses
-                   actions of endofunctors on functors with given
-                   source, and the corresponding notion of strong
-                   functors between actions, all formalized in UniMath
-                   using a recently developed library of bicategory
-                   theory. We explain what needed to be done to plug all
-                   of these ingredients together, modularly. The main
-                   result of our work is a general construction that,
-                   when fed with a signature for a simply-typed
-                   language, returns an implementation of that language
-                   together with suitable boilerplate code, in
-                   particular, a certified monadic substitution
-                   operation.},
-  doi =           {10.1145/3497775.3503678},
+  abstract =      {Despite extensive research both on the theoretical
+                   and practical fronts, formalising, reasoning about,
+                   and implementing languages with variable binding is
+                   still a daunting endeavour -- repetitive boilerplate
+                   and the overly complicated metatheory of
+                   capture-avoiding substitution often get in the way of
+                   progressing on to the actually interesting properties
+                   of a language. Existing developments offer some
+                   relief, however at the expense of inconvenient and
+                   error-prone term encodings and lack of formal
+                   foundations.},
+  doi =           {10.1145/3498715},
+  issn =          {2475-1421},
+}
+
+@inproceedings{Wood2022,
+  address =       {Cham},
+  author =        {Wood, James and Atkey, Robert},
+  booktitle =     {Programming Languages and Systems},
+  editor =        {Sergey, Ilya},
+  pages =         {376--402},
+  publisher =     {Springer International Publishing},
+  series =        {Lecture Notes in Computer Science},
+  title =         {A Framework for Substructural Type Systems},
+  volume =        {13240},
+  year =          {2022},
+  abstract =      {Mechanisation of programming language research is of
+                   growing interest, and the act of mechanising type
+                   systems and their metatheory is generally becoming
+                   easier as new techniques are invented. However,
+                   state-of-the-art techniques mostly rely on
+                   structurality of the type system --- that weakening,
+                   contraction, and exchange are admissible and
+                   variables can be used unrestrictedly once assumed.
+                   Linear logic, and many related subsequent systems,
+                   provide motivations for breaking some of these
+                   assumptions.},
+  doi =           {10.1007/978-3-030-99336-8_14},
+  isbn =          {978-3-030-99336-8},
 }
 
 @article{Allais2021,
@@ -320,53 +517,5 @@
                    https://github.com/gallais/generic-syntax .},
   doi =           {10.1017/S0956796820000076},
   issn =          {0956-7968},
-}
-
-@article{Fiore2022,
-  author =        {Fiore, Marcelo and Szamozvancev, Dmitrij},
-  journal =       {Proceedings of the ACM on Programming Languages},
-  month =         jan,
-  number =        {POPL},
-  pages =         {1--29},
-  title =         {Formal metatheory of second-order abstract syntax},
-  volume =        {6},
-  year =          {2022},
-  abstract =      {Despite extensive research both on the theoretical
-                   and practical fronts, formalising, reasoning about,
-                   and implementing languages with variable binding is
-                   still a daunting endeavour -- repetitive boilerplate
-                   and the overly complicated metatheory of
-                   capture-avoiding substitution often get in the way of
-                   progressing on to the actually interesting properties
-                   of a language. Existing developments offer some
-                   relief, however at the expense of inconvenient and
-                   error-prone term encodings and lack of formal
-                   foundations.},
-  doi =           {10.1145/3498715},
-  issn =          {2475-1421},
-}
-
-@misc{Felicissimo2023,
-  author =        {Felicissimo, Thiago},
-  title =         {A framework for erased syntax and bidirectional
-                   typing},
-  year =          {2023},
-  doi =           {10.48550/arXiv.2307.08523},
-}
-
-@incollection{Hamana2011,
-  address =       {Berlin, Heidelberg},
-  author =        {Hamana, Makoto},
-  booktitle =     {Foundations of Software Science and Computational
-                   Structures. FoSSaCS 2011},
-  editor =        {Hofmann, Martin},
-  pages =         {381--395},
-  publisher =     {Springer},
-  series =        {Lecture Notes in Computer Science},
-  title =         {Polymorphic abstract syntax via {Grothendieck}
-                   construction},
-  volume =        {6604},
-  year =          {2011},
-  doi =           {10.1007/978-3-642-19805-2_26},
 }
 

@@ -75,7 +75,7 @@
 There has been much progress in designing bidirectional type systems and associated type synthesis algorithms, but mainly on a case-by-case basis.
 %This situation is in stark contrast to parsing, for which there have been general theories and widely applicable tools such as parser generators.
 To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing and as a by-product of our formalism provides a \emph{verified} generator of \emph{proof-relevant} type synthesisers for simply typed languages: For every signature that specifies a mode-correct bidirectionally typed language, there exists a proof-relevant type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
-Soundness, completeness, and mode-correctness are studied universally for al signatures, which are sufficient conditions for deriving a type synthesiser.
+Soundness, completeness, and mode-correctness are studied universally for all signatures, which are sufficient conditions for deriving a type synthesiser.
 We propose a preprocessing step called \emph{mode decoration}, which helps the user to deal with missing type annotations in a given abstract syntax tree.
 The entire development is formalised in \Agda and can be further integrated with other language-formalisation frameworks.
 \end{abstract}

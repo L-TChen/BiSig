@@ -24,9 +24,27 @@ open import Theory.Soundness                 D
 open import Theory.Completeness              D
 
 synthesise : (Γ : Cxt 0) (r : Raw (length Γ))
-           → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
+           → (Pre Syn r × Dec (∃[ A ] Γ ⊢ r ⦂ A)) ⊎ ¬ Pre Syn r
 synthesise Γ r with decorate Syn r
 ... | no ¬p = inr ¬p
 ... | yes p with synthesise⇔ Γ p
-... | no ¬At      = inl (no λ (_ , t) → ¬At (_ , completeness p t))
-... | yes (_ , t) = inl (yes (_ , soundness t))
+... | no ¬At      = inl (p , no λ (_ , t) → ¬At (_ , completeness p t))
+... | yes (_ , t) = inl (p , yes (_ , soundness t))
+
+data Tri (P : Set) (Q : Set) (R : Set) : Set where
+  only-p : P → ¬ Q → ¬ R → Tri P Q R
+  only-q : Q → ¬ P → ¬ R → Tri P Q R
+  only-r : R → ¬ P → ¬ Q → Tri P Q R
+
+synthesise′
+  : (Γ : Cxt 0) (r : Raw (length Γ))
+  → Tri (Pre Syn r × ∃[ A ] Γ ⊢ r ⦂ A)
+        (Pre Syn r × ¬ (∃[ A ] Γ ⊢ r ⦂ A))
+        (¬ Pre Syn r)
+synthesise′ Γ r with decorate Syn r
+... | no ¬p = only-r ¬p (λ (p , _) → ¬p p) λ (p , _) → ¬p p 
+... | yes p with synthesise⇔ Γ p
+... | no ¬At      =
+  only-q (p , λ (_ , t) → ¬At (_ , completeness p t)) (λ (_ , _ , At) → ¬At (_ , completeness p At)) (λ ¬p → ¬p p)
+... | yes (_ , t) =
+  only-p (p , _ , soundness t) (λ (_ , ¬At) → ¬At (_ , soundness t)) (λ ¬p → ¬p p)

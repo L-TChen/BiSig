@@ -2,20 +2,22 @@
 
 \section{Introduction}\label{sec:intro}
 
-Type inference is an important mechanism for the transition to well typed programs from untyped abstract syntax trees, which we call \emph{raw terms}.
+Type inference is an important mechanism for the transition to well-typed programs from untyped abstract syntax trees, which we call \emph{raw terms}.
 Here `type inference' refers specifically to algorithms that ascertain the type of any raw term \emph{without type annotations}.
 However, full parametric polymorphism leads to undecidability in type inference, as do dependent types~\cite{Wells1999,Dowek1993}.
 In light of these limitations, \emph{bidirectional type synthesis} emerged as a viable alternative, providing algorithms for deciding the types of raw terms that meet some syntactic criteria and usually contain type annotations.
-\varcitet{Dunfield2021}{ summarised in their survey paper} the design principles of bidirectional type synthesis and its wide coverage of languages with simple types, polymorphic types, dependent types, gradual types, among others.
+In their survey paper, \varcitet{Dunfield2021}{ summarised} the design principles of bidirectional type synthesis and its wide coverage of languages with simple types, polymorphic types, dependent types, gradual types, among others.
 
-The basic idea of bidirectional type synthesis is that while the problem of type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types (for example, the type of a variable can be looked up in the context); for other kinds of terms, we can switch to the simpler problem of type checking, where the expected type of a term is also given so that there is more information to work with.
+While type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types.
+For example, the type of a variable can be looked up in the context.
+Bidirectional type synthesis combines type \emph{inference} on this subset of terms with type \emph{checking} (based on a given type) on the rest.
 More formally, every judgement in a bidirectional type system is extended with a \emph{mode:}
 \begin{inlineenum}
   \item $\Gamma |- \isTerm{t} \syn A$ for \emph{synthesis} and 
   \item $\Gamma |- \isTerm{t} \chk A$ for \emph{checking}.
 \end{inlineenum}
-The former indicates that the type~$A$ is computed as output, using both the context~$\Gamma$ and the term~$t$ as input, while for the latter, all three of $\Gamma$, $t$, and~$A$ are given as input.
-The algorithm of a bidirectional type synthesiser can usually be `read off' from a well designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
+The former indicates that the type~$A$ is an output, using both the context~$\Gamma$ and the term~$t$ as input, while for the latter, all three of $\Gamma$, $t$, and~$A$ are given as input.
+The algorithm of a bidirectional type synthesiser can usually be `read off' from a well-designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
 %if a condition called \emph{mode-correctness} is satisfied.
 %every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking.
 %As \citet{Pierce2000} noted, bidirectional type synthesis propagates type information locally within adjacent nodes of a term, and does not require unification as Damas--Milner type inference does.
@@ -30,7 +32,7 @@ Despite sharing the same basic idea, bidirectional typing has been mostly develo
 %\footnote{The same could be said for type checking in general, not just for bidirectional type systems.
 %While there are type checker generators grounded in unification~\citep{Gast2004,Grewe2015}, it should be noted that unification-based approaches are not suited to more complex type systems.}
 %While it is usually straightforward to derive a bidirectional type synthesis algorithm,
-\citeauthor{Dunfield2021} present informal design principles learned from individual bidirectional type systems, but in addition to crafting special techniques for individual systems, we should also start to consolidate concepts common to a class of bidirectional type systems into a general and formal theory that gives mathematically precise definitions and proves theorems for the class of systems once and for all.
+\citeauthor{Dunfield2021} present informal design principles learned from individual bidirectional type systems, but in addition to crafting special techniques for individual systems, we should start to consolidate concepts common to a class of bidirectional type systems into a general and formal theory that gives mathematically precise definitions and proves theorems for the class of systems once and for all.
 %Moreover, by mechanising the theory, we get \emph{verified} type-synthesiser generators analogous to parser generators.
 In this paper, we develop such a theory of bidirectional typing with the proof assistant \Agda.
 %and provide a \emph{verified} generator of \emph{proof-relevant} type synthesisers taking a language specification and a raw term as input.
@@ -40,17 +42,15 @@ In this paper, we develop such a theory of bidirectional typing with the proof a
 \label{sec:PLFA}
 
 Our work adopts a proof-relevant approach to (bidirectional) type synthesis, as illustrated by \citet{Wadler2022} for \PCF.
-The proof-relevant formulation deviates from the usual one:
-traditionally, a type synthesis algorithm is presented as \emph{algorithmic rules}, for example in the form $\Gamma |- \isTerm{t} \syn A \mapsto \isTerm{t}'$, which denotes that $\isTerm{t}$ in the surface language
+The proof-relevant formulation deviates from the usual one: traditionally, a type synthesis algorithm is presented as \emph{algorithmic rules}, for example in the form $\Gamma |- \isTerm{t} \syn A \mapsto \isTerm{t}'$, which denotes that $\isTerm{t}$ in the surface language
 %\Josh{The algorithm adds annotations to the input term?}
-can be transformed to a well typed term $\isTerm{t}'$ of type~$A$ in the core language~\cite{Pierce2000}.
-Such an algorithm is then accompanied by soundness and completeness assertions that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised.
-By contrast, the proof-relevant approach exploits the simultaneously computational and logical nature of Martin-L\"of type theory and formulates \emph{algorithmic soundness, completeness, and decidability in one go}.
+can be transformed to a well-typed term $\isTerm{t}'$ of type~$A$ in the core language~\cite{Pierce2000}.
+Such an algorithm is accompanied by soundness and completeness assertions that the algorithm correctly synthesises the type of a raw term and every typable term can be synthesised.
+By contrast, the proof-relevant approach exploits the simultaneously computational and logical nature of Martin-L\"of type theory and formulates algorithmic soundness, completeness, and decidability \emph{in one go}.
 %(although they do not emphasise the difference of their approach from the traditional one)
 
-In more detail:
 Recall that the law of excluded middle $P + \neg P$ does not hold as an axiom for every~$P$ constructively, and we say that $P$~is logically \emph{decidable} if the law holds for~$P$.
-Since Martin-L\"of type theory is simultaneously logical and computational, a decidability proof is also a proof-relevant decision procedure that computes not only a yes-or-no answer but also a proof of~$P$ or its refutation, so logical decidability is also algorithmic decidability.
+Since Martin-L\"of type theory is simultaneously logical and computational, a decidability proof is a proof-relevant decision procedure that computes not only a yes-or-no answer but also a proof of~$P$ or its refutation, so logical decidability is algorithmic decidability.
 %For example, a proof of \emph{decidable equality}, i.e.~$\forall x, y.~(x = y) + (x \neq y)$, decides whether $x$~and~$y$ are equal and accordingly gives an identity proof or a refutation explicitly.
 %Such a decidability proof may or may not be possible depending on the domain of $x$~and~$y$, and is non-trivial in general.
 %In type theory all proofs as programs terminate, so logical decidability implies algorithmic decidability.
@@ -76,15 +76,14 @@ This is an economic way to bridge the gap between theory and practice, where pro
 
 As mentioned in the beginning, with bidirectional typing we avoid the generally undecidable problem of type inference, and instead solve the simpler problem about the typability of `sufficiently annotated' raw terms, which we call the type synthesis problem to distinguish it from type inference.
 Annotations therefore play an important role even in the definition of the problem solved by bidirectional typing, but have not received enough attention.
-In our theory, we define \emph{mode derivations} so that we can explicitly take annotations into account, in particular properly formulating the type synthesis problem.
-We also propose a preprocessing step called \emph{mode decoration} that helps the user to work with annotations in practice.
+In our theory, we define \emph{mode derivations} so that we can explicitly take annotations into account and formulate the type synthesis problem with sufficiently annotated raw terms.
+Accordingly, a preprocessing step called \emph{mode decoration} is proposed to help the user to work with annotations.
 
-To give a bit more detail:
 The type synthesis problem is not just about deciding whether a raw term is typable---there is a third possibility that the term does not have sufficient annotations.
-To solve the type synthesis problem, before attempting to decide typability (using a bidirectional type synthesiser), we should first decide whether the raw term has sufficient annotations, which corresponds to whether the term has a mode derivation.
-Our theory gives a (proof-relevant) \emph{mode decorator}, which constructs a mode derivation for a raw term or provide information that refutes the existence of any mode derivation and helps the user to pinpoint missing annotations.
+Therefore, to solve the type synthesis problem, before attempting to decide typability (using a bidirectional type synthesiser), we should first decide whether the raw term has sufficient annotations, which corresponds to whether the term has a mode derivation.
+Our theory gives a (proof-relevant) \emph{mode decorator}, which constructs a mode derivation for a raw term or provides information that refutes the existence of any mode derivation and helps the user to pinpoint missing annotations.
 Then a bidirectional type synthesiser is required to decide the typability of only mode-decorated raw terms instead of all raw terms.
-Soundness and completeness of bidirectional typing is reformulated as a one-to-one correspondence between bidirectional typing derivations and pairs of a typing derivation and a mode derivation for the same raw term; this reformulation is more natural and useful than annotatability~\cite[Section~3.2]{Dunfield2021} which is typically formulated in the literature of bidirectional typing.
+Soundness and completeness of bidirectional typing is reformulated as a one-to-one correspondence between bidirectional typing derivations and pairs of a typing derivation and a mode derivation for the same raw term; this reformulation is more useful than annotatability~\cite[Section~3.2]{Dunfield2021} which is typically formulated in the literature of bidirectional typing.
 
 %As raw terms may not be sufficiently annotated, we propose a preprocessing step called \emph{mode decoration} to determine whether a raw term can be processed by a bidirectional type synthesiser later.
 %A bidirectional type synthesiser and a type synthesiser differ in their domain---bidirectional type synthesis only works for mode-decorated raw terms instead of all raw terms.

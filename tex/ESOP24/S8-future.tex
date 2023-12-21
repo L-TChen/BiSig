@@ -10,7 +10,7 @@ The study of presenting logics universally at least date back to universal algeb
 In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which is used to prove a general confluence theorem.
 Many general definitions and frameworks for defining logics and type theories have been proposed, and we classify them into two groups by where signatures reside: the meta level or the object level of a meta-language:
 \begin{enumerate}
-\item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
+  \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory) where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.
 \end{enumerate}
 
@@ -47,19 +47,20 @@ The decidability of bidirectional type synthesis (\cref{thm:bidirectional-type-s
 Adding subtyping $A \mathrel{<:} B$ to languages can be done by replacing type equality with a subtyping relation $\mathrel{<:}$ and type equality check with subtyping check, so polymorphically typed languages with subtyping such as \SystemFsub can be specified.
 The main idea of bidirectional typing does not change, so it should be possible to extend the formal theory without further assumptions too.
 
-However, explicit type application in \SystemF and \SystemFsub is impractical but its implicit version results in a \emph{stationary rule} which is not syntax-directed:
+However, explicit type application in \SystemF and \SystemFsub is impractical but its implicit version results in a \emph{stationary rule}~\cite{Leivant1986}:
 \[
   \inferrule{\Gamma \vdash t \syn \forall \alpha. A}{\Gamma \vdash t \syn A[B/\alpha]}
 \]
+which is not syntax-directed.
 By translating the above rule to subtyping, we have the \emph{instantiation problem} which amounts to guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$.
-A general theory that accommodates various solutions to the problem is left as future work.
+A theory that accommodates various solutions to the problem is left as future work.
 
 \paragraph{Dependent types}
 In the context of dependent type theory, type synthesis entails a term equality check for type equality.
 Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
 
 Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
-They proposes a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.), a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of generic bidirectional type synthesis which is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the set of computational rules is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
+They propose a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.), a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of generic bidirectional type synthesis which is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the set of computational rules is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
 However, the last assumption is challenging to establish even for specific languages and lacks a general understanding.
 
 \subsubsection{Beyond syntax-directed systems}

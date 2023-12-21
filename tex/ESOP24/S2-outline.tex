@@ -146,8 +146,7 @@ A \emph{mode decorator} decides for any raw term~$V \vdash \isTerm{t}$ whether $
 \end{definition}
 
 One (less important) benefit of mode decoration is that it helps to simplify the synthesiser, whose computation can be partly directed by a mode derivation.
-More importantly, whether there is a mode derivation for a term is actually very useful information to the user, because it corresponds to whether the term has enough type annotations:
-Observe that the $\SynRule{Anno}$ and $\ChkRule{Sub}$ rules allow us to switch between the synthesising and checking modes;
+More importantly, whether there is a mode derivation for a term is actually very useful information to the user, because it corresponds to whether the term has enough type annotations: observe that the $\SynRule{Anno}$ and $\ChkRule{Sub}$ rules allow us to switch between the synthesising and checking modes;
 the switch from synthesising to checking is free, whereas the opposite direction requires a type annotation.
 That is, any term in synthesising mode is also in checking mode, but not necessarily vice versa.
 A type annotation is required wherever a term that can only be in checking mode is required to be in synthesising mode, and a term does not have a mode derivation if and only if type annotations are missing in such places.
@@ -168,7 +167,7 @@ A type synthesiser using `not in synthesising mode' as its excuse can be constru
 \end{theorem}
 
 The construction is straightforward:
-Run the mode decorator on the input term~$\erase\Gamma \vdash t$.
+run the mode decorator on the input term~$\erase\Gamma \vdash t$.
 If there is no synthesising mode derivation, report that $t$~is not in synthesising mode (the third outcome).
 Otherwise $\erase\Gamma \vdash t^{\syn}$, and we can run the bidirectional type synthesiser.
 If it finds a derivation of $\Gamma \vdash t \syn A$ for some type~$A$, return a derivation of $\Gamma \vdash t : A$ (the first outcome), which is possible because the bidirectional typing~(\cref{fig:STLC-bidirectional-typing-derivations}) is \emph{sound} with respect to the original typing~(\cref{fig:STLC-typing-derivations}); if there is no derivation of $\Gamma \vdash t \syn A$ for any type~$A$, then there is no derivation of $\Gamma \vdash t : A$ for any~$A$ either (the second outcome), because the bidirectional typing is \emph{complete}:
@@ -181,7 +180,7 @@ $\Gamma \vdash t \syn A$ if and only if\/ $\erase\Gamma \vdash t^{\syn}$ and\/ $
 %If\/ $\Gamma \vdash t : A$, then $\Gamma \vdash t \syn A$.
 %\end{lemma}
 
-We will construct a mode decorator~(\cref{sec:mode-decoration}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove both lemmas~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
+We will construct a mode decorator~(\cref{sec:mode-decoration}) and a bidirectional type synthesiser~(\cref{sec:type-synthesis}) and prove the above theorem~(\cref{sec:soundness-and-completeness}) for all syntax-directed bidirectional simple type systems.
 To quantify over all such systems, we need their general definitions, which we formulate next.
 
 %\begin{figure}

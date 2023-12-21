@@ -35,11 +35,12 @@
 \setlist[inlineenum]{label=(\roman*)}
 
 \setlength{\marginparwidth}{2cm}
-\usepackage[obeyFinal,color=yellow,textsize=scriptsize]{todonotes}
+\usepackage[color=yellow,textsize=scriptsize]{todonotes}
 
 \usepackage{microtype}
 \microtypesetup{babel}
 
+\SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
 \newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
 \newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
 \newcommand{\codefigure}{\small\setlength{\parindent}{0em}\setlength{\mathindent}{0em}\setlength{\abovedisplayskip}{0ex}\setlength{\belowdisplayskip}{0ex}}
@@ -50,21 +51,19 @@
 \numberwithin{table}{section}
 
 %\let\theorem\relax
-%\let\definition\relax
 %\spnewtheorem{theorem}{Theorem}[section]{\bfseries}{}
+%\let\definition\relax
 %\spnewtheorem{definition}{Definition}[section]{\bfseries}{}
 
-%\author{Liang-Ting Chen
-%\orcidID{0000-0002-3250-1331}
-%\and 
-%Hsiang-Shang Ko
-%\orcidID{0000-0002-2439-1048}}
-%
-%\institute{Institute of Information Science, Academia Sinica, Taiwan}
+\author{Liang-Ting Chen
+\orcidID{0000-0002-3250-1331}
+\and 
+Hsiang-Shang Ko
+\orcidID{0000-0002-2439-1048}}
 
-\title{A formal treatment of bidirectional typing%
-%  \thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}
-}
+\institute{Institute of Information Science, Academia Sinica, Taiwan}
+
+\title{A formal treatment of bidirectional typing\thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}}
 
 
 \begin{document}
@@ -74,7 +73,7 @@
 \begin{abstract}
 There has been much progress in designing bidirectional type systems and associated type synthesis algorithms, but mainly on a case-by-case basis.
 %This situation is in stark contrast to parsing, for which there have been general theories and widely applicable tools such as parser generators.
-To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing and as a by-product of our formalism provides a \emph{verified} generator of \emph{proof-relevant} type synthesisers for simply typed languages: For every signature that specifies a mode-correct bidirectionally typed language, there exists a proof-relevant type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
+To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing and as a by-product of our formalism provides a \emph{verified} generator of \emph{proof-relevant} type synthesisers for simply typed languages: for every signature that specifies a mode-correct bidirectionally typed language, there exists a proof-relevant type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
 Soundness, completeness, and mode-correctness are studied universally for all signatures, which are sufficient conditions for deriving a type synthesiser.
 We propose a preprocessing step called \emph{mode decoration}, which helps the user to deal with missing type annotations in a given abstract syntax tree.
 The entire development is formalised in \Agda and can be further integrated with other language-formalisation frameworks.

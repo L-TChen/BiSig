@@ -255,14 +255,14 @@ This would assist programmers in resolving issues with ill-typed terms, rather t
 
 \subsection{Trichotomy on raw terms by type synthesis} \label{subsec:trichotomy}
 
-Combining the bidirectional type synthesiser with the mode decorator, soundness, and completeness from \cref{sec:pre-synthesis}, we get a type synthesiser parameterised by $(\Sigma, \Omega)$, generalising \cref{thm:implementation}.
+Combining the bidirectional type synthesiser with the mode decorator, soundness, and completeness from \cref{sec:pre-synthesis}, we derive a type synthesiser parameterised by~$(\Sigma, \Omega)$, generalising \cref{thm:implementation}.
 
 \begin{corollary}[Trichotomy on raw terms]\label{cor:trichotomy}
   For any mode-correct bidirectional type system $(\Sigma, \Omega)$, 
   exactly one of the following holds:
   \begin{enumerate}
-    \item $\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A$ for some type~$A$,
-    \item $\Gamma |/-_{\Sigma, \Omega} \isTerm{t} : A$ for any type~$A$, or 
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ and $\Gamma |-_{\Sigma, \erase{\Omega}} \isTerm{t} : A$ for some type~$A$,
+    \item $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$ but $\Gamma |/-_{\Sigma, \erase{\Omega}} \isTerm{t} : A$ for any type~$A$, or 
     \item $\erase{\Gamma} |/-_{\Sigma, \Omega} \isTerm{t}^{\syn}$.
   \end{enumerate}
 \end{corollary}

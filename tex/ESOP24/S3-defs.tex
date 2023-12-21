@@ -4,7 +4,7 @@
 This section provides general definitions
 %\footnote{%
 %Here's the 'small print': Our definitions cover typical examples and set the scope for bidirectional simple type systems discussed, but do not offer comprehensive coverage of all possibilities.}
-of simple types, simply typed languages, and bidirectional type systems, and uses simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
+of simple types, simply typed languages, and bidirectional type systems, and uses the simply typed $\lambda$-calculus in \cref{sec:key-ideas} as our running example.
 These definitions may look dense, especially on first reading.
 The reader may choose to skim through this section, in particular the figures, and still get some rough ideas from later sections.
 
@@ -12,8 +12,7 @@ The definitions are formulated in two steps:
 \begin{inlineenum}
   \item first we introduce a notion of arity and a notion of signature which includes a set\footnote{%
     Even though our theory is developed in Martin-L\"of type theory, the term `set' is used instead of `type' to avoid the obvious confusion. 
-    Also, as we assume \AxiomK, all types are legitimately sets in the sense of homotopy type theory.
-  } of operation symbols and an assignment of arities to symbols;
+    Indeed, as we assume \AxiomK, all types are legitimately sets in the sense of homotopy type theory~\citep[Definition 3.1.1]{UFP2013}.} of operation symbols and an assignment of arities to symbols;
 \item then, given a signature, we define raw terms and typing derivations inductively by primitive rules such as $\Rule{Var}$ and a rule schema for constructs $\tmOp_o$ indexed by an operation symbol~$o$.
 \end{inlineenum}
 %All these definitions are inductive as usual but include a \emph{rule schema} giving rise to as many rules as there are operation symbols in a signature.
@@ -47,7 +46,7 @@ For simple types, the only datum needed for specifying a type construct is its n
   Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
-\begin{definition} \label{def:substitution}
+\begin{definition}\label{def:substitution}
 The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$, denoted by $\rho\colon \Sub{\Xi}{\Xi'}$, is a map which sends a type $A : \Type_{\Sigma}(\Xi)$ to $\simsub{A}{\rho} : \Type_{\Sigma}(\Xi')$ and is defined as usual.
 \end{definition}
 
@@ -91,7 +90,7 @@ That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variable
 
 The set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays a somewhat important role:
 To use a rule like $\Rule{Abs}$ in an actual typing derivation, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
-In our formulation of substitution~(\cref{def:substitution}), we must first identify for which type variables to substitute.
+In our formulation of substitution~(\ref{def:substitution}), we must first identify which type variables to substitute for.
 As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include functions from~$\Xi$ to concrete types specifying how to instantiate typing rules by substitution.
 
 By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature~$\Sigma$ and a binding signature~$\Omega$.

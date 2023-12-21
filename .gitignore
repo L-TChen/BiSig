@@ -6,3 +6,4 @@ comment.cut
 reference.bib
 *.ptb
 _build
+tex/ESOP24/aux

@@ -3,8 +3,7 @@
 \section{Mode decoration and related properties}\label{sec:pre-synthesis}
 
 Our first important construction is mode decoration in \cref{sec:mode-decoration}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
-We also discuss some related properties:
-By bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
+We also discuss some related properties: by bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
 We also formulate annotatability~\cite{Dunfield2021} and discuss its relationship with our completeness and generalised mode decoration in \cref{sec:annotatability}.
 
 \subsection{Soundness and completeness}
@@ -37,8 +36,7 @@ $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |
 \label{sec:mode-decoration}
 
 The major goal of this section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
-In fact we will do better:
-If a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
+In fact we will do better: if a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
 It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
 We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalised-mode-decoration}), which can be weakened to an ordinary mode decorator~(\cref{thm:mode-decoration}) if the additional explanation is not needed.%
 \footnote{For the sake of simplicity, we use ordinary mode decoration elsewhere in this paper.}
@@ -92,10 +90,8 @@ We also want a lemma that covers the case where $g = \BFalse$.
 If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V |/-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
-This lemma would be wrong if the `strictness' boolean~$s$ was left out of the rules:
-Having both $\ChkRule{Sub}$ and $\SynRule{Missing}$, which we call \emph{mode casts}, it would be possible to switch between the two modes freely, which unfortunately means that we could insert a pair of $\ChkRule{Sub}$ and $\SynRule{Missing}$ anywhere, constructing a non-genuine derivation even when there is in fact a genuine one.
-The `strictness' boolean~$s$ can be thought of as disrupting the formation of such pairs of mode casts:
-Every rule other than the mode casts sets~$s$ to~$\BTrue$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\BFalse$.
+This lemma would be wrong if the `strictness' boolean~$s$ was left out of the rules: having both $\ChkRule{Sub}$ and $\SynRule{Missing}$, which we call \emph{mode casts}, it would be possible to switch between the two modes freely, which unfortunately means that we could insert a pair of $\ChkRule{Sub}$ and $\SynRule{Missing}$ anywhere, constructing a non-genuine derivation even when there is in fact a genuine one.
+The `strictness' boolean~$s$ can be thought of as disrupting the formation of such pairs of mode casts: every rule other than the mode casts sets~$s$ to~$\BTrue$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\BFalse$.
 Furthermore, the sub-derivation of a mode cast has to be strict, so it is impossible to have consecutive mode casts.
 Another way to understand the role of~$s$ is that it makes the $\SynRule{Missing}$ rule precise: an annotation is truly missing only when a term is \emph{strictly} in checking mode but is required to be in synthesising mode.
 With strictness coming into play, non-genuine derivations are now `truly non-genuine'.
@@ -194,7 +190,7 @@ In our theory, we may formulate annotatability as follows.
 \begin{proposition}[Annotatability]\label{thm:annotatability}
 If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
 \end{proposition}
-
+\LT{the paper is perhaps too modest: (...) I don't think DK annotatability says anything about evidence---a synthesiser that answered "no" could still enjoy annotatability (even if we would not enjoy that answer).}
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
 In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation produced by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.

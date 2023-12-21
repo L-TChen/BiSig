@@ -1,7 +1,7 @@
 -- All the important Agda files with mappings to the paper
 
--- Checked with Agda 2.6.3
--- and Standard Library version 7c5f3ff9 (included under agda-stdlib/)
+-- Checked with Agda 2.6.4.1
+-- and Standard Library version 2.0 (included under agda-stdlib/)
 
 -- The HTML version of this file (with hyperlinks to the imported files)
 -- can be found at docs/README.html

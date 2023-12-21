@@ -1,4 +1,4 @@
-\documentclass[orivec,envcountsame,envcountsect,oribibl]{llncs}
+\documentclass[orivec,envcountsect,envcountsame]{llncs}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -63,7 +63,7 @@ Hsiang-Shang Ko
 
 \institute{Institute of Information Science, Academia Sinica, Taiwan}
 
-\title{A formal treatment of bidirectional typing\thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}}
+\title{A formal treatment of bidirectional typing\texorpdfstring{\thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}}{}}
 
 
 \begin{document}
@@ -90,9 +90,7 @@ The entire development is formalised in \Agda and can be further integrated with
 
 \bibliographystyle{splncs04nat}
 
-\IfFileExists{reference.bib}{
-\bibliography{reference}
-}{\bibliography{ref}}
+{\bibliography{ref}
 
 \appendix
 

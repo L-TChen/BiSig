@@ -30,14 +30,14 @@ As we have outlined, the condition of mode-correctness for a synthesising rule i
 Defining the condition directly for a rule, and thus in our setting for an operation, can be somewhat intricate.
 Instead, we choose to define the conditions for the argument list---more specifically, triples $\biargvec$ of an extension context $\Delta_i$, a type $A_i$, and a mode $\dir{d_i}$---pertaining to an operation, for an operation, and subsequently for a signature.
 We also need some auxiliary definitions for the subset of variables of a type and of an extension context, and the set of variables that have been synthesised:
-\begin{definition}
+\begin{defn}
   The finite subsets\footnote{%
   There are various definitions for finite subsets of a set within type theory, but for our purposes the choice among these definitions is not a matter of concern.}
   of \emph{(free) variables} of a type $A$ and of variables in an extension context~$\Delta$ are denoted by $\fv(A)$ and $\fv(\Delta)$ respectively.
   For an argument list $\biargs$ the set of type variables $A_{i}^{\dir{d_i}}$ with $d_i$ being $\syn$ is denoted by $\synvar(\biargs)$, i.e.\ $\synvar$ gives the set of type variables that will be synthesised during type synthesis.
-\end{definition}
+\end{defn}
 
-\begin{definition}\label{def:mode-correctness-args}
+\begin{defn}\label{def:mode-correctness-args}
   The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a predicate defined by
   \begin{align*}
     \MCas( \cdot ) & = \top \\
@@ -47,17 +47,17 @@ We also need some auxiliary definitions for the subset of variables of a type an
                                   & = \phantom{, A_n} \fv(\Delta_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
   \end{align*}
   where $\top$ means an empty list is always mode-correct.
-\end{definition}
+\end{defn}
 This definition encapsulates the idea that every `input' type variable, possibly derived from an extension context~$\Delta_n$ or a checking argument~$A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
 This condition must also be met for every tail of the argument list to ensure that `output' variables accessible at each argument are from preceding arguments only, hence an inductive definition.
-\begin{definition}\label{def:mode-correctness}
+\begin{defn}\label{def:mode-correctness}
   An operation $\biop$ is \emph{mode-correct} if 
   \begin{enumerate}
     \item either $d$ is $\chk$, its argument list is mode-correct with respect to $\fv(A_0)$, and the union $\fv(A_0) \cup \synvar(\biargvec)$ contains every inhabitant of $\Xi$;
     \item or $d$ is $\syn$, its argument list is mode-correct with respect to $\emptyset$, and $\synvar(\biargvec)$ contains every inhabitant of $\Xi$ and, particularly, $\fv(A_0)$.
   \end{enumerate}
   A bidirectional binding signature $\Omega$ is \emph{mode-correct} if its operations are all mode-correct.
-\end{definition}
+\end{defn}
 For a checking operation, an `input' variable of an argument could be derived from~$A_0$, as these are known during type checking as an input.
 Since every inhabitant of~$\Xi$ can be located in either~$A_0$ or synthesised variables, we can determine a concrete type for each inhabitant of~$\Xi$ during type synthesis.
 On the other hand, for a synthesising operation, we do not have any known variables at the onset of type synthesis, so the argument list should be mode-correct with respect to~$\emptyset$.
@@ -137,10 +137,10 @@ Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in
 For the sake of clarity in presentation, though, we keep using named variables and just assume that $\Xi$ has a decidable equality.}
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
-\begin{definition}
+\begin{defn}
 By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain $\dom(\sigma)$ of $\sigma$ contains the domain of $\rho$ and $\sigma(x) = \rho(x)$ for every\/ $x$ in $\dom(\rho)$.
   By a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
-\end{definition}
+\end{defn}
 \begin{lemma}\label{lem:unify}
   For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, 
   \begin{enumerate}

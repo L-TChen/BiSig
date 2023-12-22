@@ -2,7 +2,7 @@
 
 \section{Detailed definitions}\label{sec:defs-proofs}
 
-\begin{definition}\label{def:syn-var}
+\begin{defn}\label{def:syn-var}
   The subset $\fv(\Delta)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
   For an argument list $\biargs$, the set of \emph{synthesised type variables} is defined by 
   \begin{align*}
@@ -10,7 +10,7 @@
     \synvar(\biargs, \chkbiarg[n+1]) & = \phantom{\fv(A_{n+1}) \cup {}} \synvar(\biargs) \\
     \synvar(\biargs, \synbiarg[n+1]) & = \fv(A_{n+1}) \cup           \synvar(\biargs).
   \end{align*}
-\end{definition}
+\end{defn}
 
 \begin{table}[b]
   \renewcommand{\arraystretch}{2.5}

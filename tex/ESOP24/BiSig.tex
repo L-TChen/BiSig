@@ -41,8 +41,10 @@
 \microtypesetup{babel}
 
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
+
 \newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
 \newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
+
 \newcommand{\codefigure}{\small\setlength{\parindent}{0em}\setlength{\mathindent}{0em}\setlength{\abovedisplayskip}{0ex}\setlength{\belowdisplayskip}{0ex}}
 
 \input{type-notation} %% for type theory notation copied from HoTT Book
@@ -50,10 +52,9 @@
 
 \numberwithin{table}{section}
 
-%\let\theorem\relax
-%\spnewtheorem{theorem}{Theorem}[section]{\bfseries}{}
-%\let\definition\relax
-%\spnewtheorem{definition}{Definition}[section]{\bfseries}{}
+\spnewtheorem{defn}[theorem]{Definition}{\bfseries}{\rmfamily}
+\crefformat{defn}{Definition~#2#1#3}
+
 
 \author{Liang-Ting Chen
 \orcidID{0000-0002-3250-1331}
@@ -86,7 +87,6 @@ The entire development is formalised in \Agda and can be further integrated with
 \input{S5-synthesis}
 \input{S6-example}
 \input{S8-future}
-
 
 \bibliographystyle{splncs04nat}
 \bibliography{ref}

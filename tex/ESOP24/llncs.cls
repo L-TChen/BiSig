@@ -52,6 +52,12 @@
 \RequirePackage{multicol} % needed for the list of participants, index
 \RequirePackage{aliascnt}
 
+\newcommand*{\supphantomsection}{%
+  \Hy@GlobalStepCount\Hy@linkcounter
+  \Hy@MakeCurrentHref{\@currenvir.\the\Hy@linkcounter}
+  \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}
+}
+
 \setlength{\textwidth}{12.2cm}
 \setlength{\textheight}{19.3cm}
 \renewcommand\@pnumwidth{2em}
@@ -1073,7 +1079,7 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
   \global\@namedef{end#1}{\@endtheorem}}}}
 
 \def\@spthm#1#2#3#4{\topsep 7\p@ \@plus2\p@ \@minus4\p@
-\refstepcounter{#1}%
+\refstepcounter{#1}\supphantomsection%
 \@ifnextchar[{\@spythm{#1}{#2}{#3}{#4}}{\@spxthm{#1}{#2}{#3}{#4}}}
 
 \def\@spxthm#1#2#3#4{\@spbegintheorem{#2}{\csname the#1\endcsname}{#3}{#4}%

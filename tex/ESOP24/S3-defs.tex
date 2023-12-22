@@ -57,17 +57,17 @@ A simply typed language specifies
   \item a family of sets of raw terms $\isTerm{t}$ indexed by a list~$V$ of variables (that are currently in scope) where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
   \item a family of sets of typing derivations indexed by a typing context~$\Gamma$, a raw term~$\isTerm{t}$, and a type~$A$.
 \end{inlineenum}
-Therefore, to specify a term construct, we enrich the notion of arity with some sort for typing and extension context for variable binding.
+Therefore, to specify a term construct, we enrich the notion of arity with some set of types for typing and extension context for variable binding.
 
-\begin{definition}\label{def:binding-arity}
-  A \emph{binding arity} with a sort $T$ is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
-  In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the sort of the $i$-th argument, respectively, and $A$ the target sort.
-  For brevity, a binding arity is denoted by $\bargs \to A$ where $[\Delta_i]$ is omitted if $\Delta_i$ is empty.
+\begin{definition}[{\cite[p.~322]{Fiore2010}}]\label{def:binding-arity}
+  A \emph{binding arity} with a set $T$ of types is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
+  In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the \emph{type of the $i$-th argument}, respectively, and $A$ the target type.
+  For brevity, it is denoted by $\bargs \to A$ where $[\Delta_i]$ is omitted if empty.
 \end{definition}
 
 \begin{example}
 Consider the $\Rule{Abs}$ rule (\Cref{fig:STLC-typing-derivations}).
-Its binding arity has the sort $\Type_{\Sigma_{\bto}}\{A, B\}$ and is ${[A]B} \to {(A \bto B)}$.
+Its binding arity has $\Type_{\Sigma_{\bto}}\{A, B\}$ as types and is ${[A]B} \to {(A \bto B)}$.
 This means that the $\Rule{Abs}$ rule for derivations of\/ $\Gamma |- \lam{x}t : A \bto B$ contains:
 \begin{inlineenum}
   \item a derivation of\/ $\Gamma, x : A |- t : B$ as an argument of type $B$ in a typing context extended by a variable~$x$ of type~$A$;
@@ -79,14 +79,13 @@ These arguments have types $A \bto B$ and $A$ respectively and their extension c
 \end{example}
 
 Next, akin to a signature, a binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities:
-%Also associated with every operation is the set~$\Xi$ of type variables that might be present in the operation's binding arity, and the sort of the binding arity is $\Type_{\Sigma}(\Xi)$:
 \begin{definition}\label{def:binding-signature}
   For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
   \[
     \arity(o) \colon O \to \sm{\Xi : \UU} \left(\Type_\Sigma(\Xi)^* \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
   \]
 \end{definition}
-That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variables and an arity $\arity(o)$ with the sort $\Type_{\Sigma}(\Xi)$ denoted by $\bop$.
+That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variables and an arity $\arity(o)$ with $\Type_{\Sigma}(\Xi)$ as types denoted by $\bop$.
 
 The set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays a somewhat important role:
 To use a rule like $\Rule{Abs}$ in an actual typing derivation, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
@@ -161,7 +160,7 @@ For a bidirectional type system, typing judgements appear in two forms: $\Gamma 
 Therefore, to define a bidirectional type system, we enrich the concept of binding arity to \emph{bidirectional binding arity}, which further specifies the mode for each of its arguments and for the conclusion:
 
 \begin{definition} \label{def:bidirectional-binding-signature}
-  A \emph{bidirectional binding arity} with a sort $T$ is an inhabitant of
+  A \emph{bidirectional binding arity} with a set $T$ of types is an inhabitant of
   \[
     \left(T^* \times T \times \Mode \right)^* \times T \times \Mode.
   \]
@@ -180,7 +179,7 @@ Likewise, the $\SynRule{App}$ rule has the arity ${(A \bto B)^{\syn}, A^{\chk}} 
     \mathit{ar}\colon O \to \sum_{\Xi : \UU} \left(\Type_{\Sigma}(\Xi)^* \times \Type_{\Sigma}(\Xi) \times {\Mode}\right)^* \times \Type_{\Sigma}(\Xi) \times {\Mode}.
   \]
 \end{definition}
-We write $\biop$ for an operation $o$ with a variable set $\Xi$ and its bidirectional binding arity with sort $\Type_{\Sigma}(\Xi)$.
+We write $\biop$ for an operation $o$ with a variable set $\Xi$ and its bidirectional binding arity with $\Type_{\Sigma}(\Xi)$ as types.
 We call it \emph{checking} if $d$ is ${\chk}$ or \emph{synthesising} if $d$ is ${\syn}$; similarly its $i$-th argument is checking if $d_i$ is $\chk$ and synthesising if $d_i$ is $\syn$.
 A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
 

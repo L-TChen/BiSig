@@ -311,6 +311,7 @@
 \DeclareUnicodeCharacter{2236}{:}
 \DeclareUnicodeCharacter{2261}{\ensuremath{\equiv}}
 \DeclareUnicodeCharacter{2237}{\ensuremath{\mathrel{::}}}
+\DeclareUnicodeCharacter{2283}{\ensuremath{\supset}}
 \DeclareUnicodeCharacter{2982}{\ensuremath{\bbcolon}}
 
 \DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
@@ -368,16 +369,22 @@
 
 \section{Demonstration} \label{sec:formalisation}
 As our theory is developed with \Agda constructively, the formal counterparts of our development can be used as programs directly.
-We sketch their use with our running example, simply typed $\lambda$-calculus, by specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$, showing it mode-correct, and then instantiating its type synthesiser.
+We sketch their use with our running example, the simply typed $\lambda$-calculus, by
+\begin{inlineenum}
+  \item specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$,
+  \item showing it mode-correct, and then
+  \item instantiating its type synthesiser.
+\end{inlineenum}
 
 \paragraph{Specifying a language}
 Signatures \ensuremath{\Conid{ΛₜD}} and \ensuremath{\Conid{Λ⇔D}} are defined for $\Sigma_{\bto}$ and $\Omega^{\Leftrightarrow}$: 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{10}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{72}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{71}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Keyword{data}\;\Conid{ΛₜOp}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\Varid{base}\;\Varid{imp}\;\mathbin{:}\;\Conid{ΛₜOp}{}\<[E]%
 \\[\blanklineskip]%
@@ -398,16 +405,16 @@ Signatures \ensuremath{\Conid{ΛₜD}} and \ensuremath{\Conid{Λ⇔D}} are defin
 \>[10]{}\mathrel{=}\;\Varid{λ}\;\Keyword{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\iden{\text{\textasciigrave}}\Varid{app}\;{}\<[10]%
-\>[10]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\Varid{[]}\;{}\<[29]%
-\>[29]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\mskip1.5mu]\;\Varid{ρ[}\;\Varid{[]}\;\Varid{⊢[}\;\Conid{Syn}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\Varid{↣}\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[72]%
-\>[72]{}\Varid{[]}\;\Varid{⇒}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
+\>[3]{}\iden{\text{\textasciigrave}}\Varid{app}\;{}\<[9]%
+\>[9]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\rho[\;{}\<[25]%
+\>[25]{}[]\;{\vdash}\![\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\mskip1.5mu]\;\rho[\;[]\;{\vdash}\![\;\Conid{Syn}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{1}\;\Varid{⊃}\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[71]%
+\>[71]{}[]\;\Varid{⇒}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\iden{\text{\textasciigrave}}\Varid{abs}\;{}\<[10]%
-\>[10]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\Varid{ρ[}\;\text{\textasciigrave}\;\Varid{1}\;\Varid{∷}\;\Varid{[]}\;{}\<[29]%
-\>[29]{}\Varid{⊢[}\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[72]%
-\>[72]{}\Varid{[]}\;\Varid{⇐}\;(\text{\textasciigrave}\;\Varid{1})\;\Varid{↣}\;(\text{\textasciigrave}\;\Varid{0}){}\<[E]%
+\>[3]{}\iden{\text{\textasciigrave}}\Varid{abs}\;{}\<[9]%
+\>[9]{}\Varid{→}\;\Varid{2}\;\Varid{▷}\;\rho[\;\text{\textasciigrave}\;\Varid{1}\;\Varid{∷}\;{}\<[25]%
+\>[25]{}[]\;{\vdash}\![\;\Conid{Chk}\;\mskip1.5mu]\;\text{\textasciigrave}\;\Varid{0}\;\mskip1.5mu]\;{}\<[71]%
+\>[71]{}[]\;\Varid{⇐}\;\text{\textasciigrave}\;\Varid{1}\;\Varid{⊃}\;\text{\textasciigrave}\;\Varid{0}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 where
@@ -501,7 +508,7 @@ Then, invoking the program \ensuremath{\Varid{synthesise}} with \ensuremath{\Con
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{⊢S?}\;\mathrel{=}\;\Varid{synthesise}\;\Varid{[]}\;(((\Varid{b}\;\Varid{↣}\;\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{↣}\;(\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{↣}\;\Varid{b}\;\Varid{↣}\;\Varid{b})\;\Varid{∋}\;\Conid{S}){}\<[E]%
+\>[B]{}\Varid{⊢S?}\;\mathrel{=}\;\Varid{synthesise}\;[]\;(((\Varid{b}\;\Varid{⊃}\;\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{⊃}\;(\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{⊃}\;\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{∋}\;\Conid{S}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

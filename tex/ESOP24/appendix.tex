@@ -5,6 +5,7 @@
 \begin{defn}\label{def:syn-var}
   The subset $\fv(\Delta)$ of variables in an extension context~$\Delta$ is defined by\/ $\fv(\cdot) = \emptyset$ and\/ $\fv(\Delta, A) = \fv(\Delta) \cup \fv(A)$.
   For an argument list $\biargs$, the set of \emph{synthesised type variables} is defined by 
+  \small
   \begin{align*}
     \synvar(\cdot)                   & = \emptyset  \\
     \synvar(\biargs, \chkbiarg[n+1]) & = \phantom{\fv(A_{n+1}) \cup {}} \synvar(\biargs) \\
@@ -27,7 +28,7 @@
 
  $\inferrule{\Gamma \vdash t \chk A_i}{\Gamma \vdash \mathtt{inj}_i(t) \chk A_1 + A_2}$ for $i = 1, 2$ & $\aritysymbol{\mathsf{inj}_i}{A_1, A_2}{A_i^{\chk}}{A_1 + A_2^{\chk}}$ for $i = 1, 2$ \\
 
- $\inferrule{\Gamma \vdash u \syn A + B \\\\ \Gamma, x_1 : A \vdash t_1 \chk C \and \Gamma, x_2 : B \vdash t_2 \chk C}{\Gamma \vdash \mathtt{case}(u; x_1. t_1; x_2. t_2) \chk C}$ & $\aritysymbol{\mathsf{case}}{A, B, C}{{A + B}^{\syn}, [A]C^{\chk}, [B]C^{\chk}}{C^{\syn}}$ \\
+ $\inferrule{\Gamma \vdash u \syn A + B \\\\ \Gamma, x_1 : A \vdash t_1 \chk C \\\\ \Gamma, x_2 : B \vdash t_2 \chk C}{\Gamma \vdash \mathtt{case}(u; x_1. t_1; x_2. t_2) \chk C}$ & $\aritysymbol{\mathsf{case}}{A, B, C}{{A + B}^{\syn}, [A]C^{\chk}, [B]C^{\chk}}{C^{\syn}}$ \\
 
  $\inferrule{\Gamma, x : A \vdash t \chk A}{\Gamma \vdash \mu x.\, t \chk A}$ & $\aritysymbol{\mathsf{mu}}{A}{[A]A^{\chk}}{A^{\chk}}$ \\
 

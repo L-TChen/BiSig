@@ -39,13 +39,14 @@ We also need some auxiliary definitions for the subset of variables of a type an
 
 \begin{defn}\label{def:mode-correctness-args}
   The \emph{mode-correctness} $\MCas\left(\biargvec\right)$ for an argument list $\biargs$ with respect to a subset $S$ of $\Xi$ is a predicate defined by
+  {\small
   \begin{align*}
     \MCas( \cdot ) & = \top \\
     \MCas\left(\biargvec, \chkbiarg[n]\right)
                                   & = \fv(\Delta_n, A_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land \MCas\left(\biargvec\right) \\
     \label{eq:MC2} \MCas\left(\biargvec, \synbiarg[n]\right) 
                                   & = \phantom{, A_n} \fv(\Delta_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
-  \end{align*}
+  \end{align*}}
   where $\MCas( \cdot ) = \top$ means that an empty list is always mode-correct.
 \end{defn}
 This definition encapsulates the idea that every `input' type variable, possibly derived from an extension context~$\Delta_n$ or a checking argument~$A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
@@ -71,7 +72,7 @@ Also, the set of synthesised variables alone should include every type variable 
 
 It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) for simply typed $\lambda$-calculus is mode-correct by definition or by the following lemma:
 \begin{lemma}\label{lem:decidability-mode-correctness}
-  It is decidable whether an operation $\biop$ is mode-correct.
+  For any operation $\biop$, it is decidable whether $o$ is mode-correct.
 \end{lemma}
 
 
@@ -193,10 +194,10 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
 
         \item $\dir{d}$ is $\chk$: Let $A$ be a type and apply \Cref{lem:unify} with $\rho_0$ defined nowhere.
           \begin{enumerate}
-            \item If there is no $\sigma \geq \rho_0$ such that $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then by inversion there is a substitution $\rho$ such that $A = \simsub{A_0}{\rho}$, thus a contradiction.
+            \item If there is no $\sigma \geq \rho_0$ s.t.\ $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then by inversion there is a substitution $\rho$ such that $A = \simsub{A_0}{\rho}$, thus a contradiction.
             \item If there is a minimal $\ext{\rho} \geq \rho_0$ s.t.\ $\simsub{A_0}{\ext{\rho}} = A$, then apply our claim with $\ext{\rho}$:
               \begin{enumerate}
-                \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ s.t.\ $\simsub{A_0}{\gamma} = A$ and ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ for every $i$.
+                \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ s.t.\ $\simsub{A_0}{\gamma} = A$ and, for every $i$, ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$.
                   Given that $\ext{\rho} \geq \rho$ is minimal s.t.\ $\simsub{A_0}{\ext{\rho}} = A$, then $\gamma$ is an extension of $\ext{\rho}$ but by assumption no such an extension satisfying ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ exists, thus a contradiction.
                 
                 \item If there is a minimal $\ext{\ext{\rho}} \geq \ext{\rho}$ s.t.\ \eqref{eq:claim}, then by mode-correctness $\ext{\ext{\rho}}$ is total and
@@ -226,12 +227,12 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
                     \begin{enumerate}
                       \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |/- \isTerm{t_{m+1}} \syn A$ for any $A$ but there is $\gamma \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m+1$, then $\gamma \geq \ext{\rho}$.
                         Therefore $\simsub{\Delta_{m+1}}{\ext{\rho}} = \simsub{\Delta_{m+1}}{\gamma}$ and we derive a contradiction because $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
-                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$, then by \Cref{lem:unify}: % we have two cases: %we unify $A$ with $A_{m+1}$ extending $\ext{\rho}$.
+                      \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$, then \Cref{lem:unify} gives following two cases:
                         \begin{itemize}
-                          \item Suppose no $\sigma \geq \ext{\rho}$ such that $\simsub{A_{m+1}}{\sigma} = A$ but an extension $\gamma \geq \rho$ such that \eqref{eq:claim} holds for $1 \leq i \leq m + 1$. 
+                          \item Suppose no $\sigma \geq \ext{\rho}$ s.t.\ $\simsub{A_{m+1}}{\sigma} = A$ but an extension $\gamma \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m + 1$. 
                             Then, $\gamma \geq \ext{\rho}$ by the minimality of $\ext{\rho}$ and thus
                             $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
-                            However, by \Cref{thm:unique-syn}, the synthesised type $\simsub{A_{m+1}}{\gamma}$ must be unique, so $\gamma$ is an extension of $\ext{\rho}$ such that $\simsub{A_{m+1}}{\gamma} = A$, leading to a contradiction.
+                            However, by \Cref{thm:unique-syn}, the synthesised type $\simsub{A_{m+1}}{\gamma}$ must be unique, so $\gamma$ is an extension of $\ext{\rho}$ s.t.\ $\simsub{A_{m+1}}{\gamma} = A$, i.e.\ a contradiction.
                           \item If there is a minimal $\ext{\ext{\rho}} \geq \ext{\rho}$ such that $\simsub{A_{m+1}}{\ext{\ext{\rho}}} = A$, then it is not hard to show that $\ext{\ext{\rho}}$ is also the minimal extension of $\rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m + 1$.
                         \end{itemize}
                     \end{enumerate}

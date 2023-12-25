@@ -1,4 +1,4 @@
-% LLNCS DOCUMENT CLASS -- version 2.22 (05-Sep-2022)
+% LLNCS DOCUMENT CLASS -- version 2.23 (02-Nov-2023)
 % Springer Verlag LaTeX2e support for Lecture Notes in Computer Science
 %
 %%
@@ -19,7 +19,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\ProvidesClass{llncs}[2022/09/05 v2.22
+\ProvidesClass{llncs}[2023/11/02 v2.23
 ^^J LaTeX document class for Lecture Notes in Computer Science]
 % Options
 \let\if@envcntreset\iffalse
@@ -84,7 +84,7 @@
 %
 \def\switcht@albion{%
 \def\abstractname{Abstract.}
-\def\ackname{Acknowledgement.}
+\def\ackname{Acknowledgments.}
 \def\andname{and}
 \def\lastandname{\unskip, and}
 \def\appendixname{Appendix}
@@ -94,6 +94,7 @@
 \def\contentsname{Table of Contents}
 \def\corollaryname{Corollary}
 \def\definitionname{Definition}
+\def\discintname{Disclosure of Interests.}
 \def\examplename{Example}
 \def\exercisename{Exercise}
 \def\figurename{Fig.}
@@ -135,6 +136,7 @@
  \def\contentsname{Table des mati\`eres}%
  \def\corollaryname{Corollaire}%
  \def\definitionname{D\'efinition}%
+ \def\discintname{Mention des Int\'{e}r\^{e}ts.}
  \def\examplename{Exemple}%
  \def\exercisename{Exercice}%
  \def\figurename{Fig.}%
@@ -174,6 +176,7 @@
  \def\contentsname{Inhaltsverzeichnis}%
  \def\corollaryname{Korollar}%
 %\def\definitionname{Definition}%
+ \def\discintname{Offenlegung von Interessen.}
  \def\examplename{Beispiel}%
  \def\exercisename{\"Ubung}%
  \def\figurename{Abb.}%
@@ -215,6 +218,20 @@
                \itemsep0\p@}%
    \belowdisplayskip \abovedisplayskip
 }
+
+% Switch to small font size for the credits at the end of the paper
+% (i.e. Acknowlegments and Disclosure of Interests)
+\newenvironment{credits}{%
+\begingroup\small%
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+        {-12\p@ \@plus -4\p@ \@minus -4\p@}%
+        {-0.5em \@plus -0.22em \@minus -0.1em}%
+        {\normalfont\small\bfseries\boldmath}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+        {-8\p@ \@plus -4\p@ \@minus -4\p@}%
+        {-0.5em \@plus -0.22em \@minus -0.1em}%
+        {\normalfont\small\itshape}}%
+}{\endgroup}
 
 \frenchspacing
 \widowpenalty=10000

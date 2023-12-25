@@ -5,9 +5,14 @@
 
 %include agda.fmt
 
+%format ^  = " "
+%format ^^ = "\;"
 %format ` = "\text{\textasciigrave}"
 %format `n = ` n
 %format `_ = ` _
+%format [] = "[]"
+%format ρ[ = "\rho["
+%format ⊢[ = "{\vdash}\!["
 %format ^ = "\hat{}"
 %format Γ' = "\iden{" Γ "^\prime}"
 %format r' = "\iden{" r "^\prime}"
@@ -26,7 +31,12 @@
 
 \section{Demonstration} \label{sec:formalisation}
 As our theory is developed with \Agda constructively, the formal counterparts of our development can be used as programs directly.
-We sketch their use with our running example, simply typed $\lambda$-calculus, by specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$, showing it mode-correct, and then instantiating its type synthesiser.
+We sketch their use with our running example, the simply typed $\lambda$-calculus, by
+\begin{inlineenum}
+  \item specifying the language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$,
+  \item showing it mode-correct, and then
+  \item instantiating its type synthesiser.
+\end{inlineenum}
 
 \paragraph{Specifying a language}
 Signatures |ΛₜD| and |Λ⇔D| are defined for $\Sigma_{\bto}$ and $\Omega^{\Leftrightarrow}$: 
@@ -43,8 +53,8 @@ data ΛOp : Set where `app `abs : ΛOp
 Λ⇔D : SigD
 Λ⇔D .Op  = ΛOp
 Λ⇔D .ar  = λ where
-  `app   → 2 ▷ ρ[ []        ⊢[ Chk ] ` 1 ] ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ]  [] ⇒ ` 0
-  `abs   → 2 ▷ ρ[ ` 1 ∷ []  ⊢[ Chk ] ` 0 ]                             [] ⇐ (` 1) ↣ (` 0) 
+  `app  → 2 ▷ ρ[        [] ⊢[ Chk ] ` 1 ] ρ[ [] ⊢[ Syn ] ` 1 ⊃ ` 0 ]  [] ⇒ ` 0
+  `abs  → 2 ▷ ρ[ ` 1 ∷  [] ⊢[ Chk ] ` 0 ]                             [] ⇐ ` 1 ⊃ ` 0
 \end{code}
 where
 \begin{inlineenum}
@@ -101,7 +111,7 @@ S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
 \end{code}
 Then, invoking the program |synthesise| with |S| and its required type annotation gives us a typing derivation as expected:
 \begin{code}
-⊢S? = synthesise [] (((b ↣ b ↣ b) ↣ (b ↣ b) ↣ b ↣ b) ∋ S)
+⊢S? = synthesise [] (((b ⊃ b ⊃ b) ⊃ (b ⊃ b) ⊃ b ⊃ b) ∋ S)
 \end{code}
 
 %\begin{code}

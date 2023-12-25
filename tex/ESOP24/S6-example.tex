@@ -13,7 +13,7 @@ Nonetheless, the total number of operation symbols a signature can have need not
 \bgroup
 \small
   \begin{mathpar}
-    \inferrule{\Gamma \vdash t \syn A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right) \and \Gamma \vdash u_1 \chk A_1 \and \dots \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
+    \inferrule{\Gamma \vdash t \syn A_1 \bto \left(A_2 \bto \left(\dots \bto \left(A_n \bto B\right)\ldots\right)\right) \and \Gamma \vdash u_1 \chk A_1 \and \!\!\cdots\!\! \and \Gamma \vdash u_n \chk A_n}{\Gamma \vdash t\;u_1\;\ldots\;u_n \syn B}
   \end{mathpar}
 \egroup
 as a rule schema parametrised by $n$, so the signature $\Omega_{\Lambda}^{\Leftrightarrow}$ can be extended with 

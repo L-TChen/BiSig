@@ -70,7 +70,7 @@ Also, the set of synthesised variables alone should include every type variable 
   This contrasts with the properties in \Cref{sec:pre-synthesis}, which can still be specified for individual systems in the absence of a general definition.
 \end{remark}
 
-It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) for simply typed $\lambda$-calculus is mode-correct by definition or by the following lemma:
+It is easy to check the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow}_{\Lambda}$) for the simply typed $\lambda$-calculus is mode-correct by definition or by the following lemma:
 \begin{lemma}\label{lem:decidability-mode-correctness}
   For any operation $\biop$, it is decidable whether $o$ is mode-correct.
 \end{lemma}
@@ -194,7 +194,7 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
 
         \item $\dir{d}$ is $\chk$: Let $A$ be a type and apply \Cref{lem:unify} with $\rho_0$ defined nowhere.
           \begin{enumerate}
-            \item If there is no $\sigma \geq \rho_0$ s.t.\ $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then by inversion there is a substitution $\rho$ such that $A = \simsub{A_0}{\rho}$, thus a contradiction.
+            \item If there is no $\sigma \geq \rho_0$ s.t.\ $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then inversion gives us a substitution $\rho$ s.t.\ $A = \simsub{A_0}{\rho}$---a contradiction.
             \item If there is a minimal $\ext{\rho} \geq \rho_0$ s.t.\ $\simsub{A_0}{\ext{\rho}} = A$, then apply our claim with $\ext{\rho}$:
               \begin{enumerate}
                 \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ s.t.\ $\simsub{A_0}{\gamma} = A$ and, for every $i$, ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$.

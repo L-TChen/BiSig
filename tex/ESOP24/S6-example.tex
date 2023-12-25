@@ -9,7 +9,7 @@ A spine application $t\;u_1\;\ldots\;u_n$ is a form of application that consists
 This arrangement allows direct access to the head term, making it practical in various applications, and has been used by \Agda's core language. %employs this form of application, as does its reflected syntax used for metaprogramming.
 
 At first glance, accommodating this form of application may seem impossible, given that the number of arguments for a construct is finite and has to be fixed.
-Nonetheless, the total number of operation symbols a signature can have need not be finite, allowing us to establish a corresponding construct for each number $n$ of arguments, i.e.\ viewing the following rule
+Nonetheless, the total number of operation symbols in a signature need not be finite, allowing us to establish a corresponding construct for each number $n$ of arguments, i.e.\ viewing the following rule
 \bgroup
 \small
   \begin{mathpar}
@@ -32,7 +32,7 @@ For illustrative purposes, consider a computational calculus~\cite{Moggi1989} wi
 The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases to consider in bidirectional type synthesis.
 
 On the other hand, similar to a parser generator, a type-synthesiser generator only needs a specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
-In more detail, such a specification can be derived by extending $\Sigma_{\bto}$ with additional type constructs with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
+Such a specification can be derived by extending $\Sigma_{\bto}$ with additional type constructs with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
 \[
   \arity({\mathsf{nat}}) = 0\qquad
   \arity({\mathsf{T}}) = 1\qquad

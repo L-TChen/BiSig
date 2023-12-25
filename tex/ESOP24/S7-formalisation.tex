@@ -422,7 +422,7 @@ where
   \item \ensuremath{\Conid{S.SigD}} is the type of type signatures,
   \item \ensuremath{\Conid{SigD}} is the type of bidirectional binding signatures,
   \item \ensuremath{\Varid{2}} indicates the number of type variable variables in an operation,
-  \item $`i$ the $i$-th type variable, 
+  \item \ensuremath{\text{\textasciigrave}\;\Varid{i}} is the $i$-th type variable, 
 \end{inlineenum}
 and the definitions of decidable equality for \ensuremath{\Conid{ΛₜOp}} and \ensuremath{\Conid{ΛOp}} are omitted above.
 
@@ -447,7 +447,7 @@ To prove that the specified language $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$
 where \ensuremath{\Varid{from-yes}} extracts the positive witness from an inhabitant of the \ensuremath{\Conid{Dec}} type.
 
 \paragraph{Instantiating a type synthesiser}
-Now we have the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with \ensuremath{\Varid{mcΛ⇔D}} for its mode-correctness, so we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
+Now that we have the definition \ensuremath{\Conid{Λ⇔D}} for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with \ensuremath{\Varid{mcΛ⇔D}} for its mode-correctness, we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -468,9 +468,9 @@ where the type synthesiser is defined:
 \>[3]{}\Varid{→}\;\Conid{Dec}\;(\Varid{∃[}\;\Conid{A}\;\mskip1.5mu]\;\Conid{Γ}\;\Varid{⊢}\;\Varid{r}\;\Varid{⦂}\;\Conid{A})\;\Varid{⊎}\;\Varid{¬}\;\Conid{Pre}\;\Conid{Syn}\;\Varid{r}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Every statement in our development so far has been formally proved constructively, so the proof \ensuremath{\Varid{synthesise}}r can actually compute as a program!
 
 \paragraph{Running a type synthesiser}
+Every statement in our development so far has been formally proved without any postulates, so the proof \ensuremath{\Varid{synthesise}}r can actually compute as a program!
 The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ are defined in the module \ensuremath{\Conid{Syntax.Typed.Raw.Term}} with the mode-erased signature \ensuremath{\Varid{erase}\;\Conid{Λ⇔D}}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -504,13 +504,14 @@ Hence, we use pattern synonyms and define raw terms in a form close to the infor
 \>[B]{}\Conid{S}\;\mathrel{=}\;\Varid{ƛ}\;\Varid{ƛ}\;\Varid{ƛ}\;\text{\textasciigrave}\;\Varid{suc}\;(\Varid{suc}\;\Varid{zero})\;\Varid{·}\;\text{\textasciigrave}\;\Varid{zero}\;\Varid{·}\;(\text{\textasciigrave}\;\Varid{suc}\;\Varid{zero}\;\Varid{·}\;\text{\textasciigrave}\;\Varid{zero}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Then, invoking the program \ensuremath{\Varid{synthesise}} with \ensuremath{\Conid{S}} and its required type annotation gives us a typing derivation as expected:
+Then, invoking the program \ensuremath{\Varid{synthesise}} with \ensuremath{\Conid{S}} and its required type annotation
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{⊢S?}\;\mathrel{=}\;\Varid{synthesise}\;[]\;(((\Varid{b}\;\Varid{⊃}\;\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{⊃}\;(\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{⊃}\;\Varid{b}\;\Varid{⊃}\;\Varid{b})\;\Varid{∋}\;\Conid{S}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+gives us a typing derivation as expected.
 
 %\begin{code}
 %inl

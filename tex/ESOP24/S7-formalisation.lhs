@@ -61,7 +61,7 @@ where
   \item |S.SigD| is the type of type signatures,
   \item |SigD| is the type of bidirectional binding signatures,
   \item |2| indicates the number of type variable variables in an operation,
-  \item $`i$ the $i$-th type variable, 
+  \item |` i| is the $i$-th type variable, 
 \end{inlineenum}
 and the definitions of decidable equality for |ΛₜOp| and |ΛOp| are omitted above.
 
@@ -78,7 +78,7 @@ mcΛ⇔D `abs   = from-yes (ModeCorrectᶜ? (Λ⇔D .ar `abs))
 where |from-yes| extracts the positive witness from an inhabitant of the |Dec| type.
 
 \paragraph{Instantiating a type synthesiser}
-Now we have the definition |Λ⇔D| for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with |mcΛ⇔D| for its mode-correctness, so we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
+Now that we have the definition |Λ⇔D| for the bidirectional type system $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ with |mcΛ⇔D| for its mode-correctness, we can instantiate its type synthesiser (\cref{cor:trichotomy}) just by importing the module
 \begin{code}
 open import Theory.Trichotomy Λ⇔D mcΛ⇔D
 \end{code}
@@ -88,9 +88,9 @@ synthesise
   : (Γ : Cxt) (r : Raw (length Γ))
   → Dec (∃[ A ] Γ ⊢ r ⦂ A) ⊎ ¬ Pre Syn r
 \end{code}
-Every statement in our development so far has been formally proved constructively, so the proof |synthesise|r can actually compute as a program!
 
 \paragraph{Running a type synthesiser}
+Every statement in our development so far has been formally proved without any postulates, so the proof |synthesise|r can actually compute as a program!
 The type of raw terms for $(\Sigma_{\bto}, \Omega^{\Leftrightarrow})$ are defined in the module |Syntax.Typed.Raw.Term| with the mode-erased signature |erase Λ⇔D|:
 \begin{code}
 open import Theory.Erasure
@@ -109,10 +109,11 @@ pattern ƛ_    r   = op (`abs , r , _)
 S : Raw n
 S = ƛ ƛ ƛ ` suc (suc zero) · ` zero · (` suc zero · ` zero)
 \end{code}
-Then, invoking the program |synthesise| with |S| and its required type annotation gives us a typing derivation as expected:
+Then, invoking the program |synthesise| with |S| and its required type annotation
 \begin{code}
 ⊢S? = synthesise [] (((b ⊃ b ⊃ b) ⊃ (b ⊃ b) ⊃ b ⊃ b) ∋ S)
 \end{code}
+gives us a typing derivation as expected.
 
 %\begin{code}
 %inl

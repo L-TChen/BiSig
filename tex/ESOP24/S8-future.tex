@@ -63,12 +63,23 @@ Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo
 They propose a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.), a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of generic bidirectional type synthesis which is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the set of computational rules is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
 However, the last assumption is challenging to establish even for specific languages and lacks a general understanding.
 
-\subsubsection{Beyond syntax-directed systems}
+\subsubsection{Beyond syntax-directedness}
 
-For non-syntax-directed systems, since there can be multiple moding or typing rules for a language construct, both the mode decorator and the bidirectional type synthesiser will need to backtrack, and the decorator may need to produce all possible mode derivations so as not to limit the synthesiser's choices.
-For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and typing derivations, although bidirectional typing rules and pairs of a moding rule and a typing rule may no longer be in perfect correspondence.
-Completeness may need to be reformulated to take all possible mode derivations as input to guarantee that at least one can be paired with the input typing derivation.
+%For non-syntax-directed systems, since there can be multiple moding or typing rules for a language construct, both the mode decorator and the bidirectional type synthesiser will need to backtrack, and the decorator may need to produce all possible mode derivations so as not to limit the synthesiser's choices.
+%For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and typing derivations, although bidirectional typing rules and pairs of a moding rule and a typing rule may no longer be in perfect correspondence.
+%Completeness may need to be reformulated to take all possible mode derivations as input to guarantee that at least one can be paired with the input typing derivation.
 
+To explore general settings, a possibility is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
+
+However, a practical setting suitable for a next step is probably this: for each raw term construct, there can be several ordinary typing rules, and each typing rule can be refined to several bidirectional typing rules with different mode assignments and different orders of premises.
+For this setting, both the mode decorator and the bidirectional type synthesiser will have to backtrack.
+For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and type information, but the completeness direction will pose a problem---for every node of a raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.
+It should be possible to fix this problem while retaining the mode decoration phase.
+For example, one idea is to make the mode decorator produce all possible mode derivations, and refine completeness to say that any typing derivation can be combined with one of mode derivations into a bidirectional typing derivation.
+
+We could instead focus on simpler cases first where each construct has exactly one typing rule, but each typing rule can be refined to more than one bidirectional typing rule.
+In such cases, the mode decorator would need to find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation as input.
+Completeness could still take the simple form presented in this paper too.
 
 \subsubsection{Towards a richer formal theory}
 

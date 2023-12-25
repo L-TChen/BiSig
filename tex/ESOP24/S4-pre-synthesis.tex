@@ -3,20 +3,19 @@
 \section{Mode decoration and related properties}\label{sec:pre-synthesis}
 
 Our first important construction is mode decoration in \cref{sec:mode-decoration}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
-We also discuss some related properties: by bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
-We also formulate annotatability~\cite{Dunfield2021} and discuss its relationship with our completeness and generalised mode decoration in \cref{sec:annotatability}.
+We discuss some related properties: by bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
+We formulate annotatability~\cite{Dunfield2021} and discuss its relationship with our completeness and generalised mode decoration in \cref{sec:annotatability}.
 
 \subsection{Soundness and completeness}
 \label{sec:soundness-and-completeness}
 
 %\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma |-_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
-Erasure of a bidirectional binding signature removes mode information and keeps everything else intact; this can be straightforwardly extended by induction to remove mode information from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
-We can also remove typing and retain mode information, arriving at a mode derivation instead.
-Conversely, if we have both mode and typing derivations for the same term, we can combine them and obtain a bidirectional typing derivation, which is completeness.
-In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, which is directed by the same raw term.
-%Formulating the notion of mode derivation helps to complete this clean picture.
-Technically, all these can be summarised in one theorem (proved by routine induction).
+Erasure of a bidirectional binding signature removes modes and keeps everything else intact; this can be straightforwardly extended by induction to remove modes from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
+Instead we can remove typing and retain modes, arriving at a mode derivation.
+Conversely, if we have both mode and typing derivations for the same term, we can combine them to obtain a bidirectional typing derivation, which is completeness.
+In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, directed by the same raw term.
+All these can be summarised in one theorem (proved by induction).
 
 \begin{theorem}\label{lem:soundness-completeness}
 $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
@@ -35,9 +34,9 @@ $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |
 \subsection{Generalised mode decoration}
 \label{sec:mode-decoration}
 
-The major goal of this section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
-In fact we will do better: if a mode decorator returns a proof that no mode derivation exists, that proof (of a negation) does not provide useful information for the user.
-It will be more helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
+The goal of this section is to construct a mode decorator, which decides for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir d$ whether $V |-_{\Sigma,\Omega} t^\dir{d}$ or not.
+In fact we shall do better: if a mode decorator returns a proof that no mode derivation exists, that negation proof does not give useful information for the user.
+It will be helpful if a decorator can produce an explanation of why no mode derivation exists, and even how to fix the input term to have a mode derivation.
 We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalised-mode-decoration}), which can be weakened to an ordinary mode decorator~(\cref{thm:mode-decoration}) if the additional explanation is not needed.%
 \footnote{For the sake of simplicity, we use ordinary mode decoration elsewhere in this paper.}
 
@@ -70,8 +69,8 @@ We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalise
 Intuitively, a term does not have a mode derivation exactly when there are not enough type annotations, but such negative formulations convey little information.
 Instead, we can provide more information by pointing out the places in the term that require annotations.
 For a bidirectional type system, an annotation is required wherever a term is `strictly' (which we will define shortly) in checking mode but required to be in synthesising mode, in which case there is no rule for switching from checking to synthesising, and thus there is no way to construct a mode derivation.
-We can, however, consider \emph{generalised mode derivations} defined in \cref{fig:generalised-mode-derivations} that allow the use of an additional $\SynRule{Missing}$ rule for such switching, so that a derivation can always be constructed.
-Given a generalised mode derivation, if it uses $\SynRule{Missing}$ in some places, then those places are exactly where annotations should be supplied, which is helpful information to the user; if it does not use $\SynRule{Missing}$, then the derivation is \emph{genuine} in the sense that it corresponds directly to an original mode derivation.
+We can, however, consider \emph{generalised mode derivations} (\cref{fig:generalised-mode-derivations}) that allow the use of an additional $\SynRule{Missing}$ rule for such switching, so that a derivation can always be constructed.
+Given a generalised mode derivation, if it uses $\SynRule{Missing}$ in some places, then those places are exactly where annotations should be supplied; if it does not use $\SynRule{Missing}$, then the derivation is \emph{genuine} in the sense that it corresponds directly to an original mode derivation.
 This can be succinctly formulated as \cref{thm:Pre?-true} below by encoding genuineness as a boolean~$g$ in the generalised mode judgement, which is set to~$\BFalse$ only by the $\SynRule{Missing}$ rule.
 (Ignore the boolean~$s$ for now.)
 
@@ -149,7 +148,7 @@ then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^
 %\end{itemize}
 %\end{proof}
 
-Finally, having constructed a generalised mode decorator, it is easy to derive an ordinary one.
+With a generalised mode decorator, it is now easy to derive an ordinary one.
 
 \begin{corollary}[Mode decoration]\label{thm:mode-decoration}
   It is decidable whether $V |-_{\Sigma,\Omega} \isTerm{t}^\dir{d}$.%for any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$
@@ -180,22 +179,17 @@ Finally, having constructed a generalised mode decorator, it is easy to derive a
 %Symmetrically, if $V |/-_{\Sigma,\Omega} t^\dir{d}$, then $g$~has to be~$\BFalse$ so as not to contradict \cref{thm:Pre?-true}.
 %\end{proof}
 
-\subsection{Annotatability}
-\label{sec:annotatability}
-
-
+\subsection{Annotatability}\label{sec:annotatability}
 \citet[Section~3.2]{Dunfield2021} formulated completeness differently from our \cref{lem:soundness-completeness} and proposed \emph{annotatability} as a more suitable name.
 In our theory, we may formulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
 If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
 \end{proposition}
-\LT{the paper is perhaps too modest: (...) I don't think DK annotatability says anything about evidence---a synthesiser that answered "no" could still enjoy annotatability (even if we would not enjoy that answer).}
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
 In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation produced by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.
 The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$, adding to the term a type annotation that comes from the given typing derivation.
-
 \begin{figure}
   \centering\small
   \judgbox{\isTerm{t} \sqsupseteq \isTerm{u}}{A raw term $t$ is more annotated than $u$}

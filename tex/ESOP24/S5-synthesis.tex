@@ -46,7 +46,7 @@ We also need some auxiliary definitions for the subset of variables of a type an
     \label{eq:MC2} \MCas\left(\biargvec, \synbiarg[n]\right) 
                                   & = \phantom{, A_n} \fv(\Delta_n) \subseteq \left( S \cup \synvar\left(\biargvec\right)\right) \land  \MCas\left(\biargvec\right)
   \end{align*}
-  where $\top$ means an empty list is always mode-correct.
+  where $\MCas( \cdot ) = \top$ means that an empty list is always mode-correct.
 \end{defn}
 This definition encapsulates the idea that every `input' type variable, possibly derived from an extension context~$\Delta_n$ or a checking argument~$A_n$, must be an `output' variable from $\synvar(\biargvec)$ or, if the rule is checking, belong to the set $S$ of `input' variables in its conclusion.
 This condition must also be met for every tail of the argument list to ensure that `output' variables accessible at each argument are from preceding arguments only, hence an inductive definition.
@@ -178,7 +178,7 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
       \begin{itemize}
         \item $\dir{d}$ is $\syn$: We apply our claim with the partial substitution $\rho_0$ defined nowhere.
           \begin{enumerate}
-            \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds but $\Gamma |- \tmOpts \syn A$ for some $A$, then by inversion we have a substitution $\rho\colon \Sub{\Xi}{\emptyset}$ such that
+            \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds but $\Gamma |- \tmOpts \syn A$ for some $A$, then by inversion we have $\rho\colon \Sub{\Xi}{\emptyset}$ such that
               \[
                 \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\rho} |- \isTerm{t_i} \colon \simsub{A_i}{\rho}^{\dir{d_i}}
               \]
@@ -194,10 +194,10 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
         \item $\dir{d}$ is $\chk$: Let $A$ be a type and apply \Cref{lem:unify} with $\rho_0$ defined nowhere.
           \begin{enumerate}
             \item If there is no $\sigma \geq \rho_0$ such that $\simsub{A_0}{\sigma} = A$ but $\Gamma |- \tmOpts \chk A$, then by inversion there is a substitution $\rho$ such that $A = \simsub{A_0}{\rho}$, thus a contradiction.
-            \item If there is a minimal $\ext{\rho} \geq \rho_0$ such that $\simsub{A_0}{\ext{\rho}} = A$, then apply our claim with $\ext{\rho}$:
+            \item If there is a minimal $\ext{\rho} \geq \rho_0$ s.t.\ $\simsub{A_0}{\ext{\rho}} = A$, then apply our claim with $\ext{\rho}$:
               \begin{enumerate}
-                \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ such that $\simsub{A_0}{\gamma} = A$ and also ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ for every $i$.
-                  Given that $\ext{\rho} \geq \rho$ is minimal such that $\simsub{A_0}{\ext{\rho}} = A$, then $\gamma$ is an extension of $\ext{\rho}$ but by assumption no such an extension satisfying ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ exists, thus a contradiction.
+                \item If there is no $\sigma \geq \ext{\rho}$ satisfying \eqref{eq:claim} but $\Gamma |- \tmOpts \chk A$, then by inversion there is $\gamma$ s.t.\ $\simsub{A_0}{\gamma} = A$ and ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ for every $i$.
+                  Given that $\ext{\rho} \geq \rho$ is minimal s.t.\ $\simsub{A_0}{\ext{\rho}} = A$, then $\gamma$ is an extension of $\ext{\rho}$ but by assumption no such an extension satisfying ${\Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\gamma} |- \isTerm{t_i} \colon \simsub{A_i}{\gamma}^{\dir{d_i}}}$ exists, thus a contradiction.
                 
                 \item If there is a minimal $\ext{\ext{\rho}} \geq \ext{\rho}$ s.t.\ \eqref{eq:claim}, then by mode-correctness $\ext{\ext{\rho}}$ is total and
                   \[
@@ -213,16 +213,16 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
           \item For the empty list, $\rho$ is the minimal extension of $\rho$ itself satisfying \eqref{eq:claim} trivially. 
           \item For $\biargvec, \biarg[m+1]$, by induction hypothesis on the list, we have two cases:
             \begin{enumerate}
-              \item If there is no $\sigma \geq \rho$ such that \eqref{eq:claim} holds for all $1 \leq i \leq m$ but a minimal $\gamma \geq \rho$ such that~\eqref{eq:claim} holds for all $1 \leq i \leq m + 1$, then we clearly have a contradiction.
+              \item If there is no $\sigma \geq \rho$ s.t.\ \eqref{eq:claim} holds for all $1 \leq i \leq m$ but a minimal $\gamma \geq \rho$ such that~\eqref{eq:claim} holds for all $1 \leq i \leq m + 1$, then we have a contradiction.
               \item There is a minimal $\ext{\rho} \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m$.
                 By case analysis on $\dir{d_{m+1}}$:
                 \begin{itemize}
                   \item $\dir{d_{m+1}}$ is $\chk$: By mode-correctness, $\simsub{\Delta_{m+1}}{\ext{\rho}}$ and $\simsub{A_{m+1}}{\ext{\rho}}$ are defined.
-                    By the induction hypothesis $ \Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}$ is decidable.
-                    Clearly, if $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}$ then the desired statement is proved; otherwise we can also easily derive a contradiction.
+                    By the ind.\ hyp.\ $ \Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}$ is decidable.
+                    Clearly, if $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \chk \simsub{A_{m+1}}{\ext{\rho}}$ then the desired statement is proved; otherwise we easily derive a contradiction.
 
                   \item $\dir{d_{m+1}}$ is $\syn$: By mode-correctness, $\simsub{\Delta_{m+1}}{\ext{\rho}}$ is defined.
-                    By the induction hypothesis, it is decidable that $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$.
+                    By the ind.\ hyp., `$\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn A$ for some $A$' is decidable:
                     \begin{enumerate}
                       \item If $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |/- \isTerm{t_{m+1}} \syn A$ for any $A$ but there is $\gamma \geq \rho$ s.t.\ \eqref{eq:claim} holds for $1 \leq i \leq m+1$, then $\gamma \geq \ext{\rho}$.
                         Therefore $\simsub{\Delta_{m+1}}{\ext{\rho}} = \simsub{\Delta_{m+1}}{\gamma}$ and we derive a contradiction because $\Gamma, \vars{x}_\isTerm{m+1} : \simsub{\Delta_{m+1}}{\ext{\rho}} |- \isTerm{t_{m+1}} \syn \simsub{A_{m+1}}{\gamma}$.
@@ -246,12 +246,11 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
 \end{proof}
 
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.
-These programs either compute the typing derivation or provide a proof of contradiction.
-Each case analysis simply branches depending on the outcomes of bidirectional type synthesis and checking for each sub-term, as well as the unification process.
-If a negation proof is not of interest, these programs can be simplified by discarding the cases that yield such negation proofs.
-Alternatively, we could consider generalising typing derivations instead, like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}).
-This could accommodate ill-typed cases and reformulate contradiction proofs positively to deliver more informative error messages.
-This would assist programmers in resolving issues with ill-typed terms, rather than simply returning a blatant `no'.
+These programs provide either the typing derivation or its negation proof.
+Each case analysis branches depending on the outcomes of bidirectional type synthesis and checking for each sub-term, as well as the unification process.
+If a negation proof is not of interest in practice, these programs can be simplified by discarding the cases that yield negation proofs.
+Alternatively, we could consider generalising typing derivations instead, like our generalised mode derivations (\Cref{fig:generalised-mode-derivations}), to reformulate negation proofs positively to deliver more informative error messages.
+This would assist programmers in resolving issues with ill-typed terms, rather than returning a blatant `no'.
 
 \subsection{Trichotomy on raw terms by type synthesis} \label{subsec:trichotomy}
 

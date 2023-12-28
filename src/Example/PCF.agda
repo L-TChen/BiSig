@@ -1,7 +1,6 @@
 module Example.PCF where
 
 open import Prelude
-  hiding (_↣_)
 
 variable
   n : ℕ
@@ -44,10 +43,10 @@ variable
   A B C : Λₜ  0
   Γ Δ   : Cxt 0
 
-infixr 8 _↣_
+infixr 8 _⊃_
 
 pattern nat′    = op (nat , [])
-pattern _↣_ A B = op (imp , A ∷ B ∷ [])
+pattern _⊃_ A B = op (imp , A ∷ B ∷ [])
 pattern _×̇_ A B = op (times , A ∷ B ∷ [])
 
 open import Syntax.BiTyped.Signature ΛₜD
@@ -167,12 +166,12 @@ PCF⟺D = record
   { Op    = ΛOp
   ; decOp = decΛOp
   ; ar    = λ { `app   → 2 ▷ ρ[ [] ⊢[ Chk ] ` 1 ]
-                           ρ[ [] ⊢[ Syn ] ` 1 ↣ ` 0 ] [] ⇒ ` 0
+                           ρ[ [] ⊢[ Syn ] ` 1 ⊃ ` 0 ] [] ⇒ ` 0
                     -- Γ ⊢ t : A → B    Γ ⊢ u : A
                     -------------------------------
                     -- Γ ⊢ t u ⇒ B
 
-              ; `abs   → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0) 
+              ; `abs   → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ⊃ (` 0) 
                     -- Γ , x : A ⊢ t ⇐ B
                     ------------------------
                     -- Γ ⊢ λ x . t ⇐ A → B
@@ -223,17 +222,17 @@ open import Syntax.BiTyped.Term PCF⟺D
 
 infixl 8 _·ᴮ_
 
-_·ᴮ_ : Γ ⊢ r ⇒ (A ↣ B)  →  Γ ⊢ s ⇐ A  →  Γ ⊢ (r · s) ⇒ B
+_·ᴮ_ : Γ ⊢ r ⇒ (A ⊃ B)  →  Γ ⊢ s ⇐ A  →  Γ ⊢ (r · s) ⇒ B
 t ·ᴮ u = op (refl , lookup (_ ∷ _ ∷ []) , refl , u , t , _)
 
-ƛᴮ_ : (A ∷ Γ) ⊢ r ⇐ B  →  Γ ⊢ (ƛ r) ⇐ (A ↣ B)
+ƛᴮ_ : (A ∷ Γ) ⊢ r ⇐ B  →  Γ ⊢ (ƛ r) ⇐ (A ⊃ B)
 ƛᴮ t = op (refl , lookup (_ ∷ _ ∷ []) , refl , t , _)
 
-⊢S : Γ ⊢ S ⇐ (A ↣ B ↣ C) ↣ (A ↣ B) ↣ A ↣ C
+⊢S : Γ ⊢ S ⇐ (A ⊃ B ⊃ C) ⊃ (A ⊃ B) ⊃ A ⊃ C
 ⊢S = ƛᴮ ƛᴮ ƛᴮ ((var (there (there (here refl))) refl ·ᴮ ((var (here refl) refl) ↑ refl) ·ᴮ
               ((var        (there (here refl))  refl ·ᴮ ((var (here refl) refl) ↑ refl)) ↑ refl)) ↑ refl)
 
 open import Theory.Trichotomy PCF⟺D mcPCF⟺D
 
 ⊢S? : _  -- Normalise me!
-⊢S? = synthesise [] (((nat′ ↣ nat′ ↣ nat′) ↣ (nat′ ↣ nat′) ↣ nat′ ↣ nat′) ∋ S)
+⊢S? = synthesise [] (((nat′ ⊃ nat′ ⊃ nat′) ⊃ (nat′ ⊃ nat′) ⊃ nat′ ⊃ nat′) ∋ S)

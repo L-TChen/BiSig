@@ -13,7 +13,7 @@ variable
 data TExp (m : ℕ) : Set where
   `_   : Fin m           → TExp m
   base :                   TExp m
-  imp  : TExp m → TExp m → TExp m
+  _⊃_  : TExp m → TExp m → TExp m
 
 -- Metavariables used only in typing rules and not elsewhere
 Ty : Set
@@ -54,14 +54,14 @@ data _⊢_⦂_ : (Γ : List Ty) → Raw (length Γ) → Ty → Set where
       → ---------------
         Γ ⊢ (A ∋ r) ⦂ A
 
-  app : Γ ⊢ r ⦂ imp A B
+  app : Γ ⊢ r ⦂ A ⊃ B
       → Γ ⊢ s ⦂ A
       → ---------------
         Γ ⊢ app r s ⦂ B
 
   abs : A ∷ Γ ⊢ r ⦂ B
       → -------------------
-        Γ ⊢ abs r ⦂ imp A B
+        Γ ⊢ abs r ⦂ A ⊃ B
 
 -- Decide whether there is a typing derivation for a given raw term
 -- if the raw term satisfies some constraint, e.g., having enough type annotations
@@ -151,14 +151,14 @@ mutual
         → ---------
           Γ ⊢ r ⇐ A
 
-    app : Γ ⊢ r ⇒ imp A B
+    app : Γ ⊢ r ⇒ A ⊃ B
         → Γ ⊢ s ⇐ A
         → ---------------
           Γ ⊢ app r s ⇒ B
 
     abs : A ∷ Γ ⊢ r ⇐ B
         → -------------------
-          Γ ⊢ abs r ⇐ imp A B
+          Γ ⊢ abs r ⇐ A ⊃ B
 
 TypeSynthesis⇔ : Set
 TypeSynthesis⇔ = (Γ : List Ty) {r : Raw (length Γ)}
@@ -166,18 +166,18 @@ TypeSynthesis⇔ = (Γ : List Ty) {r : Raw (length Γ)}
 
 module TypeSynthesis⇔ where
 
-  base≢imp : base ≢ imp A B
+  base≢imp : base ≢ A ⊃ B
   base≢imp ()
 
-  imp≡⁻ : {A A′ B B′ : Ty} → imp A B ≡ imp A′ B′ → A ≡ A′ × B ≡ B′
+  imp≡⁻ : {A A′ B B′ : Ty} → A ⊃ B ≡ A′ ⊃ B′ → A ≡ A′ × B ≡ B′
   imp≡⁻ refl = refl , refl
 
   _≟Ty_ : (A B : Ty) → Dec (A ≡ B)
   base    ≟Ty base    = yes refl
-  base    ≟Ty imp A B = no λ ()
-  imp A B ≟Ty base    = no λ ()
-  imp A B ≟Ty imp C D with A ≟Ty C | B ≟Ty D
-  ... | yes A=C | yes B=D = yes (cong₂ imp A=C B=D)
+  base    ≟Ty (A ⊃ B) = no λ ()
+  (A ⊃ B) ≟Ty base    = no λ ()
+  (A ⊃ B) ≟Ty (C ⊃ D) with A ≟Ty C | B ≟Ty D
+  ... | yes A=C | yes B=D = yes (cong₂ _⊃_ A=C B=D)
   ... | no  A≠C | _       = no λ where refl → A≠C refl
   ... | _       | no B≠D  = no λ where refl → B≠D refl
 
@@ -194,7 +194,7 @@ module TypeSynthesis⇔ where
 
   ¬arg : {Γ : List Ty} {A B : Ty} {t u : Raw (length Γ)}
     → Pre Syn t → Pre Chk u
-    → Γ ⊢ t ⇒ imp A B
+    → Γ ⊢ t ⇒ A ⊃ B
     → ¬ (Γ ⊢ u ⇐ A)
     --------------------------
     → ¬ (∃[ B′ ] Γ ⊢ app t u ⇒ B′)
@@ -213,7 +213,7 @@ module TypeSynthesis⇔ where
     synthesise Γ (app t u) with synthesise Γ t
     ... | no ¬∃              = no λ where (_ , app ⊢t ⊢u) → ¬∃ (_ , ⊢t)
     ... | yes (base    , ⊢t) = no λ where (A , app ⊢t′ ⊢u) → base≢imp (uniq-⇒ t ⊢t ⊢t′)
-    ... | yes (imp A B , ⊢t) with check Γ A u
+    ... | yes (A ⊃ B , ⊢t) with check Γ A u
     ... | no ¬⊢u = no (¬arg t u ⊢t ¬⊢u)
     ... | yes ⊢u = yes (B , app ⊢t ⊢u)
 
@@ -225,7 +225,7 @@ module TypeSynthesis⇔ where
     ... | no  A≠B = no λ where (⊢u ↑ refl) → A≠B (uniq-⇒ t ⊢u ⊢t)
     ... | yes A=B = yes (⊢t ↑ A=B)
     check Γ base      (abs t) = no λ where (() ↑ _)
-    check Γ (imp A B) (abs t) with check (A ∷ Γ) B t
+    check Γ (A ⊃ B) (abs t) with check (A ∷ Γ) B t
     ... | no ¬⊢t = no λ where
       (abs ⊢t) → ¬⊢t ⊢t
     ... | yes ⊢t = yes (abs ⊢t)

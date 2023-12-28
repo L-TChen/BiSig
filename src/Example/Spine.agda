@@ -1,7 +1,6 @@
 module Example.Spine where
 
 open import Prelude
-  hiding (_↣_)
 
 variable
   m n : ℕ
@@ -33,10 +32,10 @@ variable
   A B C : Λₜ  0
   Γ Δ   : Cxt 0
 
-infixr 8 _↣_
+infixr 8 _⊃_
 
 pattern b       = op (base , [])
-pattern _↣_ A B = op (imp , A ∷ B ∷ [])
+pattern _⊃_ A B = op (imp , A ∷ B ∷ [])
 
 open import Syntax.BiTyped.Signature ΛₜD
 
@@ -46,7 +45,7 @@ data SpineOp : Set where
 
 Π : Vec (Λₜ m) n → Λₜ m → Λₜ m
 Π []       B = B
-Π (A ∷ As) B = A ↣ Π As B
+Π (A ∷ As) B = A ⊃ Π As B
 
 decSpineOp : DecEq SpineOp
 decSpineOp = record { _≟_ = dec }
@@ -70,7 +69,7 @@ SpineD : SigD
 SpineD = record
   { Op    = SpineOp
   ; decOp = decSpineOp
-  ; ar    = λ { `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ↣ (` 0)
+  ; ar    = λ { `abs → 2 ▷ ρ[ (` 1 ∷ []) ⊢[ Chk ] ` 0 ] [] ⇐ (` 1) ⊃ (` 0)
                     -- Γ , x : A ⊢ t ⇐ B
                     ------------------------
                     -- Γ ⊢ λ x . t ⇐ A → B

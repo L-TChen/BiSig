@@ -1,8 +1,0 @@
-**/_build
-**/.git*
-docs
-tex
-.gitmodules
-.gitignore
-Dockerfile
-.dockerignore

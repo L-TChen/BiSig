@@ -37,7 +37,7 @@ To type-check the formal implementation, you need
 Should you have no `Agda` installed or fail to check `README.agda` with an earlier version Agda, you may
 
 - Install [`Agda 2.6.4.1`](https://agda.readthedocs.io/en/v2.6.4.1/getting-started/installation.html), or
-- Use [containerised](https://hub.docker.com/layers/ltchentw/agda/2.6.4.1/images/sha256-fca8293a51b23831a1d7231456bcefdd13c0ef63b68bdc16295f46b7132407c6?context=explore) `Agda 2.6.4.1` based on [Docker](https://www.docker.com).
+- Use [containerised](https://hub.docker.com/r/ltchentw/agda/) `Agda 2.6.4.1` based on [Docker](https://www.docker.com).
 
 ## Instructions
 

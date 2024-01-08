@@ -53,7 +53,7 @@ We will construct such a \emph{generalised mode decorator}~(\cref{thm:generalise
   \begin{mathpar}
     \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn\,\BTrue\,\BTrue}}\,\SynRule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,s}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn\,g\,\BTrue}}\,\SynRule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,s}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotatecolon A})^{\syn\,g\,\BTrue}}\,\SynRule{Anno}
     \and
     \inferrule{V |-_{\Sigma, \Omega}\isTerm{t}^{\chk\,g\,\BTrue}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn\,\BFalse\,\BFalse}}\,\SynRule{Missing}
     \and
@@ -195,12 +195,12 @@ The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$
   \judgbox{\isTerm{t} \sqsupseteq \isTerm{u}}{A raw term $t$ is more annotated than $u$}
   \begin{mathpar}
     \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}
-              {(\isTerm{t} \annotate A) \sqsupseteq \isTerm{u}}\;\Rule{More}
+              {(\isTerm{t} \annotatecolon A) \sqsupseteq \isTerm{u}}\;\Rule{More}
     \and
     \inferrule{\vphantom{x : \Identifier}}{\isTerm{x} \sqsupseteq \isTerm{x}}\;\Rule{Var}
     \and
     \inferrule{\isTerm{t} \sqsupseteq \isTerm{u}}
-      {(\isTerm{t} \annotate A) \sqsupseteq (\isTerm{u} \annotate A)}\;\Rule{Anno}
+      {(\isTerm{t} \annotatecolon A) \sqsupseteq (\isTerm{u} \annotatecolon A)}\;\Rule{Anno}
     \and
     \inferrule{\isTerm{t_1} \sqsupseteq \isTerm{u_1} \quad \cdots \quad \isTerm{t_n} \sqsupseteq{u_n}}
       {\tmOpts \sqsupseteq \tmOpus}\;\Rule{Op}

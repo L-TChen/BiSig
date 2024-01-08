@@ -11,13 +11,13 @@ In their survey paper, \varcitet{Dunfield2021}{ summarised} the design principle
 While type inference is not decidable in general, for certain kinds of terms it is still possible to infer their types.
 For example, the type of a variable can be looked up in the context.
 Bidirectional type synthesis combines type \emph{inference} on this subset of terms with type \emph{checking} (based on a given type) on the rest.
-More formally, every judgement in a bidirectional type system is extended with a \emph{mode:}
+Formally, every judgement in a bidirectional type system is extended with a \emph{mode:}
 \begin{inlineenum}
   \item $\Gamma |- \isTerm{t} \syn A$ for \emph{synthesis} and 
   \item $\Gamma |- \isTerm{t} \chk A$ for \emph{checking}.
 \end{inlineenum}
 The former indicates that the type~$A$ is an output, using both the context~$\Gamma$ and the term~$t$ as input, while for the latter, all three of $\Gamma$, $t$, and~$A$ are given as input.
-The algorithm of a bidirectional type synthesiser can usually be `read off' from a well-designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
+The algorithm of a bidirectional type synthesiser can be `read off' from a well-designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
 %if a condition called \emph{mode-correctness} is satisfied.
 %every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking.
 %As \citet{Pierce2000} noted, bidirectional type synthesis propagates type information locally within adjacent nodes of a term, and does not require unification as Damas--Milner type inference does.
@@ -50,7 +50,7 @@ By contrast, the proof-relevant approach exploits the simultaneously computation
 %(although they do not emphasise the difference of their approach from the traditional one)
 
 Recall that the law of excluded middle $P + \neg P$ does not hold as an axiom for every~$P$ constructively, and we say that $P$~is logically \emph{decidable} if the law holds for~$P$.
-Since Martin-L\"of type theory is simultaneously logical and computational, a decidability proof is a proof-relevant decision procedure that computes not only a yes-or-no answer but also a proof of~$P$ or its refutation, so logical decidability is algorithmic decidability.
+Since Martin-L\"of type theory is logical and computational, a decidability proof is a proof-relevant decision procedure that computes a yes-or-no answer with a proof of~$P$ or its refutation, so logical decidability is algorithmic decidability.
 %For example, a proof of \emph{decidable equality}, i.e.~$\forall x, y.~(x = y) + (x \neq y)$, decides whether $x$~and~$y$ are equal and accordingly gives an identity proof or a refutation explicitly.
 %Such a decidability proof may or may not be possible depending on the domain of $x$~and~$y$, and is non-trivial in general.
 %In type theory all proofs as programs terminate, so logical decidability implies algorithmic decidability.
@@ -63,9 +63,9 @@ which can be rephrased more succinctly as
   `It is \underline{\emph{decidable}} for any $\Gamma$~and~$t$ whether $\Gamma |- t : A$ is derivable for some~$A$'.
 \end{quote}
 A proof of this statement would also be a program that produces either a typing derivation for the given raw term~$\isTerm{t}$ or a negation proof that such a derivation is impossible.
-The first case is algorithmic soundness, while the second case is algorithmic completeness in contrapositive form (which implies the original form due to the decidability).
-Hence, proving the statement is the same as constructing a verified proof-relevant type inference algorithm, which returns not only an answer but also a proof justifying that answer.
-This is an economic way to bridge the gap between theory and practice, where proofs double as verified programs, in contrast to separately exhibiting a theory and an implementation that are only loosely related.
+The first case is algorithmic soundness, while the second case is algorithmic completeness in contrapositive form (implying the original form due to the decidability).
+Hence, proving the statement is the same as constructing a verified proof-relevant type inference algorithm, which returns not only an answer but also its justification.
+This is an economic way to bridge the gap between theory and practice, where proofs double as verified programs, in contrast to separately exhibiting a theory and an implementation that are loosely related.
 
 %Hence, both algorithmic soundness and completeness in original form are implied.
 %For a type synthesiser being proof-relevant, all of its intermediate programs have to be proof-relevant, including bidirectional type synthesiser and its mode decorator.

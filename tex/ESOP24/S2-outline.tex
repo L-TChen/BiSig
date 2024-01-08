@@ -23,7 +23,7 @@ besides the standard constructs, there is an \textsc{Anno} rule that allows the 
   \begin{mathpar}
     \inferrule{x \in V}{V \vdash \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{V \vdash \isTerm{t}}{V \vdash \isTerm{(t \annotate A)}}\,\Rule{Anno}
+    \inferrule{V \vdash \isTerm{t}}{V \vdash \isTerm{(t \annotatecolon A)}}\,\Rule{Anno}
     \and
     \inferrule{V, \isTerm{x} \vdash \isTerm{t}}{V \vdash \isTerm{\lam{x}t}}\,\Rule{Abs}
     \and
@@ -45,7 +45,7 @@ besides the standard constructs, there is an \textsc{Anno} rule that allows the 
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma \vdash \isTerm{x} : A}\,\Rule{Var}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} : A}{\Gamma \vdash \isTerm{(t \annotate A)} : A}\,\Rule{Anno}
+    \inferrule{\Gamma \vdash \isTerm{t} : A}{\Gamma \vdash \isTerm{(t \annotatecolon A)} : A}\,\Rule{Anno}
     \and
     \inferrule{\Gamma, \isTerm{x} : A \vdash \isTerm{t} : B}{\Gamma \vdash \isTerm{\lam{x}t} : A \bto B}\,\Rule{Abs}
     \and
@@ -87,7 +87,7 @@ Acceptable excuses are defined by the predicate~$E$, which describes what is wro
   \begin{mathpar}
     \inferrule{(\isTerm{x} : A) \in \Gamma}{\Gamma \vdash \isTerm{x} \syn A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma \vdash \isTerm{t} \chk A}{\Gamma \vdash \isTerm{(t \annotate A)}\syn A}\,\SynRule{Anno}
+    \inferrule{\Gamma \vdash \isTerm{t} \chk A}{\Gamma \vdash \isTerm{(t \annotatecolon A)}\syn A}\,\SynRule{Anno}
     \and
     \inferrule{\Gamma \vdash \isTerm{t} \syn B \\ B = A}{\Gamma \vdash \isTerm{t} \chk A}\,\ChkRule{Sub}
     \and
@@ -124,7 +124,7 @@ This is called \emph{mode-correctness}, which we will formally define in \cref{s
   \begin{mathpar}
     \inferrule{x \in V}{V |- \isTerm{x}^{\syn}}\,\SynRule{Var}
     \and
-    \inferrule{V |- \isTerm{t}^{\chk}}{V |- (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
+    \inferrule{V |- \isTerm{t}^{\chk}}{V |- (\isTerm{t \annotatecolon A})^{\syn}}\,\SynRule{Anno}
     \and
     \inferrule{V |- \isTerm{t}^{\syn}}{V |- \isTerm{t}^{\chk}}\,\ChkRule{Sub}
     \\

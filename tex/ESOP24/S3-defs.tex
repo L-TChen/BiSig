@@ -61,36 +61,54 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
 
 \begin{defn}[{\cite[p.~322]{Fiore2010}}]\label{def:binding-arity}
   A \emph{binding arity} with a set $T$ of types is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
-  In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the \emph{type of the $i$-th argument}, respectively, and $A$ the target type.
+  In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the \emph{type of the $i$-th argument}, respectively, and $A$ the \emph{target type}.
   For brevity, it is denoted by $\bargs \to A$ where $[\Delta_i]$ is omitted if empty.
 \end{defn}
 
 \begin{example}
-Consider the $\Rule{Abs}$ rule (\Cref{fig:STLC-typing-derivations}).
-Its binding arity has $\Type_{\Sigma_{\bto}}\{A, B\}$ as types and is ${[A]B} \to {(A \bto B)}$.
-This means that the $\Rule{Abs}$ rule for derivations of\/ $\Gamma |- \lam{x}t : A \bto B$ contains:
-\begin{inlineenum}
-  \item a derivation of\/ $\Gamma, x : A |- t : B$ as an argument of type $B$ in a typing context extended by a variable~$x$ of type~$A$;
-  \item the type $A\bto B$ for itself.
-\end{inlineenum}
-In a similar vein, the arity of the $\Rule{App}$ rule is denoted as ${(A \bto B), A} \to {B}$.
-This specifies that any derivation of\/ $\Gamma \vdash t\;u : B$ accepts derivations $\Gamma \vdash t : A \bto B$ and $\Gamma \vdash u : A$ as its arguments.
-These arguments have types $A \bto B$ and $A$ respectively and their extension contexts are empty.
+  Observe that $\Rule{Abs}$ and $\Rule{App}$ rules in \Cref{fig:STLC-typing-derivations} can be read as
+  \renewcommand{\eqnhighlightheight}{\vphantom{\Gamma}}
+  \renewcommand{\eqnannotationfont}{\rmfamily\footnotesize} % package default
+  \vspace{2em}
+  \begin{equation*}
+    \frac{\Gamma, \eqnmarkbox[blue]{ext1}{\isTerm{x} : A, \cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty1}{B}}{\Gamma \vdash \isTerm{\lam{x}t} : \eqnmarkbox{ty1}{A \bto B}}
+    \qquad\text{and}\qquad
+    \frac{\Gamma, \eqnmarkbox[blue]{ext2}{\cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty2}{A \bto B} \qquad \Gamma, \eqnmarkbox[blue]{ext3}{\cdot} \vdash \isTerm{u} : \eqnmarkbox[red]{aty3}{A}}{\Gamma \vdash \isTerm{t\;u} : \eqnmarkbox{ty2}{B}}
+  \end{equation*}
+  \annotate[yshift=1.5em]{above}{ext1,ext2,ext3}{extension context}
+  \annotate[yshift=0.4em]{above,right}{aty1,aty2,aty3}{argument type}
+  \annotate[yshift=0em]{below}{ty1,ty2}{target type}
+  \vspace{.5em}
+  \\
+  if the empty extension context $\cdot$ is added verbosely, so they can be specified by binding arities ${[A]B} \to {(A \bto B)}$ and ${(A \bto B), A} \to {B}$ respectively.
 \end{example}
+
+%\begin{example}
+%Consider the $\Rule{Abs}$ rule (\Cref{fig:STLC-typing-derivations}).
+%Its binding arity has $\Type_{\Sigma_{\bto}}\{A, B\}$ as types and is ${[A]B} \to {(A \bto B)}$.
+%This means that the $\Rule{Abs}$ rule for derivations of\/ $\Gamma |- \lam{x}t : A \bto B$ contains:
+%\begin{inlineenum}
+%  \item a derivation of\/ $\Gamma, x : A |- t : B$ as an argument of type $B$ in a typing context extended by a variable~$x$ of type~$A$;
+%  \item the type $A\bto B$ for itself.
+%\end{inlineenum}
+%In a similar vein, the arity of the $\Rule{App}$ rule is denoted as ${(A \bto B), A} \to {B}$.
+%This specifies that any derivation of\/ $\Gamma \vdash t\;u : B$ accepts derivations $\Gamma \vdash t : A \bto B$ and $\Gamma \vdash u : A$ as its arguments.
+%These arguments have types $A \bto B$ and $A$ respectively and their extension contexts are empty.
+%\end{example}
 
 Next, akin to a signature, a binding signature $\Omega$ consists of a set of operation symbols along with their respective binding arities:
 \begin{defn}\label{def:binding-signature}
-  For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ consists of a set $O$ and a function
+  For a type signature $\Sigma$, a \emph{binding signature} $\Omega$ is a set $O$ with a function
   \[
-    \arity(o) \colon O \to \sm{\Xi : \UU} \left(\Type_\Sigma(\Xi)^* \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
+    \arity \colon O \to \sm{\Xi : \UU} \left(\Type_\Sigma(\Xi)^* \times \Type_\Sigma(\Xi)\right)^* \times \Type_\Sigma(\Xi).
   \]
 \end{defn}
 That is, each inhabitant $o: O$  is associated with a set $\Xi$ of type variables and an arity $\arity(o)$ with $\Type_{\Sigma}(\Xi)$ as types denoted by $\bop$.
 
-The set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays a somewhat important role:
-To use a rule like $\Rule{Abs}$ in an actual typing derivation, we will need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
+The set~$\Xi$ of type variables for each operation, called its \emph{local context}, plays an important role.
+To use a rule like $\Rule{Abs}$ in an actual typing derivation, we need to substitute \emph{concrete types}, i.e.\ types without any type variables, for variables $A, B$.
 In our formulation of substitution~(\ref{def:substitution}), we must first identify which type variables to substitute for.
-As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include functions from~$\Xi$ to concrete types specifying how to instantiate typing rules by substitution.
+As such, this information forms part of the arity of an operation, and typing derivations, defined subsequently, will include functions $\rho$ from~$\Xi$ to concrete types specifying how to instantiate typing rules by substitution.
 
 By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature~$\Sigma$ and a binding signature~$\Omega$.
 Now, we define raw terms for $(\Sigma, \Omega)$ first.
@@ -102,7 +120,7 @@ Now, we define raw terms for $(\Sigma, \Omega)$ first.
   \begin{mathpar}
     \inferrule{\isTerm{x} \in V}{V |-_{\Sigma, \Omega} \isTerm{x}}\,\Rule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}}{V |-_{\Sigma, \Omega} \isTerm{t \annotate A}}\,\Rule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}}{V |-_{\Sigma, \Omega} \isTerm{t \annotatecolon A}}\,\Rule{Anno}
     \\
     \inferrule{V, \vars{x}_\isTerm{1} |-_{\Sigma, \Omega} \isTerm{t_1} \\ \cdots \\ V, \vars{x}_\isTerm{n} |-_{\Sigma, \Omega} \isTerm{t_n} } {V |-_{\Sigma, \Omega} \tmOpts }\,\Rule{Op} \and
     \text{for $\bop$ in $\Omega$}
@@ -116,7 +134,7 @@ Now, we define raw terms for $(\Sigma, \Omega)$ first.
   For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{raw terms} indexed by a list~$V$ of variables consists of
   \begin{inlineenum}
     \item variables in $V$,
-    \item annotations $\isTerm{t \annotate A}$ for some raw term $t$ in $V$ and a type $A$, and
+    \item annotations $\isTerm{t \annotatecolon A}$ for some raw term $t$ in $V$ and a type $A$, and
     \item a construct $\tmOpts$ for some $\bop$ in~$O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$, and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$.
   \end{inlineenum}
   These correspond to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
@@ -138,7 +156,7 @@ Here we choose to include a substitution $\rho$ from the local context $\Xi$ to 
   For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{typing derivations} of $\Gamma \vdash \isTerm{t} : A$, indexed by a typing context $\Gamma : \Cxt_\Sigma$, a raw term~$\isTerm{t}$ with free variables in $\erase{\Gamma}$, and a type $A : \Type_\Sigma(\emptyset)$, consists of 
   \begin{enumerate}
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} x : A$ if $x : A$ is in $\Gamma$,
-    \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotate A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
+    \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotatecolon A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for an operation $\bop$ if there are $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} |-_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing} respectively.
@@ -146,12 +164,7 @@ Here we choose to include a substitution $\rho$ from the local context $\Xi$ to 
 
 
 \begin{example}
-Raw terms (\Cref{fig:STLC-raw-terms}) and typing derivations (\Cref{fig:STLC-typing-derivations}) for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the binding signature consisting of 
- \[
-   \aritysymbol{\mathsf{app}}{A, B}{(A \bto B), A}{B}
-   \quad\text{and}\quad
-   \aritysymbol{\mathsf{abs}}{A , B}{[A]B}{(A \bto B)}.
- \]
+Raw terms (\Cref{fig:STLC-raw-terms}) and typing derivations (\Cref{fig:STLC-typing-derivations}) for simply typed $\lambda$-calculus can be specified by the type signature $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and the binding signature consisting of $\aritysymbol{\mathsf{app}}{A, B}{(A \bto B), A}{B}$ and $\aritysymbol{\mathsf{abs}}{A , B}{[A]B}{(A \bto B)}$.
 Rules $\Rule{Abs}$ and $\Rule{App}$ in simply typed $\lambda$-calculus are subsumed by the $\Rule{Op}$ rule schema, as applications $t\;u$ and abstractions $\lam{x}t$ can be introduced uniformly as $\tmOp_{\mathsf{app}}(t, u)$ and $\tmOp_{\mathsf{abs}}(x.t)$, respectively.
 \end{example}
 
@@ -219,7 +232,7 @@ More importantly, we are able to reason about constructions and properties that 
 %    \mprset{sep=0.5em}
     \inferrule{(\isTerm{x} : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} : A}\,\Rule{Var}
     \and
-    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) : A}\,\Rule{Anno}
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} : A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotatecolon A}) : A}\,\Rule{Anno}
     \and
     \inferrule{\rho : \Sub{\Xi}{\emptyset} \and  \Gamma, \vec{\isTerm{x}}_\isTerm{1} : \simsub{\Delta_{1}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_1} : \simsub{A_{1}}{\rho} \; \cdots \; \Gamma, \vec{\isTerm{x}}_\isTerm{n} : \simsub{\Delta_{n}}{\rho} |-_{\Sigma, \Omega} \isTerm{t_n} : \simsub{A_{n}}{\rho}}
     {\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}}\,\Rule{Op}
@@ -236,7 +249,7 @@ More importantly, we are able to reason about constructions and properties that 
   \begin{mathpar}
     \inferrule{(x : A) \in \Gamma}{\Gamma |-_{\Sigma, \Omega} \isTerm{x} :^{\syn} A}\,\SynRule{Var}
     \and
-    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotate A}) :^{\syn}  A}\,\SynRule{Anno}
+    \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}{\Gamma |-_{\Sigma, \Omega} (\isTerm{t \annotatecolon A}) :^{\syn}  A}\,\SynRule{Anno}
     \and
     \inferrule{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{{\syn}} B \\ B = A}{\Gamma |-_{\Sigma, \Omega} \isTerm{t} :^{\chk} A}\,\ChkRule{Sub}
     \\
@@ -255,7 +268,7 @@ More importantly, we are able to reason about constructions and properties that 
   \begin{mathpar}
     \inferrule{x \in V}{V |-_{\Sigma, \Omega} \isTerm{x}^{\syn}}\,\SynRule{Var}
     \and
-    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotate A})^{\syn}}\,\SynRule{Anno}
+    \inferrule{\cdot |-_{\Sigma} A \\ V |-_{\Sigma, \Omega}\isTerm{t}^{\chk}}{V |-_{\Sigma, \Omega} (\isTerm{t \annotatecolon A})^{\syn}}\,\SynRule{Anno}
     \and
     \inferrule{V |-_{\Sigma, \Omega} \isTerm{t}^{\syn}}{V |-_{\Sigma, \Omega} \isTerm{t}^{\chk}}\,\ChkRule{Sub}
     \and

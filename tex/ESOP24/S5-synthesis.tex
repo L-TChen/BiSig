@@ -93,7 +93,7 @@ However, since mode-correctness is inductively defined on the argument list, our
   Our system is syntax-directed, so $d_1$ and $d_2$ must be derived from the same rule: 
   \begin{itemize}
     \item $\SynRule{Var}$ follows from that each variable as a raw term refers to the same variable in its context.
-    \item $\SynRule{Anno}$ holds trivially, since the synthesised type $A$ is from the term $t \annotate A$ in question.
+    \item $\SynRule{Anno}$ holds trivially, since the synthesised type $A$ is from the term $t \annotatecolon A$ in question.
     \item $\Rule{Op}$: Recall that a derivation of\/ $\Gamma |- \tmOpts \syn A$ contains a substitution $\rho$ from the local context $\Xi$ to concrete types.
       To prove that any two typing derivations has the same synthesised type, it suffices to show that those substitutions $\rho_1$~and~$\rho_2$ of $d_1$~and~$d_2$, respectively, agree on variables in $\synvar(\biargs)$ so that $\simsub{A_0}{\rho_1} = \simsub{A_0}{\rho_2}$.
       We prove it by induction on the argument list:

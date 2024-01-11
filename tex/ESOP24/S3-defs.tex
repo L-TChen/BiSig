@@ -71,7 +71,7 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
   \renewcommand{\eqnannotationfont}{\rmfamily\footnotesize} % package default
   \vspace{2em}
   \begin{equation*}
-    \frac{\Gamma, \eqnmarkbox[blue]{ext1}{\isTerm{x} : A, \cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty1}{B}}{\Gamma \vdash \isTerm{\lam{x}t} : \eqnmarkbox{ty1}{A \bto B}}
+    \frac{\Gamma, \isTerm{x} : \eqnmarkbox[blue]{ext1}{A, \cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty1}{B}}{\Gamma \vdash \isTerm{\lam{x}t} : \eqnmarkbox{ty1}{A \bto B}}
     \qquad\text{and}\qquad
     \frac{\Gamma, \eqnmarkbox[blue]{ext2}{\cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty2}{A \bto B} \qquad \Gamma, \eqnmarkbox[blue]{ext3}{\cdot} \vdash \isTerm{u} : \eqnmarkbox[red]{aty3}{A}}{\Gamma \vdash \isTerm{t\;u} : \eqnmarkbox{ty2}{B}}
   \end{equation*}
@@ -80,7 +80,7 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
   \annotate[yshift=0em]{below}{ty1,ty2}{target type}
   \vspace{.5em}
   \\
-  if the empty extension context $\cdot$ is added verbosely, so they can be specified by binding arities ${[A]B} \to {(A \bto B)}$ and ${(A \bto B), A} \to {B}$ respectively.
+  if the empty context $\cdot$ is added verbosely, so they can be specified by arities ${[A]B} \to {(A \bto B)}$ and ${(A \bto B), A} \to {B}$, respectively, with $\Type_{\Sigma_{\bto}}(A, B)$ as types.
 \end{example}
 
 %\begin{example}
@@ -113,6 +113,16 @@ As such, this information forms part of the arity of an operation, and typing de
 By a \emph{simply typed language} $(\Sigma, \Omega)$, we mean a pair of a type signature~$\Sigma$ and a binding signature~$\Omega$.
 Now, we define raw terms for $(\Sigma, \Omega)$ first.
 
+\begin{defn}
+  For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{raw terms} indexed by a list~$V$ of variables consists of
+  \begin{inlineenum}
+    \item variables in $V$,
+    \item annotations $\isTerm{t \annotatecolon A}$ for some raw term $t$ in $V$ and a type $A$, and
+    \item a construct $\tmOpts$ for some $\bop$ in~$O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$, and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$.
+  \end{inlineenum}
+  These correspond to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
+\end{defn}
+
 \begin{figure}
   \centering
   \small
@@ -128,18 +138,6 @@ Now, we define raw terms for $(\Sigma, \Omega)$ first.
   \caption{Raw terms}
   \label{fig:raw-terms}
 \end{figure}
-
-
-\begin{defn}
-  For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{raw terms} indexed by a list~$V$ of variables consists of
-  \begin{inlineenum}
-    \item variables in $V$,
-    \item annotations $\isTerm{t \annotatecolon A}$ for some raw term $t$ in $V$ and a type $A$, and
-    \item a construct $\tmOpts$ for some $\bop$ in~$O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$, and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$.
-  \end{inlineenum}
-  These correspond to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:raw-terms} respectively.
-\end{defn}
-
 Before defining typing derivations, we need a definition of typing contexts.
 
 \begin{defn}

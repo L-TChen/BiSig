@@ -59,7 +59,7 @@
 
 \author{Liang-Ting Chen\orcidID{0000-0002-3250-1331} \and Hsiang-Shang Ko\orcidID{0000-0002-2439-1048}}
 \institute{Institute of Information Science, Academia Sinica, Taiwan}
-\title{A formal treatment of bidirectional typing\texorpdfstring{\thanks{The work is supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.}}{}}
+\title{A formal treatment of bidirectional typing}
 
 \begin{document}
 
@@ -68,10 +68,10 @@
 \begin{abstract}
 There has been much progress in designing bidirectional type systems and associated type synthesis algorithms, but mainly on a case-by-case basis.
 %This situation is in stark contrast to parsing, for which there have been general theories and widely applicable tools such as parser generators.
-To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing and as a by-product of our formalism provides a \emph{verified} generator of \emph{proof-relevant} type synthesisers for simply typed languages: for every signature that specifies a mode-correct bidirectionally typed language, there exists a proof-relevant type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
+To remedy the situation, this paper develops a \emph{general} and \emph{formal} theory of bidirectional typing for simply typed languages: for every signature that specifies a mode-correct bidirectionally typed language, there exists a \emph{proof-relevant} type synthesiser that for an input abstract syntax tree constructs a typing derivation if any, gives its refutation if not, or reports that the input does not have enough type annotations.
 Sufficient conditions for deriving a type synthesiser such as soundness, completeness, and mode-correctness, are studied universally for all signatures.
-We propose a preprocessing step called \emph{mode decoration}, which helps the user to deal with missing type annotations in a given abstract syntax tree.
-The entire development is formalised in \Agda and can be further integrated with other language-formalisation frameworks.
+We propose a preprocessing step called \emph{mode decoration}, which helps the user to deal with missing type annotations in a raw term.
+The entire theory is formally implemented in \Agda, so as a by-product of our formalism we provide a \emph{verified} generator of proof-relevant type synthesisers.
 \end{abstract}
 
 \input{S1-intro}

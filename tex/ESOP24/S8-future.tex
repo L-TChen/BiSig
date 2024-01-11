@@ -3,11 +3,11 @@
 \section{Discussion} \label{sec:future}
 We believe that our formal treatment lays a foundation for further investigation, as the essential aspects of bidirectional typing have been studied rigorously. 
 While our current development is based on simply typed languages to highlight the core ideas, it is evident that many concepts and aspects remain untouched.
-In this section we discuss related work and potential directions for future research.
+%In this section we discuss related work and potential directions for future research.
 \subsubsection{Language formalisation frameworks}
 
 The study of presenting logics universally at least date back to universal algebra and model theory where structures are studied for certain notions of arities and signatures.
-In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which is used to prove a general confluence theorem.
+In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which has been used to prove a general confluence theorem.
 Many general definitions and frameworks for defining logics and type theories have been proposed, and we classify them into two groups by where signatures reside: the meta level or the object level of a meta-language:
 \begin{enumerate}
   \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
@@ -65,21 +65,19 @@ However, the last assumption is challenging to establish even for specific langu
 
 \subsubsection{Beyond syntax-directedness}
 
-%For non-syntax-directed systems, since there can be multiple moding or typing rules for a language construct, both the mode decorator and the bidirectional type synthesiser will need to backtrack, and the decorator may need to produce all possible mode derivations so as not to limit the synthesiser's choices.
-%For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and typing derivations, although bidirectional typing rules and pairs of a moding rule and a typing rule may no longer be in perfect correspondence.
-%Completeness may need to be reformulated to take all possible mode derivations as input to guarantee that at least one can be paired with the input typing derivation.
+To explore general settings, an extreme possibility is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
 
-To explore general settings, a possibility is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
-
-However, a practical setting suitable for a next step is probably this: for each raw term construct, there can be several ordinary typing rules, and each typing rule can be refined to several bidirectional typing rules with different mode assignments and different orders of premises.
-For this setting, both the mode decorator and the bidirectional type synthesiser will have to backtrack.
-For soundness and completeness, it should still be possible to treat them as the separation and combination of mode and type information, but the completeness direction will pose a problem---for every node of a raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.
-It should be possible to fix this problem while retaining the mode decoration phase.
-For example, one idea is to make the mode decorator produce all possible mode derivations, and refine completeness to say that any typing derivation can be combined with one of mode derivations into a bidirectional typing derivation.
-
-We could instead focus on simpler cases first where each construct has exactly one typing rule, but each typing rule can be refined to more than one bidirectional typing rule.
-In such cases, the mode decorator would need to find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation as input.
+We could first focus on simpler cases that the ordinary typing part is still syntax-directed, but each typing rule is allowed to have multiple bidirectional variants, including different orders of their premises.
+In such cases, the mode decorator would need to find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation.
 Completeness could still take the simple form presented in this paper too.
+
+The next step is to consider non-syntax-directed systems where each typing rule has multiple bidirectional variants.
+For this setting, the mode decorator and the bidirectional type synthesiser will have to backtrack.
+It is still possible to treat soundness as the separation of mode and type information, but completeness will pose a problem.
+For every raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.
+To retain the mode decoration, one could make the mode decorator produce all possible mode derivations, and refine completeness to say that any typing derivation can be combined with one of mode derivations into a bidirectional typing derivation.
+%It should be possible to fix this problem while retaining the mode decoration phase.
+
 
 \subsubsection{Towards a richer formal theory}
 
@@ -89,4 +87,5 @@ There are also concepts that may be hard to fully formalise, for example `annota
 \begin{credits}
 \subsubsection{Acknowledgements.}
 We thank Kuen-Bang {Hou (Favonia)} and anonymous reviewers for their comments and suggestions.
+The work was supported by the National Science and Technology Council of Taiwan under grant NSTC 112-2221-E-001-003-MY3.
 \end{credits}

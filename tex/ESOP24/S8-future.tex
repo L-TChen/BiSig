@@ -14,8 +14,8 @@ Many general definitions and frameworks for defining logics and type theories ha
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory) where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.
 \end{enumerate}
 
-\LF is naturally expressive but each extension requires a different \LF and thus a different implementation to check formal \LF proofs.
-Formalising \LF and its variants is at least as hard as formalising a dependent type theory, so they are mostly implemented separately from their theory and unverified.
+The \LF approach is naturally expressive but each extension requires a different framework and a different implementation to check formal \LF proofs.
+Formalising \LF and its variants is at least as hard as formalising a dependent type theory, and they are mostly implemented separately from their theory and unverified.
 
 For the second group, theories developed in set theory can often be reformulated in type theory and thus manageable for formalisation in a type-theoretic proof assistant. 
 Such examples include frameworks developed by \citet{Allais2021,Ahrens2022,Fiore2022} in \Agda, which are relatively correct to their meta-language, although their expressiveness is limited to simply typed theories.
@@ -24,10 +24,10 @@ Our work belongs to the second group, as we aim for a formalism in a type theory
 \subsubsection{Beyond simple types}
 
 Bidirectional type synthesis plays a crucial role in handling more complex types than simple types, and we sketch how our theory can be extended to treat a broader class of languages.
-First, we need a general definition of languages, discussed above, in question (\cref{subsec:simple-types,subsec:binding-sig}).
-Then, this definition can be augmented with modes (\cref{subsec:bidirectional-system}) and the definition of mode-correctness (\cref{def:mode-correctness}) can be adapted by adding the mode information into signatures.
+First, we need a general definition of languages in question (\cref{subsec:simple-types,subsec:binding-sig}).
+Then, this definition can be augmented with modes (\cref{subsec:bidirectional-system}) and the definition of mode-correctness (\cref{def:mode-correctness}) can be adapted accordingly.
 Soundness and completeness (\cref{lem:soundness-completeness}) should still hold, as they amount to the separation and combination of mode and typing information for a given raw term (in a syntax-directed formulation).
-Mode decoration (\cref{sec:mode-decoration}) involves annotating a raw term with modes and marking missing annotations, and should also work.
+Mode decoration (\cref{sec:mode-decoration}), which annotates a raw term with modes and marks missing annotations, should also work.
 As for the decidability of bidirectional type synthesis, we discuss two cases involving polymorphic types and dependent types below.
 
 \paragraph{Polymorphic types}
@@ -37,22 +37,30 @@ In the case of languages like \SystemF and others that permit type-level variabl
 \end{inlineenum}
 
 Extending general definitions for bidirectional typing and mode derivations from \citeauthor{Hamana2011}'s work is straightforward. 
-For example, the universal type $\forall \alpha.\, A$ and type abstraction in \SystemF can be specified as operations:
+\ifarxiv
+For example, the universal type $\forall \alpha.\, A$ and type abstraction in \SystemF can be specified as operations
 \[
-\mathsf{all} : * \rhd [*] * \to *
-\quad\text{and}\quad
-\mathsf{tabs} : [*] A \rhd \left< * \right> A^{\chk} \to \tyOp_{\mathsf{all}}(\alpha. A)^{\chk}
+  \mathsf{all} : * \rhd [*] * \to *
+  \quad\text{and}\quad
+  \mathsf{tabs} : [*] A \rhd \left< * \right> A^{\chk} \to \tyOp_{\mathsf{all}}(\alpha. A)^{\chk}.
 \]
+\else
+For example, the universal type $\forall \alpha.\, A$ and type abstraction in \SystemF can be specified as operations $\mathsf{all} : * \rhd [*] * \to *$ and $\mathsf{tabs} : [*] A \rhd \left< * \right> A^{\chk} \to \tyOp_{\mathsf{all}}(\alpha. A)^{\chk}$.
+\fi
 The decidability of bidirectional type synthesis (\cref{thm:bidirectional-type-synthesis-checking}) should also carry over, as no equations are imposed on types and no guessing (for type application) is required.
 Adding subtyping $A \mathrel{<:} B$ to languages can be done by replacing type equality with a subtyping relation $\mathrel{<:}$ and type equality check with subtyping check, so polymorphically typed languages with subtyping such as \SystemFsub can be specified.
 The main idea of bidirectional typing does not change, so it should be possible to extend the formal theory without further assumptions too.
 
+\ifarxiv
 However, explicit type application in \SystemF and \SystemFsub is impractical but its implicit version results in a \emph{stationary rule}~\cite{Leivant1986}:
 \[
   \inferrule{\Gamma \vdash t \syn \forall \alpha. A}{\Gamma \vdash t \syn A[B/\alpha]}
 \]
+\else
+However, explicit type application in \SystemF and \SystemFsub is impractical but its implicit version results in a \emph{stationary rule}~\cite{Leivant1986}
+\fi
 which is not syntax-directed.
-By translating the above rule to subtyping, we have the \emph{instantiation problem} which amounts to guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$.
+By translating the rule to subtyping, we have the \emph{instantiation problem} which amounts to guessing $B$ in $\forall \alpha. A <: A[B/\alpha]$.
 A theory that accommodates various solutions to the problem is left as future work.
 
 \paragraph{Dependent types}
@@ -60,7 +68,8 @@ In the context of dependent type theory, type synthesis entails a term equality 
 Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
 
 Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
-They propose a notion of \LF signature with modes (called \emph{moded signatures} op.\ cit.), a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of generic bidirectional type synthesis which is decidable, sound, and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and the set of computational rules is \emph{well-behaved}, i.e.\ type-preserving, confluent, and strongly normalising.
+They propose a notion of \LF signature with modes, a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of bidirectional type synthesis.
+The algorithm is decidable, sound and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and that the set of computational rules is type-preserving, confluent, and strongly normalising.
 However, the last assumption is challenging to establish even for specific languages and lacks a general understanding.
 
 \subsubsection{Beyond syntax-directedness}
@@ -81,7 +90,7 @@ To retain the mode decoration, one could make the mode decorator produce all pos
 
 \subsubsection{Towards a richer formal theory}
 
-There are more techniques in bidirectional typing that could be formally studied in general, with one notable example being the Pfenning recipe for bidirectionalising typing rules~\citep[Section~4]{Dunfield2021}.
+There are more principles and techniques in bidirectional typing that could be formally studied in general, with one notable example being the Pfenning recipe for bidirectionalising typing rules~\citep[Section~4]{Dunfield2021}.
 There are also concepts that may be hard to fully formalise, for example `annotation character'~\citep[Section~3.4]{Dunfield2021}, which is roughly about how easy it is for the user to write annotated programs, but it would be interesting to explore to what extent such concepts can be formalised.
 
 \begin{credits}

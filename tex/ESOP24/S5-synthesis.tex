@@ -133,9 +133,9 @@ Then, if we go through every $t_i$ successfully, we will have a total substituti
 \begin{remark}
 To make the argument above sound, it is necessary to compare types and solve a unification problem.
 Hence, we assume that the set~$\Xi$ of type variables has a decidable equality, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
-To simplify our choice, we could simply confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$, given that these sets have a decidable equality and the arity of a type construct is finite.
-Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in the definition of $\Type_{\Sigma}$ (see \Cref{sec:formalisation} for details).
-For the sake of clarity in presentation, though, we keep using named variables and just assume that $\Xi$ has a decidable equality.}
+To simplify our choice, we may confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$, given that these sets have a decidable equality and the arity of a type construct is finite.
+Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in the definition of $\Type_{\Sigma}$\ifarxiv (see \Cref{sec:formalisation} for details)\fi.
+For the sake of clarity in presentation, though, we use named variables and just assume that $\Xi$ has a decidable equality.}
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
 \begin{defn}

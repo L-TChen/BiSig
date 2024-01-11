@@ -28,6 +28,7 @@ However, the code size increases proportionally to the number of type constructs
 When dealing with a fixed number $n$ of type constructs, for each synthesising construct, there are two cases for a checking argument but $n + 1$ cases for each synthesising argument---the successful synthesis of the expected type, an instance where it fails, or $n-1$ cases where the expected type does not match; similarly for a checking construct---making the task tedious.
 Thus, having a generator is helpful and can significantly reduce the effort for implementation.
 
+\ifarxiv
 For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with additional constructs listed in \cref{tab:computational-calculus}.
 The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases to consider in bidirectional type synthesis.
 
@@ -40,6 +41,13 @@ Such a specification can be derived by extending $\Sigma_{\bto}$ with additional
 \]
 Types $\mathtt{nat}$, $A \times B$, $A + B$, and $T(A)$ are given as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
 The signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then extended with operations listed in \cref{tab:computational-calculus}.
-Mode-correctness can be derived by \cref{lem:decidability-mode-correctness} and its type synthesiser by \cref{cor:trichotomy} with the specification~$(\Sigma, \Omega)$ directly.%
-\footnote{For a demonstration in \Agda, see \cref{sec:formalisation}.}
+Mode-correctness can be derived by \cref{lem:decidability-mode-correctness} and its type synthesiser by \cref{cor:trichotomy} with the specification~$(\Sigma, \Omega)$ directly.
+For a demonstration in \Agda, see \cref{sec:formalisation}.
+\else
+For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with naturals, sums, products, and general recursion.
+The extended language has `only' 15 constructs, including pairing, projections, injections, and so on, whereas there are nearly 100 possible cases to consider in bidirectional type synthesis.
+However, it has far fewer constructs than a realistic programming language would have. 
 
+On the other hand, similar to a parser generator, only one specification is needed for a type-synthesiser generator from the user to produce a corresponding synthesiser. 
+Such a specification can be derived by extending $(\Sigma_{\bto}, \Omega_{\Lambda}^{\Leftrightarrow})$ accordingly for additional types and constructs with mode-correctness proved by applying \cref{lem:decidability-mode-correctness}, so its type synthesiser follows from \cref{cor:trichotomy} directly.
+\fi

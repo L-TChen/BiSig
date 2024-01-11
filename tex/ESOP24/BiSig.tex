@@ -74,6 +74,10 @@ We propose a preprocessing step called \emph{mode decoration}, which helps the u
 The entire theory is formally implemented in \Agda, so as a by-product of our formalism we provide a \emph{verified} generator of proof-relevant type synthesisers.
 \end{abstract}
 
+% Due to the ESOP's page limit, the appendix is only available in the ArXiv version.
+
+\newif\ifarxiv 
+
 \input{S1-intro}
 \input{S2-outline}
 \input{S3-defs.tex}
@@ -87,7 +91,10 @@ The entire theory is formally implemented in \Agda, so as a by-product of our fo
 
 \appendix
 
+\ifarxiv
 \subfile{S7-formalisation}
+
 \input{appendix}
+\fi
 
 \end{document}

@@ -58,13 +58,14 @@ To browse and check this repository locally, please follow the instructions belo
    cd [the location of your copy of this repo]
    ```
 
-3. (Optional) If you have no `Agda`, you may install [Docker](https://www.docker.com/products/docker-desktop/) and use [containerised `Agda`](https://hub.docker.com/r/ltchentw/agda) as follow:
+3. (Optional) If you have no `Agda`, you may install [Docker](https://www.docker.com/products/docker-desktop/) and use the containerised `Agda` as follow:
 
    ```bash
+   docker load < agda.tar.gz
    docker run -it --mount type=bind,source"=${PWD}",destination=/BiSig -w /BiSig ltchentw/agda:2.6.4.1
    ```
 
-   This command pulls the pre-built image, which contains `Agda 2.6.4.1`, from Docker Hub and runs the image as a container with the current working directory mounted at `/BiSig/` internally. 
+   This command loads the local image `agda.tar.gz`, which contains `Agda 2.6.4.1`, and runs the image as a container with the current working directory mounted at `/BiSig/` internally.
 
 4. Type-check the walkthrough file
    

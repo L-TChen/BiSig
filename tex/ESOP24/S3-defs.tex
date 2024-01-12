@@ -66,7 +66,7 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
 \end{defn}
 
 \begin{example}
-  Observe that $\Rule{Abs}$ and $\Rule{App}$ rules in \Cref{fig:STLC-typing-derivations} can be read as
+  Observe that the $\Rule{Abs}$ and $\Rule{App}$ rules in \Cref{fig:STLC-typing-derivations} can be read as
   \renewcommand{\eqnhighlightheight}{\vphantom{\Gamma}}
   \renewcommand{\eqnannotationfont}{\rmfamily\footnotesize} % package default
   \vspace{2em}
@@ -116,7 +116,7 @@ Now, we define raw terms for $(\Sigma, \Omega)$ first.
 \begin{defn}
   For a simply typed language $(\Sigma, \Omega)$, the family of sets of \emph{raw terms} indexed by a list~$V$ of variables consists of
   \begin{inlineenum}
-    \item variables in $V$,
+    \item (indices of) variables in $V$,
     \item annotations $\isTerm{t \annotatecolon A}$ for some raw term $t$ in $V$ and a type $A$, and
     \item a construct $\tmOpts$ for some $\bop$ in~$O$, where $\vars{x}_{\isTerm{i}}$'s are lists of variables whose length is equal to the length of~$\Delta_i$, and $t_i$'s are raw terms in the variable list $V, \vars{x}_i$.
   \end{inlineenum}
@@ -155,7 +155,7 @@ Here we choose to include a substitution $\rho$ from the local context $\Xi$ to 
   \begin{enumerate}
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} x : A$ if $x : A$ is in $\Gamma$,
     \item a derivation of $\Gamma |-_{\Sigma, \Omega} (t \annotatecolon A) : A$ if $\Gamma \vdash_{\Sigma, \Omega} \isTerm{t} : A$ has a derivation, and
-    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for an operation $\bop$ if there are $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} |-_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
+    \item a derivation of $\Gamma |-_{\Sigma, \Omega} \tmOpts : \simsub{A_0}{\rho}$ for some operation $\bop$ if there exist $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$ and a derivation of $\Gamma, \vars{x}_{\isTerm{i}} : \simsub{\Delta_i}{\rho} |-_{\Sigma, \Omega} \isTerm{t_i} : \simsub{A_i}{\rho}$ for each $i$,
   \end{enumerate}
   corresponding to rules $\Rule{Var}$, $\Rule{Anno}$, and $\Rule{Op}$ in \Cref{fig:extrinsic-typing} respectively.
 \end{defn}
@@ -213,7 +213,7 @@ Every bidirectional binding signature $\Omega$ gives rise to a binding signature
 Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typed language $(\Sigma, \erase{\Omega})$, including raw terms and typing derivations.
 
 \begin{example}\label{ex:signature-simply-typed-lambda}
-Having established generic definitions, we can now specify simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
+Having established generic definitions, we can now specify the simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
 \[
   \aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}}
   \quad\text{and}\quad

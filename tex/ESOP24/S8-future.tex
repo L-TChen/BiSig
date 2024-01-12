@@ -6,9 +6,9 @@ While our current development is based on simply typed languages to highlight th
 %In this section we discuss related work and potential directions for future research.
 \subsubsection{Language formalisation frameworks}
 
-The study of presenting logics universally at least date back to universal algebra and model theory where structures are studied for certain notions of arities and signatures.
+The idea of presenting logics universally at least date back to universal algebra and model theory where structures are studied for certain notions of arities and signatures.
 In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which has been used to prove a general confluence theorem.
-Many general definitions and frameworks for defining logics and type theories have been proposed, and we classify them into two groups by where signatures reside: the meta level or the object level of a meta-language:
+Many general definitions and frameworks for defining logics and type theories have been proposed and can be classified into two groups by where signatures reside: the meta level or the object level of a meta-language:
 \begin{enumerate}
   \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory) where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.
@@ -17,7 +17,7 @@ Many general definitions and frameworks for defining logics and type theories ha
 The \LF approach is naturally expressive but each extension requires a different framework and a different implementation to check formal \LF proofs.
 Formalising \LF and its variants is at least as hard as formalising a dependent type theory, and they are mostly implemented separately from their theory and unverified.
 
-For the second group, theories developed in set theory can often be reformulated in type theory and thus manageable for formalisation in a type-theoretic proof assistant. 
+For the second group, theories developed in set theory can often be restated in type theory and thus manageable for formalisation in a type-theoretic proof assistant. 
 Such examples include frameworks developed by \citet{Allais2021,Ahrens2022,Fiore2022} in \Agda, which are relatively correct to their meta-language, although their expressiveness is limited to simply typed theories.
 Our work belongs to the second group, as we aim for a formalism in a type theory to minimise the gap between theory and implementation.
 
@@ -74,7 +74,7 @@ The last assumption, however, is challenging to establish even for specific lang
 
 \subsubsection{Beyond syntax-directedness}
 
-To explore general settings, an extreme possibility is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
+To explore general settings, an extreme choice is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
 
 Yet, we could first focus on simpler cases that the ordinary typing part is still syntax-directed, but each typing rule is refined to multiple bidirectional variants, including different orders of its premises.
 In such cases, the mode decorator would need to find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation.

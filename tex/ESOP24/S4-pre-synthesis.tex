@@ -188,7 +188,7 @@ If $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that $t'
 \end{proposition}
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.
-In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation produced by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.
+In our theory, \cref{thm:annotatability} can be straightforwardly proved by induction on the derivation given by generalised mode decoration~(\cref{thm:generalised-mode-decoration}) to construct a bidirectional typing derivation in the same mode.
 The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$, adding to the term a type annotation that comes from the given typing derivation.
 \begin{figure}
   \centering\small
@@ -211,7 +211,7 @@ The interesting case is $\SynRule{Missing}$, which is mapped to $\SynRule{Anno}$
 
 On the other hand, when using a bidirectional type synthesiser to implement a type synthesiser, for example in \cref{thm:implementation}, if the bidirectional type synthesiser concludes that there does not exist a bidirectional typing derivation, we use the contrapositive form of completeness to establish that such an ordinary typing derivation does not exist either.
 Now, annotatability is a kind of completeness because (roughly speaking) it turns an ordinary typing derivation bidirectional.
-Therefore it is conceivable that we could use annotatability in place of completeness in the proof of \cref{thm:implementation}.
+Hence, it is conceivable that we could use annotatability in place of completeness in the proof of \cref{thm:implementation}.
 However, in the contrapositive form of annotatability, the antecedent is `there does not exist $t'$ that is more annotated than $t$ and has a bidirectional typing derivation', which is more complex than the bidirectional type synthesiser would have to produce.
 Annotatability also does not help the user to deal with missing annotations: although annotatability seems capable of determining where annotations are missing and even filling them in correctly, its antecedent requires a typing derivation, which is what the user is trying to construct and does not have yet.
 Therefore we believe that our theory offers simpler and more useful alternatives than the notion of annotatability.

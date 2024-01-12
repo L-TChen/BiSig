@@ -74,7 +74,7 @@ This is an economic way to bridge the gap between theory and practice, where pro
 \subsubsection{Annotations in the type synthesis problem}
 %\Josh{A missing step between bidirectional type synthesis and parsing}
 
-As mentioned in the beginning, with bidirectional typing we avoid the generally undecidable problem of type inference, and instead solve the simpler problem about the typability of `sufficiently annotated' raw terms, which we call the type synthesis problem to distinguish it from type inference.
+As we mentioned in the beginning, with bidirectional typing we avoid the generally undecidable problem of type inference, and instead solve the simpler problem about the typability of `sufficiently annotated' raw terms, which we call the type synthesis problem to distinguish it from type inference.
 Annotations therefore play an important role even in the definition of the problem solved by bidirectional typing, but have not received enough attention.
 In our theory, we define \emph{mode derivations} to explicitly take annotations into account and formulate the type synthesis problem with sufficiently annotated raw terms.
 Accordingly, a preprocessing step called \emph{mode decoration} is proposed to help the user to work with annotations.
@@ -104,13 +104,13 @@ The most essential characteristics of bidirectional typing is \emph{mode-correct
 As illustrated by \citet{Dunfield2021}, it seems that the implications of mode-correctness have only been addressed informally so far and mode-correctness is not yet formally defined as a \emph{property of languages}.
 
 In order to make the notion of mode-correctness precise, we first give a general definition of bidirectional simple type systems, called \emph{bidirectional binding signature}, extending the typed version of \varcitet{Aczel1978}{'s binding signature} with modes.
-A general definition of typed languages allows us to define mode-correctness and to investigate its consequences rigorously, including the uniqueness of synthesised types and the decidability of bidirectional type synthesis for mode-correct signatures.
+A general definition of typed languages allows us to define mode-correctness and to investigate its consequences rigorously: the uniqueness of synthesised types and the decidability of bidirectional type synthesis for mode-correct signatures.
 The proof of the latter theorem amounts to a generator of proof-relevant bidirectional type synthesisers (analogous to a parser generator working for unambiguous or disambiguated grammars).
 
-To make our exposition accessible, the theory in this paper focuses on simply typed languages with a \emph{syntax-directed} bidirectional type system, so that the decidability of bidirectional type synthesis can be established without any other technical assumptions.
+To make our exposition accessible, the theory in this paper focuses on simply typed languages with a syntax-directed bidirectional type system, so that the decidability of bidirectional type synthesis can be established without any other technical assumptions.
 %the idea of extending a signature with bidirectionality should be clear enough for further generalisation.
 It should be possible to extend the theory to deal with more expressive types and assumptions other than mode-correctness.
-For instance, we briefly discuss how the theory could be extended to handle polymorphically typed languages such as \SystemF, \SystemFsub, and those systems using implicit type applications with additional assumptions in \cref{sec:future}.
+For instance, we briefly discuss how the theory can be extended to handle polymorphically typed languages such as \SystemF, \SystemFsub, and those systems using implicit type applications with additional assumptions in \cref{sec:future}.
 
 \subsubsection{Contributions and plan of this paper}
 
@@ -119,7 +119,7 @@ In short, we develop a general and formal theory of bidirectional type synthesis
 \begin{enumerate}
   \item general definitions for bidirectional type systems and mode-correctness;
   \item mode derivations for explicitly dealing with annotations in the theory, and mode decoration for helping the user to work with annotations in practice;
-  \item rigorously proven consequences of mode-correctness---the uniqueness of synthesised types and the decidability of bidirectional type synthesis, which amounts to
+  \item rigorously proven consequences of mode-correctness, including the uniqueness of synthesised types and the decidability of bidirectional type synthesis, which amounts to
   \item a fully verified generator of proof-relevant type-synthesisers.
 \end{enumerate}
 Our theory is fully formally developed~\cite{Chen2024a} with \Agda but translated to the mathematical vernacular for presentation in this paper.

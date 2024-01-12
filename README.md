@@ -47,7 +47,7 @@ To browse and check this repository locally, please follow the instructions belo
 1. Clone this repository (in the terminal)
 
    ```bash
-   git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/L-TChen/BiSig.git
+   git clone --depth 1 --recurse-submodules --shallow-submodules -b artefact-evaluation https://github.com/L-TChen/BiSig.git
    ```
 
    This repository contains the Agda standard library as a Git submodule, so it is necessary to clone this repository with the submodule.

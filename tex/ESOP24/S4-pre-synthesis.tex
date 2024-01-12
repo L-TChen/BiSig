@@ -18,7 +18,7 @@ In short, soundness and completeness are merely the separation and combination o
 All these can be summarised in one theorem and proved by induction.
 
 \begin{theorem}\label{lem:soundness-completeness}
-$\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
+$\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and $\Gamma |-_{\Sigma, \erase\Omega} t : A$.
 \end{theorem}
 
 %\begin{proof}
@@ -75,7 +75,7 @@ This can be succinctly formulated as \cref{thm:Pre?-true} below by encoding genu
 (Ignore the boolean~$s$ for now.)
 
 \begin{lemma}\label{thm:Pre?-true}
-If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BTrue\,s}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
+If $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BTrue\,s}$, then $V |-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
 %\begin{proof}
@@ -86,7 +86,7 @@ If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BTrue\,s}$, then $V |-_{\Sigma,\Omega} t
 We also want a lemma that covers the case where $g = \BFalse$.
 
 \begin{lemma}\label{thm:Pre?-false}
-If\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V |/-_{\Sigma,\Omega} t^\dir{d}$.
+If $V |-_{\Sigma,\Omega} t^{\dir{d}\,\BFalse\,s}$, then $V |/-_{\Sigma,\Omega} t^\dir{d}$.
 \end{lemma}
 
 This lemma would be wrong if the `strictness' boolean~$s$ was left out of the rules: having both $\ChkRule{Sub}$ and $\SynRule{Missing}$, which we call \emph{mode casts}, it would be possible to switch between the two modes freely, which unfortunately means that we could insert a pair of $\ChkRule{Sub}$ and $\SynRule{Missing}$ anywhere, constructing a non-genuine derivation even when there is in fact a genuine one.
@@ -115,7 +115,7 @@ With strictness coming into play, non-genuine derivations are now `truly non-gen
 Now we are ready to construct a generalised mode decorator.
 
 \begin{theorem}[Generalised mode decoration]\label{thm:generalised-mode-decoration}
-For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
+For any raw term $V |-_{\Sigma,\erase\Omega} t$ and mode~$\dir{d}$, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
 \end{theorem}
 
 The theorem could be proved directly, but that would mix up two case analyses which respectively inspect the input term~$\isTerm{t}$ and apply mode casts depending on which mode~$\dir{d}$ is required.
@@ -126,7 +126,7 @@ For any raw term $V |-_{\Sigma,\erase\Omega} t$, if
 \begin{equation}\label{eq:strict-derivation}
 V |-_{\Sigma,\Omega} t^{\dir{d'}\,g'\,\BTrue} \quad\text{for some mode~$\dir{d'}$ and boolean~$g'$}
 \end{equation}
-then for any mode~$\dir{d}$, there is a derivation of\/ $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
+then for any mode~$\dir{d}$, there is a derivation of $V |-_{\Sigma,\Omega} t^{\dir{d}\,g\,s}$ for some $g$~and~$s$.
 \end{lemma}
 
 %\begin{proof}
@@ -184,7 +184,7 @@ With a generalised mode decorator, it is now easy to derive an ordinary one.
 In our theory, we may formulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
-If\/ $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that\/ $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
+If $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.
 \end{proposition}
 Defined in \cref{fig:annotation-ordering}, the `annotation ordering' $t' \sqsupseteq t$ means that $t'$~has the same or more annotations than~$t$.
 In a sense, annotatability is a reasonable form of completeness: if a term of a simply typed language $(\Sigma, \erase\Omega)$ is typable in the ordinary type system, it may not be directly typable in the bidirectional type system $(\Sigma, \Omega)$ due to some missing annotations, but will be if those annotations are added correctly.

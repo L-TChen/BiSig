@@ -94,7 +94,7 @@ However, since mode-correctness is inductively defined on the argument list, our
   \begin{itemize}
     \item $\SynRule{Var}$ follows from that each variable as a raw term refers to the same variable in its context.
     \item $\SynRule{Anno}$ holds trivially, since the synthesised type $A$ is from the term $t \annotatecolon A$ in question.
-    \item $\Rule{Op}$: Recall that a derivation of\/ $\Gamma |- \tmOpts \syn A$ contains a substitution $\rho$ from the local context $\Xi$ to concrete types.
+    \item $\Rule{Op}$: Recall that a derivation of $\Gamma |- \tmOpts \syn A$ contains a substitution $\rho$ from the local context $\Xi$ to concrete types.
       To prove that any two typing derivations has the same synthesised type, it suffices to show that those substitutions $\rho_1$~and~$\rho_2$ of $d_1$~and~$d_2$, respectively, agree on variables in $\synvar(\biargs)$ so that $\simsub{A_0}{\rho_1} = \simsub{A_0}{\rho_2}$.
       We prove it by induction on the argument list:
       \begin{enumerate}
@@ -117,8 +117,8 @@ We have arrived at the main technical contribution of this paper.
 \begin{theorem}\label{thm:bidirectional-type-synthesis-checking}
   In a mode-correct bidirectional type system $(\Sigma, \Omega)$,
   \begin{enumerate}
-    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$ for some $A$;
-    \item if\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\chk}$, then it is decidable for any~$A$ whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A$.
+    \item if $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\syn}$, then it is decidable whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn A$ for some $A$;
+    \item if $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\chk}$, then it is decidable for any~$A$ whether $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \chk A$.
   \end{enumerate}
 \end{theorem}
 
@@ -139,21 +139,21 @@ For the sake of clarity in presentation, though, we just use named variables and
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
 \begin{defn}
-By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain $\dom(\sigma)$ of $\sigma$ contains the domain of $\rho$ and $\sigma(x) = \rho(x)$ for every\/ $x$ in $\dom(\rho)$.
-  By a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
+By an \emph{extension} $\sigma \geq \rho$ of a partial substitution $\rho$ we mean that the domain $\dom(\sigma)$ of $\sigma$ contains the domain of $\rho$ and $\sigma(x) = \rho(x)$ for every $x$ in $\dom(\rho)$.
+  By a \emph{minimal extension} $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
 \end{defn}
 \begin{lemma}\label{lem:unify}
-  For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, either
+  For any $A$ of $\Type_{\Sigma}(\Xi)$, $B$ of $\Type_{\Sigma}(\emptyset)$, and a partial substitution $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, either
   \begin{enumerate}
-    \item there is a minimal extension\/ $\bar{\rho}$ of\/ $\rho$ such that\/ $\simsub{A}{\bar{\rho}} = B$, or
-    \item there is no extension\/ $\sigma$ of\/ $\rho$ such that\/ $\simsub{A}{\sigma} = B$
+    \item there is a minimal extension $\bar{\rho}$ of $\rho$ such that $\simsub{A}{\bar{\rho}} = B$, or
+    \item there is no extension $\sigma$ of $\rho$ such that $\simsub{A}{\sigma} = B$
   \end{enumerate}
 \end{lemma}
 This lemma can be inferred from the correctness of first-order unification~\citep{McBride2003,McBride2003a}, or be proved directly without unification.
 We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
 
 \begin{proof}[of {\Cref{thm:bidirectional-type-synthesis-checking}}]
-  We prove this statement by induction on the mode derivation\/ $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
+  We prove this statement by induction on the mode derivation $\erase{\Gamma} |-_{\Sigma, \Omega} \isTerm{t}^{\dir{d}}$.
   The two cases \SynRule{Var} and \SynRule{Anno} are straightforward and independent of mode-correctness.
   The case \ChkRule{Sub} invokes the uniqueness of synthesised types to refute the case that $\Gamma |-_{\Sigma, \Omega} \isTerm{t} \syn B$ but $A \neq B$ for a given type $A$.
   The first three cases follow essentially the same reasoning provided by \citet{Wadler2022}, so we only detail the last case \Rule{Op} which is new and has been discussed informally above.

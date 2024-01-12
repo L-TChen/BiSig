@@ -16,7 +16,7 @@ Formally, every judgement in a bidirectional type system is extended with a \emp
   \item $\Gamma |- \isTerm{t} \syn A$ for \emph{synthesis} and 
   \item $\Gamma |- \isTerm{t} \chk A$ for \emph{checking}.
 \end{inlineenum}
-The former indicates that the type~$A$ is an output, using both the context~$\Gamma$ and the term~$t$ as input, while for the latter, all three of $\Gamma$, $t$, and~$A$ are given as input.
+The former indicates that the type~$A$ is an output, using both the context~$\Gamma$ and the term~$t$ as input, while for the latter, all three of $\Gamma$, $t$, and~$A$ are input.
 The algorithm of a bidirectional type synthesiser can often be `read off' from a well-designed bidirectional type system: as the synthesiser traverses a raw term, it switches between synthesis and checking, following the modes assigned to the judgements in the typing rules.
 %if a condition called \emph{mode-correctness} is satisfied.
 %every synthesised type in a typing rule is determined by previously synthesised types from its premises and its input if checking.

@@ -13,9 +13,9 @@ We formulate annotatability~\cite{Dunfield2021} and discuss its relationship wit
 
 Erasure of a bidirectional binding signature removes modes and keeps everything else intact; this can be straightforwardly extended by induction to remove modes from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
 Instead we can remove typing and retain modes, arriving at a mode derivation.
-Conversely, if we have both mode and typing derivations for the same term, we can combine them to obtain a bidirectional typing derivation, which is completeness.
-In short, soundness and completeness are no more than the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, directed by the same raw term.
-All these can be summarised in one theorem (proved by induction).
+Conversely, if we have both mode and typing derivations for the same term, we can combine them to form a bidirectional typing derivation, which is completeness.
+In short, soundness and completeness are merely the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, directed by the same raw term.
+All these can be summarised in one theorem and proved by induction.
 
 \begin{theorem}\label{lem:soundness-completeness}
 $\Gamma |-_{\Sigma, \Omega} t :^\dir{d} A$ if and only if both\/ $\erase\Gamma |-_{\Sigma, \Omega} t^\dir{d}$ and\/ $\Gamma |-_{\Sigma, \erase\Omega} t : A$.

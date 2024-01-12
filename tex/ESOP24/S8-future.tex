@@ -70,13 +70,13 @@ Achieving decidable bidirectional type synthesis depends on the decidability of 
 Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
 They propose a notion of \LF signature with modes, a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of bidirectional type synthesis.
 The algorithm is decidable, sound and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and that the set of computational rules is type-preserving, confluent, and strongly normalising.
-However, the last assumption is challenging to establish even for specific languages and lacks a general understanding.
+The last assumption, however, is challenging to establish even for specific languages and lacks a general understanding.
 
 \subsubsection{Beyond syntax-directedness}
 
 To explore general settings, an extreme possibility is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
 
-We could first focus on simpler cases that the ordinary typing part is still syntax-directed, but each typing rule is allowed to have multiple bidirectional variants, including different orders of their premises.
+Yet, we could first focus on simpler cases that the ordinary typing part is still syntax-directed, but each typing rule is refined to multiple bidirectional variants, including different orders of its premises.
 In such cases, the mode decorator would need to find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation.
 Completeness could still take the simple form presented in this paper too.
 

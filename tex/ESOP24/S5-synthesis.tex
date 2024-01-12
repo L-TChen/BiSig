@@ -122,20 +122,20 @@ We have arrived at the main technical contribution of this paper.
   \end{enumerate}
 \end{theorem}
 
-The interesting part of the theorem is the case for the $\Rule{Op}$ rule and it is rather complex.
-Here we shall give its insight first instead of jumping into the details.
+The interesting part of the theorem is the case for the $\Rule{Op}$ rule.
+We shall give its insight first instead of jumping into the details.
 Recall that a typing derivation for $\tmOpts$ contains a substitution $\rho\colon \Xi \to \Type_{\Sigma}(\emptyset)$.
-The goal of type synthesis is exactly to define such a substitution $\rho$, so we have to start with an `accumulating' substitution: a substitution $\rho_0$ that is partially defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
+The goal of type synthesis for this case is exactly to define such a substitution~$\rho$, and we have to start with an `accumulating' substitution: a substitution $\rho_0$ that is partially defined on $\fv(A_0)$ if $d$ is $\chk$ or otherwise nowhere.
 By mode-correctness, the accumulating substitution~$\rho_i$ will be defined on enough synthesised variables so that type synthesis or checking can be performed on $t_{i}$ with the context $\Gamma, \vars{x}_{i} : \simsub{\Delta_{i}}{\rho_{i}}$ based on its mode derivation $\erase{\Gamma}, \vars{x}_i |-_{\Sigma, \Omega} t_i^{\dir{d_i}}$.
-If we visit a synthesising argument $\synbiarg[i+1]$, then we may extend the domain of $\rho_i$ to include the synthesised variables $\fv(A_{i + 1})$ if type synthesis is successful and also that the synthesised type can be \emph{unified with $A_{i+ 1}$} and thereby \emph{extend} $\rho_i$ to $\bar{\rho_i} = \rho_{i+1}$ with the unifier.
-Then, if we go through every $t_i$ successfully, we will have a total substitution $\rho_n$ by mode-correctness and a derivation of $\Gamma, \vars{x}_i : \Delta_i |-_{\Sigma, \Omega} t_i :^{\dir{d_i}} \simsub{A}{\rho_n}$ for each sub-term $t_i$.
+If we visit a synthesising argument $\synbiarg[i+1]$, then we may extend the domain of $\rho_i$ to $\rho_{i+1}$ with the synthesised variables $\fv(A_{i + 1})$, provided that type synthesis is successful and that the synthesised type can be \emph{unified with $A_{i+ 1}$}.
+If we go through every $t_i$ successfully, then we will have a total substitution $\rho_n$ by mode-correctness and a derivation of $\Gamma, \vars{x}_i : \Delta_i |-_{\Sigma, \Omega} t_i :^{\dir{d_i}} \simsub{A}{\rho_n}$ for each sub-term~$t_i$.
 
 \begin{remark}
 To make the argument above sound, it is necessary to compare types and solve a unification problem.
 Hence, we assume that the set~$\Xi$ of type variables has a decidable equality, thereby ensuring that the set $\Type_{\Sigma}(\Xi)$ of types also has a decidable equality.\footnote{%
 To simplify our choice, we may confine $\Xi$ to any set within the family of sets $\Fin(n)$ of naturals less than~$n$, given that these sets have a decidable equality and the arity of a type construct is finite.
 Indeed, in our formalisation, we adopt $\Fin(n)$ as the set of type variables in the definition of $\Type_{\Sigma}$\ifarxiv (see \Cref{sec:formalisation} for details)\fi.
-For the sake of clarity in presentation, though, we use named variables and just assume that $\Xi$ has a decidable equality.}
+For the sake of clarity in presentation, though, we just use named variables and assume that $\Xi$ has a decidable equality.}
 \end{remark}
 We need some auxiliary definitions for the notion of extension to state the unification problem:
 \begin{defn}
@@ -143,10 +143,10 @@ By an \emph{extension}\/ $\sigma \geq \rho$ of a partial substitution $\rho$ we 
   By a \emph{minimal extension}\/ $\bar{\rho}$ of $\rho$ satisfying $P$ we mean an extension $\bar{\rho} \geq \rho$ with $P(\bar{\rho})$ such that $\sigma \geq \bar{\rho}$ whenever $\sigma \geq \rho$ and $P(\sigma)$.
 \end{defn}
 \begin{lemma}\label{lem:unify}
-  For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, 
+  For any\/ $A$ of\/ $\Type_{\Sigma}(\Xi)$, $B$ of\/ $\Type_{\Sigma}(\emptyset)$, and a partial substitution\/ $\rho \colon \Xi \to \Type_{\Sigma}(\emptyset)$, either
   \begin{enumerate}
-    \item either there is a minimal extension\/ $\bar{\rho}$ of\/ $\rho$ such that\/ $\simsub{A}{\bar{\rho}} = B$,
-    \item or there is no extension\/ $\sigma$ of\/ $\rho$ such that\/ $\simsub{A}{\sigma} = B$
+    \item there is a minimal extension\/ $\bar{\rho}$ of\/ $\rho$ such that\/ $\simsub{A}{\bar{\rho}} = B$, or
+    \item there is no extension\/ $\sigma$ of\/ $\rho$ such that\/ $\simsub{A}{\sigma} = B$
   \end{enumerate}
 \end{lemma}
 This lemma can be inferred from the correctness of first-order unification~\citep{McBride2003,McBride2003a}, or be proved directly without unification.

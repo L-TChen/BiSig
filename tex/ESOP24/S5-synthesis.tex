@@ -162,16 +162,17 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
       For a mode derivation of $\erase{\Gamma} |- \tmOpts^{\dir{d}}$, we first claim:
       \begin{claim}\label{lem:args-induction}
         For an argument list $\biargs$ and any partial substitution $\rho$ from $\Xi$ to $\emptyset$
+        either
         \begin{enumerate}
-          \item either there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
+          \item there is a minimal extension $\ext{\rho}$ of $\rho$ such that 
             \begin{equation} \label{eq:claim}
               \dom(\ext{\rho}) \supseteq \synvar(\biargs)
               \;\text{and}\;
 %              \text{the domain of $\ext{\rho}$ contains $\synvar(\biargs)$ and\/} \quad
               \Gamma, \vars{x}_\isTerm{i} : \simsub{\Delta_i}{\ext{\rho}} |- \isTerm{t_i} \colon \simsub{A_i}{\ext{\rho}}^{\dir{d_i}}
             \end{equation}
-            for $i = 1, \ldots, n$
-          \item or there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
+            for $i = 1, \ldots, n$, or
+          \item there is no extension $\sigma$ of $\rho$ such that \eqref{eq:claim} holds.
         \end{enumerate}
       \end{claim}
 

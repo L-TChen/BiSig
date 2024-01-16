@@ -209,6 +209,7 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
               \end{enumerate}
           \end{enumerate}
       \end{itemize}
+      We have proved the decidability by induction on the derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$, assuming the claim which remains to be proved as follows.
       \begin{proof}[of Claim]
         We prove it by induction on the list $\biargs$:
         \begin{enumerate}
@@ -240,11 +241,11 @@ We are now ready for \cref{thm:bidirectional-type-synthesis-checking}:
                 \end{itemize}
             \end{enumerate}
         \end{enumerate}
-        Therefore, we have proved our claim for any argument list by induction.\hfill
+        We have proved our claim for any argument list by induction.\hfill
         $\blacksquare$
       \end{proof}
 %  \end{itemize}
-  We have completed the proof by induction on the derivation $\erase{\Gamma} |-_{\Sigma, \Omega} t^{\dir{d}}$.\qed
+      We have completed the proof of \cref{thm:bidirectional-type-synthesis-checking}. \qed
 \end{proof}
 
 The formal counterpart of the above proof in \Agda functions as two top-level programs for type checking and synthesis.

@@ -6,7 +6,7 @@
 We start with an overview of our theory by instantiating it to simply typed $\lambda$-calculus.
 Roughly speaking, the problem of type synthesis requires us to take a raw term as input, and produce a typing derivation for the term if possible.
 To give more precise definitions: the raw terms for simply typed $\lambda$-calculus are defined%
-\footnote{The usual condition about named representations of variables is omitted.}
+\footnote{The usual conditions about named representations of variables are omitted.}
 in \cref{fig:STLC-raw-terms};
 besides the standard constructs, there is an \textsc{Anno} rule that allows the user to insert type annotations to facilitate type synthesis.
 
@@ -55,7 +55,7 @@ besides the standard constructs, there is an \textsc{Anno} rule that allows the 
 \end{figure}
 
 Correspondingly, the definition of typing derivations%
-\footnote{We write~`$\bto$' instead of~`$\to$' for the function types of the simply typed $\lambda$-calculus to avoid confusion with the function types in our type-theoretic meta-language.}
+\footnote{We write~`$\bto$' instead of~`$\to$' for the function types of simply typed $\lambda$-calculus to avoid confusion with the function types in our type-theoretic meta-language.}
 in \cref{fig:STLC-typing-derivations} has an \textsc{Anno} rule enforcing that the type of an annotated term does match the annotation.
 
 %\footnote{The presence of type annotations allows type synthesis to subsume type checking: to check whether a term~$t$ has type~$A$, synthesise the type of $t \bbcolon A$.}

@@ -4,7 +4,7 @@
 
 Our first important construction is mode decoration in \cref{sec:mode-decoration}, which is in fact generalised to pinpoint any missing type annotations in a given raw term.
 We discuss some related properties: by bringing mode derivations into the picture, we are able to give a natural formulation of soundness and completeness of a bidirectional type system with respect to its erasure to an ordinary type system in \cref{sec:soundness-and-completeness}.
-We formulate annotatability~\cite{Dunfield2021} and discuss its relationship with our completeness and generalised mode decoration in \cref{sec:annotatability}.
+We also reformulate annotatability~\cite[Section~3.2]{Dunfield2021} and compare it with our completeness and generalised mode decoration in \cref{sec:annotatability}.
 
 \subsection{Soundness and completeness}
 \label{sec:soundness-and-completeness}
@@ -12,7 +12,7 @@ We formulate annotatability~\cite{Dunfield2021} and discuss its relationship wit
 %\Josh{Throughout this sub-section, we quantify over any bidirectional type system~$(\Sigma, \Omega)$, context $\Gamma : \Cxt_\Sigma(\emptyset)$, raw term $\erase\Gamma |-_{\Sigma, \erase\Omega} t$, mode~$d$, and type $A : \Type_\Sigma(\emptyset)$.}
 
 Erasure of a bidirectional binding signature removes modes and keeps everything else intact; this can be straightforwardly extended by induction to remove modes from a bidirectional typing derivation and arrive at an ordinary typing derivation, which is soundness.
-Instead we can remove typing and retain modes, arriving at a mode derivation.
+Alternatively, we can remove typing and retain modes, arriving at a mode derivation.
 Conversely, if we have both mode and typing derivations for the same term, we can combine them to form a bidirectional typing derivation, which is completeness.
 In short, soundness and completeness are merely the separation and combination of mode and typing information carried by the three kinds of derivations while keeping their basic structure, directed by the same raw term.
 All these can be summarised in one theorem and proved by induction.
@@ -93,7 +93,7 @@ This lemma would be wrong if the `strictness' boolean~$s$ was left out of the ru
 The `strictness' boolean~$s$ can be thought of as disrupting the formation of such pairs of mode casts: every rule other than the mode casts sets~$s$ to~$\BTrue$, meaning that a term is \emph{strictly} in the mode assigned by the rule (i.e.~not altered by a mode cast), whereas the mode casts set~$s$ to~$\BFalse$.
 Furthermore, the sub-derivation of a mode cast has to be strict, so it is impossible to have consecutive mode casts.
 Another way to understand the role of~$s$ is that it makes the $\SynRule{Missing}$ rule precise: an annotation is truly missing only when a term is \emph{strictly} in checking mode but is required to be in synthesising mode.
-With strictness coming into play, non-genuine derivations are now `truly non-genuine'.
+The explicit formulation of strictness makes non-genuine derivations `truly non-genuine', and \cref{thm:Pre?-false} can be proved.
 
 %\begin{proof}[Proof of \cref{thm:Pre?-false}]
 %Induction on the generalised mode derivation, in each case analysing an arbitrary mode derivation and showing that it cannot exist.
@@ -181,7 +181,7 @@ With a generalised mode decorator, it is now easy to derive an ordinary one.
 
 \subsection{Annotatability}\label{sec:annotatability}
 \citet[Section~3.2]{Dunfield2021} formulated completeness differently from our \cref{lem:soundness-completeness} and proposed \emph{annotatability} as a more suitable name.
-In our theory, we may formulate annotatability as follows.
+In our theory, we may reformulate annotatability as follows.
 
 \begin{proposition}[Annotatability]\label{thm:annotatability}
 If $\Gamma |-_{\Sigma,\erase\Omega} t : A$, then there exists~$t'$ such that $t' \sqsupseteq t$ and $\Gamma |-_{\Sigma,\Omega} t' :^\dir{d} A$ for some~$\dir{d}$.

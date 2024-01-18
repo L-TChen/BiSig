@@ -42,8 +42,8 @@ For simple types, the only datum needed for specifying a type construct is its n
 \end{defn}
 
 \begin{example} \label{ex:type-signature-for-function-type}
-  Function types $A \bto B$ and typically a base type~$\mathtt{b}$ are included in simply typed $\lambda$-calculus and can be specified by the type signature $\Sigma_{\bto}$ consisting of operations $\mathsf{fun}$ and $\mathsf{b}$ where $\arity(\mathsf{fun}) = 2$ and $\arity(\mathsf{b}) = 0$.
-  Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
+  Function types $A \bto B$ and typically a base type~$\mathtt{b}$ are included in simply typed $\lambda$-calculus, and can be specified by the type signature $\Sigma_{\bto}$ consisting of operations $\mathsf{fun}$ and $\mathsf{b}$ where $\arity(\mathsf{fun}) = 2$ and $\arity(\mathsf{b}) = 0$.
+  Then, all types in simply typed $\lambda$-calculus can be given as $\Sigma_{\bto}$-types over the empty set, with $A \bto B$ introduced as $\tyOp_{\mathsf{fun}}(A, B)$ and $\mathtt{b}$ as $\tyOp_{\mathsf{b}}$. 
 \end{example}
 
 \begin{defn}\label{def:substitution}
@@ -54,15 +54,15 @@ The \emph{substitution} for a function $\rho\colon \Xi \to \Type_{\Sigma}(\Xi')$
 
 A simply typed language specifies
 \begin{inlineenum}
-  \item a family of sets of raw terms $\isTerm{t}$ indexed by a list~$V$ of variables (that are currently in scope) where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
+  \item a family of sets of raw terms $\isTerm{t}$ indexed by a list~$V$ of variables (that are currently in scope), where each construct is allowed to bind some variables like $\Rule{Abs}$ and to take multiple arguments like $\Rule{App}$;
   \item a family of sets of typing derivations indexed by a typing context~$\Gamma$, a raw term~$\isTerm{t}$, and a type~$A$.
 \end{inlineenum}
 Therefore, to specify a term construct, we enrich the notion of arity with some set of types for typing and extension context for variable binding.
 
 \begin{defn}[{\cite[p.~322]{Fiore2010}}]\label{def:binding-arity}
-  A \emph{binding arity} with a set $T$ of types is an inhabitant of $\left(T^* \times T\right)^* \times T$ where $T^*$ is the set of lists over $T$.
+  A \emph{binding arity} with a set $T$ of types is an inhabitant of $\left(T^* \times T\right)^* \times T$, where $T^*$ is the set of lists over $T$.
   In a binding arity $(((\Delta_1, A_1), \ldots, (\Delta_n, A_n)), A)$, every $\Delta_i$ and $A_i$ refers to the \emph{extension context} and the \emph{type of the $i$-th argument}, respectively, and $A$ the \emph{target type}.
-  For brevity, it is denoted by $\bargs \to A$ where $[\Delta_i]$ is omitted if empty.
+  For brevity, it is denoted by $\bargs \to A$, where $[\Delta_i]$ is omitted if empty.
 \end{defn}
 
 \begin{example}
@@ -75,9 +75,9 @@ Therefore, to specify a term construct, we enrich the notion of arity with some 
     \qquad\text{and}\qquad
     \frac{\Gamma, \eqnmarkbox[blue]{ext2}{\cdot} \vdash \isTerm{t} : \eqnmarkbox[red]{aty2}{A \bto B} \qquad \Gamma, \eqnmarkbox[blue]{ext3}{\cdot} \vdash \isTerm{u} : \eqnmarkbox[red]{aty3}{A}}{\Gamma \vdash \isTerm{t\;u} : \eqnmarkbox{ty2}{B}}
   \end{equation*}
-  \annotate[yshift=1.5em]{above}{ext1,ext2,ext3}{extension context}
-  \annotate[yshift=0.4em]{above,right}{aty1,aty2,aty3}{argument type}
-  \annotate[yshift=0em]{below}{ty1,ty2}{target type}
+  \annotate[yshift=1.5em]{above}{ext1,ext2,ext3}{extension contexts}
+  \annotate[yshift=0.4em]{above,right}{aty1,aty2,aty3}{argument types}
+  \annotate[yshift=0em]{below}{ty1,ty2}{target types}
   \vspace{.5em}
   \\
   if the empty context $\cdot$ is added verbosely, so they can be specified by arities ${[A]B} \to {(A \bto B)}$ and ${(A \bto B), A} \to {B}$, respectively, with $\Type_{\Sigma_{\bto}}(A, B)$ as types.
@@ -147,7 +147,7 @@ The list of variables in~$\Gamma$ is denoted~$\erase\Gamma$.
 \end{defn}
 
 The definition of typing derivations is a bit more involved.
-We need some information to compare types on the object level during type synthesis and substitute those type variables in a typing derivation $\Gamma \vdash \tmOpts : A$ for an operation $o$ in $\Omega$ at some point.
+We need some information to compare types on the object level during type synthesis and substitute those type variables in a typing derivation of $\Gamma \vdash \tmOpts : A$ for an operation $o$ in $\Omega$ at some point.
 Here we choose to include a substitution $\rho$ from the local context $\Xi$ to $\emptyset$ as part of its typing derivation explicitly:
 
 \begin{defn}\label{def:typing-derivations}
@@ -167,7 +167,8 @@ Rules $\Rule{Abs}$ and $\Rule{App}$ in simply typed $\lambda$-calculus are subsu
 \end{example}
 
 \subsection{Bidirectional binding signatures and bidirectional type systems} \label{subsec:bidirectional-system}
-For a bidirectional type system, typing judgements appear in two forms: $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$, but these two typing judgements can be considered as a single typing judgement $\Gamma |- t :^\dir{d} A$, additionally indexed by a \emph{mode} $d : \Mode$---which can be either $\syn$ or $\chk$.
+Typing judgements for a bidirectional type system appear in two forms: $\Gamma |- t \syn A$ and $\Gamma |- t \chk A$.
+These two typing judgements can be considered as a single typing judgement $\Gamma |- t :^\dir{d} A$ indexed by a \emph{mode} $d : \Mode$, which can be either $\syn$ or $\chk$.
 Therefore, to define a bidirectional type system, we enrich the concept of binding arity to \emph{bidirectional binding arity}, which further specifies the mode for each of its arguments and for the conclusion:
 
 \begin{defn} \label{def:bidirectional-binding-signature}
@@ -191,14 +192,14 @@ Likewise, the $\SynRule{App}$ rule has the arity ${(A \bto B)^{\syn}, A^{\chk}} 
   \]
 \end{defn}
 We write $\biop$ for an operation $o$ with a variable set $\Xi$ and its bidirectional binding arity with $\Type_{\Sigma}(\Xi)$ as types.
-We call it \emph{checking} if $d$ is ${\chk}$ or \emph{synthesising} if $d$ is ${\syn}$; similarly its $i$-th argument is checking if $d_i$ is $\chk$ and synthesising if $d_i$ is $\syn$.
+We call it \emph{checking} if $d$ is ${\chk}$ or \emph{synthesising} if $d$ is ${\syn}$; similarly, its $i$-th argument is checking if $d_i$ is $\chk$ and synthesising if $d_i$ is $\syn$.
 A bidirectional type system $(\Sigma, \Omega)$ refers to a pair of a type signature $\Sigma$ and a bidirectional binding signature $\Omega$.
 
 
 \begin{defn}\label{def:bidirectional-typing-derivations}\label{def:mode-derivations}
   For a bidirectional type system $(\Sigma, \Omega)$,
   \begin{itemize}
-    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, indexed by a typing context $\Gamma$, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$, is defined in \Cref{fig:bidirectional-typing-derivations} and particularly
+    \item the set of \emph{bidirectional typing derivations} of $\Gamma \vdash_{\Sigma, \Omega} t :^\dir{d} A$, indexed by a typing context $\Gamma$, a raw term $\isTerm{t}$ under $\erase{\Gamma}$, a mode $\dir{d}$, and a type $A$, is defined in \Cref{fig:bidirectional-typing-derivations}, and particularly
           \[
             \Gamma |-_{\Sigma, \Omega} \tmOpts :^{\dir{d}} \simsub{A_0}{\rho}
           \]
@@ -213,7 +214,7 @@ Every bidirectional binding signature $\Omega$ gives rise to a binding signature
 Hence a bidirectional type system $(\Sigma, \Omega)$ also specifies a simply typed language $(\Sigma, \erase{\Omega})$, including raw terms and typing derivations.
 
 \begin{example}\label{ex:signature-simply-typed-lambda}
-Having established generic definitions, we can now specify the simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
+Having established generic definitions, we can now specify simply typed $\lambda$-calculus and its bidirectional type system---including raw terms, (bidirectional) typing derivations, and mode derivations---using just a pair of signatures $\Sigma_{\bto}$ (\Cref{ex:type-signature-for-function-type}) and $\Omega^{\Leftrightarrow}_\Lambda$ which consists of 
 \[
   \aritysymbol{\mathsf{abs}}{A , B}{[A]B^{\chk}}{(A \bto B)^{\chk}}
   \quad\text{and}\quad

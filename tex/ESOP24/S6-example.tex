@@ -5,7 +5,7 @@ To exhibit the applicability of our approach, we discuss two more examples:
 one has infinitely many operations and the other includes many more constructs than simply typed $\lambda$-calculus, exhibiting the practical side of a general treatment.
 
 \subsection{Spine application}\label{subsec:spine}
-A spine application $t\;u_1\;\ldots\;u_n$ is a form of application that consists of a head term $t$ and an indeterminate number of arguments $u_1\;u_2\;\dots\;u_n$.
+A spine application $t\;u_1\;\ldots\;u_n$ is a form of application that consists of a head term $t$ and an indeterminate number of arguments $u_1$, $u_2$, \ldots, $u_n$.
 This arrangement allows direct access to the head term, making it practical in various applications, and has been used by \Agda's core language. %employs this form of application, as does its reflected syntax used for metaprogramming.
 
 At first glance, accommodating this form of application may seem impossible, given that the number of arguments for a construct is finite and has to be fixed.
@@ -25,7 +25,7 @@ Each application $t\;u_1\;\ldots\;u_n$ can be introduced as $\tmOp_{\mathsf{app}
 \subsection{Computational calculi}\label{subsec:PCF}
 Implementing a stand-alone type synthesiser for a simply typed language is typically a straightforward task.
 However, the code size increases proportionally to the number of type constructs and of arguments associated with each term construct.
-When dealing with a fixed number $n$ of type constructs, for each synthesising construct, there are two cases for a checking argument but $n + 1$ cases for each synthesising argument---the successful synthesis of the expected type, an instance where it fails, or $n-1$ cases where the expected type does not match; similarly for a checking construct---making the task tedious.
+For example, when dealing with a fixed number $n$ of type constructs, for each synthesising construct there are two cases for a checking argument but $n + 1$ cases for each synthesising argument: the successful synthesis of the expected type, an instance where it fails, or $n-1$ cases where the expected type does not match.
 Thus, having a generator is helpful and can significantly reduce the effort for implementation.
 
 \ifarxiv
@@ -45,8 +45,8 @@ Mode-correctness can be derived by \cref{lem:decidability-mode-correctness} and 
 For a demonstration in \Agda, see \cref{sec:formalisation}.
 \else
 For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with naturals, sums, products, and general recursion.
-The extended language has `only' 15 constructs, including pairing, projections, injections, and so on, whereas there are nearly 100 possible cases to consider in bidirectional type synthesis.
-However, it has far fewer constructs than a realistic programming language would have. 
+The extended language has `only' 15 constructs, including pairing, projections, injections, and so on, and this number of constructs is still far fewer than what a realistic programming language would have.
+Even for this small calculus, there are already nearly 100 possible cases to consider in bidirectional type synthesis.
 
 On the other hand, similar to a parser generator, only one specification is needed for a type-synthesiser generator from the user to produce a corresponding type synthesiser. 
 Such a specification can be derived by extending $(\Sigma_{\bto}, \Omega_{\Lambda}^{\Leftrightarrow})$ accordingly for additional types and constructs with mode-correctness proved by applying \cref{lem:decidability-mode-correctness}, so its type synthesiser follows from \cref{cor:trichotomy} directly.

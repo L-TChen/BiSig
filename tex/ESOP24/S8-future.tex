@@ -8,14 +8,14 @@ While our current development is based on simply typed languages to highlight th
 
 The idea of presenting logics universally at least date back to universal algebra and model theory, where structures are studied for certain notions of arities and signatures.
 In programming language theory, \varcitet{Aczel1978}{'s binding signature} is an example which has been used to prove a general confluence theorem.
-Many general definitions and frameworks for defining logics and type theories have been proposed and can be classified into two groups by where signatures reside: the meta level or the object level of a meta-language:
+Many general definitions and frameworks for defining logics and type theories have been proposed and can be classified into two groups by where signatures reside---the meta level or the object level of a meta-language:
 \begin{enumerate}
-  \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory, where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
+  \item \varcitet{Harper1993a}{'s logical framework \LF} and its family of variants~\cite{Harper2007,Reed2008,Assaf2016,Felicissimo2023} are \emph{extensions} of Martin-L\"of type theory, where signatures are on the \emph{meta level} and naturally capable of specifying dependent type theories;
 \item general dependent type theories~\cite{Bauer2020,Haselwarter2021,Bauer2022a,Uemura2021}, categorical semantics~\cite{Fiore1999,Tanaka2006,Tanaka2006a,Fiore2010,Hamana2011,Fiore2013,Arkor2020,Fiore2022} (which includes the syntactic model as a special case), and frameworks for substructural systems~\cite{Tanaka2006,Tanaka2006a,Wood2022} are developed \emph{within} a meta-theory (set theory or type theory), where signatures are on the \emph{object level} and their expressiveness varies depending on their target languages.
 \end{enumerate}
 
-The \LF approach is naturally expressive, but each extension requires a different framework and a different implementation to check formal \LF proofs.
-Formalising \LF and its variants is at least as hard as formalising a dependent type theory, and they are mostly implemented separately from their theory and unverified.
+The \LF family is expressive, but each extension is a different metalanguage and requires a different implementation to check formal \LF proofs.
+Formalising \LF and its variants is at least as complicated as formalising a dependent type theory, and they are mostly implemented separately from their theory and unverified.
 
 For the second group, theories developed in set theory can often be restated in type theory and thus manageable for formalisation in a type-theoretic proof assistant. 
 Such examples include frameworks developed by \citet{Ahrens2022,Allais2021,Fiore2022}, although these formal implementations are limited to simply typed theories for now.
@@ -69,19 +69,19 @@ In the context of dependent type theory, type synthesis entails a term equality 
 Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
 
 Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
-They propose a notion of \LF signature with modes, a definition of mode-correctness (called \emph{well-typed} op.\ cit.), and an algorithm of bidirectional type synthesis.
-The algorithm is decidable, sound and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and that the set of computational rules is type-preserving, confluent, and strongly normalising.
-The last assumption, however, is challenging to establish even for specific languages, and lacks a general treatment.
+They propose a notion of \LF signature with modes, a definition of mode-correctness, and an algorithm of bidirectional type synthesis.
+The algorithm is decidable, sound and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and that the set of computational rules is type-preserving, confluent, and normalising.
+The last assumption, however, lacks a general treatment and is challenging to establish even for specific languages.
 
 \subsubsection{Beyond syntax-directedness}
 
 %To explore general settings, an extreme choice is to independently specify an ordinary and a bidirectional type system over the same raw terms and then investigate relationships between the two systems.
 
-To relax the assumption of syntax-directedness, we could start from a simpler case where the ordinary typing part is still syntax-directed, but each typing rule is refined to multiple bidirectional variants, including different orders of its premises.
+To relax the assumption of syntax-directedness, we could start from a simple but common case where the ordinary typing part is still syntax-directed, but each typing rule is refined to multiple bidirectional variants, including different orders of its premises.
 In such cases, the mode decorator would need to backtrack and find all mode derivations, but the type synthesiser should still work in a syntax-directed manner on each mode derivation.
 Completeness could still take the simple form presented in this paper too.
 
-Next, we could consider systems where each construct can have multiple typing rules, which can have multiple bidirectional variants.
+Next, we could consider systems where each construct can have multiple typing rules, which can further have multiple bidirectional variants.
 In this setting, the bidirectional type synthesiser will also need to backtrack.
 It is still possible to treat soundness as the separation of mode and type information, but completeness will pose a problem:
 for every raw term, a mode derivation chooses a mode assignment while a typing derivation chooses a typing rule, but there may not be a bidirectional typing rule for this particular combination.

@@ -30,9 +30,14 @@ Thus, having a generator is helpful and can significantly reduce the effort for 
 
 \ifarxiv
 For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with additional constructs listed in \cref{tab:computational-calculus}.
-The extended language has `only' 15 constructs, far fewer than a realistic programming language would have, but there are nearly 100 possible cases to consider in bidirectional type synthesis.
+\else
+For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with naturals, sums, products, and general recursion.
+\fi
+The extended language has `only' 15 constructs, including pairing, projections, injections, and so on, and this number of constructs is still far fewer than what a realistic programming language would have.
+Even for this small calculus, there are already nearly 100 possible cases to consider in bidirectional type synthesis.
 
-On the other hand, similar to a parser generator, a type-synthesiser generator only needs a specification $(\Sigma, \Omega)$ from the user to produce a corresponding synthesiser. 
+On the other hand, similar to a parser generator, only one specification is needed for a type-synthesiser generator from the user to produce a corresponding type synthesiser. 
+\ifarxiv
 Such a specification can be derived by extending $\Sigma_{\bto}$ with additional type constructs with $\mathsf{nat}$, $\mathsf{prod}$, $\mathsf{sum}$, and $\mathsf{T}$ such that
 \[
   \arity({\mathsf{nat}}) = 0\qquad
@@ -41,13 +46,8 @@ Such a specification can be derived by extending $\Sigma_{\bto}$ with additional
 \]
 Types $\mathtt{nat}$, $A \times B$, $A + B$, and $T(A)$ are given as $\tyOp_{\mathsf{nat}}$, $\tyOp_{\mathsf{prod}}(A, B)$, $\tyOp_{\mathsf{sum}}(A, B)$, and $\tyOp_{\mathsf{T}}(A)$ respectively.
 The signature $\Omega_{\Lambda}^{\Leftrightarrow}$ is then extended with operations listed in \cref{tab:computational-calculus}.
-Mode-correctness can be derived by \cref{lem:decidability-mode-correctness} and its type synthesiser by \cref{cor:trichotomy} with the specification~$(\Sigma, \Omega)$ directly.
+Mode-correctness can be proved by applying \cref{lem:decidability-mode-correctness}, so its type synthesiser follows from \cref{cor:trichotomy} with the extended specification.
 For a demonstration in \Agda, see \cref{sec:formalisation}.
 \else
-For illustrative purposes, consider a computational calculus~\cite{Moggi1989} with naturals, sums, products, and general recursion.
-The extended language has `only' 15 constructs, including pairing, projections, injections, and so on, and this number of constructs is still far fewer than what a realistic programming language would have.
-Even for this small calculus, there are already nearly 100 possible cases to consider in bidirectional type synthesis.
-
-On the other hand, similar to a parser generator, only one specification is needed for a type-synthesiser generator from the user to produce a corresponding type synthesiser. 
 Such a specification can be derived by extending $(\Sigma_{\bto}, \Omega_{\Lambda}^{\Leftrightarrow})$ accordingly for additional types and constructs with mode-correctness proved by applying \cref{lem:decidability-mode-correctness}, so its type synthesiser follows from \cref{cor:trichotomy} directly.
 \fi

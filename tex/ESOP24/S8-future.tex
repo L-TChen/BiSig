@@ -65,13 +65,15 @@ By translating the rule to subtyping, we have the \emph{instantiation problem} t
 A theory that accommodates various solutions to the problem is left as future work.
 
 \paragraph{Dependent types}
-In the context of dependent type theory, type synthesis entails a term equality check for type equality.
-Achieving decidable bidirectional type synthesis depends on the decidability of term equality, which, in turn, relies on the ability to specify computation rules within a language specification.
+Logical frameworks with bidirectional typing are proposed by \citet{Reed2008} and \citet{Felicissimo2023}.
+\citeauthor{Felicissimo2023}'s framework is more expressive than \citeauthor{Reed2008}'s, due to its ability to specify rewriting rules.
+Both frameworks extend \LF, enabling generic bidirectional type checking for dependent type theories.
+They also incorporate notions of signatures and mode-correctness (called \emph{strictness} and \emph{validity}, respectively, in their contexts) but differ from ours in several ways.
 
-Extending the logical framework \Dedukti~\cite{Assaf2016}, \varcitet{Felicissimo2023}{'s recent \textsf{CompLF}} is capable of defining dependent type theories with computational rules and enables generic bidirectional type synthesis.
-They propose a notion of \LF signature with modes, a definition of mode-correctness, and an algorithm of bidirectional type synthesis.
-The algorithm is decidable, sound and complete with respect to mode-decorated terms, provided that the specified language is mode-correct, and that the set of computational rules is type-preserving, confluent, and normalising.
-The last assumption, however, lacks a general treatment and is challenging to establish even for specific languages.
+First, the number of operations introduced by a signature in \LF is finite, so constructs like spine application seem impossible to define.
+Second, \citeauthor{Reed2008} and \citeauthor{Felicissimo2023} deal with decorated raw terms only, while our theory bridges the gap between ordinary and decorated raw terms by mode decoration.
+Lastly, \citeauthor{Felicissimo2023} classifies operations \emph{a priori} into introduction and elimination rules, and follows the Pfenning recipe assigning, for example, the synthesising mode to each elimination rule and its principal argument.
+As pointed out by \citeauthor{Dunfield2021} that bidirectional typing is essentially about managing information flow, and that some systems remarkably deviate from this recipe, we do not enforce it but establish our results on any reasonable information flow.
 
 \subsubsection{Beyond syntax-directedness}
 

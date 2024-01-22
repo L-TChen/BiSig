@@ -15,6 +15,8 @@
 \newcommand{\bmmax}{0}
 \usepackage{bm}
 \usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{amssymb}
 \input{mathlig}
 \usepackage{mathpartir}
 \usepackage{annotate-equations}
@@ -22,11 +24,12 @@
 \usepackage{xspace}
 \usepackage[capitalise,noabbrev]{cleveref}
 
-
 % Used for typesetting Agda code
-\usepackage{agda-lhs2tex}
-\newcommand{\cons}[1]{\mathbf{#1}}
-\newcommand{\iden}{\mathit}
+\IfFileExists{./agda-lhs2tex.sty}{%
+  \usepackage{agda-lhs2tex}
+  \newcommand{\cons}[1]{\mathbf{##1}}
+  \newcommand{\iden}{\mathit}
+}{}
 
 \usepackage{xifthen}
 \newcommand{\varcitet}[3][]{\citeauthor{#2}#3~\ifthenelse{\isempty{#1}}{\cite{#2}}{\cite[#1]{#2}}}
@@ -35,16 +38,10 @@
 \newlist{inlineenum}{enumerate*}{1}
 \setlist[inlineenum]{label=(\roman*)}
 
-\setlength{\marginparwidth}{2cm}
-\usepackage[color=yellow,textsize=scriptsize]{todonotes}
-
 \usepackage{microtype}
 \microtypesetup{babel}
 
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
-
-\newcommand{\LT}[2][]{\todo[author=LT,color=orange!40,#1]{#2}}
-\newcommand{\Josh}[2][]{\todo[author=Josh,color=yellow!40,#1]{#2}}
 
 \newcommand{\codefigure}{\small\setlength{\parindent}{0em}\setlength{\mathindent}{0em}\setlength{\abovedisplayskip}{0ex}\setlength{\belowdisplayskip}{0ex}}
 
@@ -55,7 +52,6 @@
 
 \spnewtheorem{defn}[theorem]{Definition}{\bfseries}{\rmfamily}
 \crefformat{defn}{Definition~#2#1#3}
-
 
 \author{Liang-Ting Chen\orcidID{0000-0002-3250-1331} \and Hsiang-Shang Ko\orcidID{0000-0002-2439-1048}}
 \institute{Institute of Information Science, Academia Sinica, Taipei, Taiwan}
@@ -78,6 +74,7 @@ The entire theory is formally implemented in \Agda, so we provide a \emph{verifi
 % Due to ESOP's page limit, the appendix is only available in the ArXiv version.
 
 \newif\ifarxiv 
+%\arxivtrue
 
 \input{S1-intro}
 \input{S2-outline}
@@ -90,9 +87,9 @@ The entire theory is formally implemented in \Agda, so we provide a \emph{verifi
 \bibliographystyle{splncs04nat}
 \bibliography{ref}
 
-\appendix
-
 \ifarxiv
+
+\appendix
 \subfile{S7-formalisation}
 
 \input{appendix}

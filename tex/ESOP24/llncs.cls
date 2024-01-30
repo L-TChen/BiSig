@@ -1,4 +1,4 @@
-% LLNCS DOCUMENT CLASS -- version 2.23 (02-Nov-2023)
+% LLNCS DOCUMENT CLASS -- version 2.24 (29-Jan-2024)
 % Springer Verlag LaTeX2e support for Lecture Notes in Computer Science
 %
 %%
@@ -19,7 +19,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\ProvidesClass{llncs}[2023/11/02 v2.23
+\ProvidesClass{llncs}[2024/01/29 v2.24
 ^^J LaTeX document class for Lecture Notes in Computer Science]
 % Options
 \let\if@envcntreset\iffalse
@@ -51,12 +51,6 @@
 \LoadClass[twoside]{article}
 \RequirePackage{multicol} % needed for the list of participants, index
 \RequirePackage{aliascnt}
-
-\newcommand*{\supphantomsection}{%
-  \Hy@GlobalStepCount\Hy@linkcounter
-  \Hy@MakeCurrentHref{\@currenvir.\the\Hy@linkcounter}
-  \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}
-}
 
 \setlength{\textwidth}{12.2cm}
 \setlength{\textheight}{19.3cm}
@@ -1061,17 +1055,25 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\def\@thmcountersep{}
-\def\@thmcounterend{.}
+\edef\@thmcountersep{}
+\edef\@thmcounterend{.}
 
 \def\spnewtheorem{\@ifstar{\@sthm}{\@Sthm}}
 
 % definition of \spnewtheorem with number
 
-\def\@spnthm#1#2{%
-  \@ifnextchar[{\@spxnthm{#1}{#2}}{\@spynthm{#1}{#2}}}
+\def\@spnthm#1#2{\@ifnextchar[{\@spxnthm{#1}{#2}}{\@spynthm{#1}{#2}}}
 \def\@Sthm#1{\@ifnextchar[{\@spothm{#1}}{\@spnthm{#1}}}
 
+% theorem-like environment with standard counter
+\def\@spynthm#1#2#3#4{\expandafter\@ifdefinable\csname #1\endcsname
+   {\@definecounter{#1}%
+   \expandafter\xdef\csname the#1\endcsname{\@thmcounter{#1}}%
+   \expandafter\xdef\csname #1name\endcsname{#2}%
+   \global\@namedef{#1}{\@spthm{#1}{\csname #1name\endcsname}{#3}{#4}}%
+                               \global\@namedef{end#1}{\@endtheorem}}}
+
+% theorem-like environment with section-wise counter (envcountsect)
 \def\@spxnthm#1#2[#3]#4#5{\expandafter\@ifdefinable\csname #1\endcsname
    {\@definecounter{#1}\@addtoreset{#1}{#3}%
    \expandafter\xdef\csname the#1\endcsname{\expandafter\noexpand
@@ -1080,23 +1082,24 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
    \global\@namedef{#1}{\@spthm{#1}{\csname #1name\endcsname}{#4}{#5}}%
                               \global\@namedef{end#1}{\@endtheorem}}}
 
-\def\@spynthm#1#2#3#4{\expandafter\@ifdefinable\csname #1\endcsname
-   {\@definecounter{#1}%
-   \expandafter\xdef\csname the#1\endcsname{\@thmcounter{#1}}%
-   \expandafter\xdef\csname #1name\endcsname{#2}%
-   \global\@namedef{#1}{\@spthm{#1}{\csname #1name\endcsname}{#3}{#4}}%
-                               \global\@namedef{end#1}{\@endtheorem}}}
-
+% theorem-like environment with shared counter (envcountsame)
 \def\@spothm#1[#2]#3#4#5{%
   \@ifundefined{c@#2}{\@latexerr{No theorem environment `#2' defined}\@eha}%
   {\expandafter\@ifdefinable\csname #1\endcsname
   {\newaliascnt{#1}{#2}%
   \expandafter\xdef\csname #1name\endcsname{#3}%
+  \if@envcntsect
+    % the following line, introduced in v2.24, fixes incorrect hypertexnames
+    % when envcountsect is used in combination with envcountsame
+    \@addtoreset{#1}{section}
+  \fi
   \global\@namedef{#1}{\@spthm{#1}{\csname #1name\endcsname}{#4}{#5}}%
   \global\@namedef{end#1}{\@endtheorem}}}}
 
+
+
 \def\@spthm#1#2#3#4{\topsep 7\p@ \@plus2\p@ \@minus4\p@
-\refstepcounter{#1}\supphantomsection%
+\refstepcounter{#1}%
 \@ifnextchar[{\@spythm{#1}{#2}{#3}{#4}}{\@spxthm{#1}{#2}{#3}{#4}}}
 
 \def\@spxthm#1#2#3#4{\@spbegintheorem{#2}{\csname the#1\endcsname}{#3}{#4}%
@@ -1146,7 +1149,7 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
    \fi
 \fi
 
-%definition of divers theorem environments
+%definition of various theorem environments
 \spnewtheorem*{claim}{Claim}{\itshape}{\rmfamily}
 \spnewtheorem*{proof}{Proof}{\itshape}{\rmfamily}
 \if@envcntsame % alle Umgebungen wie Theorem.
